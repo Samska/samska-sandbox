@@ -1,0 +1,26 @@
+# Local environment and secret files. Safe templates remain trackable.
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.secret
+*.secrets
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Local tool and operating-system files.
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Future generated dependency and build outputs.
+node_modules/
+target/
+build/
+dist/
+coverage/
