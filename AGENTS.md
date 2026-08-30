@@ -1,24 +1,24 @@
 # AI Agent Instructions
 
-This repository's documentation is the authoritative project context. Conversation history is not.
+Repository documentation is the authoritative project context. Conversation history, generated output, and agent assumptions are not.
 
 Before meaningful work, an agent must:
 
-1. Read this file and documentation relevant to the task.
-2. Inspect the existing implementation and identify affected modules.
-3. Assess scope, security implications, and appropriate risk-based tests.
-4. Produce a concise plan before making substantial changes.
-5. Implement only the requested scope; do not pull roadmap work forward.
-6. Run appropriate verification and report decisions, tradeoffs, risks, and remaining concerns.
+1. Read this file, documentation relevant to the task, and the existing implementation.
+2. Confirm requested scope, acceptance criteria, affected modules, documentation, security implications, and risk-based verification.
+3. Produce a concise plan before substantial changes and stop for a human decision when material uncertainty exists.
+4. Implement only approved scope; do not pull roadmap work forward.
+5. Update affected documentation and create an ADR for significant, durable architecture decisions.
+6. Run appropriate verification.
+7. Report what changed, why, verification, decisions, tradeoffs, alternatives when relevant, risks, and remaining concerns.
 
 Follow these rules:
 
 - Do not add dependencies, infrastructure, or architectural patterns without a demonstrated need and justification.
 - Keep the backend a modular monolith unless an accepted ADR changes that direction.
-- Create an ADR for significant, durable architectural decisions; do not create ADRs for routine implementation choices.
 - Never add, expose, log, or commit secrets, credentials, private keys, or real customer data.
 - Use synthetic data and simulated payments only.
-- Update affected documentation in the same change as implementation.
-- Human review and validation remain mandatory for all AI-produced work.
+- Explain meaningful engineering decisions so the human can learn and approve them.
+- Human review, understanding, and validation remain mandatory; never accept AI output blindly.
 
-Read the relevant detailed guidance in [docs/AI-GOVERNANCE.md](docs/AI-GOVERNANCE.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/TESTING.md](docs/TESTING.md), [docs/SECURITY.md](docs/SECURITY.md), and [docs/adr/README.md](docs/adr/README.md).
+Read the relevant detailed guidance in [docs/AI-GOVERNANCE.md](docs/AI-GOVERNANCE.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/architecture/principles.md](docs/architecture/principles.md), [docs/TESTING.md](docs/TESTING.md), [docs/SECURITY.md](docs/SECURITY.md), and [docs/adr/README.md](docs/adr/README.md).

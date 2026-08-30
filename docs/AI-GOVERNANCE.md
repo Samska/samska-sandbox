@@ -2,7 +2,7 @@
 
 ## Purpose
 
-AI coding agents are expected to generate or modify production code in Samska Sandbox. They accelerate execution but do not transfer accountability from humans.
+AI coding agents are expected to generate or modify production code in Samska Sandbox. They accelerate execution and help the human learn, but do not transfer accountability from humans.
 
 Repository documentation is the source of truth for project context. Conversation history, generated output, and agent assumptions are not authoritative.
 
@@ -10,30 +10,51 @@ Repository documentation is the source of truth for project context. Conversatio
 
 | AI Agents | Human Owner and Reviewers |
 | --- | --- |
-| Inspect the repository and relevant documentation before meaningful work | Define requirements and acceptance criteria |
-| Identify affected modules, security implications, tests, and documentation | Make architecture and engineering decisions |
-| Propose a concise implementation plan | Review scope, correctness, security, maintainability, and tradeoffs |
-| Implement only approved scope and run appropriate verification | Validate results and assess residual risk |
-| Report evidence, decisions, risks, limitations, and follow-up concerns | Understand and accept or reject AI-produced changes |
+| Read required context, inspect the implementation, and identify affected modules and documentation | Define requirements, acceptance criteria, priorities, and risk tolerance |
+| Assess scope, security implications, dependencies, architecture compliance, and risk-based verification | Make and approve important product, architecture, dependency, and risk decisions |
+| Produce a concise plan and request a decision when material uncertainty exists | Review scope, correctness, security, maintainability, tradeoffs, and evidence |
+| Implement only approved scope, synchronize documentation, and run appropriate verification | Validate results, understand the approach, and accept or reject the output |
+| Explain what changed, why, tradeoffs, relevant alternatives, verification, risks, and follow-up concerns | Remain accountable for the resulting change and its residual risk |
 
 Humans must not accept AI output blindly.
 
-## Required Agent Workflow
+## Required Context
 
-Before meaningful implementation, an agent must read [AGENTS.md](../AGENTS.md), relevant documentation, and the existing implementation. It must then identify requested scope, affected modules, security concerns, suitable risk-based tests, and documentation updates before producing a concise plan.
+Before meaningful work, an agent must read [AGENTS.md](../AGENTS.md), documentation relevant to the task, and the existing implementation. Relevant documentation includes architecture, [architecture principles](architecture/principles.md), security, testing, contribution, roadmap, and ADR guidance when the task affects those concerns.
 
-During implementation, agents must avoid speculative dependencies, infrastructure, abstractions, and roadmap work. They must not introduce an architectural pattern without justification. Significant durable architectural changes require an ADR under [adr/](adr/README.md).
+## Planning and Scope Discipline
 
-After implementation, agents must run appropriate verification and report what changed, why, tests or checks run, decisions, tradeoffs, residual risks, and deferred concerns.
+- Before substantial changes, identify the requested outcome, acceptance criteria, affected modules, security implications, verification approach, and documentation updates, then provide a concise plan.
+- Implement only approved scope. Do not use a task as an opportunity to add roadmap work, abstractions, cleanup, dependencies, or infrastructure that was not requested.
+- Identify material uncertainty, conflicting requirements, missing ownership, or unaccepted risk. Stop and request a human decision rather than guessing.
+- Explain meaningful engineering decisions in terms the human can review and learn from: what changed, why it was chosen, tradeoffs, and relevant alternatives.
+
+## Architecture and Dependencies
+
+- Follow [Architecture Principles](architecture/principles.md) and accepted ADRs. Do not introduce an architectural pattern without demonstrated need and justification.
+- Significant, durable architectural decisions require an ADR under [adr/](adr/README.md). Routine implementation details do not.
+- A new dependency, platform component, or infrastructure capability requires a current problem, alternatives, security and operational cost, testing impact, and removal or rollback consideration.
+- Do not introduce distributed infrastructure, services, or future roadmap technology merely to demonstrate it.
+
+## Security and Verification
+
+- Assess security implications for changes to data, secrets, APIs, dependencies, logs, build pipelines, infrastructure, and deployment configuration. Follow [security engineering guidance](SECURITY.md).
+- Never add or expose secrets, private keys, credentials, real data, or real payment processing. Use synthetic data and simulated payments only.
+- Select verification according to risk and follow [the testing strategy](TESTING.md). Do not claim tests, checks, controls, or behavior without evidence.
+- Run appropriate verification after implementation and disclose meaningful verification gaps.
+
+## Documentation and Reporting
+
+- Update affected documentation in the same change as behavior, architecture, security posture, process, or roadmap status changes.
+- Report scope completed, files changed, why the approach was chosen, decisions, tradeoffs, relevant alternatives, verification performed, residual risks, and deferred concerns.
+- Preserve durable rationale in documentation and ADRs so future agents do not depend on conversation history.
 
 ## Boundaries
 
-- AI agents must never add or reveal secrets, private keys, credentials, real data, or real payment processing.
 - AI agents must not claim verification, enabled repository controls, or system behavior without evidence.
-- AI agents must update relevant documentation in the same change as behavior, process, architecture, security posture, or roadmap changes.
-- AI agents must not automatically implement future roadmap items.
-- AI agents must stop and request a decision when requirements, ownership, risk acceptance, or architectural direction is materially unclear.
+- AI agents must not automatically implement future roadmap items or replace human decisions with agent preference.
+- AI agents must not create custom agent tooling, automated reviewers, CI/CD automation, or other AI-specific infrastructure without a separately justified request.
 
 ## Evidence and Review
 
-Every meaningful change should leave durable evidence in the repository: code and tests where applicable, updated documentation, ADRs for significant decisions, and a reviewable change description. Human review remains required regardless of whether a change was authored manually or with AI assistance.
+Every meaningful change should leave durable evidence in the repository: code and tests where applicable, updated documentation, ADRs for significant decisions, and a reviewable change description. Human review remains required regardless of whether a change was authored manually or with AI assistance. AI assistance is successful only when the human can understand and approve the important decisions it supported.
