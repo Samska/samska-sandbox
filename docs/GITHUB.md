@@ -2,35 +2,48 @@
 
 ## Purpose
 
-GitHub is part of the engineering laboratory. This document records the desired repository controls and distinguishes them from controls independently verified as enabled.
+GitHub is part of the engineering laboratory. This document records the repository controls and their verification evidence.
 
-No GitHub repository control is verified as enabled during SS-001. This document is an intended baseline, not evidence of configuration.
+All statuses below were verified on 2026-08-30. `API-verified` controls were confirmed through the GitHub API. `Owner-verified, API-unverified` controls were confirmed by the project owner because the available API does not expose their configuration.
 
-## Desired Controls
+## Configured Controls
 
-| Control | Intended Direction | SS-001 Verification Status |
+| Control | Status | Verified state | Evidence |
+| --- | --- | --- | --- |
+| `main` protection mechanism | Enabled | Active `Main` ruleset targets the default branch (`main`). | API-verified |
+| Pull requests | Enabled | Changes to `main` require a pull request. | API-verified |
+| Required approvals | Enabled | The pull request rule requires zero approvals. | API-verified |
+| Conversation resolution | Enabled | Pull request review threads must be resolved before merge. | API-verified |
+| Force-push protection | Enabled | Non-fast-forward updates to `main` are blocked. | API-verified |
+| Branch-deletion protection | Enabled | Deletion of `main` is blocked. | API-verified |
+| Bypass policy | Enabled | No bypass actors are permitted. | Owner-verified, API-unverified |
+| Squash merge | Enabled | Squash is the only allowed merge method for pull requests to `main`. | API-verified |
+| Merge commits | Enabled | Merge commits are not allowed for pull requests to `main`. | API-verified |
+| Rebase merge | Enabled | Rebase merges are not allowed for pull requests to `main`. | API-verified |
+| Secret Protection / Secret Scanning | Enabled | Secret Scanning is enabled. | Owner-verified, API-unverified |
+| Push Protection | Enabled | Push Protection is enabled. | Owner-verified, API-unverified |
+| Private Vulnerability Reporting | Enabled | Private vulnerability reports can be submitted through GitHub. | API-verified |
+| Security Advisories | Enabled | Available to maintainers for private vulnerability remediation and coordinated disclosure. | Owner-verified, API-unverified |
+
+## Deferred Controls
+
+| Control | Status | Rationale |
 | --- | --- | --- |
-| Protected `main` branch | Require reviewed, passing changes before merge when collaboration requires it | Not verified |
-| Rulesets | Apply branch and repository protections as supported | Not verified |
-| GitHub Issues and Projects | Track execution work and planning | Not verified |
-| Pull requests | Use short-lived branches and reviewable changes | Not verified |
-| GitHub Actions | Evolve CI with repository and product capabilities | Not verified |
-| GitHub Environments | Use controlled deployment environments when deployments exist | Not verified |
-| Dependabot | Review dependency updates when dependency manifests exist | Not verified |
-| Dependency Review | Review dependency-change risk when supported | Not verified |
-| CodeQL | Analyze supported application code when it exists | Not verified |
-| Secret scanning and push protection | Detect and prevent exposed secrets where available | Not verified |
-| GitHub Container Registry | Publish images only when image distribution is justified | Not verified |
-| Releases | Publish versioned, reviewable milestones | Not verified |
-| SBOM and artifact attestations | Add when build and release outputs exist | Not verified |
-| Security advisories and private reporting | Support responsible vulnerability disclosure | Not verified |
+| Required status checks | Deferred | No CI checks exist yet. |
+| GitHub Actions / CI | Deferred | SS-005 may add lightweight repository or documentation checks when justified. |
+| CodeQL | Deferred | Application code does not exist yet. |
+| Dependabot | Deferred | Dependency manifests do not exist yet. |
+| Dependency Review | Deferred | Dependency-change automation is not configured yet. |
+| GitHub Environments | Deferred | Deployment environments do not exist yet. |
+| GitHub Container Registry | Deferred | Image distribution is not justified yet. |
+| Releases | Deferred | Versioned release work has not begun. |
+| SBOM and artifact attestations | Deferred | Build and release outputs do not exist yet. |
 
 ## Configuration Rules
 
-- SS-004 will configure applicable repository security controls and record what was independently verified.
 - SS-005 may add lightweight repository or documentation CI only when justified; it must not predict application build systems.
 - Backend, frontend, persistence/integration, and end-to-end CI evolve with their corresponding implementation work.
-- GitHub settings that cannot be represented in the repository must be checked manually and their verification date recorded here when enabled.
+- GitHub settings that cannot be represented in the repository must be checked manually and their verification date and evidence recorded here when enabled.
 - No workflow, token, secret, or control should be represented as active solely because it is desired.
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for contribution expectations and [SECURITY.md](../SECURITY.md) for vulnerability reporting.

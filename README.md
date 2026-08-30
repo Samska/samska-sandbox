@@ -27,4 +27,4 @@ The initial technology direction is React, TypeScript, Java, Spring Boot, Postgr
 
 ## Current Status
 
-SS-003 defines detailed AI engineering guidelines. The next planned task is SS-004, which will configure GitHub repository security.
+SS-004 establishes the GitHub repository security baseline. The next planned task is SS-005, which may configure initial repository or documentation CI.

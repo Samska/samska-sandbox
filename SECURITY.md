@@ -4,7 +4,7 @@
 
 Do not report suspected vulnerabilities through public issues, discussions, pull requests, or commits.
 
-Use GitHub private vulnerability reporting when it is available for this repository. Its availability is not currently verified. If it is unavailable, contact the repository owner through the contact method on the owner's GitHub profile and include enough detail to reproduce and assess the issue.
+Use GitHub Private Vulnerability Reporting as the preferred reporting path for this repository. If you cannot submit a private report, contact the repository owner through the contact method on the owner's GitHub profile and include enough detail to reproduce and assess the issue.
 
 Please provide:
 
