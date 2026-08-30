@@ -27,4 +27,4 @@ The initial technology direction is React, TypeScript, Java, Spring Boot, Postgr
 
 ## Current Status
 
-SS-001, repository bootstrap, establishes the documentation and governance baseline. The next planned task is SS-002, which will define architecture principles and record the initial modular-monolith decision.
+SS-002 defines the architecture principles and records the initial modular-monolith decision. The next planned task is SS-003, which will define detailed AI engineering guidelines.

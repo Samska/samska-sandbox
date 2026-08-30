@@ -23,4 +23,4 @@ Do not create ADRs for routine implementation details, short-lived experiments, 
 - Once accepted, do not rewrite the decision's historical rationale. Record a new ADR to supersede or deprecate it when circumstances change.
 - Link related ADRs, implementation, and affected documentation.
 
-No ADR has been created during repository bootstrap. SS-002 is expected to create the first one for the initial modular-monolith decision.
+The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](0001-adopt-modular-monolith.md).
