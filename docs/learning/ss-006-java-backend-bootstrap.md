@@ -3,7 +3,7 @@
 - Status: Active
 - Date: 2026-08-31
 - Work item: [SS-006, Issue #12](https://github.com/Samska/samska-sandbox/issues/12)
-- Pull request: Pending
+- Pull request: [#13: feat(backend): bootstrap Java Spring Boot foundation](https://github.com/Samska/samska-sandbox/pull/13)
 - ADRs: [ADR 0001: Adopt a Modular Monolith for v0.1](../adr/0001-adopt-modular-monolith.md)
 - Canonical documentation: [Architecture](../ARCHITECTURE.md), [Testing Strategy](../TESTING.md), [Security Engineering](../SECURITY.md), [GitHub Repository Controls](../GITHUB.md), and [Backend CI workflow](../../.github/workflows/backend-ci.yml)
 
@@ -63,7 +63,7 @@ Backend CI is separate from documentation CI because they validate independent a
 
 The direct dependency set is deliberately small. Versions are managed by Spring Boot, Maven downloads are checksum verified by the wrapper, and CI uses read-only permissions, disabled persisted credentials, and immutable action pins. Health is the only intentionally exposed HTTP endpoint; discovery is disabled and health details are hidden. The baseline does not provide authentication, authorization, public deployment protections, vulnerability scanning, or dependency-update automation.
 
-Local verification used an ephemeral Temurin 25.0.4.1 JDK because the workstation default was a Java 8 JRE without a compiler. Maven Wrapper 3.9.16 passed `clean verify`: it compiled the application and ran the application/component smoke test successfully. The packaged JAR started successfully; `/actuator/health` returned HTTP 200 with status `UP`, while `/actuator` and `/actuator/env` returned 404. `actionlint` 1.7.12 passed for the backend workflow after its official Windows artifact checksum was verified. Backend CI has not run yet because no pull request has been created.
+Local verification used an ephemeral Temurin 25.0.4.1 JDK because the workstation default was a Java 8 JRE without a compiler. Maven Wrapper 3.9.16 passed `clean verify`: it compiled the application and ran the application/component smoke test successfully. The packaged JAR started successfully; `/actuator/health` returned HTTP 200 with status `UP`, while `/actuator` and `/actuator/env` returned 404. `actionlint` 1.7.12 passed for the backend workflow after its official Windows artifact checksum was verified. On pull request [#13](https://github.com/Samska/samska-sandbox/pull/13), Backend CI passed `clean verify`, Repository CI passed Markdown, local-link, and EditorConfig validation, and GitGuardian Security Checks passed.
 
 ## Failure Modes and Safeguards
 
@@ -86,11 +86,11 @@ The implementation added Maven Wrapper 3.3.4 in only-script mode, a SHA-256-veri
 
 ### Review
 
-No formal review evidence exists yet. Human review must confirm the selected dependencies, endpoint surface, CI security settings, and absence of out-of-scope implementation.
+No GitHub review has been submitted yet. Human review must confirm the selected dependencies, endpoint surface, CI security settings, and absence of out-of-scope implementation.
 
 ### Pull Request
 
-No pull request exists yet. Add its link, review findings, verification evidence, and residual risks when one is created.
+Pull request [#13](https://github.com/Samska/samska-sandbox/pull/13) targets `main`. Its Backend CI, Repository CI, and GitGuardian Security Checks passed; the pull request remains open and unmerged for human review.
 
 ## What the Project Owner Should Understand
 
