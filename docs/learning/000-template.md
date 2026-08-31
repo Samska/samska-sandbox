@@ -64,7 +64,7 @@ Include only safe, reproducible repository exercises that reinforce a Core or Im
 
 Include one to three high-value questions where warranted. Give expected discussion points for context, constraint, decision, evidence, trade-off, and boundary or deferred work. Add likely follow-ups only when useful; do not write a memorization script.
 
-### Question
+### Interview Question
 
 - Expected discussion points:
 - Likely follow-up:
