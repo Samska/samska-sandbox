@@ -27,4 +27,4 @@ The initial technology direction is React, TypeScript, Java, Spring Boot, Postgr
 
 ## Current Status
 
-SS-004 establishes the GitHub repository security baseline. The next planned task is SS-005, which may configure initial repository or documentation CI.
+SS-005 establishes initial repository CI for Markdown, local relative-link, and EditorConfig validation. Application-specific CI begins when the corresponding implementation and tooling exist.

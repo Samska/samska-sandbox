@@ -24,13 +24,13 @@ All statuses below were verified on 2026-08-30. `API-verified` controls were con
 | Push Protection | Enabled | Push Protection is enabled. | Owner-verified, API-unverified |
 | Private Vulnerability Reporting | Enabled | Private vulnerability reports can be submitted through GitHub. | API-verified |
 | Security Advisories | Enabled | Available to maintainers for private vulnerability remediation and coordinated disclosure. | Owner-verified, API-unverified |
+| GitHub Actions / repository CI | Configured | The `Repository CI` workflow runs on pull requests targeting `main` and validates Markdown, local relative links, and EditorConfig consistency. It has only `contents: read` permission. | `.github/workflows/repository-ci.yml`; runtime verification occurs on the pull request that introduces it. |
 
 ## Deferred Controls
 
 | Control | Status | Rationale |
 | --- | --- | --- |
-| Required status checks | Deferred | No CI checks exist yet. |
-| GitHub Actions / CI | Deferred | SS-005 may add lightweight repository or documentation checks when justified. |
+| Required status checks | Deferred | Repository CI is not yet configured as a required status check. |
 | CodeQL | Deferred | Application code does not exist yet. |
 | Dependabot | Deferred | Dependency manifests do not exist yet. |
 | Dependency Review | Deferred | Dependency-change automation is not configured yet. |
