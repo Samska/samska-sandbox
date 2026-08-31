@@ -1,0 +1,7 @@
+default: true
+
+# The repository does not use hard-wrapped prose.
+MD013: false
+
+# ADR templates use angle-bracket placeholders.
+MD033: false

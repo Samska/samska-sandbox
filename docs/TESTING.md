@@ -4,7 +4,7 @@
 
 Quality begins with the first feature. Testing is risk-based: use the smallest effective level of verification for the risk, and do not require every test type for every change.
 
-No test framework, test suite, or CI test job is configured during repository bootstrap.
+No application test framework, test suite, or application CI job is configured during repository bootstrap. Repository CI validates only Markdown, local relative links, and EditorConfig consistency until application implementation exists.
 
 ## Intended Testing Layers
 

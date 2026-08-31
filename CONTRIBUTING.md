@@ -22,4 +22,4 @@ Samska Sandbox is an educational engineering laboratory. Contributions should im
 
 A pull request should explain the requested scope, decisions made, security considerations, verification performed, documentation updates, and remaining risks or follow-up work. AI-generated output requires the same human review and validation as manually written output.
 
-Repository rules, required checks, and security controls will be documented and verified through the GitHub configuration work item. See [docs/GITHUB.md](docs/GITHUB.md) for the intended baseline and current verification status.
+Repository rules, CI behavior, required-check status, and security controls are documented in [docs/GITHUB.md](docs/GITHUB.md).
