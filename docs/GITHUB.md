@@ -25,14 +25,15 @@ All statuses below were verified on 2026-08-30. `API-verified` controls were con
 | Private Vulnerability Reporting | Enabled | Private vulnerability reports can be submitted through GitHub. | API-verified |
 | Security Advisories | Enabled | Available to maintainers for private vulnerability remediation and coordinated disclosure. | Owner-verified, API-unverified |
 | GitHub Actions / repository CI | Configured | The `Repository CI` workflow runs on pull requests targeting `main` and validates Markdown, local relative links, and EditorConfig consistency. It has only `contents: read` permission. | `.github/workflows/repository-ci.yml`; runtime verification occurs on the pull request that introduces it. |
+| GitHub Actions / backend CI | Configured | The `Backend CI` workflow runs Maven `clean verify` for the Java backend on pull requests targeting `main`. It uses Temurin 25, Maven dependency caching, immutable Action pins, `contents: read`, and no persisted checkout credentials. | `.github/workflows/backend-ci.yml`; runtime verification occurs on the pull request that introduces it. |
 
 ## Deferred Controls
 
 | Control | Status | Rationale |
 | --- | --- | --- |
 | Required status checks | Deferred | Repository CI is not yet configured as a required status check. |
-| CodeQL | Deferred | Application code does not exist yet. |
-| Dependabot | Deferred | Dependency manifests do not exist yet. |
+| CodeQL | Deferred | Backend application code exists, but static-analysis tooling has not yet been separately justified and configured. |
+| Dependabot | Deferred | The backend has a dependency manifest, but dependency-update automation has not yet been separately justified and configured. |
 | Dependency Review | Deferred | Dependency-change automation is not configured yet. |
 | GitHub Environments | Deferred | Deployment environments do not exist yet. |
 | GitHub Container Registry | Deferred | Image distribution is not justified yet. |

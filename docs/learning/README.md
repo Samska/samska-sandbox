@@ -15,6 +15,7 @@ It is a curated learning layer, not a new source of operational truth. Issues, p
 | [ss-003-ai-engineering-governance.md](ss-003-ai-engineering-governance.md) | AI-assisted engineering governance and human accountability. |
 | [ss-004-github-repository-security.md](ss-004-github-repository-security.md) | GitHub security controls and evidence-based governance. |
 | [ss-005-repository-documentation-ci.md](ss-005-repository-documentation-ci.md) | Repository CI, GitHub Actions security, and documentation quality gates. |
+| [ss-006-java-backend-bootstrap.md](ss-006-java-backend-bootstrap.md) | Java backend baseline, dependency management, Spring Boot, testing, and backend CI. |
 
 Use the work-item identifier in a new record name, for example `ss-009-product-domain.md`. One record should cover one coherent work item; link to other records when a later item builds on its lesson.
 

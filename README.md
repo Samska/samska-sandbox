@@ -2,7 +2,7 @@
 
 Samska Sandbox is a public educational engineering platform built around a fictional commerce and logistics domain. It is non-commercial as a project purpose; the source code is licensed under the [Apache License 2.0](LICENSE).
 
-The repository currently contains the engineering foundation only. No application, service, database, container configuration, or runnable local workflow exists yet.
+The repository contains an initial Java backend foundation. It has no business-domain implementation, database, container configuration, or frontend application yet.
 
 All production code is expected to be generated or modified with AI coding agents. Humans remain responsible for requirements, architecture, engineering decisions, review, validation, risk assessment, and understanding the resulting work.
 
@@ -28,4 +28,17 @@ The initial technology direction is React, TypeScript, Java, Spring Boot, Postgr
 
 ## Current Status
 
-SS-005 establishes initial repository CI for Markdown, local relative-link, and EditorConfig validation. Application-specific CI begins when the corresponding implementation and tooling exist.
+SS-005 establishes repository CI for Markdown, local relative-link, and EditorConfig validation. SS-006 establishes backend CI that builds and tests the Java backend on pull requests targeting `main`.
+
+## Backend
+
+The backend is a Spring Boot 4.1.1 application in [backend/](backend/) that requires Eclipse Temurin 25 or another compatible Java 25 JDK. The Maven Wrapper provisions Maven 3.9.16; a separate Maven installation is not required.
+
+Run these commands from `backend/`:
+
+```bash
+./mvnw clean verify
+./mvnw spring-boot:run
+```
+
+On Windows, use `mvnw.cmd` instead. When the application has started, `http://localhost:8080/actuator/health` returns a response whose status is `UP`. Health is the only intentionally exposed HTTP endpoint.
