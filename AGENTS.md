@@ -8,7 +8,7 @@ Before meaningful work, an agent must:
 2. Confirm requested scope, acceptance criteria, affected modules, documentation, security implications, and risk-based verification.
 3. Produce a concise plan before substantial changes and stop for a human decision when material uncertainty exists.
 4. Implement only approved scope; do not pull roadmap work forward.
-5. Update affected documentation and create an ADR for significant, durable architecture decisions.
+5. Update affected documentation, create or update required learning records under [docs/learning/](docs/learning/README.md), and create an ADR for significant, durable architecture decisions.
 6. Run appropriate verification.
 7. Report what changed, why, verification, decisions, tradeoffs, alternatives when relevant, risks, and remaining concerns.
 
@@ -21,4 +21,4 @@ Follow these rules:
 - Explain meaningful engineering decisions so the human can learn and approve them.
 - Human review, understanding, and validation remain mandatory; never accept AI output blindly.
 
-Read the relevant detailed guidance in [docs/AI-GOVERNANCE.md](docs/AI-GOVERNANCE.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/architecture/principles.md](docs/architecture/principles.md), [docs/TESTING.md](docs/TESTING.md), [docs/SECURITY.md](docs/SECURITY.md), and [docs/adr/README.md](docs/adr/README.md).
+Read the relevant detailed guidance in [docs/AI-GOVERNANCE.md](docs/AI-GOVERNANCE.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/architecture/principles.md](docs/architecture/principles.md), [docs/TESTING.md](docs/TESTING.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/learning/README.md](docs/learning/README.md), and [docs/adr/README.md](docs/adr/README.md).
