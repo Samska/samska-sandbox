@@ -46,6 +46,8 @@ Before meaningful work, an agent must read [AGENTS.md](../AGENTS.md), documentat
 ## Documentation and Reporting
 
 - Update affected documentation in the same change as behavior, architecture, security posture, process, or roadmap status changes.
+- For meaningful work that meets the [learning-journal criteria](learning/README.md#when-a-learning-record-is-required), create or update the corresponding learning record in the same change.
+- Learning records preserve concise, evidence-based Plan, Build, Review, and Pull Request conclusions for human learning. They must not contain raw AI prompts, transcripts, hidden reasoning, secrets, credentials, or personal data.
 - Report scope completed, files changed, why the approach was chosen, decisions, tradeoffs, relevant alternatives, verification performed, residual risks, and deferred concerns.
 - Preserve durable rationale in documentation and ADRs so future agents do not depend on conversation history.
 

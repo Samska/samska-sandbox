@@ -20,6 +20,7 @@ The initial technology direction is React, TypeScript, Java, Spring Boot, Postgr
 - [Testing strategy](docs/TESTING.md)
 - [Security engineering](docs/SECURITY.md)
 - [AI engineering governance](docs/AI-GOVERNANCE.md)
+- [Engineering Learning Journal](docs/learning/README.md)
 - [GitHub controls](docs/GITHUB.md)
 - [Architecture Decision Records](docs/adr/README.md)
 - [Contributing](CONTRIBUTING.md)
