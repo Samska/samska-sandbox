@@ -1,0 +1,2 @@
+# Preserve the generated Windows Maven Wrapper launcher in its native format.
+backend/mvnw.cmd text eol=crlf

@@ -4,7 +4,7 @@
 
 Quality begins with the first feature. Testing is risk-based: use the smallest effective level of verification for the risk, and do not require every test type for every change.
 
-No application test framework, test suite, or application CI job is configured during repository bootstrap. Repository CI validates only Markdown, local relative links, and EditorConfig consistency until application implementation exists.
+Repository CI validates Markdown, local relative links, and EditorConfig consistency. The Java backend has a Spring Boot application/component smoke test that starts the embedded server on a random port and verifies the health endpoint. Backend CI runs the Maven `clean verify` lifecycle on pull requests targeting `main`.
 
 ## Intended Testing Layers
 
@@ -29,4 +29,4 @@ For each change, identify:
 3. Any higher-level verification required for critical integration or user impact.
 4. What is deliberately not tested and why, when that omission is material.
 
-Test infrastructure evolves with the product. Backend tests begin with the backend, persistence integration tests begin with persistence, and end-to-end tests begin when a stable user journey exists. See [the roadmap](ROADMAP.md) and [AI governance](AI-GOVERNANCE.md).
+The SS-006 application/component smoke test is not a unit test: it verifies framework configuration, embedded-server startup, and the health endpoint together. No artificial unit tests exist because no isolated business behavior exists yet. Test infrastructure evolves with the product. Unit tests begin with business rules, persistence integration tests begin with persistence, and end-to-end tests begin when a stable user journey exists. See [the roadmap](ROADMAP.md) and [AI governance](AI-GOVERNANCE.md).

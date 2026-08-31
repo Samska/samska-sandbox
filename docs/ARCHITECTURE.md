@@ -2,7 +2,7 @@
 
 ## Current State
 
-No application architecture has been implemented. This document records the approved direction for future work; it does not describe a deployed system, existing modules, APIs, data stores, or operational controls.
+The repository contains one Spring Boot backend application in `backend/`. It has an application bootstrap and a health-only Actuator endpoint, but no business modules, business APIs, persistence, external integrations, or deployment configuration. This document records the approved direction for future work; it does not describe a deployed system, existing modules, APIs, data stores, or operational controls beyond that verified baseline.
 
 ## Initial Direction
 
