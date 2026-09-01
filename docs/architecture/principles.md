@@ -4,7 +4,7 @@
 
 These principles guide future architectural decisions for Samska Sandbox. They define decision boundaries, not classes, packages, APIs, database schemas, deployment topology, or framework conventions.
 
-They apply to the future v0.1 backend and its integrations. The current repository has no application implementation.
+They apply to the future v0.1 backend and its integrations. The current repository has bootstrap applications in `backend/` and `web/`; these principles do not prescribe the frontend's future feature structure.
 
 ## Modular Monolith Baseline
 
