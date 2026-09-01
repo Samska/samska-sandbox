@@ -4,7 +4,7 @@
 
 Quality begins with the first feature. Testing is risk-based: use the smallest effective level of verification for the risk, and do not require every test type for every change.
 
-Repository CI validates Markdown, local relative links, and EditorConfig consistency. The Java backend has a Spring Boot application/component smoke test that starts the embedded server on a random port and verifies the health endpoint. Backend CI runs the Maven `clean verify` lifecycle on pull requests targeting `main`.
+Repository CI validates Markdown, local relative links, and EditorConfig consistency. The Java backend has a Spring Boot application/component smoke test that starts the embedded server on a random port and verifies the health endpoint. The React frontend has a Vitest and React Testing Library component smoke test that renders the foundation component and verifies its semantic heading and visible message in jsdom. Backend CI runs the Maven `clean verify` lifecycle and Frontend CI runs deterministic npm installation, TypeScript checking, component tests, and a production build on pull requests targeting `main`.
 
 ## Intended Testing Layers
 
@@ -30,3 +30,5 @@ For each change, identify:
 4. What is deliberately not tested and why, when that omission is material.
 
 The SS-006 application/component smoke test is not a unit test: it verifies framework configuration, embedded-server startup, and the health endpoint together. No artificial unit tests exist because no isolated business behavior exists yet. Test infrastructure evolves with the product. Unit tests begin with business rules, persistence integration tests begin with persistence, and end-to-end tests begin when a stable user journey exists. See [the roadmap](ROADMAP.md) and [AI governance](AI-GOVERNANCE.md).
+
+The SS-007 frontend test is also not a unit, backend integration, end-to-end, or real-browser test. It verifies user-visible component output through a simulated DOM. TypeScript checking catches static type errors, the Vite development server and Hot Module Replacement are manually verified locally, and the production build verifies static asset generation. These layers do not prove browser layout, deployed hosting, backend behavior, or a user journey.
