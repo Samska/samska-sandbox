@@ -4,7 +4,7 @@
 - Work date: 2026-09-01
 - Last reviewed: 2026-09-01
 - Work item: [SS-007, Issue #16](https://github.com/Samska/samska-sandbox/issues/16)
-- Pull request: Pending
+- Pull request: [#17: feat(web): bootstrap React application foundation](https://github.com/Samska/samska-sandbox/pull/17)
 - ADRs: None
 - Canonical documentation: [README](../../README.md), [Architecture](../ARCHITECTURE.md), [Testing Strategy](../TESTING.md), [Security Engineering](../SECURITY.md), [GitHub Repository Controls](../GITHUB.md), and [Frontend CI workflow](../../.github/workflows/frontend-ci.yml)
 
@@ -187,14 +187,14 @@ SS-007 followed the Java backend bootstrap and found no frontend project. It add
 
 The direct dependency set contains React, React DOM, Vite, TypeScript, Vitest, jsdom, Testing Library, and their necessary type/plugin packages. The clean `npm ci --ignore-scripts` install passed. The only `hasInstallScript` lockfile marker was optional macOS-only `fsevents`; it was not installed or required on Windows. `npm ls --depth=0` and `npm ls --all` showed the approved direct dependencies, platform-specific optional packages, and no peer-dependency failure.
 
-TypeScript checking, the jsdom component smoke test, and Vite production build passed locally. A real Microsoft Edge page rendered the heading and foundation message; a temporary text edit updated that page through Vite HMR before the source was restored. `dist/` is static build output, not a deployment. Frontend CI runtime evidence remains for the pull request that introduces it.
+TypeScript checking, the jsdom component smoke test, and Vite production build passed locally. A real Microsoft Edge page rendered the heading and foundation message; a temporary text edit updated that page through Vite HMR before the source was restored. `dist/` is static build output, not a deployment. GitHub Actions validated initial commit `a508028` in [PR #17](https://github.com/Samska/samska-sandbox/pull/17): Frontend CI, Repository CI, Backend CI, and GitGuardian Security Checks all passed.
 
 ### Delivery History
 
 - **Plan:** Human approval selected Node 24.20.0, npm 11.19.0, React 19.2.8, TypeScript 6.0.2, Vite 8.2.2, one component smoke test, native CSS, and separate Frontend CI.
 - **Build:** The implementation used manually curated files rather than retaining a scaffold. It established the strict compiler configuration, semantic foundation output, test setup, lockfile, and immutable workflow pins.
-- **Review:** No formal GitHub review exists yet. Human review must assess the lockfile, scope, documentation claims, CI runtime result, and dependency/security boundary.
-- **Pull Request:** Pending. It must provide CI results and confirm no out-of-scope application behavior was introduced.
+- **Review:** No formal human GitHub review exists yet. Human review must assess the lockfile, scope, documentation claims, CI result, and dependency/security boundary.
+- **Pull Request:** [PR #17](https://github.com/Samska/samska-sandbox/pull/17) is open. Its initial commit passed Frontend CI, Repository CI, Backend CI, and GitGuardian Security Checks; no out-of-scope application behavior was introduced.
 
 ## Follow-up and Sources
 
