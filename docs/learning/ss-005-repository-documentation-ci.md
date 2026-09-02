@@ -1,114 +1,140 @@
 # SS-005: Repository Documentation CI
 
 - Status: Historical
-- Date: 2026-08-31
+- Work date: 2026-08-31
 - Work item: [SS-005, Issue #8](https://github.com/Samska/samska-sandbox/issues/8)
 - Pull request: [PR #9](https://github.com/Samska/samska-sandbox/pull/9)
 - ADRs: None
 - Canonical documentation: [GitHub Repository Controls](../GITHUB.md), [Testing Strategy](../TESTING.md), and [Repository CI workflow](../../.github/workflows/repository-ci.yml)
 
-## Goal and Previous State
+## Study Surface
 
-SS-005 added the first CI workflow while the repository contained documentation and governance only. There was no backend, frontend, database, application build, application test suite, or dependency manifest. The work therefore had to validate existing artifacts without predicting future tooling.
+CI should validate current artifacts with bounded assurance and execute with minimal capability.
 
-## What Changed and Why
+### Must Remember
 
-The `Repository CI` GitHub Actions workflow runs on pull requests targeting `main`. It lints Markdown, checks local Markdown links offline, and checks EditorConfig compliance. This gives the repository quality gates for the documentation and formatting that actually existed.
+- CI should select the smallest effective checks for current artifacts and risks, not a future technology checklist.
+- A passing quality gate proves only the behavior that gate checks.
+- Read-only permissions and disabled persisted checkout credentials reduce capability available to later workflow steps.
+- Immutable action SHA pinning reduces silent drift but does not remove supply-chain risk or update responsibility.
+- Workflow event context matters when proposed changes are untrusted.
 
-The workflow uses job-level `contents: read`, checks out without persisted credentials, pins actions to immutable commit SHAs, and specifies tool versions where the actions support them. These choices reduce unnecessary write capability and limit supply-chain drift in a workflow that evaluates pull requests.
+### Mental Model
 
-## Engineering Concepts
+```text
+Pull request -> read-only pinned workflow -> checks current artifacts -> bounded feedback
+```
 
-### Continuous Integration and Quality Gates
+### Active Recall
 
-Continuous Integration provides automated feedback on changes before merge. In Samska's initial state, the useful gates were Markdown structure, local links, and EditorConfig consistency, not Java, React, database, or end-to-end tests that did not yet exist.
+#### Why were Markdown, local-link, and EditorConfig checks justified before application CI?
 
-This demonstrates risk-based verification: select the smallest effective checks for the repository's current artifacts. The trade-off is limited coverage. Passing documentation CI says nothing about future application correctness, security, or deployment readiness.
+<details>
+<summary>Answer guide</summary>
 
-### GitHub Actions Permissions and Credentials
+- Documentation and governance were the artifacts that existed.
+- Java, React, database, and journey checks would have been speculative.
 
-The workflow declares `contents: read`, granting the job only repository-content read access. The checkout step also uses `persist-credentials: false`, preventing the checkout action from retaining a GitHub token in local Git configuration for later steps. Together, they reduce the effect of a compromised or unsafe workflow step, but do not eliminate all workflow or third-party-action risk.
+</details>
 
-### Immutable Pinning and Supply-Chain Risk
+#### What does passing Repository CI prove, and not prove?
 
-Each referenced action is pinned to a full commit SHA, with a comment recording the release version. A tag can be moved; an immutable SHA fixes the referenced action revision. Tool-version inputs further constrain the tools used by actions where configured.
+<details>
+<summary>Answer guide</summary>
 
-Pinning improves reviewability and reduces silent action-version drift, but it creates a maintenance responsibility: pinned actions and tools can become outdated or vulnerable and still require deliberate updates.
+- It proves the configured documentation checks passed.
+- It does not prove application correctness, security, deployment readiness, semantic completeness, or live external-link availability.
 
-### `pull_request`, `pull_request_target`, and Deterministic Feedback
+</details>
 
-The workflow uses `pull_request` for changes targeting `main`; it does not use `pull_request_target`. The selected event is appropriate for running repository validation on proposed changes without requiring the base-repository context associated with `pull_request_target`. Workflows using `pull_request_target` require additional care because untrusted pull-request content can interact with a more privileged base-repository context.
+#### Why do permissions, credentials, pins, and event context all matter?
 
-The fixed runner image (`ubuntu-24.04`), immutable action SHAs, explicit tool versions, and offline link checking make CI feedback more predictable. They do not make hosted CI perfectly deterministic: runner images and action internals can still change, and offline link checking intentionally validates local links rather than live external availability.
+<details>
+<summary>Answer guide</summary>
 
-### Markdown, Links, and EditorConfig
+- They constrain what untrusted or compromised workflow steps can do and reduce silent action drift.
+- They do not eliminate hosted-runner or third-party-action risk.
 
-Markdown linting checks repository documentation structure. Lychee runs offline with fragment checks to validate local relative links without relying on network availability. EditorConfig checking enforces declared text-file consistency such as UTF-8, LF endings, final newlines, and trimmed trailing whitespace.
+</details>
 
-These are repository quality controls, not application tests. They prevent documentation navigation and formatting regressions, but cannot determine whether technical guidance is complete or behavior is correct.
+### Decision Drills
 
-## Alternatives and Trade-offs
+#### Decision Drill: First CI gates
 
-SS-005 deliberately did not add Java or React builds, Playwright, Testcontainers, PostgreSQL, CodeQL, Dependabot, dependency review, deployment, containers, or cloud configuration. Adding them before corresponding artifacts existed would create speculative tooling and misleading assurance.
+**Problem:** The repository had documentation and governance but no application, manifest, build, or test suite.
 
-Required status checks remained deferred when this first workflow was introduced. The canonical control document records that they are not configured as required and that runtime verification occurs on the introducing pull request. The historical sources do not define a stability threshold or commit to when required checks will be enabled; do not represent a future requirement as already decided.
+**Options:** No automated feedback, speculative future-stack CI, or checks for existing artifacts.
 
-## Security and Verification
+**Decision:** Markdown linting, offline local-link/fragment checking, and EditorConfig validation on PRs to `main`.
 
-The workflow's least-privilege permission, disabled persisted credentials, SHA pinning, and `pull_request` trigger are implemented facts in the workflow. They reduce risk but are not a complete CI threat model or a substitute for reviewing third-party actions.
+**Why:** These were the smallest effective checks for actual repository regressions.
 
-PR #9 reports that actionlint, markdownlint, offline relative-link validation, EditorConfig validation, and `git diff --check` passed. `docs/GITHUB.md` records that runtime verification occurs on the pull request that introduced the workflow. Required status checks remain deferred, and no application-specific CI is configured.
+**Trade-off:** Fast bounded feedback, not application or deployment assurance.
 
-## Failure Modes and Safeguards
+**Reconsider When:** New backend, frontend, persistence, or journey artifacts introduce corresponding risks.
 
-- A documentation change can contain a broken local link. Run offline relative-link validation with fragments.
-- A workflow step can receive unnecessary write capability or retained credentials. Keep job permissions read-only and disable persisted checkout credentials.
-- A mutable action tag can change unexpectedly. Pin to a reviewed commit SHA and update deliberately.
-- Passing repository CI can be mistaken for application verification. Keep its scope explicit and add application checks only with implementation.
-- An external link can fail while offline checking passes. The workflow intentionally validates local links only; external availability needs separate, justified verification.
-- A new quality gate can block merges before its signal is understood. Required status checks remain deferred; the project must make a later evidence-based decision before enforcing them.
+#### Decision Drill: Least-privilege PR workflow
 
-## Plan, Build, Review, and Pull Request Lessons
+**Problem:** A PR workflow processes proposed content with tokens and third-party actions.
 
-### Plan
+**Options:** Broad permissions, retained credentials, mutable tags, or privileged event context; or restricted permissions, no retained token, immutable pins, and `pull_request`.
 
-Issue #8 required a minimal pull-request workflow that validates existing repository artifacts and follows least privilege. It explicitly excluded application tooling and infrastructure.
+**Decision:** `contents: read`, `persist-credentials: false`, SHA-pinned actions, and `pull_request`.
 
-### Build
+**Why:** It reduces unnecessary capability, credential exposure, privileged-context risk, and silent drift.
 
-The merged change added one documentation-validation job, `.markdownlint.yaml`, and documentation updates describing its actual checks and deferred status-check configuration.
+**Trade-off:** Updates remain deliberate and third-party or runner risk remains.
 
-### Review
+**Reconsider When:** Workflow responsibilities require a changed threat model and explicitly justified capabilities.
 
-No formal GitHub review, review comment, or review finding is recorded for PR #9. The PR reports the local validation results listed above; it cannot establish review outside GitHub.
+### Concept Cards
 
-### Pull Request
+#### Quality-gate assurance boundary
 
-PR #9 kept scope to repository CI and recorded explicit security choices: read-only permissions, immutable action pins, and no persisted checkout credentials. It did not claim application CI, required status checks, or deployment controls.
+- **Meaning:** A check supplies evidence only within its asserted scope.
+- **Samska application:** Repository CI validates Markdown, local links/fragments, and EditorConfig.
+- **Boundary or common mistake:** Passing documentation CI is not evidence of application correctness.
 
-## What the Project Owner Should Understand
+### Hands-on Reinforcement
 
-Early CI should be valuable for the artifacts that exist, not a future technology checklist. Workflow security matters even for documentation CI because third-party actions, tokens, event context, and supply-chain updates can affect repository trust.
+#### Inspect Repository CI
 
-## Interview Practice
+- **Prerequisite:** none.
+- **Perform or inspect:** read `.github/workflows/repository-ci.yml`.
+- **Expected observation:** trigger, permissions, checkout credential behavior, SHA pins, and three checks are explicit.
+- **Explain:** which risk each configuration reduces and which assurance boundary remains.
+- **Cleanup:** none.
+- **Proves / does not prove:** practices workflow interpretation; does not execute or independently secure the workflow.
 
-### Questions
+### Five-Minute Checkpoint Cues
 
-- How do you choose the first CI checks for a new repository?
-- Why use `contents: read`, `persist-credentials: false`, and SHA-pinned actions in GitHub Actions?
-- Why is `pull_request` safer than `pull_request_target` for this workflow?
-- Why were required status checks deferred?
+Use the [canonical checkpoint](README.md#five-minute-learning-checkpoint).
 
-### Interview-Ready Explanation
+- **Decision or reasoning to reconstruct:** first CI gates.
+- **Concept or boundary to explain:** a passing gate proves only its configured checks.
+- **Repository action:** identify the workflow's least-privilege settings.
 
-Samska began CI with the repository artifacts that existed: Markdown, local documentation links, and EditorConfig rules. The workflow runs on pull requests to `main`, uses `contents: read`, avoids persisted checkout credentials, and pins actions to commit SHAs to reduce privilege and supply-chain drift. We did not add application checks without an application. Required status checks remain deferred because the initial workflow was newly introduced and the repository records only its first runtime validation, not an approved long-term enforcement threshold.
+## Reference Surface
 
-## Follow-up and Sources
+### Historical Context and Outcome
 
-Evolve CI alongside backend, frontend, persistence, and end-to-end implementation. Make any required-status-check decision only after reviewing workflow signal, reliability, and the current branch-protection strategy.
+SS-005 added the first CI workflow when the repository had documentation and governance only. It intentionally excluded backend, frontend, database, application-test, deployment, and dependency tooling.
+
+### Implementation and Decision Evidence
+
+Repository CI runs on PRs to `main` and uses Markdown linting, offline local link/fragment validation, and EditorConfig checks. The workflow uses `contents: read`, no persisted checkout credentials, immutable action SHAs, explicit supported tool versions, and `pull_request` rather than `pull_request_target`.
+
+### Security, Verification, and Risks
+
+PR #9 reported actionlint, markdownlint, local-link validation, EditorConfig validation, and `git diff --check` passing. Pins, fixed runner selection, and offline checks improve predictability but do not make CI fully deterministic. Required status checks were historically deferred without an approved threshold.
+
+### Delivery History and Deferred Work
+
+No formal GitHub review, comments, or findings are recorded for PR #9. Later backend and frontend CI are current separate controls; consult canonical documentation for present state.
+
+### Sources
 
 - [Issue #8](https://github.com/Samska/samska-sandbox/issues/8)
 - [PR #9](https://github.com/Samska/samska-sandbox/pull/9)
 - [Repository CI workflow](../../.github/workflows/repository-ci.yml)
 - [GitHub Repository Controls](../GITHUB.md)
-- [Testing Strategy](../TESTING.md)

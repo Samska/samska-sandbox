@@ -1,96 +1,126 @@
 # SS-002: Architecture Principles and the Modular Monolith
 
 - Status: Historical
-- Date: 2026-08-30
+- Work date: 2026-08-30
 - Work item: [SS-002, Issue #3](https://github.com/Samska/samska-sandbox/issues/3)
 - Pull request: [PR #1](https://github.com/Samska/samska-sandbox/pull/1)
-- ADR: [ADR 0001](../adr/0001-adopt-modular-monolith.md)
+- ADRs: [ADR 0001](../adr/0001-adopt-modular-monolith.md)
 - Canonical documentation: [Architecture](../ARCHITECTURE.md), [Architecture Principles](../architecture/principles.md), and [ADR guide](../adr/README.md)
 
-## Goal and Previous State
+## Study Surface
 
-SS-002 established architecture guidance before application implementation. The repository had no backend, modules, APIs, persistence, or infrastructure. Issue #3 was backfilled only for project tracking; PR #1 and the merged commit are the detailed historical evidence for this work.
+Explicit internal boundaries let one deployable backend remain simple without becoming an unstructured monolith.
 
-## What Changed and Why
+### Must Remember
 
-The work added architecture principles and accepted ADR 0001: v0.1 will begin as one deployable modular monolith with explicit in-process business-module boundaries. The candidate catalog, cart, orders, payments, and inventory capabilities remain directional boundaries, not independently deployed services or separate databases.
+- One deployable application can still have explicit business-module boundaries.
+- A business capability owns its rules and durable concepts; other modules use explicit behavior rather than internals.
+- Directional, acyclic dependencies and persistence ownership prevent hidden cross-module contracts.
+- Architecture changes when evidence changes its trade-off; an ADR preserves a consequential durable decision while principles guide repeated choices.
 
-The decision keeps local development, deployment, debugging, and end-to-end testing simpler while the product and boundaries are still unproven. It also creates reviewable rules for ownership and dependencies without prematurely selecting package structure, persistence technology, APIs, or infrastructure.
+### Mental Model
 
-## Engineering Concepts
+```text
+One deployable backend
+  -> explicit in-process business boundaries
+  -> owned rules and persisted concepts
+  -> directional dependencies
+  -> evidence can justify later extraction
+```
 
-### Modular Monolith, Microservices, and an Unstructured Monolith
+### Active Recall
 
-A modular monolith is one deployable application whose internal business boundaries are explicit. Samska selected this baseline because no evidence yet justified independent deployment, scaling, coordination, or ownership. Starting with microservices would have added distributed failure handling, operational overhead, and observability needs before the product existed.
+#### Why was a modular monolith appropriate before product behavior existed?
 
-An unstructured monolith would avoid distributed complexity but would not protect ownership or future evolution. Samska rejected that alternative because business rules and durable concepts need a clear owner. The trade-off is that module boundaries require continuing design review; modules cannot yet be deployed or scaled independently.
+<details>
+<summary>Answer guide</summary>
 
-### Module Boundaries, Dependencies, and Persistence Ownership
+- It establishes ownership and boundaries without distributed operational cost.
+- Independent deployment, scaling, coordination, and ownership needs had no supporting evidence.
+- It is a starting point, not an anti-microservices rule.
 
-The architecture principles organize modules around business capability. Each business rule and durable data concept has one owning module; other modules use its explicit behavior rather than reaching into internals. Dependencies must be directional and acyclic, and cross-module orchestration must be explicit.
+</details>
 
-The same ownership rule applies to persistence: a module must not directly query or mutate another module's persisted concepts. This prevents convenience shortcuts from turning storage structure into a hidden cross-module contract. It leaves physical schema layout, transaction design, and persistence libraries undecided until implementation supplies evidence.
+#### What fails when Orders directly mutates Inventory persistence?
 
-### Evidence-Driven Evolution and ADRs
+<details>
+<summary>Answer guide</summary>
 
-Samska treats Redis, messaging, service extraction, and other infrastructure as evaluation candidates, not planned implementations. A measurable coupling, deployment, scale, reliability, or ownership problem must justify change.
+- Inventory loses ownership of its durable concept.
+- Storage becomes a hidden cross-module contract.
+- Explicit behavior and reviewable orchestration are bypassed.
 
-An ADR records one significant, durable decision and its historical rationale. Architecture principles are broader, ongoing rules used to evaluate many implementation choices. ADR 0001 records the modular-monolith baseline; the principles guide how that baseline is applied. Neither replaces implementation documentation.
+</details>
 
-## Alternatives and Trade-offs
+#### What would justify reconsidering ADR 0001?
 
-ADR 0001 explicitly rejected starting with microservices, an unstructured monolith, and preemptive event-driven infrastructure. The accepted trade-off is a simpler initial operating model in exchange for no independent module deployment or scaling. Future extraction may require migration work if evidence later justifies its cost.
+<details>
+<summary>Answer guide</summary>
 
-## Security and Verification
+- Observed coupling, deployment, scaling, reliability, or ownership needs must outweigh distributed-system cost.
+- A significant durable change requires a new ADR.
 
-No security control or application behavior was implemented. The principles nevertheless require external systems to sit behind module-owned boundaries, which reduces vendor concerns leaking into business behavior. Security effects remain future implementation concerns, not verified protections.
+</details>
 
-PR #1 reports relative-link validation and `git diff --check`; it also confirms no application code or infrastructure was introduced. No application tests existed or were claimed.
+### Decision Drills
 
-## Failure Modes and Safeguards
+#### Decision Drill: Modular monolith baseline
 
-- Direct cross-module access can undermine ownership. Apply the principles during design review and focused testing as implementation appears.
-- Shared mutable state or shared business abstractions can conceal coupling. Keep shared code technical and independent of business modules.
-- Premature services or messaging can create operational complexity without a product need. Require evidence and a new ADR for a significant change.
-- Treating candidate modules as deployed services would overstate the current architecture. Preserve the distinction in code and documentation.
+**Problem:** Establish future business boundaries without premature distributed infrastructure.
 
-## Plan, Build, Review, and Pull Request Lessons
+**Options:** Microservices, an unstructured monolith, preemptive event-driven infrastructure, or an explicit modular monolith.
 
-### Plan
+**Decision:** One deployable modular monolith with explicit in-process boundaries.
 
-PR #1 constrained the work to architecture documentation and an initial decision record; it did not authorize implementation or infrastructure.
+**Why:** Boundaries and ownership matter now; independent services do not yet have evidence-based value.
 
-### Build
+**Trade-off:** Modules cannot deploy or scale independently and require design discipline.
 
-The merged change added the principles, ADR 0001, and links from existing architecture documentation. It intentionally left package, API, schema, transaction, and deployment choices open.
+**Reconsider When:** Observed coupling, deployment, scaling, reliability, or ownership needs justify a different cost profile. See [ADR 0001](../adr/0001-adopt-modular-monolith.md).
 
-### Review
+### Concept Cards
 
-No formal GitHub review, review comment, or review finding is recorded for PR #1. The available PR evidence reports documentation-link validation and `git diff --check`; it cannot establish review that occurred outside GitHub.
+#### Module ownership
 
-### Pull Request
+- **Meaning:** One capability owns its rules and durable concepts; other modules use its explicit behavior.
+- **Samska application:** Candidate catalog, cart, orders, payments, and inventory boundaries are in-process, not services.
+- **Boundary or common mistake:** Shared mutable state or direct cross-module persistence access conceals coupling.
 
-PR #1 documented SS-002-only scope and no application or infrastructure work. Its residual risk is architectural drift once implementation begins, which the principles direct reviewers to manage.
+### Interview Drill
 
-## What the Project Owner Should Understand
+#### Why did Samska choose a modular monolith rather than microservices?
 
-The modular monolith is a deliberate starting point, not an anti-microservices claim. Samska chose explicit in-process ownership first because it provides a simpler learning and operating model while retaining an evidence-based path to later change.
+- **Expected reasoning:** initial context, explicit ownership, avoided distributed cost, accepted independent-scaling limitation, and evidence-driven reconsideration.
+- **Short, 15-30 seconds:** one deployable backend with explicit boundaries was the smallest justified starting point.
+- **Technical, 1-2 minutes:** reconstruct the Decision Drill and distinguish ADR history from ongoing principles.
 
-## Interview Practice
+### Five-Minute Checkpoint Cues
 
-### Questions
+Use the [canonical checkpoint](README.md#five-minute-learning-checkpoint).
 
-- Why did Samska start with a modular monolith instead of microservices?
-- How do directional dependencies and persistence ownership protect module boundaries?
-- When should an ADR be used instead of an architecture-principles document?
+- **Decision or reasoning to reconstruct:** modular monolith baseline.
+- **Concept or boundary to explain:** why direct persistence access violates ownership.
+- **Repository action:** inspect ADR 0001 and identify its reconsideration condition.
 
-### Interview-Ready Explanation
+## Reference Surface
 
-For v0.1, Samska chose a single deployable modular monolith in ADR 0001 because the project had no evidence that independent deployment or scaling was needed. We still defined business ownership, acyclic dependencies, and persistence ownership so the monolith would not become unstructured. The trade-off is that modules cannot scale independently, but we avoid distributed-system cost until observed coupling, reliability, or ownership needs justify a new ADR.
+### Historical Context and Outcome
 
-## Follow-up and Sources
+SS-002 established architecture guidance before application implementation. Issue #3 was backfilled for tracking; PR #1 and ADR 0001 are the detailed historical evidence. The work established candidate in-process catalog, cart, orders, payments, and inventory boundaries, not services, databases, packages, APIs, or infrastructure.
 
-Validate these principles when the backend begins: confirm one deployable unit and reviewable module ownership and dependencies. Revisit ADR 0001 only when concrete evidence changes its trade-off.
+### Implementation and Decision Evidence
+
+ADR 0001 rejected starting with microservices, an unstructured monolith, and preemptive event infrastructure. The principles require ownership, directional acyclic dependencies, explicit in-process contracts, and module-owned persistence while leaving schema, transaction, package, and enforcement design open until implementation exists.
+
+### Security, Verification, and Risks
+
+No application behavior or security control was implemented. PR #1 reported relative-link validation and `git diff --check`; no application tests existed. Risks were architectural drift, shared business abstractions, cross-module access, and premature infrastructure.
+
+### Delivery History and Deferred Work
+
+PR #1 was documentation-only. No formal GitHub review or review finding is recorded. Validate one deployable unit and reviewable ownership/dependencies as business behavior appears.
+
+### Sources
 
 - [Issue #3](https://github.com/Samska/samska-sandbox/issues/3)
 - [PR #1](https://github.com/Samska/samska-sandbox/pull/1)
