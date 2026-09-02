@@ -8,98 +8,123 @@
 - ADRs: None or links
 - Canonical documentation: Links
 
-`Last reviewed` may equal the work date when the record is first written. Update it when a later learning-focused revision is made; do not change the original work date.
+`Last reviewed` records document maintenance or revalidation, not personal study activity. Do not add a section merely because it appears below.
 
-## Mental Model
+## Study Surface
 
-Provide a concise model of what was built, how its important pieces connect, and where it fits in the larger system. Add a simple ASCII flow only when it materially improves reconstruction.
+State the central lesson in one sentence.
 
-## Learning Priorities
+### Must Remember
 
-| Priority | Concepts | Why this level matters |
-| --- | --- | --- |
-| Core | Concept | Needed to reconstruct or justify the work. |
-| Important | Concept | Needed to reason about an implementation, verification, risk, or trade-off. |
-| Supporting | Grouped details | Useful context, not a primary study outcome. |
+Use 3-5 atomic retention targets normally; fewer are valid. More than five requires explicit pruning review and justification. Avoid exact details unless their selection was the decision being learned.
 
-Use at most three Core and four Important concepts. These are authoring limits, not quotas.
+- Retention target
 
-## Active Recall
+### Mental Model
 
-Ask three to six reasoning questions where warranted before presenting detailed Concept Cards. Use GitHub-native `<details>` for answer guidance. Answers should contain reasoning points and evidence, not polished scripts.
+Use one short paragraph or small diagram to connect responsibilities. Do not repeat decision reasoning or inventory files and versions.
 
-### Question
+### Active Recall
+
+Use 3-5 reasoning questions normally. Answers must remain collapsed. Add at most one hint only where it improves retrieval.
+
+#### Question
+
+<details>
+<summary>Hint</summary>
+
+Small cue that does not reveal the answer.
+
+</details>
 
 <details>
 <summary>Answer guide</summary>
 
-Reasoning points and Samska evidence.
+- Reasoning point
+- Boundary or evidence
 
 </details>
 
-## Core Concepts
+### Decision Drills
 
-### Concept
+Include only for an evidence-supported, reusable choice with real alternatives. Omit the whole section otherwise. A normal record has 0-2 drills.
+
+#### Decision Drill: Title
+
+**Problem:**
+
+**Options:**
+
+**Decision:**
+
+**Why:**
+
+**Trade-off:**
+
+**Reconsider When:**
+
+Decision Drills are study aids, not authoritative decisions or ADR replacements.
+
+### Concept Cards
+
+Include only when concept mechanics need explanation. A normal record has 0-2 cards.
+
+#### Concept
 
 - **Meaning:**
 - **Samska application:**
-- **Decision value:**
-- **Trade-off or failure boundary:**
+- **Boundary or common mistake:**
 
-Add **Alternative**, **Common mistake**, or **Evidence** only when useful and supported.
+### Hands-on Reinforcement
 
-## Important Concepts
+Include only safe, reproducible exercises with meaningful learning value. State prerequisites, platform differences, action, observation, explanation, cleanup, and proof boundary. Exercise results are study validation, not historical evidence.
 
-Use compact cards or focused prose only when an Important concept needs treatment. Omit this section when Core concepts and evidence already provide enough context.
+#### Exercise
 
-## Common Misconceptions
+- **Prerequisite:**
+- **Perform or inspect:**
+- **Expected observation:**
+- **Explain:**
+- **Cleanup:**
+- **Proves / does not prove:**
 
-Include only when several related misconceptions would lead to weak explanations. Use `Misconception -> correction -> Samska evidence`.
+### Interview Drill
 
-## Hands-on Reinforcement
+Include only when a real decision or combined explanation warrants it. Do not write a script.
 
-Include only safe, reproducible repository exercises that reinforce a Core or Important concept. State prerequisites, commands for relevant platforms, the expected observation, and cleanup. Exercise results from this record's update are study validation, not historical evidence for the original work.
+#### Question
 
-## Interview Practice
+- **Expected reasoning:** context, problem, decision, why, evidence, trade-off, boundary, reconsideration as applicable.
+- **Likely follow-up:** optional.
+- **Short, 15-30 seconds:** decision, principal reason, boundary.
+- **Technical, 1-2 minutes:** context, options, decision, evidence, trade-off, boundary, reconsideration.
 
-Include one to three high-value questions where warranted. Give expected discussion points for context, constraint, decision, evidence, trade-off, and boundary or deferred work. Add likely follow-ups only when useful; do not write a memorization script.
+### Five-Minute Checkpoint Cues
 
-### Interview Question
+Use the [canonical checkpoint](README.md#five-minute-learning-checkpoint). Add only record-specific cues:
 
-- Expected discussion points:
-- Likely follow-up:
+- **Decision or reasoning to reconstruct:**
+- **Concept or boundary to explain:**
+- **Repository action:**
 
-## Explanation Depth
+## Reference Surface
 
-Use only for one or two Core decisions when it adds interview value. Give a 15-second thesis and an approximately one-minute expansion, then link to the deeper concept and evidence rather than duplicating content.
+### Historical Context and Outcome
 
-## Self-check
+State the dated starting point, requested outcome, and material result. Keep historical state distinct from current state.
 
-List the concepts and decisions the owner should be able to explain, compare, identify, or apply without reading this record.
+### Implementation and Decision Evidence
 
-## Engineering Evidence and History
+Preserve exact choices, files, versions, commands, supported alternatives, ADR links, and canonical sources needed for later fact checking.
 
-### Starting Point and Result
+### Security, Verification, and Risks
 
-State the problem, requested outcome, relevant previous state, material change, and evidence-supported reason. Identify historical facts separately from current state.
+State material security implications, original verification evidence, known gaps, and risks. Do not claim controls or tests without evidence.
 
-### Decisions, Alternatives, and Boundaries
+### Delivery History and Deferred Work
 
-List only alternatives actually considered or explicitly documented. Describe accepted trade-offs, failure modes, safeguards, and deferred work.
+Summarize only durable Plan, Build, Review, and Pull Request conclusions, including absent review evidence and deferred work.
 
-### Security and Verification
+### Sources
 
-Describe material security implications, verification performed, and meaningful verification gaps. Do not claim a control or test ran without evidence.
-
-### Delivery History
-
-Summarize only the conclusions that matter for future work:
-
-- **Plan:** constraints, material questions, and selected direction.
-- **Build:** meaningful implementation facts and deviations from the plan.
-- **Review:** resolved findings, validation gaps, and human decisions. State when no review evidence exists.
-- **Pull Request:** scope, evidence, deferred work, and residual risks.
-
-## Follow-up and Sources
-
-List future work, supersession notes, Issue, PR, ADR, canonical documentation, and other evidence. Link instead of copying authoritative documents.
+Link Issue, PR, ADR, canonical documentation, and primary external sources. Link rather than copy canonical artifacts.

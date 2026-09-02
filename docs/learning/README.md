@@ -2,102 +2,154 @@
 
 ## Purpose
 
-The Engineering Learning Journal preserves durable lessons from Samska Sandbox work. It helps the project owner return to an implemented decision months later and work through:
+The Engineering Learning Journal preserves durable lessons from Samska Sandbox work. It supports:
 
 ```text
-understand -> recall -> explain -> apply
+understand -> retrieve -> explain -> apply -> revisit
 ```
 
-It is a curated, evidence-based learning layer, not a new source of operational truth. Issues, pull requests, ADRs, and technical documentation remain authoritative for their respective purposes.
+It is an evidence-based learning layer, not a source of operational truth. Issues, pull requests, ADRs, and technical documentation remain authoritative for their respective responsibilities.
 
 ## Structure
 
 | File | Purpose |
 | --- | --- |
-| [000-template.md](000-template.md) | Reusable active-learning format for a Learning Record. |
-| [ss-002-architecture-principles.md](ss-002-architecture-principles.md) | Architecture principles, the modular-monolith decision, and ADR use. |
-| [ss-003-ai-engineering-governance.md](ss-003-ai-engineering-governance.md) | AI-assisted engineering governance and human accountability. |
-| [ss-004-github-repository-security.md](ss-004-github-repository-security.md) | GitHub security controls and evidence-based governance. |
-| [ss-005-repository-documentation-ci.md](ss-005-repository-documentation-ci.md) | Repository CI, GitHub Actions security, and documentation quality gates. |
-| [ss-006-java-backend-bootstrap.md](ss-006-java-backend-bootstrap.md) | Java backend baseline, dependency management, Spring Boot, testing, and backend CI. |
-| [ss-007-react-application-bootstrap.md](ss-007-react-application-bootstrap.md) | React frontend baseline, npm dependency reproducibility, Vite, component testing, and frontend CI. |
+| [000-template.md](000-template.md) | Reusable retention-oriented Learning Record format. |
+| [ss-002-architecture-principles.md](ss-002-architecture-principles.md) | Modular-monolith boundaries and ADR reasoning. |
+| [ss-003-ai-engineering-governance.md](ss-003-ai-engineering-governance.md) | Human accountability in AI-assisted engineering. |
+| [ss-004-github-repository-security.md](ss-004-github-repository-security.md) | Repository security controls and evidence boundaries. |
+| [ss-005-repository-documentation-ci.md](ss-005-repository-documentation-ci.md) | Risk-based CI and workflow security. |
+| [ss-006-java-backend-bootstrap.md](ss-006-java-backend-bootstrap.md) | Java backend baseline and verification boundaries. |
+| [ss-007-react-application-bootstrap.md](ss-007-react-application-bootstrap.md) | React frontend baseline and browser/tooling boundaries. |
 
-Use the work-item identifier in a new record name, for example `ss-009-product-domain.md`. One record should cover one coherent work item; link to another record when later work builds on its lesson.
+Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 
 ## Artifact Boundaries
 
 | Artifact | Canonical responsibility | Learning-record responsibility |
 | --- | --- | --- |
-| GitHub Issue | Requested outcome, scope, acceptance criteria, and work status. | Explain what is worth learning from completing the work. |
-| Pull Request | Exact change set, review discussion, verification evidence, and merge context. | Distill durable conclusions and link to the PR. |
-| ADR | Historical rationale for a significant, durable architectural decision. | Explain the engineering concepts and interview lessons around the decision without replacing the ADR. |
-| Technical documentation | Current system, process, control, or operational guidance. | Relate current guidance to the work that produced it without copying it. |
-| Learning record | Evidence-linked learning context and practice. | Never become a second copy of the canonical artifact. |
+| GitHub Issue | Requested outcome, scope, acceptance criteria, and status. | Explain what completing the work teaches. |
+| Pull Request | Exact change, review, verification, and merge evidence. | Distill durable conclusions and link it. |
+| ADR | Historical rationale for a significant, durable architecture decision. | Teach its reasoning without replacing it. |
+| Technical documentation | Current system, process, control, or operational guidance. | Relate it to dated work without copying it. |
+| Learning Record | Evidence-linked study and reference material. | Never become a second canonical artifact. |
 
 ## When a Learning Record Is Required
 
 Create or update a Learning Record for meaningful work that establishes or materially changes architecture, module boundaries, dependencies, infrastructure, data or API behavior, security posture, CI/CD, testing or verification strategy, engineering governance, or material operational risk.
 
-Also create a record when an experiment, incident, rejected approach, or non-obvious trade-off produces a reusable engineering lesson. Do not create a record for mechanical edits with no durable lesson. If the need is unclear, the human owner decides before implementation.
+Also create one when an experiment, incident, rejected approach, or non-obvious trade-off produces a reusable lesson. Do not create one for mechanical edits with no durable lesson. Create or update it in the same pull request as the work. Retrospective records may use repository and GitHub history.
 
-Create or update the record in the same pull request as the work. Retrospective records may use repository history and GitHub artifacts when a prior work item predates this journal.
+SS-020 is an explicit exception: it evolves this canonical Learning System, so its durable evidence is Issue #19, this guide, the template, migrated records, the pull request, and verification evidence. It does not need a recursive Learning Record.
 
-## Record Format
+## Study Surface
 
-Use [the template](000-template.md), adapting it to the work rather than filling every possible section. The required parts are:
+The Study Surface is the compact material a returning reader should repeatedly retrieve and explain. It appears before detailed evidence. A reader should identify retention targets within about one minute; a normal review should take about 5-10 minutes, excluding exercise execution.
 
-- Evidence-linked metadata, including the original work date and `Last reviewed` for records in the active format.
-- A concise Mental Model that lets a reader reconstruct the important pieces and their connection.
-- Learning Priorities.
-- Active Recall before detailed concept treatment, with answer guidance hidden in GitHub-native `<details>` elements.
-- Appropriate treatment of Core concepts.
-- A learning-outcome Self-check.
-- Engineering Evidence and History, including security and verification implications.
-- Canonical sources.
+### Must Remember
 
-The following are conditional or optional: Important Concept Cards, Common Misconceptions, Hands-on Reinforcement, Interview Practice, explanation-depth ladders, likely interview follow-ups, and diagrams. Omit them when they do not add learning value; do not leave empty headings.
+Use 3-5 atomic statements normally. Fewer are valid when they sufficiently capture the lesson. More than five requires explicit pruning review and justification.
 
-Use an ASCII flow or diagram only when it clarifies a sequence, dependency, system boundary, or connection that prose would make harder to reconstruct.
+Choose decisions, transferable concepts, architecture reasoning, testing or security boundaries, and material trade-offs. Avoid exact versions, hashes, commands, individual configuration, and incidental implementation facts unless selecting them was itself the central decision. Every item must be exercised by recall, a Decision Drill, a Concept Card, an Interview Drill, or checkpoint cues.
 
-### Learning Priorities
+### Mental Model
 
-| Priority | Meaning | Expected treatment |
-| --- | --- | --- |
-| Core | Needed to reconstruct the work, justify its central decisions, and explain or apply the lesson. | Full Concept Card, recall coverage, and usually interview coverage. |
-| Important | Needed to reason about implementation, verification, risk, or a material trade-off. | Compact card or focused prose. |
-| Supporting | Useful evidence, terminology, version detail, or operational context, but not a primary learning outcome. | Grouped brief context or a source link. |
+Use one short paragraph or one small useful diagram. It connects responsibilities, flow, or boundaries and should be reconstructable from memory. Around 3-7 meaningful nodes is a useful review trigger. Do not turn it into a file inventory, version list, decision rationale, or generic tutorial.
 
-Prioritize a concept when misunderstanding it would lead to a materially wrong design or explanation, it was central to the Issue outcome, it transfers to later work, or it has a meaningful alternative, failure mode, or practical exercise. A normal record has at most three Core concepts and four Important concepts. These are limits, not quotas; group Supporting details.
+### Active Recall
 
-### Concept Cards and Recall
+Use 3-5 reasoning questions normally. Ask why, why not, what a layer solves or does not solve, how responsibilities differ, what would fail without it, or what would justify reconsideration. Answers stay collapsed in GitHub-native `<details>` and use concise reasoning bullets, not scripts or a duplicated Decision Drill.
 
-Use a full Concept Card only for a Core concept or an Important concept that needs structured treatment. A full card has:
+Use 0-1 hint per question only when a small cue can unblock retrieval without revealing the answer. A reader attempts the question first, opens a hint only after a genuine attempt, then opens the answer guide only after another attempt.
+
+### Decision Drills
+
+A Decision Drill is a study-oriented reconstruction of an evidence-supported choice. It is not an ADR and does not approve or change a decision.
+
+Create one only when realistic documented alternatives existed, the choice mattered to the Issue, meaningful reasoning and a trade-off exist, and it has reusable learning value. A normal record has 0-2 drills; three needs clear justification. When used, include all fields:
+
+- **Problem**
+- **Options**
+- **Decision**
+- **Why**
+- **Trade-off**
+- **Reconsider When**
+
+Do not invent alternatives or rationale. Maven vs Gradle, npm vs pnpm, and the current Vite vs Next.js choice are Decision Drill candidates. Modular Monolith vs Microservices is authoritative in [ADR 0001](../adr/0001-adopt-modular-monolith.md); SS-002 may summarize it with a link, never supersede it.
+
+### Concept Cards
+
+Use a card only when the mechanics of a concept deserve understanding. A normal record has 0-2 cards; three needs clear justification. Use:
 
 - **Meaning**
 - **Samska application**
-- **Decision value**
-- **Trade-off or failure boundary**
+- **Boundary or common mistake**
 
-Alternative, common-mistake, and evidence fields are optional. Use normal prose for minor details. Do not create a card for every noun in an implementation.
+Decision reasoning belongs in a Decision Drill. Use prose or a source link for minor details.
 
-Use approximately three to six Active Recall questions when warranted. Ask why, how, comparison, prediction, or failure-reasoning questions tied to Samska decisions. The answer guide should provide reasoning points and evidence, not a script to memorize.
+### Primary-Home Rule
 
-Interview Practice is different: it tests open-ended communication of a real decision. Include one to three high-value questions only when useful. Give expected discussion points covering context, constraint, decision, evidence, trade-off, and boundary or deferred work. Add likely follow-ups only when they improve practice.
+| Section | Owns |
+| --- | --- |
+| Must Remember | Retention target name. |
+| Mental Model | Connections and responsibilities. |
+| Decision Drill | Decision reasoning. |
+| Concept Card | Concept mechanics. |
+| Active Recall | Retrieval. |
+| Interview Drill | Combined explanation. |
+| Reference Surface | Evidence and exact detail. |
 
-Use a 15-second thesis and an approximately one-minute expansion for no more than two Core decisions when different explanation depths add interview value. Link to deeper cards and evidence instead of repeating the same explanation three times.
+Cross-reference instead of repeating explanatory prose.
 
-### Hands-on Reinforcement and Misconceptions
+### Interview Drills
 
-An exercise must use the actual repository, be safe and reproducible, reinforce a Core or Important concept, and ask for an observation or explanation. It must not require unrelated infrastructure. Include zero to three meaningful exercises and execute published commands during change verification where the environment permits. Exercise results from a later Learning Record update are study validation, not historical evidence for the original work.
+Use 0-2 high-value drills when useful. Include a question, expected reasoning, and an optional likely follow-up. Expected reasoning uses only applicable context, problem, decision, why, evidence, trade-off, boundary, and reconsideration points. Do not provide polished answers.
 
-Use a concise Common Misconceptions section only when several related mistakes would weaken technical explanations. Otherwise put the mistake in the relevant Concept Card.
+One major decision may also use depth cues:
 
-## Evidence and Sustainability
+- **Short, 15-30 seconds:** decision, principal reason, and important boundary.
+- **Technical, 1-2 minutes:** context, options, decision, evidence, trade-off, boundary, and reconsideration.
 
-Clearly distinguish verified facts, historical facts, current state, future direction, and deferred work. Include alternatives only when evidence supports them. Preserve concise Plan, Build, Review, and Pull Request conclusions because they explain delivery history, but do not reproduce raw AI prompts, chat transcripts, tool output, hidden reasoning, credentials, secrets, personal data, or unsupported reconstructions.
+These are coverage cues, not scripts.
 
-Canonical documents describe current state; records preserve a dated lesson. Update canonical documentation first when later work changes a lesson, then add a dated follow-up or supersession note to the affected record. Do not rewrite supported historical facts to make them appear current.
+### Hands-on Reinforcement
 
-Learning density matters more than document size. Prefer the shortest record that achieves its learning outcomes. A record below 1,200 words is acceptable; do not add prose to reach a target. Around 1,800 words should trigger a pruning review, and more than 2,000 words requires explicit review justification. Never remove necessary engineering evidence merely to meet a length guideline. Link canonical sources instead of copying inventories, policies, workflows, or ADR text.
+Use 0-2 exercises normally. Each needs prerequisites, a perform/inspect action, expected observation, explanation task, platform differences where relevant, side effects/cleanup, and a statement of what it proves and does not prove. Prefer inspection over mutation. Exercise results from a later record update are study validation, not historical Issue evidence.
 
-Records created under the previous format remain valid historical records and do not require immediate migration. Migrate them only through separately justified work after the active format has proven useful. Verify relative links whenever the journal changes.
+## Five-Minute Learning Checkpoint
+
+After a meaningful Issue merges, use this reusable checkpoint:
+
+1. Explain the Issue outcome in about 60 seconds.
+2. Recall the Must Remember items.
+3. Reconstruct one Decision Drill when one exists.
+4. Explain one important concept or boundary.
+5. Interpret or perform one small repository-based action.
+
+Records contain only compact, record-specific cues linked here. Do not record scores, failures, study dates, mistakes, personal performance, or private learning analytics.
+
+## Spaced and Cumulative Recall
+
+Review after merge, about +1 day, +7 days, +30 days, and when the concept is reused. Start with Active Recall rather than rereading explanations. `Last reviewed` means document maintenance or revalidation, not personal study activity.
+
+Occasionally mix real cross-Issue comparisons without creating a central question bank. Useful examples include JDK versus Maven Wrapper, Maven Wrapper versus `package-lock.json`/`npm ci`, Node tooling versus browser runtime, Spring versus React component smoke tests, CI evidence versus runtime evidence, and future PostgreSQL readiness versus application persistence.
+
+## Reference Surface
+
+Reference comes after study and preserves engineering evidence without making every fact a memorization target. Use conditional sections as appropriate:
+
+- Historical Context and Outcome
+- Implementation and Decision Evidence
+- Security, Verification, and Risks
+- Delivery History and Deferred Work
+- Sources
+
+Clearly distinguish historical facts, current state, future direction, and deferred work. Include alternatives only when evidence supports them. Link canonical documentation rather than copying inventories, policy prose, workflows, or ADR text. Do not include raw prompts, transcripts, hidden reasoning, secrets, credentials, personal data, or unsupported reconstructions.
+
+## Sustainability
+
+Learning density matters more than total file size. A large Reference Surface is acceptable when evidence requires it; an oversized Study Surface is not.
+
+Trigger pruning review when there are more than five Must Remember items, more than three Decision Drills or five recall questions, more than two Concept Cards or Interview Drills without justification, a Study Surface exceeds about ten minutes, evidence interrupts the study path, explanations repeat, a Mental Model becomes an inventory, interview content becomes a script, or generic tutorial text could be reused unchanged elsewhere.
+
+Do not fill a quota, create a card for every concept, create a drill for every choice, or write to reach a word count. Verify relative links whenever the journal changes.
