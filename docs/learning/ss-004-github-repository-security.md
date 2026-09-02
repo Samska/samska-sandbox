@@ -85,7 +85,7 @@ Policy -> GitHub enforcement -> evidence of configured state -> human review
 
 ### Interview Drill
 
-#### Explain the repository security baseline without overstating review or evidence.
+#### Explain the repository security baseline without overstating review or evidence
 
 - **Expected reasoning:** public-repository context, protected main, zero-approval boundary, secret protection, evidence levels, deferred controls, and residual owner review.
 

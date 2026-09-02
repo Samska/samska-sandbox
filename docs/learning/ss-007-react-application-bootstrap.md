@@ -136,7 +136,7 @@ Node -> npm / TypeScript / Vite / Vitest -> JavaScript assets -> browser -> Reac
 
 ### Interview Drill
 
-#### Justify the frontend baseline and its confidence boundaries.
+#### Justify the frontend baseline and its confidence boundaries
 
 - **Expected reasoning:** Node/browser separation, npm and lockfile choice, React/TypeScript/Vite responsibilities, client-rendered boundary, verification layers, browser-public configuration, and deferred behavior.
 - **Likely follow-up:** when would pnpm, a full-stack framework, or E2E testing be justified?

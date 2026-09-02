@@ -28,7 +28,7 @@ Use one short paragraph or small diagram to connect responsibilities. Do not rep
 
 Use 3-5 reasoning questions normally. Answers must remain collapsed. Add at most one hint only where it improves retrieval.
 
-#### Question
+#### Active Recall Question
 
 <details>
 <summary>Hint</summary>
@@ -92,7 +92,7 @@ Include only safe, reproducible exercises with meaningful learning value. State 
 
 Include only when a real decision or combined explanation warrants it. Do not write a script.
 
-#### Question
+#### Interview Question
 
 - **Expected reasoning:** context, problem, decision, why, evidence, trade-off, boundary, reconsideration as applicable.
 - **Likely follow-up:** optional.

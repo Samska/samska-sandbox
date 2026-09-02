@@ -145,7 +145,7 @@ Consider what Spring and the embedded server do before the HTTP request runs.
 
 ### Interview Drill
 
-#### Justify the smallest backend baseline.
+#### Justify the smallest backend baseline
 
 - **Expected reasoning:** conventional single application, separate JDK/Wrapper responsibilities, Maven/POM dependency model, Spring Boot, health-only startup evidence, and deferred behavior-based layers.
 - **Likely follow-up:** why Maven rather than Gradle, and what would justify changing the build choice?
