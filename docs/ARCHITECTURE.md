@@ -2,7 +2,7 @@
 
 ## Current State
 
-The repository contains a Spring Boot backend application in `backend/` and a React frontend application in `web/`. The backend has an application bootstrap and a health-only Actuator endpoint. The frontend renders only a neutral foundation screen and has no routing, business UI, API integration, or browser configuration. Neither application has business modules, business APIs, persistence, external integrations, or deployment configuration. This document records the approved direction for future work; it does not describe a deployed system, existing modules, APIs, data stores, or operational controls beyond those verified baselines.
+The repository contains a Spring Boot backend application in `backend/`, a React frontend application in `web/`, and a Docker Compose PostgreSQL runtime for local development. The backend has an application bootstrap and a health-only Actuator endpoint. The frontend renders only a neutral foundation screen and has no routing, business UI, API integration, or browser configuration. Neither application has business modules, business APIs, persistence, external integrations, or deployment configuration. PostgreSQL readiness is infrastructure evidence only: the backend has no JDBC driver, DataSource, schema, migration, repository, or database health participation. This document records the approved direction for future work; it does not describe a deployed system or unimplemented application behavior.
 
 ## Initial Direction
 
@@ -18,7 +18,7 @@ Candidate v0.1 modules are:
 
 These are candidate in-process boundaries, not a requirement to create services or independent databases. Their responsibilities, dependencies, persistence ownership, and enforcement approach are guided by [Architecture Principles](architecture/principles.md).
 
-The initial technology direction uses React and TypeScript with Vite for the web application and Java and Spring Boot for the backend. PostgreSQL for persistence and Docker Compose for local orchestration remain future evaluation candidates; they are not configured or required in the repository yet.
+The initial technology direction uses React and TypeScript with Vite for the web application and Java and Spring Boot for the backend. Docker Compose now provides a local PostgreSQL runtime that future persistence work can use. Physical schemas, module data ownership, persistence libraries, transactions, migrations, application credentials, and backend connectivity remain future decisions tied to actual persistence behavior.
 
 ## Evidence-Driven Evolution
 

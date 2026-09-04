@@ -7,7 +7,7 @@ Assume the repository is public and a future demo may receive hostile users and 
 ## Data and Secrets
 
 - Use synthetic data only. Real customer data is prohibited.
-- Never commit, hardcode, log, or expose passwords, tokens, credentials, connection strings, private keys, or other secrets.
+- Never commit, hardcode, log, or expose real or reusable passwords, tokens, credentials, connection strings, private keys, or other secrets. Intentionally public local-only development defaults must be clearly identified and must never be reused as secrets.
 - Real environment files must not be committed. Safe example files may be committed only when they contain no secrets.
 - Never include secrets in frontend bundles, documentation examples, test fixtures, images, or CI output.
 - Payments are simulated only; do not integrate real payment processors.
@@ -36,3 +36,9 @@ Do not claim a control is enabled until it has been independently verified. The 
 The React application in `web/` has no environment files, API configuration, credentials, or backend integration. Browser-delivered JavaScript, HTML, CSS, browser storage, and network requests must be treated as public to users; deployed source maps are public too when enabled. Vite statically exposes `VITE_*` values through `import.meta.env`; those values are public configuration, never secret storage. Do not put credentials, tokens, private API keys, connection strings, or backend secrets in frontend source, Vite configuration, or `VITE_*` variables.
 
 `web/.nvmrc` selects the Node version for supported workflows and CI. The `engines` and `packageManager` fields communicate intended compatibility to tooling but do not themselves prevent unsupported local tools. The committed `package-lock.json` and `npm ci --ignore-scripts` provide deterministic dependency installation while minimizing lifecycle-script execution. This baseline does not provide authentication, authorization, API security, vulnerability scanning, dependency-update automation, or deployment controls.
+
+## Current Local Database Baseline
+
+Docker Compose publishes PostgreSQL only on IPv4 loopback, preventing direct exposure on other host interfaces. The committed database name, bootstrap user, and password are intentionally public local-only configuration, not secrets, and are unsuitable for CI, shared, deployed, or production environments. The official image gives the bootstrap user elevated PostgreSQL privileges; no application uses that account, and future backend integration must reconsider least-privileged credentials.
+
+The local database uses a Docker-managed named volume outside the Git repository. Local data remains until the volume is explicitly removed, so developers must use synthetic data and treat `docker compose down -v` as a destructive reset. Real secrets and real data remain prohibited in Compose files, `.env` files, commands, logs, and database contents.

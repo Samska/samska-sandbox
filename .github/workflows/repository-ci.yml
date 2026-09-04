@@ -18,6 +18,9 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Validate Docker Compose configuration
+        run: docker compose config --quiet
+
       - name: Lint Markdown
         uses: DavidAnson/markdownlint-cli2-action@21c1be1b93ad9ed58fa840aacc3f279cde2a72ff # v24.2.0
         with:
