@@ -47,7 +47,7 @@ On Windows, use `mvnw.cmd` instead. When the application has started, `http://lo
 
 The repository-root [Compose file](compose.yaml) runs the official Debian-based `postgres:18-trixie` image. The tag fixes the PostgreSQL major line and Debian base family while allowing PostgreSQL patches, operating-system security fixes, and image rebuilds through `docker compose pull`; it is not immutable.
 
-Docker Desktop or Docker Engine with Docker Compose v2 is required. A local PostgreSQL installation and local `psql` are not required because the container provides the client tools. Run these commands from the repository root:
+Docker Desktop or Docker Engine with Docker Compose v2 is required. A local PostgreSQL installation and local `psql` are not required because the container provides the client tools. Before running Compose, create an ignored root `.env` from the committed [.env.example](.env.example) and set `POSTGRES_PASSWORD` to a non-empty local value. Compose fails before startup when the variable is absent or empty; `.env.example` is only a configuration template and contains no usable password. Run these commands from the repository root:
 
 ```bash
 docker compose up -d --wait
@@ -61,7 +61,7 @@ docker compose down -v
 
 `docker compose stop` retains the container, named volume, and database data. `docker compose down` removes the container and Compose network but retains the named volume and data. `docker compose down -v` also removes the named volume and intentionally destroys the local database data; treat it as a destructive reset. These commands do not remove the cached image.
 
-The database is `samska`, the bootstrap development user is `samska_dev`, and the password is `samska-local-only`. These committed values are public local-only configuration, not secrets. The bootstrap user has elevated PostgreSQL privileges. Never reuse these values in CI, shared, deployed, or production environments; future application integration must establish appropriate least-privileged credentials.
+The committed database name is `samska` and the bootstrap development user is `samska_dev`. The password is supplied through the local ignored `.env` and is not committed. The bootstrap user has elevated PostgreSQL privileges. The `.env` workflow is local convenience, not production secret management; shared or deployed environments must supply credentials through an appropriate runtime secret mechanism, and future application integration must establish least-privileged credentials.
 
 PostgreSQL is published only on IPv4 loopback at `127.0.0.1:5432`. If that host port is occupied, set `POSTGRES_HOST_PORT=5433` in an uncommitted root `.env` file and use `127.0.0.1:5433`. A process on the host uses `127.0.0.1:<published-host-port>`, while a Compose peer uses `postgres:5432`. `localhost` always refers to the network namespace of the calling process.
 

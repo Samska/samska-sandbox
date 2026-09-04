@@ -16,11 +16,11 @@ The PostgreSQL foundation separates a reproducible local database runtime from a
 
 ### Must Remember
 
-- An image is a reusable runtime template; a container is an instance of it, and unlike a virtual machine it shares a host kernel rather than emulating a complete machine.
+- The bounded `postgres:18-trixie` image is a reusable runtime template; a container is an instance of it that shares the host kernel rather than emulating a complete machine.
 - A host process uses `127.0.0.1:<published-port>`, while a Compose peer uses `postgres:5432`; `localhost` belongs to the caller's network namespace.
 - The named volume outlives container removal: `down` preserves data, while destructive `down -v` removes the volume and data.
 - Readiness and successful SQL provide database evidence, not Spring Boot connectivity, schemas, repositories, or business persistence.
-- `postgres:18-trixie` bounds the PostgreSQL major and Debian family while deliberately accepting patch and image rebuild updates.
+- A disposable local password may have little runtime value, but committing a password literal violates secret-scanning policy; Compose therefore requires it from an ignored `.env`.
 
 ### Mental Model
 
@@ -31,6 +31,9 @@ postgres:18-trixie image -> postgres container -> PostgreSQL process
 
 host process -> 127.0.0.1:host port -> container:5432
 Compose peer ------------------------> postgres:5432
+
+.env (ignored) -> Compose interpolation -> POSTGRES_PASSWORD
+.env.example ---- variable names only ---^
 
 pg_isready / psql evidence -X-> Spring Boot persistence evidence
 ```
@@ -99,6 +102,17 @@ Identify whose network namespace interprets `localhost`.
 
 </details>
 
+#### Why keep even a disposable local password outside version control?
+
+<details>
+<summary>Answer guide</summary>
+
+- A password literal conflicts with repository secret-scanning policy regardless of its current runtime value.
+- The ignored `.env` supplies the local value while `.env.example` documents only the required variables.
+- A local `.env` is not production secret management; shared and deployed environments need an appropriate runtime secret mechanism.
+
+</details>
+
 ### Decision Drills
 
 #### Decision Drill: Runtime-only database boundary
@@ -135,8 +149,8 @@ Decision Drills are study aids, not authoritative decisions or ADR replacements.
 
 #### Inspect runtime, addressing, and evidence layers
 
-- **Prerequisite:** Docker Engine or Docker Desktop with Docker Compose v2; work from the repository root.
-- **Perform or inspect:** run `docker compose pull`, `docker compose up -d --wait`, `docker compose ps`, the documented `pg_isready` command, and `docker compose exec postgres psql -U samska_dev -d samska -c "SELECT current_database(), current_user;"`.
+- **Prerequisite:** Docker Engine or Docker Desktop with Docker Compose v2 and an ignored root `.env` containing a non-empty `POSTGRES_PASSWORD`; work from the repository root.
+- **Perform or inspect:** run `docker compose pull`, `docker compose up -d --wait`, `docker compose ps`, the documented `pg_isready` command, and `docker compose exec postgres sh -c 'PGPASSWORD="$POSTGRES_PASSWORD" psql -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT current_database(), current_user;"'`.
 - **Expected observation:** the image is cached, one generated container is healthy, host port 5432 maps only from `127.0.0.1`, and SQL reports `samska` and `samska_dev`.
 - **Explain:** distinguish image from container, host address from Compose service address, and readiness from authenticated query evidence.
 - **Cleanup:** run `docker compose down -v` if no local data should remain.
@@ -180,11 +194,11 @@ PostgreSQL 18 was selected after reviewing the PostgreSQL support policy: 18 had
 
 The official `postgres:18-trixie` registry tag existed and supported the local AMD64 platform. The standard Debian image was preferred over Alpine because image size was not a requirement and Debian offered the more conventional compatibility and debugging baseline. The image documentation confirmed that PostgreSQL 18+ volumes mount at `/var/lib/postgresql`; the database cluster used the image's version-specific `/var/lib/postgresql/18/docker` subdirectory.
 
-The root `compose.yaml` defines service `postgres`, database `samska`, bootstrap superuser `samska_dev`, public local-only password `samska-local-only`, `127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432`, volume `postgres-data`, and a `pg_isready` healthcheck. Compose supplies generated resource names and the default project network. No top-level version, custom name, container name, restart policy, custom network, initialization mount, or extra service exists.
+The root `compose.yaml` defines service `postgres`, database `samska`, bootstrap superuser `samska_dev`, fail-fast `POSTGRES_PASSWORD` interpolation, `127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432`, volume `postgres-data`, and a `pg_isready` healthcheck. The ignored `.env` supplies the local password; `.env.example` lists the host-port default and an empty password field without providing a usable credential. Repository CI uses the non-secret GitHub run ID only as a render-time value for static Compose validation; it does not start PostgreSQL. Compose supplies generated resource names and the default project network. No top-level version, custom name, container name, restart policy, custom network, initialization mount, or extra service exists.
 
 ### Security, Verification, and Risks
 
-Docker 29.7.2, Docker Compose v5.5.0, and daemon connectivity through `hello-world` passed. Both `docker compose config` and `docker compose config --quiet` passed. Pull and startup resolved PostgreSQL 18.6 (`Debian 18.6-1.pgdg13+2`) and image ID/digest `sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280`. The digest is evidence, not an enforced pin.
+Docker 29.7.2, Docker Compose v5.5.0, and daemon connectivity through `hello-world` passed. Compose rejected configuration when `POSTGRES_PASSWORD` was absent, then both `docker compose config` and `docker compose config --quiet` passed with a temporary value in the ignored local `.env`; `git status --ignored` confirmed that `.env` remained excluded. Pull and startup resolved PostgreSQL 18.6 (`Debian 18.6-1.pgdg13+2`) and image ID/digest `sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280`. The digest is evidence, not an enforced pin.
 
 `docker compose ps` reported healthy with only `127.0.0.1:5432` published. `pg_isready` reported accepting connections. The required in-container local-socket `psql` query returned database `samska`, user `samska_dev`, and the server version; an additional in-container TCP query with `PGPASSWORD` verified password authentication. Host-native `psql` was unavailable and was not installed; Windows `Test-NetConnection` confirmed TCP reachability to `127.0.0.1:5432`, so host-native PostgreSQL protocol/query evidence remains absent.
 
@@ -192,9 +206,9 @@ The generic `ss008_persistence_probe` row survived `stop`/`start` and `down`/`up
 
 Independent verification passed the backend Maven `clean verify` lifecycle, frontend clean install/typecheck/component test/production build, actionlint 1.7.12, Markdown lint, offline local-link validation, EditorConfig checking, and `git diff --check`. The existing GitHub Action pins and backend/frontend application files remained unchanged.
 
-PR #21's implementation commit passed Repository CI, Backend CI, Frontend CI, all three CodeQL analyses, and the aggregate CodeQL check. GitGuardian failed because its generic-password detector classified the intentionally public `POSTGRES_PASSWORD` local default as a secret; the finding did not identify a real or reusable credential, and required status checks are not configured.
+PR #21's implementation commit passed Repository CI, Backend CI, Frontend CI, all three CodeQL analyses, and the aggregate CodeQL check. GitGuardian failed because its generic-password detector found a committed `POSTGRES_PASSWORD` literal. Although the disposable value had never protected a shared or external resource, the finding exposed a conflict with repository secret-scanning policy. The correction removed the literal, made Compose fail fast when the local variable is absent or empty, and added an inert `.env.example`; no external credential existed to rotate.
 
-The committed credentials are public local-only configuration and the bootstrap user has elevated privileges. They must not be reused in CI, shared, deployed, or production environments. A mutable image tag can resolve new bytes after a pull, and PostgreSQL major upgrades require an explicit data migration or disposable local reset.
+The ignored local `.env` supplies the password outside version control, and the bootstrap user has elevated privileges. An `.env` file does not make a production secret secure: shared and deployed environments must use an appropriate runtime secret mechanism, and no production or shared credential is present in the repository. A mutable image tag can resolve new bytes after a pull, and PostgreSQL major upgrades require an explicit data migration or disposable local reset.
 
 ### Delivery History and Deferred Work
 

@@ -19,6 +19,8 @@ jobs:
           persist-credentials: false
 
       - name: Validate Docker Compose configuration
+        env:
+          POSTGRES_PASSWORD: ${{ github.run_id }}
         run: docker compose config --quiet
 
       - name: Lint Markdown

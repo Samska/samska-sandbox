@@ -7,7 +7,7 @@ Assume the repository is public and a future demo may receive hostile users and 
 ## Data and Secrets
 
 - Use synthetic data only. Real customer data is prohibited.
-- Never commit, hardcode, log, or expose real or reusable passwords, tokens, credentials, connection strings, private keys, or other secrets. Intentionally public local-only development defaults must be clearly identified and must never be reused as secrets.
+- Never commit, hardcode, log, or expose passwords, tokens, credentials, connection strings, private keys, or other secrets.
 - Real environment files must not be committed. Safe example files may be committed only when they contain no secrets.
 - Never include secrets in frontend bundles, documentation examples, test fixtures, images, or CI output.
 - Payments are simulated only; do not integrate real payment processors.
@@ -39,6 +39,6 @@ The React application in `web/` has no environment files, API configuration, cre
 
 ## Current Local Database Baseline
 
-Docker Compose publishes PostgreSQL only on IPv4 loopback, preventing direct exposure on other host interfaces. The committed database name, bootstrap user, and password are intentionally public local-only configuration, not secrets, and are unsuitable for CI, shared, deployed, or production environments. The official image gives the bootstrap user elevated PostgreSQL privileges; no application uses that account, and future backend integration must reconsider least-privileged credentials.
+Docker Compose publishes PostgreSQL only on IPv4 loopback, preventing direct exposure on other host interfaces. The database name and bootstrap user are committed configuration, but the PostgreSQL password must be supplied through an ignored local `.env` and is not present in the repository. The committed `.env.example` is an inert configuration template with an empty password field. The official image gives the bootstrap user elevated PostgreSQL privileges; no application uses that account, and future backend integration must establish least-privileged credentials.
 
-The local database uses a Docker-managed named volume outside the Git repository. Local data remains until the volume is explicitly removed, so developers must use synthetic data and treat `docker compose down -v` as a destructive reset. Real secrets and real data remain prohibited in Compose files, `.env` files, commands, logs, and database contents.
+The local `.env` may contain a disposable development credential and must remain ignored. It is a local Compose input, not production secret management; shared and deployed environments must use an appropriate runtime secret mechanism. No production or shared credential belongs in the repository. The local database uses a Docker-managed named volume outside the Git repository. Local data remains until the volume is explicitly removed, so developers must use synthetic data and treat `docker compose down -v` as a destructive reset. Real data and credentials remain prohibited in committed files, commands, logs, and database contents.
