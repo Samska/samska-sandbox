@@ -4,7 +4,8 @@ services:
     environment:
       POSTGRES_DB: samska
       POSTGRES_USER: samska_dev
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
+      POSTGRES_PASSWORD: >-
+        ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     ports:
       - "127.0.0.1:${POSTGRES_HOST_PORT:-5432}:5432"
     volumes:
