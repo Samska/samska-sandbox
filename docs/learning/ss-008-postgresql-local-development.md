@@ -1,10 +1,10 @@
 # SS-008: PostgreSQL Local Development
 
-- Status: Draft
+- Status: Active
 - Work date: 2026-09-04
 - Last reviewed: 2026-09-04
 - Work item: [SS-008, Issue #18](https://github.com/Samska/samska-sandbox/issues/18)
-- Pull request: Not created
+- Pull request: [#21: feat(database): establish PostgreSQL local development](https://github.com/Samska/samska-sandbox/pull/21)
 - ADRs: None
 - Canonical documentation: [README](../../README.md), [Architecture](../ARCHITECTURE.md), [Testing Strategy](../TESTING.md), [Security Engineering](../SECURITY.md), [GitHub Repository Controls](../GITHUB.md), and [Compose configuration](../../compose.yaml)
 
@@ -192,11 +192,13 @@ The generic `ss008_persistence_probe` row survived `stop`/`start` and `down`/`up
 
 Independent verification passed the backend Maven `clean verify` lifecycle, frontend clean install/typecheck/component test/production build, actionlint 1.7.12, Markdown lint, offline local-link validation, EditorConfig checking, and `git diff --check`. The existing GitHub Action pins and backend/frontend application files remained unchanged.
 
+PR #21's implementation commit passed Repository CI, Backend CI, Frontend CI, all three CodeQL analyses, and the aggregate CodeQL check. GitGuardian failed because its generic-password detector classified the intentionally public `POSTGRES_PASSWORD` local default as a secret; the finding did not identify a real or reusable credential, and required status checks are not configured.
+
 The committed credentials are public local-only configuration and the bootstrap user has elevated privileges. They must not be reused in CI, shared, deployed, or production environments. A mutable image tag can resolve new bytes after a pull, and PostgreSQL major upgrades require an explicit data migration or disposable local reset.
 
 ### Delivery History and Deferred Work
 
-Issue #18 approved PostgreSQL runtime infrastructure and moved to In Progress while retaining High priority. No pull request or formal review exists yet. Repository CI gained static Compose validation but does not start PostgreSQL. JDBC, DataSource configuration, least-privileged application credentials, schemas, migrations, repositories, Testcontainers, database-backed tests, other infrastructure services, deployment, backups, and monitoring remain deferred until concrete behavior requires them.
+Issue #18 approved PostgreSQL runtime infrastructure and is In Review with High priority. PR #21 opened on 2026-09-04; no formal GitHub review exists yet. Repository CI gained static Compose validation but does not start PostgreSQL. JDBC, DataSource configuration, least-privileged application credentials, schemas, migrations, repositories, Testcontainers, database-backed tests, other infrastructure services, deployment, backups, and monitoring remain deferred until concrete behavior requires them.
 
 ### Sources
 
