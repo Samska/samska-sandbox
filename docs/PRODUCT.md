@@ -8,7 +8,7 @@ The project's non-commercial purpose does not restrict downstream use of the Apa
 
 ## Current Scope
 
-The repository currently contains only the engineering foundation. There is no application, service, UI, API, database, deployment environment, or runnable workflow.
+The repository currently contains Java backend and React frontend foundations plus a local PostgreSQL runtime. There is no business-domain behavior, business UI, business API, application persistence, or deployment environment.
 
 ## Initial Product Milestone
 
@@ -22,7 +22,7 @@ v0.1.0, "First Order", will eventually enable a user to:
 6. Create an order.
 7. View an order confirmation.
 
-The expected local workflow will eventually be simple, such as `docker compose up`, but no container workflow exists yet.
+Docker Compose can start PostgreSQL for local development, but the backend and frontend are not containerized and PostgreSQL is not integrated with the application. A future full-application workflow should remain simple when its behavior is justified.
 
 ## Future Domain Scope
 

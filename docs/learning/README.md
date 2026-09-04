@@ -21,6 +21,7 @@ It is an evidence-based learning layer, not a source of operational truth. Issue
 | [ss-005-repository-documentation-ci.md](ss-005-repository-documentation-ci.md) | Risk-based CI and workflow security. |
 | [ss-006-java-backend-bootstrap.md](ss-006-java-backend-bootstrap.md) | Java backend baseline and verification boundaries. |
 | [ss-007-react-application-bootstrap.md](ss-007-react-application-bootstrap.md) | React frontend baseline and browser/tooling boundaries. |
+| [ss-008-postgresql-local-development.md](ss-008-postgresql-local-development.md) | PostgreSQL container, networking, readiness, and data-lifecycle boundaries. |
 
 Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 
