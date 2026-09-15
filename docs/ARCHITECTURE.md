@@ -2,15 +2,12 @@
 
 ## Current State
 
-The repository contains a Spring Boot backend application in `backend/`, a React frontend application in `web/`, and a Docker Compose PostgreSQL runtime for local development. The backend has an application bootstrap and a health-only Actuator endpoint. The frontend renders only a neutral foundation screen and has no routing, business UI, API integration, or browser configuration. Neither application has business modules, business APIs, persistence, external integrations, or deployment configuration. PostgreSQL readiness is infrastructure evidence only: the backend has no JDBC driver, DataSource, schema, migration, repository, or database health participation. This document records the approved direction for future work; it does not describe a deployed system or unimplemented application behavior.
+The repository contains a Spring Boot backend application in `backend/`, a React frontend application in `web/`, and a Docker Compose PostgreSQL runtime for local development. The backend has an application bootstrap, a health-only Actuator endpoint, and the first business boundary: Catalog owns a framework-independent Product domain model. The frontend renders only a neutral foundation screen and has no routing, business UI, API integration, or browser configuration. The backend has no business API, persistence, external integrations, or deployment configuration. PostgreSQL readiness is infrastructure evidence only: the backend has no JDBC driver, DataSource, schema, migration, repository, or database health participation. This document records the approved direction for future work; it does not describe a deployed system or unimplemented application behavior.
 
 ## Initial Direction
 
-The initial backend will be a modular monolith. It will begin as one deployable application with explicit internal module boundaries, rather than independently deployed services.
+The initial backend is a modular monolith: one deployable application with explicit internal module boundaries, rather than independently deployed services. Catalog is the first implemented boundary and owns Product. The remaining candidate v0.1 modules are:
 
-Candidate v0.1 modules are:
-
-- Catalog
 - Cart
 - Orders
 - Payments

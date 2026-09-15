@@ -2,7 +2,7 @@
 
 Samska Sandbox is a public educational engineering platform built around a fictional commerce and logistics domain. It is non-commercial as a project purpose; the source code is licensed under the [Apache License 2.0](LICENSE).
 
-The repository contains initial Java backend and React frontend foundations plus a Docker Compose PostgreSQL runtime for local development. It has no business-domain implementation or application persistence.
+The repository contains Java backend and React frontend foundations, a Docker Compose PostgreSQL runtime for local development, and an initial framework-independent Product domain model in the Catalog boundary. It has no business API or application persistence.
 
 All production code is expected to be generated or modified with AI coding agents. Humans remain responsible for requirements, architecture, engineering decisions, review, validation, risk assessment, and understanding the resulting work.
 
@@ -28,7 +28,7 @@ The initial technology direction is React, TypeScript, Java, Spring Boot, Postgr
 
 ## Current Status
 
-SS-005 establishes repository CI for Markdown, local relative-link, and EditorConfig validation. SS-006 establishes backend CI that builds and tests the Java backend on pull requests targeting `main`. SS-007 establishes a React frontend foundation and Frontend CI for type checking, component smoke tests, and production builds. SS-008 establishes a PostgreSQL local runtime without backend database integration and extends Repository CI with static Compose validation.
+SS-005 establishes repository CI for Markdown, local relative-link, and EditorConfig validation. SS-006 establishes backend CI that builds and tests the Java backend on pull requests targeting `main`. SS-007 establishes a React frontend foundation and Frontend CI for type checking, component smoke tests, and production builds. SS-008 establishes a PostgreSQL local runtime without backend database integration and extends Repository CI with static Compose validation. SS-009 establishes the initial Catalog Product domain model with framework-independent business rules and unit tests.
 
 ## Backend
 
