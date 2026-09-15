@@ -2,7 +2,7 @@
 
 ## Security Baseline
 
-Assume the repository is public and a future demo may receive hostile users and automated traffic. Security requirements apply from the first implementation change, even though the current backend and frontend are bootstrap applications with no business behavior.
+Assume the repository is public and a future demo may receive hostile users and automated traffic. Security requirements apply from the first implementation change. The current backend has a framework-independent Product domain model but no public business interface, persistence, or external integration; the frontend remains a bootstrap application.
 
 ## Data and Secrets
 

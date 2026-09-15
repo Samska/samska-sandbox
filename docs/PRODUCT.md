@@ -8,7 +8,7 @@ The project's non-commercial purpose does not restrict downstream use of the Apa
 
 ## Current Scope
 
-The repository currently contains Java backend and React frontend foundations plus a local PostgreSQL runtime. There is no business-domain behavior, business UI, business API, application persistence, or deployment environment.
+The repository currently contains Java backend and React frontend foundations, a local PostgreSQL runtime, and a framework-independent Product domain model in the Catalog boundary. There is no business UI, business API, application persistence, or deployment environment.
 
 ## Initial Product Milestone
 
