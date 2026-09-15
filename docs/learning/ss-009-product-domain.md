@@ -4,7 +4,7 @@
 - Work date: 2026-09-15
 - Last reviewed: 2026-09-15
 - Work item: [SS-009, Issue #22](https://github.com/Samska/samska-sandbox/issues/22)
-- Pull request: Not created
+- Pull request: [#23: feat(catalog): establish Product domain model](https://github.com/Samska/samska-sandbox/pull/23)
 - ADRs: [ADR 0001: Adopt a Modular Monolith for v0.1](../adr/0001-adopt-modular-monolith.md)
 - Canonical documentation: [Product](../PRODUCT.md), [Architecture](../ARCHITECTURE.md), [Architecture Principles](../architecture/principles.md), [Testing Strategy](../TESTING.md), and [AI Engineering Governance](../AI-GOVERNANCE.md)
 
@@ -164,15 +164,16 @@ Product stores an exact non-negative BigDecimal without automatic rounding, scal
 
 The Product model adds no HTTP endpoint, persistence configuration, dependency, secret, external integration, or real data. Test examples use synthetic product values. The model protects its own invalid name and negative-price state but does not provide API validation, authorization, persistence constraints, identifier uniqueness coordination, inventory behavior, or monetary policy.
 
-Focused Product verification passed with `./mvnw.cmd --batch-mode --no-transfer-progress -Dtest=ProductTest test`, and complete backend verification passed with `./mvnw.cmd --batch-mode --no-transfer-progress clean verify`. Static Compose validation passed with an ephemeral environment value and did not start PostgreSQL; `git diff --check` found no whitespace errors. Node/npm, Markdownlint, Lychee, EditorConfig Checker, and actionlint were unavailable in the local environment, so frontend and those repository checks remain for pull-request CI or a provisioned local environment.
+Focused Product verification passed with `./mvnw.cmd --batch-mode --no-transfer-progress -Dtest=ProductTest test`, and complete backend verification passed with `./mvnw.cmd --batch-mode --no-transfer-progress clean verify`. Static Compose validation passed with an ephemeral environment value and did not start PostgreSQL; `git diff --check` found no whitespace errors. Node/npm, Markdownlint, Lychee, EditorConfig Checker, and actionlint were unavailable in the local environment. PR #23 then passed Repository CI, Backend CI, Frontend CI, GitGuardian Security Checks, all three CodeQL analyses, and the aggregate CodeQL check.
 
 ### Delivery History and Deferred Work
 
-Issue #22 is the canonical scope and acceptance-criteria record. No pull request exists at this point. REST, Catalog API, JSON contracts, persistence, PostgreSQL integration, repositories, schemas, migrations, inventory, cart, checkout, payments, messaging, Redis, deployment, Product status, ProductName, and Money remain deferred.
+Issue #22 is the canonical scope and acceptance-criteria record. PR #23 carries the implementation and verification evidence; no formal GitHub review is recorded at this point. REST, Catalog API, JSON contracts, persistence, PostgreSQL integration, repositories, schemas, migrations, inventory, cart, checkout, payments, messaging, Redis, deployment, Product status, ProductName, and Money remain deferred.
 
 ### Sources
 
 - [Issue #22](https://github.com/Samska/samska-sandbox/issues/22)
+- [PR #23](https://github.com/Samska/samska-sandbox/pull/23)
 - [ADR 0001](../adr/0001-adopt-modular-monolith.md)
 - [Architecture Principles](../architecture/principles.md)
 - [Testing Strategy](../TESTING.md)
