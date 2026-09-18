@@ -20,6 +20,6 @@ Samska Sandbox is an educational engineering laboratory. Contributions should im
 
 ## Pull Request Evidence
 
-A pull request should explain the requested scope, decisions made, security considerations, verification performed, documentation updates, and remaining risks or follow-up work. AI-generated output requires the same human review and validation as manually written output.
+A pull request should explain the requested scope, decisions made, security considerations, verification performed, documentation updates, and remaining risks or follow-up work. When applicable, complete and report Human Verification before commit or pull request creation as defined in [AI Engineering Governance](docs/AI-GOVERNANCE.md). AI-generated output requires the same human review and validation as manually written output.
 
 Repository rules, CI behavior, required-check status, and security controls are documented in [docs/GITHUB.md](docs/GITHUB.md).

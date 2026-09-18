@@ -43,6 +43,26 @@ Before meaningful work, an agent must read [AGENTS.md](../AGENTS.md), documentat
 - Select verification according to risk and follow [the testing strategy](TESTING.md). Do not claim tests, checks, controls, or behavior without evidence.
 - Run appropriate verification after implementation and disclose meaningful verification gaps.
 
+### Human Verification
+
+Keep verification evidence distinct in implementation and pull request reports:
+
+- **Agent Verification** is commands, tests, inspections, and runtime checks performed by the AI agent.
+- **Human Verification** is behavior explicitly reproduced or reviewed by the human owner. Never claim it unless the human actually performed and reported it.
+- **CI Verification** is checks performed by GitHub Actions or other repository automation.
+
+For every meaningful change, classify Human Verification as **Required** or **Not applicable** with a concise evidence-based reason. It is usually required when direct human observation adds evidence, such as for UI, locally exercisable API, runtime/startup, developer-tooling, safe integration, end-to-end, or accessibility behavior. It may be not applicable for pure documentation, GitHub/project administration, mechanical metadata, or changes with no useful human-observable behavior.
+
+When Human Verification is required, complete Build and Agent Verification, then stop before commit or pull request creation. The agent must provide the human with:
+
+1. What changed.
+2. How to reproduce it locally.
+3. What to observe.
+4. Known limitations or areas requiring human judgment.
+5. `## Local Environment Changes`.
+
+The human reports the relevant result before the workflow continues. Human Verification is an engineering evidence control, not a Learning System gate: use representative behavior checks and human judgment rather than repeating automated suites, quizzes, exercises, or learning responses. Future Build prompts may rely on this governance rule rather than restating the policy.
+
 ## Documentation and Reporting
 
 - Update affected documentation in the same change as behavior, architecture, security posture, process, or roadmap status changes.
