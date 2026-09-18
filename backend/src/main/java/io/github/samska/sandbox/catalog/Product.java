@@ -10,7 +10,7 @@ public final class Product {
 
     public Product(ProductId id, String name, BigDecimal price) {
         if (id == null) {
-            throw new IllegalArgumentException("Product ID must not be null");
+            throw new InvalidProductException("Product ID must not be null");
         }
 
         this.id = id;
@@ -56,17 +56,17 @@ public final class Product {
 
     private static String validatedName(String name) {
         if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Product name must not be blank");
+            throw new InvalidProductException("Product name must not be blank");
         }
         return name;
     }
 
     private static BigDecimal validatedPrice(BigDecimal price) {
         if (price == null) {
-            throw new IllegalArgumentException("Product price must not be null");
+            throw new InvalidProductException("Product price must not be null");
         }
         if (price.signum() < 0) {
-            throw new IllegalArgumentException("Product price must not be negative");
+            throw new InvalidProductException("Product price must not be negative");
         }
         return price;
     }

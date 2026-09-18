@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class ProductTest {
 
@@ -33,43 +33,43 @@ class ProductTest {
 
     @Test
     void rejectsNullProductId() {
-        assertThatIllegalArgumentException()
+        assertThatExceptionOfType(InvalidProductException.class)
                 .isThrownBy(() -> new Product(null, "Sample", new BigDecimal("12.50")));
     }
 
     @Test
     void rejectsNullUuidInProductId() {
-        assertThatIllegalArgumentException()
+        assertThatExceptionOfType(InvalidProductException.class)
                 .isThrownBy(() -> new ProductId(null));
     }
 
     @Test
     void rejectsNullName() {
-        assertThatIllegalArgumentException()
+        assertThatExceptionOfType(InvalidProductException.class)
                 .isThrownBy(() -> new Product(FIRST_ID, null, new BigDecimal("12.50")));
     }
 
     @Test
     void rejectsEmptyName() {
-        assertThatIllegalArgumentException()
+        assertThatExceptionOfType(InvalidProductException.class)
                 .isThrownBy(() -> new Product(FIRST_ID, "", new BigDecimal("12.50")));
     }
 
     @Test
     void rejectsWhitespaceOnlyName() {
-        assertThatIllegalArgumentException()
+        assertThatExceptionOfType(InvalidProductException.class)
                 .isThrownBy(() -> new Product(FIRST_ID, " \t\n", new BigDecimal("12.50")));
     }
 
     @Test
     void rejectsNullPrice() {
-        assertThatIllegalArgumentException()
+        assertThatExceptionOfType(InvalidProductException.class)
                 .isThrownBy(() -> new Product(FIRST_ID, "Sample", null));
     }
 
     @Test
     void rejectsNegativePrice() {
-        assertThatIllegalArgumentException()
+        assertThatExceptionOfType(InvalidProductException.class)
                 .isThrownBy(() -> new Product(FIRST_ID, "Sample", new BigDecimal("-0.01")));
     }
 
@@ -86,7 +86,7 @@ class ProductTest {
     void rejectsInvalidRenameAndPreservesName() {
         var product = new Product(FIRST_ID, "Sample", new BigDecimal("12.50"));
 
-        assertThatIllegalArgumentException()
+        assertThatExceptionOfType(InvalidProductException.class)
                 .isThrownBy(() -> product.rename("   "));
 
         assertThat(product.name()).isEqualTo("Sample");
@@ -107,7 +107,7 @@ class ProductTest {
         var originalPrice = new BigDecimal("12.50");
         var product = new Product(FIRST_ID, "Sample", originalPrice);
 
-        assertThatIllegalArgumentException()
+        assertThatExceptionOfType(InvalidProductException.class)
                 .isThrownBy(() -> product.changePrice(new BigDecimal("-0.01")));
 
         assertThat(product.price()).isSameAs(originalPrice);
