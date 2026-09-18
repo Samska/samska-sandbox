@@ -10,7 +10,7 @@ Before meaningful work, an agent must:
 4. Implement only approved scope; do not pull roadmap work forward.
 5. Update affected documentation, create or update required learning records under [docs/learning/](docs/learning/README.md), and create an ADR for significant, durable architecture decisions.
 6. Run appropriate verification.
-7. Report what changed, why, verification, decisions, tradeoffs, alternatives when relevant, risks, and remaining concerns.
+7. Report what changed, why, verification, decisions, tradeoffs, alternatives when relevant, risks, remaining concerns, and `## Local Environment Changes` as required by [AI Engineering Governance](docs/AI-GOVERNANCE.md).
 
 Follow these rules:
 

@@ -23,63 +23,14 @@ The initial technology direction is React, TypeScript, Java, Spring Boot, Postgr
 - [Engineering Learning Journal](docs/learning/README.md)
 - [GitHub controls](docs/GITHUB.md)
 - [Architecture Decision Records](docs/adr/README.md)
+- [Local development](docs/LOCAL-DEVELOPMENT.md)
 - [Contributing](CONTRIBUTING.md)
 - [Security reporting](SECURITY.md)
 
 ## Current Status
 
-SS-005 establishes repository CI for Markdown, local relative-link, and EditorConfig validation. SS-006 establishes backend CI that builds and tests the Java backend on pull requests targeting `main`. SS-007 establishes a React frontend foundation and Frontend CI for type checking, component smoke tests, and production builds. SS-008 establishes a PostgreSQL local runtime without backend database integration and extends Repository CI with static Compose validation. SS-009 establishes the initial Catalog Product domain model with framework-independent business rules and unit tests. SS-010 adds Product creation and retrieval over HTTP with application-layer coordination and temporary in-memory storage. SS-011 adds a focused Catalog UI with independent create and retrieve-by-ID forms.
+SS-005 establishes repository CI for Markdown, local relative-link, and EditorConfig validation. SS-006 establishes backend CI that builds and tests the Java backend on pull requests targeting `main`. SS-007 establishes a React frontend foundation and Frontend CI for type checking, component smoke tests, and production builds. SS-008 establishes a PostgreSQL local runtime without backend database integration and extends Repository CI with static Compose validation. SS-009 establishes the initial Catalog Product domain model with framework-independent business rules and unit tests. SS-010 adds Product creation and retrieval over HTTP with application-layer coordination and temporary in-memory storage. SS-011 adds a focused Catalog UI with independent create and retrieve-by-ID forms. SS-021 establishes the canonical local development workflow.
 
-## Backend
+## Local Development
 
-The backend is a Spring Boot 4.1.1 application in [backend/](backend/) that requires Eclipse Temurin 25 or another compatible Java 25 JDK. The Maven Wrapper provisions Maven 3.9.16; a separate Maven installation is not required.
-
-Run these commands from `backend/`:
-
-```bash
-./mvnw clean verify
-./mvnw spring-boot:run
-```
-
-On Windows, use `mvnw.cmd` instead. When the application has started, `http://localhost:8080/actuator/health` returns a response whose status is `UP`. `POST /api/products` creates a Product with system-generated identity, and `GET /api/products/{id}` retrieves a Product created during the current application process. Catalog API data starts empty and is lost when the application stops.
-
-## Local PostgreSQL
-
-The repository-root [Compose file](compose.yaml) runs the official Debian-based `postgres:18-trixie` image. The tag fixes the PostgreSQL major line and Debian base family while allowing PostgreSQL patches, operating-system security fixes, and image rebuilds through `docker compose pull`; it is not immutable.
-
-Docker Desktop or Docker Engine with Docker Compose v2 is required. A local PostgreSQL installation and local `psql` are not required because the container provides the client tools. Before running Compose, create an ignored root `.env` from the committed [.env.example](.env.example) and set `POSTGRES_PASSWORD` to a non-empty local value. Compose fails before startup when the variable is absent or empty; `.env.example` is only a configuration template and contains no usable password. Run these commands from the repository root:
-
-```bash
-docker compose up -d --wait
-docker compose ps
-docker compose exec postgres pg_isready -h 127.0.0.1 -p 5432 -U samska_dev -d samska
-docker compose exec postgres psql -U samska_dev -d samska
-docker compose stop
-docker compose down
-docker compose down -v
-```
-
-`docker compose stop` retains the container, named volume, and database data. `docker compose down` removes the container and Compose network but retains the named volume and data. `docker compose down -v` also removes the named volume and intentionally destroys the local database data; treat it as a destructive reset. These commands do not remove the cached image.
-
-The committed database name is `samska` and the bootstrap development user is `samska_dev`. The password is supplied through the local ignored `.env` and is not committed. The bootstrap user has elevated PostgreSQL privileges. The `.env` workflow is local convenience, not production secret management; shared or deployed environments must supply credentials through an appropriate runtime secret mechanism, and future application integration must establish least-privileged credentials.
-
-PostgreSQL is published only on IPv4 loopback at `127.0.0.1:5432`. If that host port is occupied, set `POSTGRES_HOST_PORT=5433` in an uncommitted root `.env` file and use `127.0.0.1:5433`. A process on the host uses `127.0.0.1:<published-host-port>`, while a Compose peer uses `postgres:5432`. `localhost` always refers to the network namespace of the calling process.
-
-A healthy container means PostgreSQL is accepting connections. It does not prove credentials, host publication, Spring Boot connectivity, schemas, migrations, repositories, business persistence, or data correctness. The backend remains runnable and testable without PostgreSQL.
-
-## Frontend
-
-The frontend is a React and TypeScript application in [web/](web/). It requires Node.js 24.20.0 and its bundled npm 11.19.0. The `web/.nvmrc` file selects that version for supported local workflows and CI; `engines` and `packageManager` in `web/package.json` communicate supported Node and intended npm versions to compatible tooling, but do not enforce local runtime selection by themselves.
-
-Run these commands from `web/`:
-
-```bash
-npm ci --ignore-scripts
-npm run dev
-npm run typecheck
-npm test
-npm run build
-npm run preview
-```
-
-`npm ci` installs the exact dependency graph recorded in `package-lock.json`. Start the backend before `npm run dev`: the Vite development server proxies relative `/api` requests to `http://localhost:8080`, allowing the Catalog UI to create Products and retrieve them by ID during local development. The proxy is development-only; it does not define production frontend/API routing or prove production CORS behavior. The Vite development server supports local development and Hot Module Replacement; it is not a production runtime. `npm run build` creates production static assets in `web/dist/`, and `npm run preview` is only for local inspection of that build.
+The Catalog application requires the Java/Spring Boot backend and React/Vite frontend. PostgreSQL is optional local infrastructure and is not connected to Spring Boot. Product data is process-local and is lost when the backend stops. See [Local Development](docs/LOCAL-DEVELOPMENT.md) for the canonical prerequisites, setup, commands, verification, shutdown, reset, and troubleshooting guidance.
