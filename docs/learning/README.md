@@ -24,6 +24,7 @@ It is an evidence-based learning layer, not a source of operational truth. Issue
 | [ss-008-postgresql-local-development.md](ss-008-postgresql-local-development.md) | PostgreSQL container, networking, readiness, and data-lifecycle boundaries. |
 | [ss-009-product-domain.md](ss-009-product-domain.md) | Catalog-owned Product identity, invariants, and framework-independent domain behavior. |
 | [ss-010-catalog-api.md](ss-010-catalog-api.md) | Catalog HTTP contracts, application coordination, DTOs, error mapping, and temporary storage. |
+| [ss-011-catalog-ui.md](ss-011-catalog-ui.md) | Catalog UI, typed API consumption, local state, accessible feedback, and mocked component tests. |
 
 Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 

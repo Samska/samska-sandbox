@@ -2,7 +2,7 @@
 
 ## Security Baseline
 
-Assume the repository is public and a future demo may receive hostile users and automated traffic. Security requirements apply from the first implementation change. The current backend has an unauthenticated Catalog Product API with process-local data, but no application persistence, external integration, or deployed public environment; the frontend remains a bootstrap application.
+Assume the repository is public and a future demo may receive hostile users and automated traffic. Security requirements apply from the first implementation change. The current backend has an unauthenticated Catalog Product API with process-local data, but no application persistence, external integration, or deployed public environment; the frontend provides a minimal Catalog UI.
 
 ## Data and Secrets
 
@@ -33,7 +33,7 @@ Do not claim a control is enabled until it has been independently verified. The 
 
 ## Current Frontend Baseline
 
-The React application in `web/` has no environment files, API configuration, credentials, or backend integration. Browser-delivered JavaScript, HTML, CSS, browser storage, and network requests must be treated as public to users; deployed source maps are public too when enabled. Vite statically exposes `VITE_*` values through `import.meta.env`; those values are public configuration, never secret storage. Do not put credentials, tokens, private API keys, connection strings, or backend secrets in frontend source, Vite configuration, or `VITE_*` variables.
+The React application in `web/` uses a feature-local API adapter to send relative Catalog requests during local development. Vite proxies `/api` to `http://localhost:8080` only for its development server, so the proxy does not establish production routing or a backend CORS policy. The UI does not store credentials, browser data, or backend error bodies. Browser-delivered JavaScript, HTML, CSS, browser storage, and network requests must be treated as public to users; deployed source maps are public too when enabled. Vite statically exposes `VITE_*` values through `import.meta.env`; those values are public configuration, never secret storage. Do not put credentials, tokens, private API keys, connection strings, or backend secrets in frontend source, Vite configuration, or `VITE_*` variables.
 
 `web/.nvmrc` selects the Node version for supported workflows and CI. The `engines` and `packageManager` fields communicate intended compatibility to tooling but do not themselves prevent unsupported local tools. The committed `package-lock.json` and `npm ci --ignore-scripts` provide deterministic dependency installation while minimizing lifecycle-script execution. This baseline does not provide authentication, authorization, API security, vulnerability scanning, dependency-update automation, or deployment controls.
 
