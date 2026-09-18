@@ -4,7 +4,7 @@
 - Work date: 2026-09-18
 - Last reviewed: 2026-09-18
 - Work item: [SS-024](https://github.com/Samska/samska-sandbox/issues/34)
-- Pull request: None
+- Pull request: [PR #35](https://github.com/Samska/samska-sandbox/pull/35)
 - ADRs: None
 - Canonical documentation: [AI Engineering Governance](../AI-GOVERNANCE.md)
 
@@ -47,7 +47,7 @@ SS-024 does not add screenshots, video evidence, approval bureaucracy, new autom
 ## Reference
 
 - Issue: [SS-024](https://github.com/Samska/samska-sandbox/issues/34)
-- Pull request: None
+- Pull request: [PR #35](https://github.com/Samska/samska-sandbox/pull/35)
 - Relevant source files: [AI Engineering Governance](../AI-GOVERNANCE.md), [Contributing](../../CONTRIBUTING.md), [Learning Journal guide](README.md)
 - ADRs: None
 - Canonical documentation: [AI Engineering Governance](../AI-GOVERNANCE.md), [Learning Journal guide](README.md)
