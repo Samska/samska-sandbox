@@ -6,7 +6,7 @@ public record ProductId(UUID value) {
 
     public ProductId {
         if (value == null) {
-            throw new IllegalArgumentException("Product ID must not be null");
+            throw new InvalidProductException("Product ID must not be null");
         }
     }
 

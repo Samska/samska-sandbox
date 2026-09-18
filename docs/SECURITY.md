@@ -2,7 +2,7 @@
 
 ## Security Baseline
 
-Assume the repository is public and a future demo may receive hostile users and automated traffic. Security requirements apply from the first implementation change. The current backend has a framework-independent Product domain model but no public business interface, persistence, or external integration; the frontend remains a bootstrap application.
+Assume the repository is public and a future demo may receive hostile users and automated traffic. Security requirements apply from the first implementation change. The current backend has an unauthenticated Catalog Product API with process-local data, but no application persistence, external integration, or deployed public environment; the frontend remains a bootstrap application.
 
 ## Data and Secrets
 
@@ -27,7 +27,7 @@ Security implications must be assessed for changes to data flows, authentication
 
 ## Current Backend Baseline
 
-The backend intentionally exposes only Spring Boot Actuator health over HTTP. Actuator discovery is disabled and health details are not exposed. This allows startup verification without creating a business API. It is not a complete public-API security posture: authentication, authorization, rate limiting, CORS policy, and deployment controls remain deferred until their corresponding work is justified.
+The backend exposes Spring Boot Actuator health plus Product creation and retrieval by identity over HTTP. Actuator discovery remains disabled and health details are not exposed. Product input is constrained by domain invariants, API failures do not expose exception details, and Product data is process-local. Repository policy requires synthetic data, but the API does not verify data provenance. The Catalog API has no authentication, authorization, rate limiting, or explicit CORS configuration and is not a complete public-API security posture; deployment controls remain deferred until corresponding work is justified.
 
 Do not claim a control is enabled until it has been independently verified. The intended GitHub controls and their current verification status are in [GITHUB.md](GITHUB.md). Vulnerability reporting instructions are in the repository-level [security policy](../SECURITY.md).
 

@@ -2,7 +2,7 @@
 
 Samska Sandbox is a public educational engineering platform built around a fictional commerce and logistics domain. It is non-commercial as a project purpose; the source code is licensed under the [Apache License 2.0](LICENSE).
 
-The repository contains Java backend and React frontend foundations, a Docker Compose PostgreSQL runtime for local development, and an initial framework-independent Product domain model in the Catalog boundary. It has no business API or application persistence.
+The repository contains Java backend and React frontend foundations, a Docker Compose PostgreSQL runtime for local development, and a Catalog boundary with a framework-independent Product domain model and its first HTTP API. Catalog products use temporary process-local storage; there is no application persistence.
 
 All production code is expected to be generated or modified with AI coding agents. Humans remain responsible for requirements, architecture, engineering decisions, review, validation, risk assessment, and understanding the resulting work.
 
@@ -28,7 +28,7 @@ The initial technology direction is React, TypeScript, Java, Spring Boot, Postgr
 
 ## Current Status
 
-SS-005 establishes repository CI for Markdown, local relative-link, and EditorConfig validation. SS-006 establishes backend CI that builds and tests the Java backend on pull requests targeting `main`. SS-007 establishes a React frontend foundation and Frontend CI for type checking, component smoke tests, and production builds. SS-008 establishes a PostgreSQL local runtime without backend database integration and extends Repository CI with static Compose validation. SS-009 establishes the initial Catalog Product domain model with framework-independent business rules and unit tests.
+SS-005 establishes repository CI for Markdown, local relative-link, and EditorConfig validation. SS-006 establishes backend CI that builds and tests the Java backend on pull requests targeting `main`. SS-007 establishes a React frontend foundation and Frontend CI for type checking, component smoke tests, and production builds. SS-008 establishes a PostgreSQL local runtime without backend database integration and extends Repository CI with static Compose validation. SS-009 establishes the initial Catalog Product domain model with framework-independent business rules and unit tests. SS-010 adds Product creation and retrieval over HTTP with application-layer coordination and temporary in-memory storage.
 
 ## Backend
 
@@ -41,7 +41,7 @@ Run these commands from `backend/`:
 ./mvnw spring-boot:run
 ```
 
-On Windows, use `mvnw.cmd` instead. When the application has started, `http://localhost:8080/actuator/health` returns a response whose status is `UP`. Health is the only intentionally exposed HTTP endpoint.
+On Windows, use `mvnw.cmd` instead. When the application has started, `http://localhost:8080/actuator/health` returns a response whose status is `UP`. `POST /api/products` creates a Product with system-generated identity, and `GET /api/products/{id}` retrieves a Product created during the current application process. Catalog API data starts empty and is lost when the application stops.
 
 ## Local PostgreSQL
 
