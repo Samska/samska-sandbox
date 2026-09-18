@@ -139,6 +139,12 @@ Future records no longer require the active-study structure introduced by SS-019
 
 Do not add reminders, scheduling, scores, tracking, or learning analytics.
 
+## Five-Minute Learning Checkpoint
+
+This heading remains only for compatibility with historical Learning Record links. The Five-Minute Learning Checkpoint belonged to the previous active-learning format and is not part of the current Learning System.
+
+It is not required before Build, pull request creation, merge, Issue completion, or any other engineering progression. Future Learning Records use the mini-lesson structure; optional review happens only in **Optional Review** or when the human explicitly requests study/review mode.
+
 ## Historical Learning Records
 
 Do not bulk migrate historical Learning Records. Their active-recall and checkpoint structures remain valid dated evidence of the Learning System that existed when they were written.
