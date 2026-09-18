@@ -51,6 +51,20 @@ Before meaningful work, an agent must read [AGENTS.md](../AGENTS.md), documentat
 - Report scope completed, files changed, why the approach was chosen, decisions, tradeoffs, relevant alternatives, verification performed, residual risks, and deferred concerns.
 - Preserve durable rationale in documentation and ADRs so future agents do not depend on conversation history.
 
+### Local Environment Changes
+
+Every meaningful implementation report must include a `## Local Environment Changes` section. It must say `None` when the change does not alter local developer setup.
+
+When local setup changes, the section must state:
+
+- what changed and why;
+- required manual developer action and exact commands;
+- affected configuration or files;
+- migration or update steps for existing local environments; and
+- verification steps.
+
+Report changes to Java/JDK, Node/npm, or other required local tools; environment variables; Docker services; ports; volumes; database migrations; startup commands; and local runtime or configuration. When any of these changes alter canonical local setup, update [Local Development](LOCAL-DEVELOPMENT.md) in the same change.
+
 ## Boundaries
 
 - AI agents must not claim verification, enabled repository controls, or system behavior without evidence.
