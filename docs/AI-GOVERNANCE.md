@@ -67,6 +67,8 @@ When local setup changes, the section must state:
 
 Report changes to Java/JDK, Node/npm, or other required local tools; environment variables; Docker services; ports; volumes; database migrations; startup commands; and local runtime or configuration. When any of these changes alter canonical local setup, update [Local Development](LOCAL-DEVELOPMENT.md) in the same change.
 
+Every setup-affecting change must also review whether the repository [local-development launcher](../scripts/dev.sh) remains valid. Update the launcher and rerun relevant launcher verification in the same change only when its startup commands, prerequisites, ports, environment or local-configuration assumptions, required runtime services, process lifecycle, or other startup behavior are affected. Setup-affecting work is incomplete when the canonical guide, launcher, and verified runtime behavior disagree.
+
 ## Boundaries
 
 - AI agents must not claim verification, enabled repository controls, or system behavior without evidence.

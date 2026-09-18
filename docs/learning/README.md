@@ -42,6 +42,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-010-catalog-api.md](ss-010-catalog-api.md) | Catalog HTTP contracts, application coordination, DTOs, error mapping, and temporary storage. |
 | [ss-011-catalog-ui.md](ss-011-catalog-ui.md) | Catalog UI, typed API consumption, local state, accessible feedback, and mocked component tests. |
 | [ss-021-local-development-workflow.md](ss-021-local-development-workflow.md) | Repository-owned local setup, runtime boundaries, and setup-change reporting. |
+| [ss-023-local-development-launcher.md](ss-023-local-development-launcher.md) | Bash process supervision, signal-safe local orchestration, and non-interactive Node selection. |
 
 Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 
