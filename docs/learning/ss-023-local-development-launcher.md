@@ -4,7 +4,7 @@
 - Work date: 2026-09-18
 - Last reviewed: 2026-09-18
 - Work item: [SS-023, Issue #32](https://github.com/Samska/samska-sandbox/issues/32)
-- Pull request: None
+- Pull request: [#33: SS-023 — Add local development launcher](https://github.com/Samska/samska-sandbox/pull/33)
 - ADRs: None
 - Canonical documentation: [Local Development](../LOCAL-DEVELOPMENT.md), [AI Engineering Governance](../AI-GOVERNANCE.md), and [Testing Strategy](../TESTING.md)
 
@@ -85,7 +85,7 @@ Do not add Dockerized frontend/backend services, a cross-platform Windows wrappe
 ## Reference
 
 - Issue: [#32](https://github.com/Samska/samska-sandbox/issues/32)
-- Pull request: None
+- Pull request: [#33: SS-023 — Add local development launcher](https://github.com/Samska/samska-sandbox/pull/33)
 - Relevant source files: [`scripts/dev.sh`](../../scripts/dev.sh), [`backend/mvnw`](../../backend/mvnw), [`web/package.json`](../../web/package.json), [`web/.nvmrc`](../../web/.nvmrc), and [`web/vite.config.ts`](../../web/vite.config.ts)
 - ADRs: None
 - Canonical documentation: [Local Development](../LOCAL-DEVELOPMENT.md), [Learning Journal](README.md), and [AI Engineering Governance](../AI-GOVERNANCE.md)
