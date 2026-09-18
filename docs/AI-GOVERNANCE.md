@@ -47,7 +47,9 @@ Before meaningful work, an agent must read [AGENTS.md](../AGENTS.md), documentat
 
 - Update affected documentation in the same change as behavior, architecture, security posture, process, or roadmap status changes.
 - For meaningful work that meets the [learning-journal criteria](learning/README.md#when-a-learning-record-is-required), create or update the corresponding learning record in the same change.
-- Learning records preserve concise, evidence-based Plan, Build, Review, and Pull Request conclusions for human learning. They must not contain raw AI prompts, transcripts, hidden reasoning, secrets, credentials, or personal data.
+- Learning records preserve concise, evidence-linked mini-lessons for human learning. Their canonical format is defined in the [Learning Journal guide](learning/README.md) and [Learning Record template](learning/000-template.md). They must not contain raw AI prompts, transcripts, hidden reasoning, secrets, credentials, or personal data.
+- Learning supports engineering work but never gates it. Agents must not require quizzes, recall, exercises, checkpoints, or human answers before Build, pull request creation, merge, Issue completion, or other engineering progression.
+- Agents must not wait for study responses unless the human explicitly requests study/review mode. Normal human engineering review remains required where the delivery workflow calls for it; engineering review is not a learning gate.
 - Report scope completed, files changed, why the approach was chosen, decisions, tradeoffs, relevant alternatives, verification performed, residual risks, and deferred concerns.
 - Preserve durable rationale in documentation and ADRs so future agents do not depend on conversation history.
 

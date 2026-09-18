@@ -4,127 +4,66 @@
 - Work date: YYYY-MM-DD
 - Last reviewed: YYYY-MM-DD
 - Work item: [SS-000](https://github.com/Samska/samska-sandbox/issues/000)
-- Pull request: [PR #000](https://github.com/Samska/samska-sandbox/pull/000)
+- Pull request: [PR #000](https://github.com/Samska/samska-sandbox/pull/000) or None
 - ADRs: None or links
 - Canonical documentation: Links
 
-`Last reviewed` records document maintenance or revalidation, not personal study activity. Do not add a section merely because it appears below.
+`Last reviewed` records document maintenance or revalidation, not personal study activity. Keep verified repository evidence distinct from generic explanation. Do not add a section merely because it appears below.
 
-## Study Surface
+## What you should learn
 
-State the central lesson in one sentence.
+Identify approximately 3-6 important transferable concepts from this Issue.
 
-### Must Remember
+### Core — Know this for interviews
 
-Use 3-5 atomic retention targets normally; fewer are valid. More than five requires explicit pruning review and justification. Avoid exact details unless their selection was the decision being learned.
+List the prioritized subset of the concepts above. Name the priority without duplicating the explanation below.
 
-- Retention target
+## Concepts explained
 
-### Mental Model
+Explain each Core concept concisely: what it is, why it exists, and what problem it solves. Include a short diagram or mental model only when it materially improves understanding.
 
-Use one short paragraph or small diagram to connect responsibilities. Do not repeat decision reasoning or inventory files and versions.
+## How Samska uses it
 
-### Active Recall
+Connect the concepts to the actual repository implementation, architecture, runtime, workflow, or evidence. Link relevant files and canonical documentation rather than copying inventories.
 
-Use 3-5 reasoning questions normally. Answers must remain collapsed. Add at most one hint only where it improves retrieval.
+## Interview perspective
 
-#### Active Recall Question
+Describe likely interview themes or questions and what a strong answer should cover. Do not require an answer and do not write a memorized script.
 
-<details>
-<summary>Hint</summary>
+## What not to worry about yet
 
-Small cue that does not reveal the answer.
+Identify intentionally deferred complexity that is outside the current Issue and should not distract from current priorities.
 
-</details>
+## Reference
 
-<details>
-<summary>Answer guide</summary>
+- Issue:
+- Pull request:
+- Relevant source files:
+- ADRs:
+- Canonical documentation:
 
-- Reasoning point
-- Boundary or evidence
+## Conditional Sections
 
-</details>
+Include only the sections below that add Issue-specific value. Omit unused headings.
 
-### Decision Drills
+### Why this design
 
-Include only for an evidence-supported, reusable choice with real alternatives. Omit the whole section otherwise. A normal record has 0-2 drills.
+Use only when meaningful alternatives, decisions, or trade-offs exist. Explain why the current choice fits the current stage. Do not invent unsupported alternatives or rationale.
 
-#### Decision Drill: Title
+### Common mistakes
 
-**Problem:**
+Use for realistic misconceptions, terminology confusion, or implementation errors.
 
-**Options:**
+### Interview vocabulary
 
-**Decision:**
+Define only important terms introduced by the Issue. Keep each definition to normally 1-2 lines and avoid glossary bloat.
 
-**Why:**
+### Deeper — Useful later
 
-**Trade-off:**
+Use for advanced or lower-priority concepts that should not distract from current interview or job-search priorities.
 
-**Reconsider When:**
+### Optional Review
 
-Decision Drills are study aids, not authoritative decisions or ADR replacements.
+This section is optional. No response is required, and it never blocks engineering delivery.
 
-### Concept Cards
-
-Include only when concept mechanics need explanation. A normal record has 0-2 cards.
-
-#### Concept
-
-- **Meaning:**
-- **Samska application:**
-- **Boundary or common mistake:**
-
-### Hands-on Reinforcement
-
-Include only safe, reproducible exercises with meaningful learning value. State prerequisites, platform differences, action, observation, explanation, cleanup, and proof boundary. Exercise results are study validation, not historical evidence.
-
-#### Exercise
-
-- **Prerequisite:**
-- **Perform or inspect:**
-- **Expected observation:**
-- **Explain:**
-- **Cleanup:**
-- **Proves / does not prove:**
-
-### Interview Drill
-
-Include only when a real decision or combined explanation warrants it. Do not write a script.
-
-#### Interview Question
-
-- **Expected reasoning:** context, problem, decision, why, evidence, trade-off, boundary, reconsideration as applicable.
-- **Likely follow-up:** optional.
-- **Short, 15-30 seconds:** decision, principal reason, boundary.
-- **Technical, 1-2 minutes:** context, options, decision, evidence, trade-off, boundary, reconsideration.
-
-### Five-Minute Checkpoint Cues
-
-Use the [canonical checkpoint](README.md#five-minute-learning-checkpoint). Add only record-specific cues:
-
-- **Decision or reasoning to reconstruct:**
-- **Concept or boundary to explain:**
-- **Repository action:**
-
-## Reference Surface
-
-### Historical Context and Outcome
-
-State the dated starting point, requested outcome, and material result. Keep historical state distinct from current state.
-
-### Implementation and Decision Evidence
-
-Preserve exact choices, files, versions, commands, supported alternatives, ADR links, and canonical sources needed for later fact checking.
-
-### Security, Verification, and Risks
-
-State material security implications, original verification evidence, known gaps, and risks. Do not claim controls or tests without evidence.
-
-### Delivery History and Deferred Work
-
-Summarize only durable Plan, Build, Review, and Pull Request conclusions, including absent review evidence and deferred work.
-
-### Sources
-
-Link Issue, PR, ADR, canonical documentation, and primary external sources. Link rather than copy canonical artifacts.
+Include review questions, safe hands-on prompts, or self-study cues only when they add real value.
