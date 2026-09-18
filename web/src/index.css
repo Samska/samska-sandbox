@@ -16,15 +16,16 @@ body {
 }
 
 main {
-  display: grid;
   min-height: 100vh;
-  place-content: center;
-  gap: 0.5rem;
-  padding: 2rem;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 4rem) 1.25rem;
 }
 
 h1,
-p {
+h2,
+p,
+dl {
   margin: 0;
 }
 
@@ -34,5 +35,129 @@ h1 {
 }
 
 p {
+  font-size: 1rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+.catalog {
+  display: grid;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.catalog-introduction {
+  max-width: 48rem;
   font-size: 1.125rem;
+}
+
+.catalog-panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.catalog-panel {
+  display: grid;
+  align-content: start;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  background: #ffffff;
+  border: 1px solid #cbd5df;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.25rem 0.75rem rgb(31 41 51 / 8%);
+}
+
+form {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.375rem;
+}
+
+label {
+  font-weight: 700;
+}
+
+input,
+button {
+  font: inherit;
+}
+
+input {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  color: inherit;
+  background: #ffffff;
+  border: 1px solid #708090;
+  border-radius: 0.375rem;
+}
+
+button {
+  justify-self: start;
+  padding: 0.625rem 1rem;
+  color: #ffffff;
+  background: #175e75;
+  border: 1px solid #175e75;
+  border-radius: 0.375rem;
+  cursor: pointer;
+}
+
+input:focus-visible,
+button:focus-visible {
+  outline: 3px solid #c87500;
+  outline-offset: 2px;
+}
+
+button:disabled,
+input:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.field-error,
+[role="alert"] {
+  color: #9f1239;
+  font-weight: 700;
+}
+
+[role="status"] {
+  color: #14532d;
+}
+
+.product-result {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 0.25rem;
+  border-top: 1px solid #d7e0e8;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 0.375rem 1rem;
+}
+
+dt {
+  font-weight: 700;
+}
+
+dd {
+  margin: 0;
+}
+
+.product-id {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 44rem) {
+  .catalog-panels {
+    grid-template-columns: 1fr;
+  }
 }

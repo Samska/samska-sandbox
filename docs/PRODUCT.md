@@ -8,7 +8,7 @@ The project's non-commercial purpose does not restrict downstream use of the Apa
 
 ## Current Scope
 
-The repository currently contains Java backend and React frontend foundations, a local PostgreSQL runtime, and a Catalog boundary with a framework-independent Product domain model plus HTTP creation and retrieval by identity. Catalog API data is temporary and process-local. There is no business UI, application persistence, PostgreSQL application integration, or deployment environment.
+The repository currently contains Java and React applications, a local PostgreSQL runtime, and a Catalog boundary with a framework-independent Product domain model plus HTTP creation and retrieval by identity. The React UI can create a Product and retrieve one by its generated identity; it does not browse a Product collection. Catalog API data is temporary and process-local. There is no application persistence, PostgreSQL application integration, or deployment environment.
 
 ## Initial Product Milestone
 
