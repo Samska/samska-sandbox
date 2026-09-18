@@ -40,7 +40,7 @@ A child process inherits its parent environment, but a non-interactive script do
 
 The launcher uses `wait -n`, which is why it requires Bash 4.3 or later. It reports backend health only after the existing Actuator endpoint returns `UP`; Vite keeps its native output so its selected port remains visible.
 
-[`LOCAL-DEVELOPMENT.md`](../LOCAL-DEVELOPMENT.md) retains the manual backend/frontend commands and the independent Compose PostgreSQL workflow. The launcher neither reads `.env` nor runs Docker because Catalog state remains in [`InMemoryProductStore`](../../backend/src/main/java/io/github/samska/sandbox/catalog/InMemoryProductStore.java), not PostgreSQL.
+[`LOCAL-DEVELOPMENT.md`](../LOCAL-DEVELOPMENT.md) retains the manual backend/frontend commands and the independent Compose PostgreSQL workflow. The launcher neither reads `.env` nor runs Docker because Catalog state remains in [`InMemoryProductStore`](../../backend/src/main/java/io/github/samska/sandbox/catalog/storage/InMemoryProductStore.java), not PostgreSQL.
 
 Repository governance prevents launcher drift: setup-affecting work reviews the canonical local-development guide and the launcher together when relevant, updates the launcher only when its assumptions change, and reruns its verification after an update.
 
