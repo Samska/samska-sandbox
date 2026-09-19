@@ -4,7 +4,7 @@
 - Work date: 2026-09-19
 - Last reviewed: 2026-09-19
 - Work item: [SS-025](https://github.com/Samska/samska-sandbox/issues/36)
-- Pull request: None
+- Pull request: [PR #37](https://github.com/Samska/samska-sandbox/pull/37)
 - ADRs: None
 - Canonical documentation: [Testing Strategy](../TESTING.md), [GitHub Repository Controls](../GITHUB.md), and [AI Engineering Governance](../AI-GOVERNANCE.md)
 
@@ -61,7 +61,7 @@ Surefire already produces the required XML, and Vitest provides a built-in JUnit
 ## Reference
 
 - Issue: [SS-025](https://github.com/Samska/samska-sandbox/issues/36)
-- Pull request: None
+- Pull request: [PR #37](https://github.com/Samska/samska-sandbox/pull/37)
 - Relevant source files: `.github/workflows/backend-ci.yml`, `.github/workflows/frontend-ci.yml`
 - ADRs: None
 - Canonical documentation: [Testing Strategy](../TESTING.md), [GitHub Repository Controls](../GITHUB.md), and [AI Engineering Governance](../AI-GOVERNANCE.md)
