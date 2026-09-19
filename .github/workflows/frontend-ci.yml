@@ -54,6 +54,8 @@ jobs:
           require_tests: true
           job_summary: true
           detailed_summary: true
+          include_passed: true
+          group_suite: true
           include_time_in_summary: true
 
       - name: Annotate frontend test results from forks
@@ -69,6 +71,8 @@ jobs:
           require_tests: true
           job_summary: true
           detailed_summary: true
+          include_passed: true
+          group_suite: true
           include_time_in_summary: true
 
       - name: Upload frontend JUnit XML
