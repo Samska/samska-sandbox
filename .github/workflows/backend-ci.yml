@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  checks: write
 
 jobs:
   build:
@@ -30,4 +31,52 @@ jobs:
           cache-dependency-path: backend/pom.xml
 
       - name: Build and test backend
+        id: test
+        continue-on-error: true
         run: ./mvnw --batch-mode --no-transfer-progress clean verify
+
+      - name: Publish backend test results
+        if: ${{ !cancelled() && steps.test.outcome != 'skipped' && github.event.pull_request.head.repo.full_name == github.repository }}
+        uses: mikepenz/action-junit-report@a9170d5795813c01ab4901ffb045b52bab4ab09d # v6.5.0
+        with:
+          check_name: Backend test results
+          report_paths: backend/target/surefire-reports/TEST-*.xml
+          group_reports: true
+          fail_on_failure: false
+          fail_on_parse_error: true
+          require_tests: true
+          job_summary: true
+          detailed_summary: true
+          include_passed: true
+          group_suite: true
+          include_time_in_summary: true
+
+      - name: Annotate backend test results from forks
+        if: ${{ !cancelled() && steps.test.outcome != 'skipped' && github.event.pull_request.head.repo.full_name != github.repository }}
+        uses: mikepenz/action-junit-report@a9170d5795813c01ab4901ffb045b52bab4ab09d # v6.5.0
+        with:
+          check_name: Backend test results
+          report_paths: backend/target/surefire-reports/TEST-*.xml
+          group_reports: true
+          annotate_only: true
+          fail_on_failure: false
+          fail_on_parse_error: true
+          require_tests: true
+          job_summary: true
+          detailed_summary: true
+          include_passed: true
+          group_suite: true
+          include_time_in_summary: true
+
+      - name: Upload backend JUnit XML
+        if: ${{ !cancelled() && steps.test.outcome != 'skipped' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: backend-junit-xml
+          path: backend/target/surefire-reports/TEST-*.xml
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Preserve backend test failure
+        if: ${{ always() && steps.test.outcome == 'failure' }}
+        run: exit 1
