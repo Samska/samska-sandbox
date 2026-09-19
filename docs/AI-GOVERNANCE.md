@@ -63,6 +63,12 @@ When Human Verification is required, complete Build and Agent Verification, then
 
 The human reports the relevant result before the workflow continues. Human Verification is an engineering evidence control, not a Learning System gate: use representative behavior checks and human judgment rather than repeating automated suites, quizzes, exercises, or learning responses. Future Build prompts may rely on this governance rule rather than restating the policy.
 
+#### Remote-only Human Verification
+
+Pre-commit/pre-PR Human Verification remains the default. A narrow exception is allowed only when the required human-observable behavior exists exclusively in remote CI or PR infrastructure and cannot meaningfully be inspected earlier. The agent must explain that boundary and the remote behavior to inspect. Normal human engineering review of the implementation remains required before commit or PR creation; it is not Human Verification.
+
+For an approved remote-only exception, create only the minimum commit and PR needed to expose the behavior, then stop for actual Human Verification before merge. Keep CI Verification and Human Verification distinct, and never use this exception merely for convenience when meaningful local Human Verification exists.
+
 ## Documentation and Reporting
 
 - Update affected documentation in the same change as behavior, architecture, security posture, process, or roadmap status changes.

@@ -24,3 +24,6 @@ target/
 build/
 dist/
 coverage/
+
+# Generated test reports.
+web/test-results/
