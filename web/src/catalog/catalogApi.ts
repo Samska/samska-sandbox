@@ -37,6 +37,34 @@ export async function getProduct(id: string): Promise<ProductResponse> {
   return requestProduct(`/api/products/${encodeURIComponent(id)}`, 200);
 }
 
+export async function listProducts(): Promise<ProductResponse[]> {
+  let response: Response;
+
+  try {
+    response = await fetch("/api/products");
+  } catch {
+    throw new CatalogApiError("network");
+  }
+
+  if (response.status !== 200) {
+    throw new CatalogApiError(errorKindFor(response.status));
+  }
+
+  let payload: unknown;
+
+  try {
+    payload = await response.json();
+  } catch {
+    throw new CatalogApiError("invalid-response");
+  }
+
+  if (!Array.isArray(payload) || !payload.every(isProductResponse)) {
+    throw new CatalogApiError("invalid-response");
+  }
+
+  return payload;
+}
+
 async function requestProduct(
   path: string,
   expectedStatus: number,

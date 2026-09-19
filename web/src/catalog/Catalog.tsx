@@ -1,27 +1,176 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import {
   CatalogApiError,
   createProduct,
   getProduct,
+  listProducts,
   type ProductResponse
 } from "./catalogApi";
+import CartPanel from "../cart/Cart";
+import {
+  addCartItem,
+  CartApiError,
+  getCart,
+  removeCartItem,
+  updateCartItem,
+  type CartResponse
+} from "../cart/cartApi";
 
 export default function Catalog() {
+  const [products, setProducts] = useState<ProductResponse[]>([]);
+  const [productsPending, setProductsPending] = useState(true);
+  const [productsError, setProductsError] = useState<string | null>(null);
+  const [cart, setCart] = useState<CartResponse | null>(null);
+  const [cartPending, setCartPending] = useState(true);
+  const [cartError, setCartError] = useState<string | null>(null);
+
+  async function refreshProducts() {
+    setProductsPending(true);
+    setProductsError(null);
+
+    try {
+      setProducts(await listProducts());
+    } catch (caughtError) {
+      setProductsError(catalogBrowseErrorMessage(caughtError));
+    } finally {
+      setProductsPending(false);
+    }
+  }
+
+  async function refreshCart() {
+    setCartPending(true);
+    setCartError(null);
+
+    try {
+      setCart(await getCart());
+    } catch (caughtError) {
+      setCartError(cartErrorMessage(caughtError));
+    } finally {
+      setCartPending(false);
+    }
+  }
+
+  useEffect(() => {
+    void refreshProducts();
+    void refreshCart();
+  }, []);
+
+  async function handleAddToCart(product: ProductResponse) {
+    setCartPending(true);
+    setCartError(null);
+
+    try {
+      setCart(await addCartItem(product.id, 1));
+    } catch (caughtError) {
+      setCartError(cartErrorMessage(caughtError));
+    } finally {
+      setCartPending(false);
+    }
+  }
+
+  async function handleUpdateQuantity(productId: string, quantity: number) {
+    setCartPending(true);
+    setCartError(null);
+
+    try {
+      setCart(await updateCartItem(productId, quantity));
+    } catch (caughtError) {
+      setCartError(cartErrorMessage(caughtError));
+    } finally {
+      setCartPending(false);
+    }
+  }
+
+  async function handleRemoveItem(productId: string) {
+    setCartPending(true);
+    setCartError(null);
+
+    try {
+      setCart(await removeCartItem(productId));
+    } catch (caughtError) {
+      setCartError(cartErrorMessage(caughtError));
+    } finally {
+      setCartPending(false);
+    }
+  }
+
   return (
     <div className="catalog">
       <p className="catalog-introduction">
-        Create a Product or retrieve one by its generated ID. Product data is temporary and is lost when
-        the backend restarts.
+        Browse available Products, add them to a Cart, and manage the Cart while Product data remains temporary
+        and is lost when the backend restarts.
       </p>
+      <ProductBrowse
+        products={products}
+        isPending={productsPending}
+        error={productsError}
+        isCartPending={cartPending}
+        onRetry={() => void refreshProducts()}
+        onAdd={handleAddToCart}
+      />
       <div className="catalog-panels">
-        <CreateProductForm />
+        <CreateProductForm onProductCreated={() => void refreshProducts()} />
         <ProductLookupForm />
       </div>
+      <CartPanel
+        cart={cart}
+        isPending={cartPending}
+        error={cartError}
+        onUpdateQuantity={handleUpdateQuantity}
+        onRemoveItem={handleRemoveItem}
+      />
     </div>
   );
 }
 
-function CreateProductForm() {
+function ProductBrowse({
+  products,
+  isPending,
+  error,
+  isCartPending,
+  onRetry,
+  onAdd
+}: {
+  products: ProductResponse[];
+  isPending: boolean;
+  error: string | null;
+  isCartPending: boolean;
+  onRetry: () => void;
+  onAdd: (product: ProductResponse) => Promise<void>;
+}) {
+  return (
+    <section className="catalog-panel" aria-labelledby="product-browse-heading" aria-busy={isPending}>
+      <h2 id="product-browse-heading">Products</h2>
+      {isPending ? <p role="status">Loading Products...</p> : null}
+      {error !== null ? (
+        <div>
+          <p role="alert">{error}</p>
+          <button type="button" onClick={onRetry} disabled={isPending}>
+            Retry Products
+          </button>
+        </div>
+      ) : null}
+      {!isPending && error === null && products.length === 0 ? <p>No Products are available.</p> : null}
+      {!isPending && error === null && products.length > 0 ? (
+        <ul className="product-list">
+          {products.map((product) => (
+            <li key={product.id} className="product-card">
+              <div>
+                <h3>{product.name}</h3>
+                <p>Price: {product.price}</p>
+              </div>
+              <button type="button" onClick={() => void onAdd(product)} disabled={isCartPending}>
+                Add to Cart
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </section>
+  );
+}
+
+function CreateProductForm({ onProductCreated }: { onProductCreated: () => void }) {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [isPending, setIsPending] = useState(false);
@@ -55,6 +204,7 @@ function CreateProductForm() {
 
     try {
       setProduct(await createProduct({ name, price: numericPrice }));
+      onProductCreated();
     } catch (caughtError) {
       setError(createErrorMessage(caughtError));
     } finally {
@@ -244,6 +394,36 @@ function lookupErrorMessage(error: unknown): string {
   }
 
   return generalErrorMessage(error);
+}
+
+function catalogBrowseErrorMessage(error: unknown): string {
+  if (error instanceof CatalogApiError && error.kind === "network") {
+    return "The Product service could not be reached. Try again.";
+  }
+
+  return generalErrorMessage(error);
+}
+
+function cartErrorMessage(error: unknown): string {
+  if (error instanceof CartApiError) {
+    if (error.kind === "bad-request") {
+      return "The Cart request was invalid. Check the quantity and try again.";
+    }
+
+    if (error.kind === "not-found") {
+      return "The Product or Cart item was not found.";
+    }
+
+    if (error.kind === "network") {
+      return "The Cart service could not be reached. Try again.";
+    }
+
+    if (error.kind === "invalid-response") {
+      return "The Cart service returned an unexpected response. Try again.";
+    }
+  }
+
+  return "The Cart service failed. Try again.";
 }
 
 function generalErrorMessage(error: unknown): string {

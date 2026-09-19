@@ -1,6 +1,8 @@
 package io.github.samska.sandbox.catalog.storage;
 
 import java.util.Optional;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -23,5 +25,10 @@ public class InMemoryProductStore implements ProductStore {
     @Override
     public Optional<Product> findById(ProductId id) {
         return Optional.ofNullable(products.get(id));
+    }
+
+    @Override
+    public Collection<Product> findAll() {
+        return List.copyOf(products.values());
     }
 }
