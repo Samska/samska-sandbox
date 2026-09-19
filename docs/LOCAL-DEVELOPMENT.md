@@ -4,7 +4,7 @@
 
 This is the canonical guide for configuring, running, verifying, stopping, and troubleshooting Samska Sandbox locally. It describes the repository's current state; it is not deployment guidance.
 
-The core Catalog application uses a Java/Spring Boot backend and a React/Vite frontend. Product data is held in backend process memory and disappears whenever the backend restarts. Docker Compose PostgreSQL is optional local infrastructure: Spring Boot does not connect to it, and it does not persist Products.
+The core Catalog and Cart application uses a Java/Spring Boot backend and a React/Vite frontend. Product and Cart data are held in backend process memory and disappear whenever the backend restarts. Docker Compose PostgreSQL is optional local infrastructure: Spring Boot does not connect to it, and it does not persist Products or Cart state.
 
 ## Prerequisites
 
@@ -111,14 +111,14 @@ Browser
   -> Vite development server (default 5173 when available)
     -> /api proxy
       -> Spring Boot (default 8080)
-        -> InMemoryProductStore
+        -> InMemoryProductStore and InMemoryCartStore
 
 PostgreSQL (127.0.0.1:${POSTGRES_HOST_PORT:-5432})
   -> separate local infrastructure
   -> not used by Spring Boot
 ```
 
-Vite's startup output is authoritative when its default port is unavailable. The frontend can start without the backend, but Product requests then fail. The backend can run without the frontend and without PostgreSQL. The Catalog UI requires both frontend and backend; PostgreSQL is optional.
+Vite's startup output is authoritative when its default port is unavailable. The frontend can start without the backend, but Product and Cart requests then fail. The backend can run without the frontend and without PostgreSQL. The Catalog and Cart UI requires both frontend and backend; PostgreSQL is optional.
 
 ## Manual / Troubleshooting: Start the Backend
 
@@ -165,7 +165,7 @@ The proxy does not define production routing or establish a Spring Boot CORS pol
 ## Runtime and Manual Verification
 
 1. Start the backend and confirm the health response reports `UP`.
-2. Start the frontend, open its reported URL, create a synthetic Product, and retrieve it by the generated ID.
+2. Start the frontend, open its reported URL, create a synthetic Product, browse it, add it to the Cart, update its quantity, remove it, and retrieve it by the generated ID.
 3. Stop and restart the backend, then try the same ID again. It must no longer be found.
 4. If PostgreSQL is running, use `docker compose ps` and `pg_isready` to verify its container state independently.
 

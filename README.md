@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Target milestone:** `v0.1.0 — First Order` (unreleased)
-- **Current stage:** Catalog vertical slice complete
-- **Next product capability:** Shopping Cart
+- **Current stage:** Shopping Cart vertical slice complete
+- **Next planned work:** Product UX Foundation
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -23,8 +23,8 @@ are build metadata, not evidence of a published product release.
 
 Samska Sandbox uses a fictional catalog and order journey to demonstrate
 evidence-driven engineering. The current application contains a Java/Spring
-Boot backend, a React/TypeScript frontend, and a Catalog boundary for creating
-and retrieving Products by generated identity.
+Boot backend, a React/TypeScript frontend, a Catalog boundary for Products, and
+a process-local Cart boundary.
 
 AI agents are implementation tools operating under repository-defined
 governance. Humans own requirements, architecture, decisions, review,
@@ -35,33 +35,36 @@ validation, learning, and risk.
 | Capability | Status | Current boundary |
 | --- | --- | --- |
 | Product domain model | Implemented | Framework-independent Catalog rules and identity. |
-| Catalog API | Implemented | `POST /api/products` and `GET /api/products/{id}`. |
-| Catalog UI | Implemented | React forms for creating and retrieving a Product. |
+| Catalog API | Implemented | Product creation, collection browsing, and retrieval by identity. |
+| Catalog UI | Implemented | Product creation, browsing, retrieval, and Cart selection. |
+| Shopping Cart | Implemented | Process-local Cart contents, quantity changes, removal, and server-calculated totals. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
-| Shopping Cart | Next | Product capability after the Catalog slice. |
-| Checkout, payment, orders, E2E, deployment | Planned | Not implemented in the current repository. |
+| Product UX Foundation, Checkout, payment, orders, E2E, deployment | Planned | Not implemented in the current repository. |
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    User[User / browser] --> UI[React / TypeScript<br/>Catalog UI]
+    User[User / browser] --> UI[React / TypeScript<br/>Catalog and Cart UI]
     UI --> Adapter[Catalog API adapter]
     Adapter --> Proxy[Vite development<br/>/api proxy]
-    Proxy --> HTTP[Spring Boot<br/>Catalog HTTP API]
-    HTTP --> App[Catalog application<br/>service coordination]
+    Proxy --> HTTP[Spring Boot<br/>Catalog and Cart HTTP APIs]
+    HTTP --> App[Catalog and Cart applications<br/>service coordination]
     App --> Domain[Product domain]
     App --> Store[ProductStore boundary]
     Store --> Memory[InMemoryProductStore<br/>process-local]
+    App --> Cart[Cart aggregate]
+    Cart --> CartMemory[InMemoryCartStore<br/>single current Cart]
 
     Postgres[(PostgreSQL<br/>optional local Compose infrastructure<br/>not connected to application)]
 ```
 
-The Vite proxy is for local development only. Product data is held in process
-memory and is lost when the backend restarts. PostgreSQL is deliberately shown
-separately because the application has no database connection or persistence.
+The Vite proxy is for local development only. Product and Cart data are held in
+process memory and are lost when the backend restarts. PostgreSQL is
+deliberately shown separately because the application has no database connection
+or persistence.
 
 ## Engineering Practices
 
@@ -109,8 +112,8 @@ components.
 
 ## Roadmap And Next Work
 
-The First Order sequence continues with Shopping Cart, Checkout, payment
-simulation, order creation, the complete First Order journey, and then the
+The First Order sequence continues with Checkout, payment simulation, order
+creation, the complete First Order journey, and then the
 `v0.1.0` release. Future capabilities receive an SS identifier only when their
 GitHub Issue is created; the roadmap does not reserve future identifiers.
 

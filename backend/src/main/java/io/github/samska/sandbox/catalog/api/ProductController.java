@@ -2,6 +2,7 @@ package io.github.samska.sandbox.catalog.api;
 
 import java.net.URI;
 import java.util.UUID;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,5 +37,12 @@ public class ProductController {
     @GetMapping("/{id}")
     public ProductResponse getProduct(@PathVariable("id") UUID id) {
         return ProductResponse.from(productApplicationService.getProduct(new ProductId(id)));
+    }
+
+    @GetMapping
+    public List<ProductResponse> listProducts() {
+        return productApplicationService.listProducts().stream()
+                .map(ProductResponse::from)
+                .toList();
     }
 }

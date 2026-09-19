@@ -25,10 +25,11 @@ never renumbered.
 | PostgreSQL local infrastructure | SS-008 |
 | Catalog Product domain, API, and UI | SS-009 through SS-011 |
 | Learning, local development, verification, and CI reporting improvements | SS-018 through SS-025 |
+| Shopping Cart vertical slice | SS-027 |
 
 ### Future Product Sequence
 
-1. Shopping Cart
+1. Product UX Foundation
 2. Checkout
 3. Payment simulator
 4. Order creation

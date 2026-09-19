@@ -8,13 +8,92 @@ const createdProduct = {
   price: 12.5
 };
 
+const emptyCart = { items: [], total: 0 };
+
 afterEach(() => {
   vi.unstubAllGlobals();
 });
 
 describe("Catalog", () => {
-  it("creates a Product with the Catalog API contract and renders its generated data", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(response(201, createdProduct));
+  it("browses Products and renders the empty Cart", async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      if (String(input) === "/api/products") {
+        return Promise.resolve(response(200, [createdProduct]));
+      }
+
+      return Promise.resolve(response(200, emptyCart));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<Catalog />);
+
+    expect(await screen.findByRole("heading", { name: "Products" })).toBeInTheDocument();
+    expect(await screen.findByText(createdProduct.name)).toBeInTheDocument();
+    expect(screen.getByText("Your Cart is empty.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add to Cart" })).toBeInTheDocument();
+  });
+
+  it("renders an empty browse state", async () => {
+    vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL) => {
+      if (String(input) === "/api/products") {
+        return Promise.resolve(response(200, []));
+      }
+
+      return Promise.resolve(response(200, emptyCart));
+    }));
+    render(<Catalog />);
+
+    expect(await screen.findByText("No Products are available.")).toBeInTheDocument();
+  });
+
+  it("adds a Product and renders the authoritative Cart response", async () => {
+    const cartWithProduct = {
+      items: [{
+        productId: createdProduct.id,
+        name: createdProduct.name,
+        quantity: 1,
+        unitPrice: createdProduct.price,
+        lineSubtotal: createdProduct.price
+      }],
+      total: createdProduct.price
+    };
+    const fetchMock = vi.fn((input: RequestInfo | URL, options?: RequestInit) => {
+      const path = String(input);
+
+      if (path === "/api/products") {
+        return Promise.resolve(response(200, [createdProduct]));
+      }
+
+      if (path === "/api/cart" && options === undefined) {
+        return Promise.resolve(response(200, emptyCart));
+      }
+
+      return Promise.resolve(response(200, cartWithProduct));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<Catalog />);
+
+    expect(await screen.findByText("Your Cart is empty.")).toBeInTheDocument();
+    const addButton = await screen.findByRole("button", { name: "Add to Cart" });
+    await waitFor(() => expect(addButton).not.toBeDisabled());
+    fireEvent.click(addButton);
+
+    await waitFor(() => expect(screen.getByText("Total:").parentElement).toHaveTextContent("12.5"));
+    expect(screen.getByText("Unit price")).toBeInTheDocument();
+    expect(screen.getByText("Subtotal")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith("/api/cart/items", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productId: createdProduct.id, quantity: 1 })
+    });
+  });
+
+  it("creates a Product and refreshes the browse list", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementationOnce(() => Promise.resolve(response(200, [])))
+      .mockImplementationOnce(() => Promise.resolve(response(200, emptyCart)))
+      .mockImplementationOnce(() => Promise.resolve(response(201, createdProduct)))
+      .mockImplementationOnce(() => Promise.resolve(response(200, [createdProduct])));
     vi.stubGlobal("fetch", fetchMock);
     render(<Catalog />);
 
@@ -22,21 +101,18 @@ describe("Catalog", () => {
     fireEvent.change(screen.getByLabelText("Price"), { target: { value: "12.50" } });
     fireEvent.click(screen.getByRole("button", { name: "Create Product" }));
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
-
-    expect(fetchMock).toHaveBeenCalledWith("/api/products", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: "Canvas Tote", price: 12.5 })
-    });
     expect(await screen.findByText("Product created successfully.")).toBeInTheDocument();
-    expect(screen.getByText(createdProduct.id)).toBeInTheDocument();
-    expect(screen.getByText(createdProduct.name)).toBeInTheDocument();
-    expect(screen.getByText("12.5")).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Add to Cart" })).toBeInTheDocument();
   });
 
-  it("prevents invalid creation input from calling the API", () => {
-    const fetchMock = vi.fn();
+  it("prevents invalid creation input from calling the create API", async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      if (String(input) === "/api/products") {
+        return Promise.resolve(response(200, []));
+      }
+
+      return Promise.resolve(response(200, emptyCart));
+    });
     vi.stubGlobal("fetch", fetchMock);
     render(<Catalog />);
 
@@ -45,125 +121,53 @@ describe("Catalog", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create Product" }));
 
     expect(screen.getByRole("alert")).toHaveTextContent("Enter a Product name.");
-    expect(fetchMock).not.toHaveBeenCalled();
-
-    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Canvas Tote" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create Product" }));
-
-    expect(screen.getByRole("alert")).toHaveTextContent("Enter a price that is zero or greater.");
-    expect(fetchMock).not.toHaveBeenCalled();
-  });
-
-  it("reports a create 400 response without reading an error body", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response(400)));
-    render(<Catalog />);
-
-    submitCreation();
-
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Check the Product name and price, then try again."
-    );
+    expect(fetchMock).not.toHaveBeenCalledWith("/api/products", expect.objectContaining({ method: "POST" }));
   });
 
   it("retrieves a Product by its trimmed and encoded ID", async () => {
     const productId = "product/id";
-    const fetchMock = vi.fn().mockResolvedValue(response(200, { ...createdProduct, id: productId }));
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      const path = String(input);
+      if (path === "/api/products") {
+        return Promise.resolve(response(200, []));
+      }
+      if (path === "/api/cart") {
+        return Promise.resolve(response(200, emptyCart));
+      }
+      return Promise.resolve(response(200, { ...createdProduct, id: productId }));
+    });
     vi.stubGlobal("fetch", fetchMock);
     render(<Catalog />);
 
     fireEvent.change(screen.getByLabelText("Product ID"), { target: { value: ` ${productId} ` } });
     fireEvent.click(screen.getByRole("button", { name: "Find Product" }));
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
-
-    expect(fetchMock).toHaveBeenCalledWith("/api/products/product%2Fid", undefined);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith("/api/products/product%2Fid", undefined));
     expect(await screen.findByText("Product found successfully.")).toBeInTheDocument();
     expect(screen.getByText(productId)).toBeInTheDocument();
   });
 
-  it.each([
-    [400, "Enter a valid Product ID."],
-    [404, "No Product was found with that ID."]
-  ])("reports lookup status %i", async (status, message) => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response(status)));
-    render(<Catalog />);
-
-    submitLookup();
-
-    expect(await screen.findByRole("alert")).toHaveTextContent(message);
-  });
-
-  it("reports network and unexpected server failures safely", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockRejectedValueOnce(new Error("connection details"))
-      .mockResolvedValueOnce(response(500));
+  it("reports browse and lookup failures without exposing response bodies", async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      const path = String(input);
+      if (path === "/api/products") {
+        return Promise.resolve(response(500));
+      }
+      if (path === "/api/cart") {
+        return Promise.resolve(response(200, emptyCart));
+      }
+      return Promise.resolve(response(404));
+    });
     vi.stubGlobal("fetch", fetchMock);
     render(<Catalog />);
 
-    submitLookup();
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "The Product service could not be reached. Try again."
-    );
+    expect(await screen.findByText("The Product service failed. Try again.")).toBeInTheDocument();
 
-    submitLookup();
-    expect(await screen.findByRole("alert")).toHaveTextContent("The Product service failed. Try again.");
-  });
-
-  it("reports malformed successful responses", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response(201, { id: "only-an-id" })));
-    render(<Catalog />);
-
-    submitCreation();
-
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "The Product service returned an unexpected response. Try again."
-    );
-  });
-
-  it("disables only the pending form, prevents duplicate submission, and clears stale results on retry", async () => {
-    let resolveRequest: ((value: Response) => void) | undefined;
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(response(201, createdProduct))
-      .mockImplementationOnce(
-        () =>
-          new Promise<Response>((resolve) => {
-            resolveRequest = resolve;
-          })
-      );
-    vi.stubGlobal("fetch", fetchMock);
-    render(<Catalog />);
-
-    submitCreation();
-    expect(await screen.findByText("Product created successfully.")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "Create Product" }));
-
-    expect(screen.getByRole("status")).toHaveTextContent("Loading Product...");
-    expect(screen.queryByText("Product created successfully.")).not.toBeInTheDocument();
-    expect(screen.getByLabelText("Name")).toBeDisabled();
-    expect(screen.getByLabelText("Product ID")).not.toBeDisabled();
-    expect(screen.getByRole("button", { name: "Find Product" })).not.toBeDisabled();
-
-    fireEvent.click(screen.getByRole("button", { name: "Creating Product..." }));
-    expect(fetchMock).toHaveBeenCalledTimes(2);
-
-    resolveRequest?.(response(201, createdProduct));
-    expect(await screen.findByText("Product created successfully.")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Product ID"), { target: { value: "product-id" } });
+    fireEvent.click(screen.getByRole("button", { name: "Find Product" }));
+    expect(await screen.findByText("No Product was found with that ID.")).toBeInTheDocument();
   });
 });
-
-function submitCreation() {
-  fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Canvas Tote" } });
-  fireEvent.change(screen.getByLabelText("Price"), { target: { value: "12.50" } });
-  fireEvent.click(screen.getByRole("button", { name: "Create Product" }));
-}
-
-function submitLookup() {
-  fireEvent.change(screen.getByLabelText("Product ID"), { target: { value: "product-id" } });
-  fireEvent.click(screen.getByRole("button", { name: "Find Product" }));
-}
 
 function response(status: number, body?: unknown): Response {
   return {

@@ -10,11 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -61,6 +63,19 @@ class ProductApiTest {
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.name").value("Canvas Tote"))
                 .andExpect(jsonPath("$.price").value(12.50));
+
+        mockMvc.perform(get("/api/products"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$[*].name", hasItems("Canvas Tote")));
+    }
+
+    @Test
+    @DirtiesContext(methodMode = DirtiesContext.MethodMode.BEFORE_METHOD)
+    void returnsEmptyProductCollection() throws Exception {
+        mockMvc.perform(get("/api/products"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(0)));
     }
 
     @Test
