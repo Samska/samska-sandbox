@@ -97,10 +97,10 @@ Pull request -> read-only pinned workflow -> checks current artifacts -> bounded
 
 ### Hands-on Reinforcement
 
-#### Inspect Repository CI
+#### Inspect Historical Repository CI
 
 - **Prerequisite:** none.
-- **Perform or inspect:** read `.github/workflows/ci.yml`.
+- **Perform or inspect:** read the [SS-005 Repository CI workflow](https://github.com/Samska/samska-sandbox/blob/9624f6f9da0d5fac17dbade87c7c452277c222b1/.github/workflows/repository-ci.yml) at the SS-005 merge commit.
 - **Expected observation:** trigger, permissions, checkout credential behavior, SHA pins, and three checks are explicit.
 - **Explain:** which risk each configuration reduces and which assurance boundary remains.
 - **Cleanup:** none.
@@ -136,5 +136,6 @@ No formal GitHub review, comments, or findings are recorded for PR #9. Later bac
 
 - [Issue #8](https://github.com/Samska/samska-sandbox/issues/8)
 - [PR #9](https://github.com/Samska/samska-sandbox/pull/9)
-- [CI workflow](../../.github/workflows/ci.yml)
+- [SS-005 Repository CI workflow at its merge commit](https://github.com/Samska/samska-sandbox/blob/9624f6f9da0d5fac17dbade87c7c452277c222b1/.github/workflows/repository-ci.yml)
+- [Current CI workflow](../../.github/workflows/ci.yml)
 - [GitHub Repository Controls](../GITHUB.md)

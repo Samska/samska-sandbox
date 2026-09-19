@@ -45,7 +45,7 @@ versions are independent. Releases are milestone-based rather than
 Issue-based, and Git tags use `vMAJOR.MINOR.PATCH`.
 
 Versions below `1.0.0` represent evolving, pre-stable product milestones. The
-first planned release is `v0.1.0 - First Order`. No Git tag or GitHub Release
+first planned release is `v0.1.0 — First Order`. No Git tag or GitHub Release
 exists yet; release creation is future First Order work.
 
 ## Directional Evolution
