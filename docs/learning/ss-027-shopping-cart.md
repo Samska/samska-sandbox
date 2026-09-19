@@ -4,7 +4,7 @@
 - Work date: 2026-09-19
 - Last reviewed: 2026-09-19
 - Work item: [SS-027](https://github.com/Samska/samska-sandbox/issues/41)
-- Pull request: None
+- Pull request: [PR #42](https://github.com/Samska/samska-sandbox/pull/42)
 - ADRs: None
 - Canonical documentation: [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md), [Security](../SECURITY.md)
 
@@ -50,7 +50,7 @@ Authentication, sessions, multiple carts, persistence, Checkout, inventory, paym
 ## Reference
 
 - Issue: [SS-027](https://github.com/Samska/samska-sandbox/issues/41)
-- Pull request: None
+- Pull request: [PR #42](https://github.com/Samska/samska-sandbox/pull/42)
 - Relevant source files: `backend/src/main/java/io/github/samska/sandbox/catalog/application/ProductCatalog.java`, `backend/src/main/java/io/github/samska/sandbox/cart/Cart.java`, `backend/src/main/java/io/github/samska/sandbox/cart/Quantity.java`, `web/src/cart/Cart.tsx`
 - ADRs: None; follows [ADR 0001](../adr/0001-adopt-modular-monolith.md)
 - Canonical documentation: [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md), [Security](../SECURITY.md)

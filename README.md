@@ -11,7 +11,7 @@ licensed under the [Apache License 2.0](LICENSE).
 
 - **Target milestone:** `v0.1.0 — First Order` (unreleased)
 - **Current stage:** Shopping Cart vertical slice complete
-- **Next product capability:** Checkout
+- **Next planned work:** Product UX Foundation
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -41,7 +41,7 @@ validation, learning, and risk.
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
-| Checkout, payment, orders, E2E, deployment | Planned | Not implemented in the current repository. |
+| Product UX Foundation, Checkout, payment, orders, E2E, deployment | Planned | Not implemented in the current repository. |
 
 ## Architecture
 
