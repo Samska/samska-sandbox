@@ -5,7 +5,7 @@
 - Work item: [SS-005, Issue #8](https://github.com/Samska/samska-sandbox/issues/8)
 - Pull request: [PR #9](https://github.com/Samska/samska-sandbox/pull/9)
 - ADRs: None
-- Canonical documentation: [GitHub Repository Controls](../GITHUB.md), [Testing Strategy](../TESTING.md), and [Repository CI workflow](../../.github/workflows/repository-ci.yml)
+- Canonical documentation: [GitHub Repository Controls](../GITHUB.md), [Testing Strategy](../TESTING.md), and [CI workflow](../../.github/workflows/ci.yml)
 
 ## Study Surface
 
@@ -100,7 +100,7 @@ Pull request -> read-only pinned workflow -> checks current artifacts -> bounded
 #### Inspect Repository CI
 
 - **Prerequisite:** none.
-- **Perform or inspect:** read `.github/workflows/repository-ci.yml`.
+- **Perform or inspect:** read `.github/workflows/ci.yml`.
 - **Expected observation:** trigger, permissions, checkout credential behavior, SHA pins, and three checks are explicit.
 - **Explain:** which risk each configuration reduces and which assurance boundary remains.
 - **Cleanup:** none.
@@ -136,5 +136,5 @@ No formal GitHub review, comments, or findings are recorded for PR #9. Later bac
 
 - [Issue #8](https://github.com/Samska/samska-sandbox/issues/8)
 - [PR #9](https://github.com/Samska/samska-sandbox/pull/9)
-- [Repository CI workflow](../../.github/workflows/repository-ci.yml)
+- [CI workflow](../../.github/workflows/ci.yml)
 - [GitHub Repository Controls](../GITHUB.md)
