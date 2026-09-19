@@ -72,6 +72,8 @@ For an approved remote-only exception, create only the minimum commit and PR nee
 ## Documentation and Reporting
 
 - Update affected documentation in the same change as behavior, architecture, security posture, process, or roadmap status changes.
+- `README.md` is the high-level repository landing page for engineers, recruiters, and contributors. Meaningful work must assess README impact and update it in the same pull request when the change materially affects capabilities, product stage or milestone, architecture or module boundaries, technology stack, CI/CD, security controls, testing capabilities, the local-development entry point, or the next major capability. This assessment is not required for trivial metadata-only work.
+- Report the assessment as `README impact: Yes` followed by `Updated: <sections>`, or `README impact: No` followed by `Reason: <concise reason>` when relevant.
 - For meaningful work that meets the [learning-journal criteria](learning/README.md#when-a-learning-record-is-required), create or update the corresponding learning record in the same change.
 - Learning records preserve concise, evidence-linked mini-lessons for human learning. Their canonical format is defined in the [Learning Journal guide](learning/README.md) and [Learning Record template](learning/000-template.md). They must not contain raw AI prompts, transcripts, hidden reasoning, secrets, credentials, or personal data.
 - Learning supports engineering work but never gates it. Agents must not require quizzes, recall, exercises, checkpoints, or human answers before Build, pull request creation, merge, Issue completion, or other engineering progression.

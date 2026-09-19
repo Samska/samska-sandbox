@@ -2,51 +2,68 @@
 
 ## Purpose
 
-GitHub is part of the engineering laboratory. This document records the repository controls and their verification evidence.
-
-All statuses below were verified on 2026-08-30. `API-verified` controls were confirmed through the GitHub API. `Owner-verified, API-unverified` controls were confirmed by the project owner because the available API does not expose their configuration.
+GitHub is part of the engineering laboratory. This document records repository
+controls and the evidence available for them. Verification dates are stated
+per control because repository settings, workflow files, and runtime checks do
+not necessarily change on the same date.
 
 ## Configured Controls
 
 | Control | Status | Verified state | Evidence |
 | --- | --- | --- | --- |
-| `main` protection mechanism | Enabled | Active `Main` ruleset targets the default branch (`main`). | API-verified |
-| Pull requests | Enabled | Changes to `main` require a pull request. | API-verified |
-| Required approvals | Enabled | The pull request rule requires zero approvals. | API-verified |
-| Conversation resolution | Enabled | Pull request review threads must be resolved before merge. | API-verified |
-| Force-push protection | Enabled | Non-fast-forward updates to `main` are blocked. | API-verified |
-| Branch-deletion protection | Enabled | Deletion of `main` is blocked. | API-verified |
-| Bypass policy | Enabled | No bypass actors are permitted. | Owner-verified, API-unverified |
-| Squash merge | Enabled | Squash is the only allowed merge method for pull requests to `main`. | API-verified |
-| Merge commits | Enabled | Merge commits are not allowed for pull requests to `main`. | API-verified |
-| Rebase merge | Enabled | Rebase merges are not allowed for pull requests to `main`. | API-verified |
-| Secret Protection / Secret Scanning | Enabled | Secret Scanning is enabled. | Owner-verified, API-unverified |
-| Push Protection | Enabled | Push Protection is enabled. | Owner-verified, API-unverified |
-| Private Vulnerability Reporting | Enabled | Private vulnerability reports can be submitted through GitHub. | API-verified |
-| Security Advisories | Enabled | Available to maintainers for private vulnerability remediation and coordinated disclosure. | Owner-verified, API-unverified |
-| GitHub Actions / repository CI | Configured | The `Repository CI` workflow runs on pull requests targeting `main` and validates Markdown, local relative links, EditorConfig consistency, and Docker Compose configuration. It does not start PostgreSQL. The workflow has only `contents: read` permission. | `.github/workflows/repository-ci.yml`; runtime verification occurs on the pull request that introduces or changes a check. |
-| GitHub Actions / backend CI | Configured | The `Backend CI` workflow runs Maven `clean verify` for the Java backend on pull requests targeting `main`. It publishes Surefire JUnit XML as a structured `Backend test results` Check Run with annotations where supported, a Job Summary, and a seven-day diagnostic artifact. It uses Temurin 25, Maven dependency caching, immutable Action pins, `contents: read`, narrowly scoped `checks: write` for the Check Run, and no persisted checkout credentials, secrets, or PR comments. Report publication runs after an executed test failure while an explicit gate preserves the failed job result. | `.github/workflows/backend-ci.yml`; runtime verification occurs on the pull request that introduces or changes reporting. |
-| GitHub Actions / frontend CI | Configured | The `Frontend CI` workflow runs `npm ci --ignore-scripts`, TypeScript checking, Vitest component tests, and the Vite production build for `web/` on pull requests targeting `main`. It generates JUnit XML and publishes a structured `Frontend test results` Check Run with annotations where supported, a Job Summary, and a seven-day diagnostic artifact. It uses Node 24.20.0 from `web/.nvmrc`, npm caching, immutable Action pins, `contents: read`, narrowly scoped `checks: write` for the Check Run, and no persisted checkout credentials, secrets, or PR comments. Report publication runs after an executed test failure while an explicit gate preserves the failed job result. | `.github/workflows/frontend-ci.yml`; runtime verification occurs on the pull request that introduces or changes reporting. |
+| `main` protection mechanism | Enabled | Active `Main` ruleset targets the default branch (`main`). | API-verified 2026-09-19 |
+| Pull requests | Enabled | Changes to `main` require a pull request. | API-verified 2026-09-19 |
+| Required approvals | Enabled | The pull request rule requires zero approvals. | API-verified 2026-09-19 |
+| Conversation resolution | Enabled | Pull request review threads must be resolved before merge. | API-verified 2026-09-19 |
+| Force-push protection | Enabled | Non-fast-forward updates to `main` are blocked. | API-verified 2026-09-19 |
+| Branch-deletion protection | Enabled | Deletion of `main` is blocked. | API-verified 2026-09-19 |
+| Automatic merged-head branch deletion | Enabled | Merged pull request head branches are deleted automatically. | Owner/external verified 2026-09-19; not exposed by the OpenCode GitHub read surface |
+| Bypass policy | Enabled | No bypass actors are permitted. | Owner-verified, API-unverified; recorded 2026-08-30 |
+| Squash merge | Enabled | Squash is the only allowed merge method for pull requests to `main`. | API-verified 2026-09-19 |
+| Merge commits | Enabled | Merge commits are not allowed for pull requests to `main`. | API-verified 2026-09-19 |
+| Rebase merge | Enabled | Rebase merges are not allowed for pull requests to `main`. | API-verified 2026-09-19 |
+| Secret Protection / Secret Scanning | Enabled | Secret Scanning is enabled. | Owner-verified, API-unverified; recorded 2026-08-30 |
+| Push Protection | Enabled | Push Protection is enabled. | Owner-verified, API-unverified; recorded 2026-08-30 |
+| Private Vulnerability Reporting | Enabled | Private vulnerability reports can be submitted through GitHub. | API-verified 2026-08-30 |
+| Security Advisories | Enabled | Available to maintainers for private vulnerability remediation and coordinated disclosure. | Owner-verified, API-unverified; recorded 2026-08-30 |
+| GitHub Actions / CI | Configured | The `CI` workflow runs on pull requests targeting `main` with independent Repository validation, Backend, and Frontend jobs. Repository validation has `contents: read`; Backend and Frontend additionally have narrowly scoped `checks: write` for structured result Check Runs. | `.github/workflows/ci.yml`; runtime verification occurs on the PR that introduces or changes the workflow. |
+| CodeQL | Configured | GitHub-managed CodeQL analysis is active. Current successful checks analyze GitHub Actions, Java/Kotlin, and JavaScript/TypeScript. | GitHub Advanced Security CodeQL check and dynamic `github-code-scanning/codeql` workflow observed on PR #37, 2026-09-19. |
+| GitGuardian | Configured | GitGuardian Security Checks are active as a separate secret-related PR check. | Successful GitGuardian Security Checks observed on PR #37, 2026-09-19. |
 
 ## Deferred Controls
 
 | Control | Status | Rationale |
 | --- | --- | --- |
-| Required status checks | Deferred | Repository CI is not yet configured as a required status check. |
-| CodeQL | Deferred | Backend application code exists, but static-analysis tooling has not yet been separately justified and configured. |
-| Dependabot | Deferred | The backend has a dependency manifest, but dependency-update automation has not yet been separately justified and configured. |
-| Dependency Review | Deferred | Dependency-change automation is not configured yet. |
+| Required status checks | Deferred | The active `Main` ruleset does not require named status checks. |
+| Dependabot | Deferred | Dependency-update automation is not configured. |
+| Dependency Review | Deferred | Dependency-change automation is not configured. |
 | GitHub Environments | Deferred | Deployment environments do not exist yet. |
 | GitHub Container Registry | Deferred | Image distribution is not justified yet. |
-| Releases | Deferred | Versioned release work has not begun. |
+| Releases | Deferred | The first versioned release has not begun. |
 | SBOM and artifact attestations | Deferred | Build and release outputs do not exist yet. |
 
 ## Configuration Rules
 
-- SS-005 may add lightweight repository or documentation CI only when justified; it must not predict application build systems.
-- Backend, frontend, persistence/integration, and end-to-end CI evolve with their corresponding implementation work.
-- GitHub settings that cannot be represented in the repository must be checked manually and their verification date and evidence recorded here when enabled.
-- No workflow, token, secret, or control should be represented as active solely because it is desired.
-- GitHub exposes test evidence through Check Runs, annotations, Job Summaries, artifacts, and raw logs; it does not provide a dedicated Bamboo-style Tests tab.
+- The `CI` workflow keeps repository validation, backend, and frontend work as
+  independent jobs within one workflow. A workflow groups automation; jobs run
+  independently; steps execute within a job; and Check Runs expose job or
+  structured test-result evidence in GitHub.
+- Backend and frontend reporting reuses JUnit-compatible XML, publishes named
+  Check Runs and Job Summaries, retains seven-day diagnostic artifacts, and
+  preserves failed test-job results through an explicit final gate.
+- GitHub exposes test evidence through Check Runs, annotations, Job Summaries,
+  artifacts, and raw logs; it does not provide a dedicated Bamboo-style Tests
+  tab.
+- GitHub settings that cannot be represented in the repository must be checked
+  manually and their evidence recorded here when enabled.
+- Protected default-branch deletion and automatic merged-head branch deletion
+  solve different problems: the `Main` ruleset protects `main`, while the
+  cleanup setting removes completed short-lived pull request branches.
+- Normal branch teardown still verifies remote and local cleanup after merge.
+  Disposable branches from pull requests closed without merge require explicit
+  remote and local cleanup.
+- No workflow, token, secret, or control should be represented as active solely
+  because it is desired.
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for contribution expectations and [SECURITY.md](../SECURITY.md) for vulnerability reporting.
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for contribution expectations and
+[SECURITY.md](../SECURITY.md) for vulnerability reporting.

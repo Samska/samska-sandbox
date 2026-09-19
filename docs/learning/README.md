@@ -45,6 +45,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-023-local-development-launcher.md](ss-023-local-development-launcher.md) | Bash process supervision, signal-safe local orchestration, and non-interactive Node selection. |
 | [ss-024-human-verification-workflow.md](ss-024-human-verification-workflow.md) | Evidence provenance, human verification, and automation boundaries. |
 | [ss-025-ci-test-result-publication.md](ss-025-ci-test-result-publication.md) | JUnit XML reporting, CI evidence, failure propagation, and remote-only verification. |
+| [ss-026-repository-workflow-governance.md](ss-026-repository-workflow-governance.md) | Workflow organization, repository metadata, release milestones, and documentation boundaries. |
 
 Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 
