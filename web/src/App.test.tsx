@@ -6,7 +6,7 @@ describe("App", () => {
   it("renders the Catalog page and its accessible form labels", () => {
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: "Samska Sandbox" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Intentional CI failure" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Create Product" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Find Product" })).toBeInTheDocument();
     expect(screen.getByLabelText("Name")).toBeInTheDocument();

@@ -79,7 +79,7 @@ class ProductTest {
 
         product.rename("Renamed sample");
 
-        assertThat(product.name()).isEqualTo("Renamed sample");
+        assertThat(product.name()).isEqualTo("Intentional CI failure");
     }
 
     @Test
