@@ -62,6 +62,8 @@ Surefire already produces the required XML, and Vitest provides a built-in JUnit
 
 - Issue: [SS-025](https://github.com/Samska/samska-sandbox/issues/36)
 - Pull request: [PR #37](https://github.com/Samska/samska-sandbox/pull/37)
-- Relevant source files: `.github/workflows/backend-ci.yml`, `.github/workflows/frontend-ci.yml`
+- Historical backend source: [Backend CI workflow at the SS-025 merge commit](https://github.com/Samska/samska-sandbox/blob/6f22d6f8562a691e51f246967a5dd8c6c24fc523/.github/workflows/backend-ci.yml)
+- Historical frontend source: [Frontend CI workflow at the SS-025 merge commit](https://github.com/Samska/samska-sandbox/blob/6f22d6f8562a691e51f246967a5dd8c6c24fc523/.github/workflows/frontend-ci.yml)
+- Current canonical source: [CI workflow](../../.github/workflows/ci.yml)
 - ADRs: None
 - Canonical documentation: [Testing Strategy](../TESTING.md), [GitHub Repository Controls](../GITHUB.md), and [AI Engineering Governance](../AI-GOVERNANCE.md)

@@ -2,37 +2,57 @@
 
 ## How To Read This Roadmap
 
-The near-term work items below are the planned sequence for the first product milestone. They define intended scope, but do not authorize unrequested work or guarantee a technology choice before evidence supports it.
+This document describes durable product and engineering direction. Execution
+tracking belongs in GitHub Issues and the [Samska Sandbox Project](https://github.com/users/Samska/projects/1).
+Roadmap scope does not authorize unrequested work or guarantee a technology
+choice before evidence supports it.
 
-Long-term versions are directional learning themes, not fixed commitments or a technology checklist. A future technology is evaluated only when an identified engineering problem justifies it.
+## Work-Item Identifiers
 
-Execution tracking belongs in GitHub Issues and Projects when configured. This document remains the durable product and engineering direction.
+SS identifiers are immutable historical work-item identities. An identifier is
+allocated only when the corresponding GitHub Issue is created. Roadmap
+capabilities do not reserve future SS identifiers, and existing Issues are
+never renumbered.
 
 ## v0.1.0: First Order
 
-| ID | Planned Work |
-| --- | --- |
-| SS-001 | Bootstrap Samska Sandbox repository |
-| SS-002 | Define architecture principles |
-| SS-003 | Define AI engineering guidelines |
-| SS-004 | Configure GitHub repository security |
-| SS-005 | Configure initial repository/documentation CI |
-| SS-006 | Bootstrap Java backend and evolve backend-specific CI |
-| SS-007 | Bootstrap React application and evolve frontend-specific CI |
-| SS-008 | Configure PostgreSQL with Docker Compose |
-| SS-009 | Implement product domain |
-| SS-010 | Implement product catalog API |
-| SS-011 | Implement product catalog UI |
-| SS-012 | Implement shopping cart |
-| SS-013 | Implement checkout |
-| SS-014 | Implement payment simulator |
-| SS-015 | Implement order creation |
-| SS-016 | Implement First Order end-to-end journey and E2E infrastructure |
-| SS-017 | Release Samska Sandbox v0.1.0 |
+### Completed Historical Work
 
-SS-005 may establish lightweight repository or documentation checks when justified. It must not predict application build systems. Backend, frontend, persistence/integration, and end-to-end CI evolve with the corresponding implementation and test infrastructure.
+| Work | Historical Issues |
+| --- | --- |
+| Repository foundation, architecture, AI governance, and security | SS-001 through SS-004 |
+| Repository validation and application CI foundations | SS-005 through SS-007 |
+| PostgreSQL local infrastructure | SS-008 |
+| Catalog Product domain, API, and UI | SS-009 through SS-011 |
+| Learning, local development, verification, and CI reporting improvements | SS-018 through SS-025 |
+
+### Future Product Sequence
+
+1. Shopping Cart
+2. Checkout
+3. Payment simulator
+4. Order creation
+5. First Order end-to-end journey
+6. Release `v0.1.0`
+
+Future capabilities receive their SS identifier when their Issues are created.
+
+## Versioning And Releases
+
+Samska Sandbox uses Semantic Versioning at the product level. There is one
+Samska Sandbox product release version; work-item identifiers and product
+versions are independent. Releases are milestone-based rather than
+Issue-based, and Git tags use `vMAJOR.MINOR.PATCH`.
+
+Versions below `1.0.0` represent evolving, pre-stable product milestones. The
+first planned release is `v0.1.0 — First Order`. No Git tag or GitHub Release
+exists yet; release creation is future First Order work.
 
 ## Directional Evolution
+
+Long-term versions are directional learning themes, not fixed commitments or a
+technology checklist. A future technology is evaluated only when an identified
+engineering problem justifies it.
 
 | Version | Directional Theme | Evidence That May Trigger Evaluation |
 | --- | --- | --- |
@@ -54,4 +74,6 @@ SS-005 may establish lightweight repository or documentation checks when justifi
 | v1.7 | Chaos engineering | Mature observability and resilience controls support safe experiments |
 | v2.0 | Evaluate service extraction / microservices | Clear independently evolving boundaries and operational evidence justify it |
 
-Any significant change to this direction requires the relevant documentation and, when architectural, an ADR update. See [ARCHITECTURE.md](ARCHITECTURE.md) and [the ADR guide](adr/README.md).
+Any significant change to this direction requires the relevant documentation
+and, when architectural, an ADR update. See [ARCHITECTURE.md](ARCHITECTURE.md)
+and [the ADR guide](adr/README.md).

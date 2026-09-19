@@ -6,7 +6,7 @@
 - Work item: [SS-007, Issue #16](https://github.com/Samska/samska-sandbox/issues/16)
 - Pull request: [#17: feat(web): bootstrap React application foundation](https://github.com/Samska/samska-sandbox/pull/17)
 - ADRs: None
-- Canonical documentation: [README](../../README.md), [Architecture](../ARCHITECTURE.md), [Testing Strategy](../TESTING.md), [Security Engineering](../SECURITY.md), [GitHub Repository Controls](../GITHUB.md), and [Frontend CI workflow](../../.github/workflows/frontend-ci.yml)
+- Canonical documentation: [README](../../README.md), [Architecture](../ARCHITECTURE.md), [Testing Strategy](../TESTING.md), [Security Engineering](../SECURITY.md), [GitHub Repository Controls](../GITHUB.md), and [CI workflow](../../.github/workflows/ci.yml)
 
 ## Study Surface
 

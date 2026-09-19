@@ -6,7 +6,7 @@
 - Work item: [SS-006, Issue #12](https://github.com/Samska/samska-sandbox/issues/12)
 - Pull request: [#13: feat(backend): bootstrap Java Spring Boot foundation](https://github.com/Samska/samska-sandbox/pull/13)
 - ADRs: [ADR 0001: Adopt a Modular Monolith for v0.1](../adr/0001-adopt-modular-monolith.md)
-- Canonical documentation: [Architecture](../ARCHITECTURE.md), [Testing Strategy](../TESTING.md), [Security Engineering](../SECURITY.md), [GitHub Repository Controls](../GITHUB.md), and [Backend CI workflow](../../.github/workflows/backend-ci.yml)
+- Canonical documentation: [Architecture](../ARCHITECTURE.md), [Testing Strategy](../TESTING.md), [Security Engineering](../SECURITY.md), [GitHub Repository Controls](../GITHUB.md), and [CI workflow](../../.github/workflows/ci.yml)
 
 ## Study Surface
 

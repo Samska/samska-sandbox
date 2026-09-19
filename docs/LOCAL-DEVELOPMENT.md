@@ -185,7 +185,7 @@ docker compose config --quiet
 git diff --check
 ```
 
-`docker compose config --quiet` requires a non-empty `POSTGRES_PASSWORD` through the ignored `.env` or the command environment. Repository CI also validates Markdown, local relative links, and EditorConfig. Static checks and component tests do not prove live browser, proxy, or full application integration.
+`docker compose config --quiet` requires a non-empty `POSTGRES_PASSWORD` through the ignored `.env` or the command environment. The Repository validation job in CI also validates Markdown, local relative links, and EditorConfig. Static checks and component tests do not prove live browser, proxy, or full application integration.
 
 ## Shutdown and Reset
 
