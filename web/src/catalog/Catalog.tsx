@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   CatalogApiError,
   createProduct,
@@ -28,6 +28,7 @@ export default function Catalog() {
   const [products, setProducts] = useState<ProductResponse[]>([]);
   const [productsPending, setProductsPending] = useState(true);
   const [productsError, setProductsError] = useState<string | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductResponse | null>(null);
   const [cart, setCart] = useState<CartResponse | null>(null);
   const [cartPending, setCartPending] = useState(true);
   const [cartError, setCartError] = useState<string | null>(null);
@@ -112,14 +113,24 @@ export default function Catalog() {
   return (
     <div className="grid gap-6">
       <div className="grid items-start gap-5 [grid-template-columns:minmax(0,1fr)_minmax(18rem,21rem)] max-[58rem]:grid-cols-1">
-        <ProductBrowse
-          products={products}
-          isPending={productsPending}
-          error={productsError}
-          isCartPending={cartPending}
-          onRetry={() => void refreshProducts()}
-          onAdd={handleAddToCart}
-        />
+        {selectedProduct !== null ? (
+          <ProductDetail
+            product={selectedProduct}
+            isCartPending={cartPending}
+            onBack={() => setSelectedProduct(null)}
+            onAdd={handleAddToCart}
+          />
+        ) : (
+          <ProductBrowse
+            products={products}
+            isPending={productsPending}
+            error={productsError}
+            isCartPending={cartPending}
+            onRetry={() => void refreshProducts()}
+            onAdd={handleAddToCart}
+            onSelect={setSelectedProduct}
+          />
+        )}
         <CartPanel
           cart={cart}
           isPending={cartPending}
@@ -139,15 +150,15 @@ export default function Catalog() {
         </p>
       ) : null}
       <details id="catalog-tools" className="rounded-lg border border-border">
-        <summary className="flex cursor-pointer list-inside items-baseline justify-between gap-4 max-[44rem]:flex-col max-[44rem]:items-start max-[44rem]:gap-1.5">
+        <summary className="flex cursor-pointer list-inside items-baseline justify-between gap-4 p-5 max-[44rem]:flex-col max-[44rem]:items-start max-[44rem]:gap-1.5">
           <span className="text-base font-extrabold text-ink" role="heading" aria-level={2}>
-            Catalog tools
+            Product setup tools
           </span>
           <span className="text-sm text-muted">
-            Create or retrieve Products for local setup and inspection.
+            Local setup and testing utility for creating and retrieving Products. Not part of customer browsing.
           </span>
         </summary>
-        <div className="mt-5 grid gap-4 [grid-template-columns:repeat(2,minmax(0,1fr))] max-[44rem]:grid-cols-1">
+        <div className="grid gap-4 px-5 pb-5 [grid-template-columns:repeat(2,minmax(0,1fr))] max-[44rem]:grid-cols-1">
           <CreateProductForm onProductCreated={() => void refreshProducts()} />
           <ProductLookupForm />
         </div>
@@ -162,7 +173,8 @@ function ProductBrowse({
   error,
   isCartPending,
   onRetry,
-  onAdd
+  onAdd,
+  onSelect
 }: {
   products: ProductResponse[];
   isPending: boolean;
@@ -170,6 +182,7 @@ function ProductBrowse({
   isCartPending: boolean;
   onRetry: () => void;
   onAdd: (product: ProductResponse) => Promise<void>;
+  onSelect: (product: ProductResponse) => void;
 }) {
   return (
     <section
@@ -223,24 +236,101 @@ function ProductBrowse({
               </div>
               <article className="grid gap-2.5 px-1.5 pt-0.5">
                 <h3 className="text-lg leading-[1.15] text-ink">{product.name}</h3>
+                <p className="line-clamp-3 text-[0.9375rem] text-muted">{product.description}</p>
                 <p className="flex items-baseline justify-between gap-4 text-xl font-extrabold text-ink">
                   <span className="text-[0.8125rem] font-bold text-muted">Price</span>
                   <span>{formatAmount(product.price)}</span>
                 </p>
               </article>
-              <button
-                type="button"
-                className="mx-1.5 mb-1.5 min-h-11 rounded-sm border border-brand bg-brand px-4 py-2.5 font-bold text-white hover:bg-brand-dark hover:border-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
-                onClick={() => void onAdd(product)}
-                disabled={isCartPending}
-                aria-label={`Add ${product.name} to Cart`}
-              >
-                Add to Cart
-              </button>
+              <div className="mx-1.5 mb-1.5 grid gap-2.5">
+                <button
+                  type="button"
+                  className="min-h-11 rounded-sm border border-border-strong bg-transparent px-4 py-2.5 font-bold text-brand-dark hover:border-brand hover:bg-brand hover:text-white"
+                  onClick={() => onSelect(product)}
+                  aria-label={`View details for ${product.name}`}
+                >
+                  View details
+                </button>
+                <button
+                  type="button"
+                  className="min-h-11 rounded-sm border border-brand bg-brand px-4 py-2.5 font-bold text-white hover:bg-brand-dark hover:border-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={() => void onAdd(product)}
+                  disabled={isCartPending}
+                  aria-label={`Add ${product.name} to Cart`}
+                >
+                  Add to Cart
+                </button>
+              </div>
             </li>
           ))}
         </ul>
       ) : null}
+    </section>
+  );
+}
+
+function ProductDetail({
+  product,
+  isCartPending,
+  onBack,
+  onAdd
+}: {
+  product: ProductResponse;
+  isCartPending: boolean;
+  onBack: () => void;
+  onAdd: (product: ProductResponse) => Promise<void>;
+}) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
+
+  return (
+    <section
+      id="products"
+      className="grid min-w-0 gap-5 rounded-lg border border-border bg-surface p-5 shadow-card"
+      aria-labelledby="product-detail-heading"
+    >
+      <button
+        type="button"
+        className="min-h-11 w-fit rounded-sm border border-border-strong bg-transparent px-4 py-2.5 font-bold text-brand-dark hover:border-brand hover:bg-brand hover:text-white"
+        onClick={onBack}
+      >
+        Back to Products
+      </button>
+      <div
+        className={`grid aspect-[16/9] place-items-center overflow-hidden rounded-md text-white/85 ${productMediaToneClasses[productMediaTone(product.name)]}`}
+        aria-hidden="true"
+      >
+        <span className="text-[clamp(4rem,12vw,8rem)] font-extrabold leading-none tracking-[-0.08em] -translate-y-0.5">
+          {productInitial(product.name)}
+        </span>
+      </div>
+      <div className="grid gap-3">
+        <h1
+          id="product-detail-heading"
+          ref={headingRef}
+          tabIndex={-1}
+          className="text-[clamp(1.75rem,4vw,2.5rem)] leading-[1.15] tracking-[-0.03em] text-ink"
+        >
+          {product.name}
+        </h1>
+        <p className="text-muted">{product.description}</p>
+        <p className="flex items-baseline justify-between gap-4 text-2xl font-extrabold text-ink">
+          <span className="text-sm font-bold text-muted">Price</span>
+          <span>{formatAmount(product.price)}</span>
+        </p>
+      </div>
+      <button
+        type="button"
+        className="min-h-11 w-fit rounded-sm border border-brand bg-brand px-4 py-2.5 font-bold text-white hover:bg-brand-dark hover:border-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
+        onClick={() => void onAdd(product)}
+        disabled={isCartPending}
+        aria-label={`Add ${product.name} to Cart`}
+      >
+        Add to Cart
+      </button>
     </section>
   );
 }
@@ -255,6 +345,7 @@ function productMediaTone(name: string): number {
 
 function CreateProductForm({ onProductCreated }: { onProductCreated: () => void }) {
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [isPending, setIsPending] = useState(false);
   const [product, setProduct] = useState<ProductResponse | null>(null);
@@ -275,6 +366,12 @@ function CreateProductForm({ onProductCreated }: { onProductCreated: () => void 
       return;
     }
 
+    if (description.trim().length === 0) {
+      setProduct(null);
+      setError("Enter a Product description.");
+      return;
+    }
+
     if (price.length === 0 || !Number.isFinite(numericPrice) || numericPrice < 0) {
       setProduct(null);
       setError("Enter a price that is zero or greater.");
@@ -286,7 +383,7 @@ function CreateProductForm({ onProductCreated }: { onProductCreated: () => void 
     setIsPending(true);
 
     try {
-      setProduct(await createProduct({ name, price: numericPrice }));
+      setProduct(await createProduct({ name, description, price: numericPrice }));
       onProductCreated();
     } catch (caughtError) {
       setError(createErrorMessage(caughtError));
@@ -319,6 +416,28 @@ function CreateProductForm({ onProductCreated }: { onProductCreated: () => void 
           />
           {error === "Enter a Product name." ? (
             <p id="product-name-error" className="font-bold">
+              {error}
+            </p>
+          ) : null}
+        </div>
+        <div className="grid gap-1.5">
+          <label className="text-[0.9375rem] font-bold text-ink" htmlFor="product-description">
+            Description
+          </label>
+          <textarea
+            id="product-description"
+            name="description"
+            rows={3}
+            className="min-h-11 w-full rounded-sm border border-border-strong bg-surface px-3 py-2.5"
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            disabled={isPending}
+            aria-invalid={error === "Enter a Product description."}
+            aria-describedby={error === "Enter a Product description." ? "product-description-error" : undefined}
+            required
+          />
+          {error === "Enter a Product description." ? (
+            <p id="product-description-error" className="font-bold">
               {error}
             </p>
           ) : null}
@@ -474,6 +593,8 @@ function ProductDetails({ product }: { product: ProductResponse }) {
       <dd className="m-0 font-bold [overflow-wrap:anywhere]">{product.id}</dd>
       <dt className="text-sm text-muted">Name</dt>
       <dd className="m-0 font-bold">{product.name}</dd>
+      <dt className="text-sm text-muted">Description</dt>
+      <dd className="m-0 font-bold [overflow-wrap:anywhere]">{product.description}</dd>
       <dt className="text-sm text-muted">Price</dt>
       <dd className="m-0 font-bold">{formatAmount(product.price)}</dd>
     </dl>

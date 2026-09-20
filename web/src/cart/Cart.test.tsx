@@ -29,6 +29,9 @@ describe("CartPanel", () => {
 
     expect(screen.getByText("Your Cart is empty.")).toBeInTheDocument();
     expect(screen.queryByText("Total:")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Back to Products" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Browse Products" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Browse Products" })).not.toBeInTheDocument();
   });
 
   it("updates quantity and removes an item with accessible controls", async () => {

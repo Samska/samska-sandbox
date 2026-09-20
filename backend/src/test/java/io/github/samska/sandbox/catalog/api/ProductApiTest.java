@@ -40,14 +40,16 @@ class ProductApiTest {
                         .content("""
                                 {
                                   "name": "Canvas Tote",
+                                  "description": "A sturdy everyday tote.",
                                   "price": 12.50
                                 }
                                 """))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.*", hasSize(3)))
+                .andExpect(jsonPath("$.*", hasSize(4)))
                 .andExpect(jsonPath("$.id").isString())
                 .andExpect(jsonPath("$.name").value("Canvas Tote"))
+                .andExpect(jsonPath("$.description").value("A sturdy everyday tote."))
                 .andExpect(jsonPath("$.price").value(12.50))
                 .andReturn();
 
@@ -59,15 +61,17 @@ class ProductApiTest {
         mockMvc.perform(get("/api/products/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.*", hasSize(3)))
+                .andExpect(jsonPath("$.*", hasSize(4)))
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.name").value("Canvas Tote"))
+                .andExpect(jsonPath("$.description").value("A sturdy everyday tote."))
                 .andExpect(jsonPath("$.price").value(12.50));
 
         mockMvc.perform(get("/api/products"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$[*].name", hasItems("Canvas Tote")));
+                .andExpect(jsonPath("$[*].name", hasItems("Canvas Tote")))
+                .andExpect(jsonPath("$[*].description", hasItems("A sturdy everyday tote.")));
     }
 
     @Test
@@ -85,6 +89,21 @@ class ProductApiTest {
                         .content("""
                                 {
                                   "name": "   ",
+                                  "description": "A sample product",
+                                  "price": 12.50
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void rejectsProductWithBlankDescription() throws Exception {
+        mockMvc.perform(post("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Canvas Tote",
+                                  "description": "   ",
                                   "price": 12.50
                                 }
                                 """))

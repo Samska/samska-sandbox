@@ -27,6 +27,7 @@ never renumbered.
 | Learning, local development, verification, and CI reporting improvements | SS-018 through SS-025 |
 | Shopping Cart vertical slice | SS-027 |
 | Product UX Foundation | SS-028 |
+| Product Discovery | SS-029 |
 
 ### Future Product Sequence
 

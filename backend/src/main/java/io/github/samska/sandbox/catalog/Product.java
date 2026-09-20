@@ -6,15 +6,17 @@ public final class Product {
 
     private final ProductId id;
     private String name;
+    private String description;
     private BigDecimal price;
 
-    public Product(ProductId id, String name, BigDecimal price) {
+    public Product(ProductId id, String name, String description, BigDecimal price) {
         if (id == null) {
             throw new InvalidProductException("Product ID must not be null");
         }
 
         this.id = id;
         this.name = validatedName(name);
+        this.description = validatedDescription(description);
         this.price = validatedPrice(price);
     }
 
@@ -24,6 +26,10 @@ public final class Product {
 
     public String name() {
         return name;
+    }
+
+    public String description() {
+        return description;
     }
 
     public BigDecimal price() {
@@ -59,6 +65,13 @@ public final class Product {
             throw new InvalidProductException("Product name must not be blank");
         }
         return name;
+    }
+
+    private static String validatedDescription(String description) {
+        if (description == null || description.isBlank()) {
+            throw new InvalidProductException("Product description must not be blank");
+        }
+        return description;
     }
 
     private static BigDecimal validatedPrice(BigDecimal price) {

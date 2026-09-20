@@ -56,9 +56,6 @@ export default function CartPanel({
       {cart !== null && cart.items.length === 0 ? (
         <div className="grid gap-3">
           <p>Your Cart is empty.</p>
-          <a className="w-fit font-bold text-brand-dark" href="#products">
-            Browse Products
-          </a>
         </div>
       ) : null}
       {cart !== null && cart.items.length > 0 ? (

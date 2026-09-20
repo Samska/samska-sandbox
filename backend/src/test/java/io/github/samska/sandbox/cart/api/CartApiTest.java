@@ -101,7 +101,7 @@ class CartApiTest {
     private String createProduct() throws Exception {
         var result = mockMvc.perform(post("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Canvas Tote\",\"price\":12.50}"))
+                        .content("{\"name\":\"Canvas Tote\",\"description\":\"A sturdy everyday tote.\",\"price\":12.50}"))
                 .andExpect(status().isCreated())
                 .andReturn();
 
