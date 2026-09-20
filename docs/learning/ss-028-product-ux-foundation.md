@@ -4,7 +4,7 @@
 - Work date: 2026-09-20
 - Last reviewed: 2026-09-20
 - Work item: [SS-028](https://github.com/Samska/samska-sandbox/issues/43)
-- Pull request: None at finalization; Human Verification approved
+- Pull request: [PR #44](https://github.com/Samska/samska-sandbox/pull/44); Human Verification approved
 - ADRs: [ADR 0002: Adopt Tailwind CSS v4 for Frontend Styling](../adr/0002-adopt-tailwind-css-v4-for-frontend-styling.md) (Accepted)
 - Canonical documentation: [Product](../PRODUCT.md), [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md)
 
