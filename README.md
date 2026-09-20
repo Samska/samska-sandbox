@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Target milestone:** `v0.1.0 — First Order` (unreleased)
-- **Current stage:** Shopping Cart vertical slice complete
-- **Next planned work:** Product UX Foundation
+- **Current stage:** Product UX Foundation complete
+- **Next planned work:** Checkout
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -36,12 +36,13 @@ validation, learning, and risk.
 | --- | --- | --- |
 | Product domain model | Implemented | Framework-independent Catalog rules and identity. |
 | Catalog API | Implemented | Product creation, collection browsing, and retrieval by identity. |
-| Catalog UI | Implemented | Product creation, browsing, retrieval, and Cart selection. |
+| Catalog UI | Implemented | Product creation, secondary lookup tools, product-oriented browsing, and Cart selection. |
 | Shopping Cart | Implemented | Process-local Cart contents, quantity changes, removal, and server-calculated totals. |
+| Product UX Foundation | Implemented | Commerce-oriented shell, responsive Product browsing, integrated Cart presentation, accessible feedback, and secondary Catalog tools. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
-| Product UX Foundation, Checkout, payment, orders, E2E, deployment | Planned | Not implemented in the current repository. |
+| Checkout, payment, orders, E2E, deployment | Planned | Product UX Foundation is complete; later First Order capabilities remain future work. |
 
 ## Architecture
 
@@ -99,7 +100,7 @@ protection are repository controls documented in [GitHub controls](docs/GITHUB.m
 | Area | Current technology |
 | --- | --- |
 | Backend | Java 25, Spring Boot 4.1.1, Maven Wrapper |
-| Frontend | React 19, TypeScript, Vite |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS v4 |
 | Testing | JUnit/Surefire, Spring MockMvc, Vitest, React Testing Library |
 | Local infrastructure | PostgreSQL 18 via Docker Compose, not application-integrated |
 | CI/CD | GitHub Actions, structured JUnit reporting, immutable Action pins |
