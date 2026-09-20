@@ -16,7 +16,16 @@ const cart: CartResponse = {
 
 describe("CartPanel", () => {
   it("renders an empty Cart", () => {
-    render(<CartPanel cart={{ items: [], total: 0 }} isPending={false} error={null} onUpdateQuantity={vi.fn()} onRemoveItem={vi.fn()} />);
+    render(
+      <CartPanel
+        cart={{ items: [], total: 0 }}
+        isPending={false}
+        error={null}
+        onRetry={vi.fn()}
+        onUpdateQuantity={vi.fn()}
+        onRemoveItem={vi.fn()}
+      />
+    );
 
     expect(screen.getByText("Your Cart is empty.")).toBeInTheDocument();
     expect(screen.queryByText("Total:")).not.toBeInTheDocument();
@@ -25,7 +34,16 @@ describe("CartPanel", () => {
   it("updates quantity and removes an item with accessible controls", async () => {
     const onUpdateQuantity = vi.fn().mockResolvedValue(undefined);
     const onRemoveItem = vi.fn().mockResolvedValue(undefined);
-    render(<CartPanel cart={cart} isPending={false} error={null} onUpdateQuantity={onUpdateQuantity} onRemoveItem={onRemoveItem} />);
+    render(
+      <CartPanel
+        cart={cart}
+        isPending={false}
+        error={null}
+        onRetry={vi.fn()}
+        onUpdateQuantity={onUpdateQuantity}
+        onRemoveItem={onRemoveItem}
+      />
+    );
 
     fireEvent.change(screen.getByLabelText("Quantity for Canvas Tote"), { target: { value: "4" } });
     fireEvent.click(screen.getByRole("button", { name: "Update quantity" }));
@@ -39,7 +57,16 @@ describe("CartPanel", () => {
 
   it("rejects zero quantity locally", () => {
     const onUpdateQuantity = vi.fn().mockResolvedValue(undefined);
-    render(<CartPanel cart={cart} isPending={false} error={null} onUpdateQuantity={onUpdateQuantity} onRemoveItem={vi.fn()} />);
+    render(
+      <CartPanel
+        cart={cart}
+        isPending={false}
+        error={null}
+        onRetry={vi.fn()}
+        onUpdateQuantity={onUpdateQuantity}
+        onRemoveItem={vi.fn()}
+      />
+    );
 
     fireEvent.change(screen.getByLabelText("Quantity for Canvas Tote"), { target: { value: "0" } });
     fireEvent.click(screen.getByRole("button", { name: "Update quantity" }));
@@ -49,9 +76,22 @@ describe("CartPanel", () => {
   });
 
   it("renders server failures and pending state", () => {
-    render(<CartPanel cart={cart} isPending={true} error="The Cart service failed. Try again." onUpdateQuantity={vi.fn()} onRemoveItem={vi.fn()} />);
+    const onRetry = vi.fn();
+    render(
+      <CartPanel
+        cart={cart}
+        isPending={true}
+        error="The Cart service failed. Try again."
+        onRetry={onRetry}
+        onUpdateQuantity={vi.fn()}
+        onRemoveItem={vi.fn()}
+      />
+    );
 
     expect(screen.getByRole("alert")).toHaveTextContent("The Cart service failed. Try again.");
     expect(screen.getByRole("button", { name: "Update quantity" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Reload Cart" })).toBeDisabled();
+
+    expect(onRetry).not.toHaveBeenCalled();
   });
 });

@@ -29,7 +29,7 @@ describe("Catalog", () => {
     expect(await screen.findByRole("heading", { name: "Products" })).toBeInTheDocument();
     expect(await screen.findByText(createdProduct.name)).toBeInTheDocument();
     expect(screen.getByText("Your Cart is empty.")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Add to Cart" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add Canvas Tote to Cart" })).toBeInTheDocument();
   });
 
   it("renders an empty browse state", async () => {
@@ -42,7 +42,7 @@ describe("Catalog", () => {
     }));
     render(<Catalog />);
 
-    expect(await screen.findByText("No Products are available.")).toBeInTheDocument();
+    expect(await screen.findByText("No Products are available yet.")).toBeInTheDocument();
   });
 
   it("adds a Product and renders the authoritative Cart response", async () => {
@@ -73,11 +73,12 @@ describe("Catalog", () => {
     render(<Catalog />);
 
     expect(await screen.findByText("Your Cart is empty.")).toBeInTheDocument();
-    const addButton = await screen.findByRole("button", { name: "Add to Cart" });
+    const addButton = await screen.findByRole("button", { name: "Add Canvas Tote to Cart" });
     await waitFor(() => expect(addButton).not.toBeDisabled());
     fireEvent.click(addButton);
 
-    await waitFor(() => expect(screen.getByText("Total:").parentElement).toHaveTextContent("12.5"));
+    await waitFor(() => expect(screen.getByText("Total").parentElement).toHaveTextContent("12.50"));
+    expect(screen.getByRole("status")).toHaveTextContent("Canvas Tote added to your Cart.");
     expect(screen.getByText("Unit price")).toBeInTheDocument();
     expect(screen.getByText("Subtotal")).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith("/api/cart/items", {
@@ -97,12 +98,13 @@ describe("Catalog", () => {
     vi.stubGlobal("fetch", fetchMock);
     render(<Catalog />);
 
+    fireEvent.click(screen.getByText("Catalog tools"));
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Canvas Tote" } });
     fireEvent.change(screen.getByLabelText("Price"), { target: { value: "12.50" } });
     fireEvent.click(screen.getByRole("button", { name: "Create Product" }));
 
     expect(await screen.findByText("Product created successfully.")).toBeInTheDocument();
-    expect(await screen.findByRole("button", { name: "Add to Cart" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Add Canvas Tote to Cart" })).toBeInTheDocument();
   });
 
   it("prevents invalid creation input from calling the create API", async () => {
@@ -116,6 +118,7 @@ describe("Catalog", () => {
     vi.stubGlobal("fetch", fetchMock);
     render(<Catalog />);
 
+    fireEvent.click(screen.getByText("Catalog tools"));
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "   " } });
     fireEvent.change(screen.getByLabelText("Price"), { target: { value: "-1" } });
     fireEvent.click(screen.getByRole("button", { name: "Create Product" }));
@@ -139,6 +142,7 @@ describe("Catalog", () => {
     vi.stubGlobal("fetch", fetchMock);
     render(<Catalog />);
 
+    fireEvent.click(screen.getByText("Catalog tools"));
     fireEvent.change(screen.getByLabelText("Product ID"), { target: { value: ` ${productId} ` } });
     fireEvent.click(screen.getByRole("button", { name: "Find Product" }));
 
@@ -161,6 +165,7 @@ describe("Catalog", () => {
     vi.stubGlobal("fetch", fetchMock);
     render(<Catalog />);
 
+    fireEvent.click(screen.getByText("Catalog tools"));
     expect(await screen.findByText("The Product service failed. Try again.")).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("Product ID"), { target: { value: "product-id" } });
