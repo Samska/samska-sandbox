@@ -1,11 +1,13 @@
 export interface CreateProductRequest {
   name: string;
+  description: string;
   price: number;
 }
 
 export interface ProductResponse {
   id: string;
   name: string;
+  description: string;
   price: number;
 }
 
@@ -118,12 +120,14 @@ function isProductResponse(value: unknown): value is ProductResponse {
   const keys = Object.keys(product);
 
   return (
-    keys.length === 3 &&
+    keys.length === 4 &&
     keys.includes("id") &&
     keys.includes("name") &&
+    keys.includes("description") &&
     keys.includes("price") &&
     typeof product.id === "string" &&
     typeof product.name === "string" &&
+    typeof product.description === "string" &&
     typeof product.price === "number" &&
     Number.isFinite(product.price)
   );

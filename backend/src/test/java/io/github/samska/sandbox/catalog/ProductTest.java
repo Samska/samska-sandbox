@@ -17,16 +17,17 @@ class ProductTest {
     void createsProductWithValidState() {
         var price = new BigDecimal("12.50");
 
-        var product = new Product(FIRST_ID, "  Canvas Tote  ", price);
+        var product = new Product(FIRST_ID, "  Canvas Tote  ", "  A sturdy everyday tote.  ", price);
 
         assertThat(product.id()).isEqualTo(FIRST_ID);
         assertThat(product.name()).isEqualTo("  Canvas Tote  ");
+        assertThat(product.description()).isEqualTo("  A sturdy everyday tote.  ");
         assertThat(product.price()).isSameAs(price);
     }
 
     @Test
     void acceptsZeroPrice() {
-        var product = new Product(FIRST_ID, "Sample", new BigDecimal("0"));
+        var product = new Product(FIRST_ID, "Sample", "A sample product", new BigDecimal("0"));
 
         assertThat(product.price()).isEqualByComparingTo(BigDecimal.ZERO);
     }
@@ -34,7 +35,7 @@ class ProductTest {
     @Test
     void rejectsNullProductId() {
         assertThatExceptionOfType(InvalidProductException.class)
-                .isThrownBy(() -> new Product(null, "Sample", new BigDecimal("12.50")));
+                .isThrownBy(() -> new Product(null, "Sample", "A sample product", new BigDecimal("12.50")));
     }
 
     @Test
@@ -46,36 +47,54 @@ class ProductTest {
     @Test
     void rejectsNullName() {
         assertThatExceptionOfType(InvalidProductException.class)
-                .isThrownBy(() -> new Product(FIRST_ID, null, new BigDecimal("12.50")));
+                .isThrownBy(() -> new Product(FIRST_ID, null, "A sample product", new BigDecimal("12.50")));
     }
 
     @Test
     void rejectsEmptyName() {
         assertThatExceptionOfType(InvalidProductException.class)
-                .isThrownBy(() -> new Product(FIRST_ID, "", new BigDecimal("12.50")));
+                .isThrownBy(() -> new Product(FIRST_ID, "", "A sample product", new BigDecimal("12.50")));
     }
 
     @Test
     void rejectsWhitespaceOnlyName() {
         assertThatExceptionOfType(InvalidProductException.class)
-                .isThrownBy(() -> new Product(FIRST_ID, " \t\n", new BigDecimal("12.50")));
+                .isThrownBy(() -> new Product(FIRST_ID, " \t\n", "A sample product", new BigDecimal("12.50")));
+    }
+
+    @Test
+    void rejectsNullDescription() {
+        assertThatExceptionOfType(InvalidProductException.class)
+                .isThrownBy(() -> new Product(FIRST_ID, "Sample", null, new BigDecimal("12.50")));
+    }
+
+    @Test
+    void rejectsEmptyDescription() {
+        assertThatExceptionOfType(InvalidProductException.class)
+                .isThrownBy(() -> new Product(FIRST_ID, "Sample", "", new BigDecimal("12.50")));
+    }
+
+    @Test
+    void rejectsWhitespaceOnlyDescription() {
+        assertThatExceptionOfType(InvalidProductException.class)
+                .isThrownBy(() -> new Product(FIRST_ID, "Sample", " \t\n", new BigDecimal("12.50")));
     }
 
     @Test
     void rejectsNullPrice() {
         assertThatExceptionOfType(InvalidProductException.class)
-                .isThrownBy(() -> new Product(FIRST_ID, "Sample", null));
+                .isThrownBy(() -> new Product(FIRST_ID, "Sample", "A sample product", null));
     }
 
     @Test
     void rejectsNegativePrice() {
         assertThatExceptionOfType(InvalidProductException.class)
-                .isThrownBy(() -> new Product(FIRST_ID, "Sample", new BigDecimal("-0.01")));
+                .isThrownBy(() -> new Product(FIRST_ID, "Sample", "A sample product", new BigDecimal("-0.01")));
     }
 
     @Test
     void renamesProduct() {
-        var product = new Product(FIRST_ID, "Sample", new BigDecimal("12.50"));
+        var product = new Product(FIRST_ID, "Sample", "A sample product", new BigDecimal("12.50"));
 
         product.rename("Renamed sample");
 
@@ -84,7 +103,7 @@ class ProductTest {
 
     @Test
     void rejectsInvalidRenameAndPreservesName() {
-        var product = new Product(FIRST_ID, "Sample", new BigDecimal("12.50"));
+        var product = new Product(FIRST_ID, "Sample", "A sample product", new BigDecimal("12.50"));
 
         assertThatExceptionOfType(InvalidProductException.class)
                 .isThrownBy(() -> product.rename("   "));
@@ -94,7 +113,7 @@ class ProductTest {
 
     @Test
     void changesProductPrice() {
-        var product = new Product(FIRST_ID, "Sample", new BigDecimal("12.50"));
+        var product = new Product(FIRST_ID, "Sample", "A sample product", new BigDecimal("12.50"));
         var newPrice = new BigDecimal("18.750");
 
         product.changePrice(newPrice);
@@ -105,7 +124,7 @@ class ProductTest {
     @Test
     void rejectsInvalidPriceChangeAndPreservesPrice() {
         var originalPrice = new BigDecimal("12.50");
-        var product = new Product(FIRST_ID, "Sample", originalPrice);
+        var product = new Product(FIRST_ID, "Sample", "A sample product", originalPrice);
 
         assertThatExceptionOfType(InvalidProductException.class)
                 .isThrownBy(() -> product.changePrice(new BigDecimal("-0.01")));
@@ -115,24 +134,24 @@ class ProductTest {
 
     @Test
     void productsWithSameIdAreEqualDespiteDifferentMutableState() {
-        var firstProduct = new Product(FIRST_ID, "First name", new BigDecimal("12.50"));
-        var secondProduct = new Product(FIRST_ID, "Second name", new BigDecimal("18.75"));
+        var firstProduct = new Product(FIRST_ID, "First name", "First description", new BigDecimal("12.50"));
+        var secondProduct = new Product(FIRST_ID, "Second name", "Second description", new BigDecimal("18.75"));
 
         assertThat(firstProduct).isEqualTo(secondProduct);
     }
 
     @Test
     void equalProductsHaveEqualHashCodes() {
-        var firstProduct = new Product(FIRST_ID, "First name", new BigDecimal("12.50"));
-        var secondProduct = new Product(FIRST_ID, "Second name", new BigDecimal("18.75"));
+        var firstProduct = new Product(FIRST_ID, "First name", "First description", new BigDecimal("12.50"));
+        var secondProduct = new Product(FIRST_ID, "Second name", "Second description", new BigDecimal("18.75"));
 
         assertThat(firstProduct).hasSameHashCodeAs(secondProduct);
     }
 
     @Test
     void productsWithDifferentIdsAreNotEqual() {
-        var firstProduct = new Product(FIRST_ID, "Sample", new BigDecimal("12.50"));
-        var secondProduct = new Product(SECOND_ID, "Sample", new BigDecimal("12.50"));
+        var firstProduct = new Product(FIRST_ID, "Sample", "A sample product", new BigDecimal("12.50"));
+        var secondProduct = new Product(SECOND_ID, "Sample", "A sample product", new BigDecimal("12.50"));
 
         assertThat(firstProduct).isNotEqualTo(secondProduct);
     }

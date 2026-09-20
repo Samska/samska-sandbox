@@ -47,9 +47,9 @@ Checkout, payment, orders, authentication, persistence, Product imagery, search 
 ## Reference
 
 - Issue: [SS-028](https://github.com/Samska/samska-sandbox/issues/43)
-- Pull request: None at Plan/Build Human Verification stop
+- Pull request: [PR #44](https://github.com/Samska/samska-sandbox/pull/44); Human Verification approved
 - Relevant source files: `web/src/App.tsx`, `web/src/catalog/Catalog.tsx`, `web/src/cart/Cart.tsx`, `web/src/index.css`, `web/vite.config.ts`
-- ADRs: [ADR 0002](../adr/0002-adopt-tailwind-css-v4-for-frontend-styling.md) (Proposed); follows [ADR 0001](../adr/0001-adopt-modular-monolith.md)
+- ADRs: [ADR 0002](../adr/0002-adopt-tailwind-css-v4-for-frontend-styling.md) (Accepted); follows [ADR 0001](../adr/0001-adopt-modular-monolith.md)
 - Canonical documentation: [Product](../PRODUCT.md), [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md), [AI Governance](../AI-GOVERNANCE.md)
 
 ## Why this design

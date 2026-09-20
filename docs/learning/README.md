@@ -48,6 +48,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-026-repository-workflow-governance.md](ss-026-repository-workflow-governance.md) | Workflow organization, repository metadata, release milestones, and documentation boundaries. |
 | [ss-027-shopping-cart.md](ss-027-shopping-cart.md) | Cart aggregates, Catalog contracts, quantity invariants, price snapshots, state ownership, and risk-based verification. |
 | [ss-028-product-ux-foundation.md](ss-028-product-ux-foundation.md) | Product-oriented hierarchy, responsive UX foundations, accessible interaction design, local state, and risk-based frontend verification. |
+| [ss-029-product-discovery.md](ss-029-product-discovery.md) | Domain and API contract enrichment, strict response validation, local Product selection and detail flow, and accessible in-page navigation. |
 
 Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 
