@@ -29,6 +29,55 @@ Before meaningful work, an agent must read [AGENTS.md](../AGENTS.md), documentat
 - Identify material uncertainty, conflicting requirements, missing ownership, or unaccepted risk. Stop and request a human decision rather than guessing.
 - Explain meaningful engineering decisions in terms the human can review and learn from: what changed, why it was chosen, tradeoffs, and relevant alternatives.
 
+## Issue and Project Handoff Protocol
+
+Every Issue and pull request carries a structured handoff so a future session can resume work from repository and GitHub state instead of conversation history.
+
+### Issue Handoff
+
+Every Issue must contain an `## Issue Handoff` section with these fields in this order:
+
+1. Handoff status.
+2. Objective.
+3. Approved scope.
+4. Out of scope.
+5. Acceptance criteria.
+6. Decisions and assumptions.
+7. Relevant files and documentation.
+8. Verification plan.
+9. Pending questions or blockers.
+10. Next step.
+11. Whether `PROJECT_HANDOFF.md` must be updated, with a reason.
+
+Handoff status is a controlled value: `Planned`, `Awaiting approval`, `In Build`, `Blocked`, `Paused`, or `Completed`. It records the work-item state for continuation; the Project `Status` field remains the execution state on the board.
+
+The repository [Issue Form](../.github/ISSUE_TEMPLATE/work-item.yml) is the enforced creation path and renders these fields as canonical headings; blank issues are disabled in the same directory's `config.yml`. Issues created through the GitHub API or by an AI agent bypass the form and must manually reproduce the same canonical fields in the same order.
+
+### Pull Request Handoff
+
+Every pull request body must contain a `# Pull Request Handoff` heading with these fields in order:
+
+1. Issue reference.
+2. Confirmed implementation state.
+3. Files changed.
+4. Decisions and deviations.
+5. Agent Verification.
+6. Human Verification.
+7. CI Verification.
+8. Documentation impact.
+9. Remaining risks.
+10. Next step.
+11. `PROJECT_HANDOFF` update.
+12. Local Environment Changes, as required by the reporting rules above.
+
+The repository [pull request template](../.github/pull_request_template.md) provides the structure, and the Repository validation job fails when a required heading is missing from a pull request body, including after a body edit. The check verifies heading presence only; authors remain responsible for content. The check is not yet a required status check, as documented in [GitHub controls](GITHUB.md).
+
+### PROJECT_HANDOFF.md
+
+[PROJECT_HANDOFF.md](../PROJECT_HANDOFF.md) is one concise project-level resume snapshot, not a per-Issue work log or conversation archive. It records current active work and recent durable completed work, and it is updated in the same change when project state, durable decisions, active work, or the next step changes. It does not contain the full history of every Issue, and transient local branch or working-tree details are not durable project state.
+
+A resuming session follows the procedure in [AGENTS.md](../AGENTS.md#session-resume).
+
 ## Architecture and Dependencies
 
 - Follow [Architecture Principles](architecture/principles.md) and accepted ADRs. Do not introduce an architectural pattern without demonstrated need and justification.
