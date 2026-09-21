@@ -33,9 +33,11 @@ Before meaningful work, an agent must read [AGENTS.md](../AGENTS.md), documentat
 
 Every Issue and pull request carries a structured handoff so a future session can resume work from repository and GitHub state instead of conversation history.
 
+The Issue Handoff applies to new Issues created from this protocol forward. Existing and historical Issues, including [#47](https://github.com/Samska/samska-sandbox/issues/47), are not retrofitted.
+
 ### Issue Handoff
 
-Every Issue must contain an `## Issue Handoff` section with these fields in this order:
+Every new Issue must contain an `## Issue Handoff` section with these fields in this order:
 
 1. Handoff status.
 2. Objective.

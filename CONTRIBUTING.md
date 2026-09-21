@@ -24,7 +24,7 @@ A pull request should explain the requested scope, decisions made, security cons
 
 ## Issue and Pull Request Handoff
 
-Every Issue carries an Issue Handoff and every pull request carries a Pull Request Handoff, as defined in [AI Engineering Governance](docs/AI-GOVERNANCE.md#issue-and-project-handoff-protocol). Create Issues through the repository Issue Form so the canonical fields are enforced; Issues created through the GitHub API or by an AI agent must reproduce the same fields in the same order. Pull requests use the [pull request template](.github/pull_request_template.md), and the Repository validation job fails when a required handoff heading is missing from the pull request body.
+Every new Issue carries an Issue Handoff and every pull request carries a Pull Request Handoff, as defined in [AI Engineering Governance](docs/AI-GOVERNANCE.md#issue-and-project-handoff-protocol). The Issue Handoff applies to Issues created from this protocol forward; existing and historical Issues, including [#47](https://github.com/Samska/samska-sandbox/issues/47), are not retrofitted. Create Issues through the repository Issue Form so the canonical fields are enforced; Issues created through the GitHub API or by an AI agent must reproduce the same fields in the same order. Pull requests use the [pull request template](.github/pull_request_template.md), and the Repository validation job fails when a required handoff heading is missing from the pull request body.
 
 [PROJECT_HANDOFF.md](PROJECT_HANDOFF.md) is one concise project-level snapshot, not a per-Issue work log. Update it in the same change when project state, durable decisions, active work, or the next step changes.
 

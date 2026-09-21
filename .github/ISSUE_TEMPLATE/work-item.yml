@@ -61,13 +61,17 @@ body:
     id: decisions-and-assumptions
     attributes:
       label: Decisions and assumptions
-      description: Confirmed decisions and assumptions that shape the work. Leave empty when none exist yet.
+      description: Confirmed decisions and assumptions that shape the work. Write `None` when none exist yet.
+    validations:
+      required: true
 
   - type: textarea
     id: relevant-files
     attributes:
       label: Relevant files and documentation
-      description: Modules, files, and canonical documentation a future session must read.
+      description: Modules, files, and canonical documentation a future session must read. Write `None` when nothing applies.
+    validations:
+      required: true
 
   - type: textarea
     id: verification-plan
@@ -81,7 +85,9 @@ body:
     id: pending-questions
     attributes:
       label: Pending questions or blockers
-      description: Open questions, decisions needed, or blockers. Leave empty when none.
+      description: Open questions, decisions needed, or blockers. Write `None` when none exist.
+    validations:
+      required: true
 
   - type: input
     id: next-step
