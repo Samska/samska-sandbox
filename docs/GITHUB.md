@@ -26,7 +26,8 @@ not necessarily change on the same date.
 | Push Protection | Enabled | Push Protection is enabled. | Owner-verified, API-unverified; recorded 2026-08-30 |
 | Private Vulnerability Reporting | Enabled | Private vulnerability reports can be submitted through GitHub. | API-verified 2026-08-30 |
 | Security Advisories | Enabled | Available to maintainers for private vulnerability remediation and coordinated disclosure. | Owner-verified, API-unverified; recorded 2026-08-30 |
-| GitHub Actions / CI | Configured | The `CI` workflow runs on pull requests targeting `main` with independent Repository validation, Backend, and Frontend jobs. Repository validation has `contents: read`; Backend and Frontend additionally have narrowly scoped `checks: write` for structured result Check Runs. | `.github/workflows/ci.yml`; runtime verification occurs on the PR that introduces or changes the workflow. |
+| GitHub Actions / CI | Configured | The `CI` workflow runs on pull request events (`opened`, `synchronize`, `reopened`, `edited`) targeting `main` with independent Repository validation, Backend, and Frontend jobs. Repository validation has `contents: read` and checks Markdown, local relative links, EditorConfig, the rendered Docker Compose configuration, and required pull request handoff headings; Backend and Frontend additionally have narrowly scoped `checks: write` for structured result Check Runs. | `.github/workflows/ci.yml`; runtime verification occurs on the PR that introduces or changes the workflow. |
+| Issue Forms | Configured | One generic Issue Form defines the canonical Issue Handoff ordered items, and blank issues are disabled; created issue bodies contain the submitted items in order, while the form's `markdown` introduction is display-only. | `.github/ISSUE_TEMPLATE/`; becomes effective on the default branch when merged. |
 | CodeQL | Configured | GitHub-managed CodeQL analysis is active. Current successful checks analyze GitHub Actions, Java/Kotlin, and JavaScript/TypeScript. | GitHub Advanced Security CodeQL check and dynamic `github-code-scanning/codeql` workflow observed on PR #37, 2026-09-19. |
 | GitGuardian | Configured | GitGuardian Security Checks are active as a separate secret-related PR check. | Successful GitGuardian Security Checks observed on PR #37, 2026-09-19. |
 
@@ -62,6 +63,13 @@ not necessarily change on the same date.
 - Normal branch teardown still verifies remote and local cleanup after merge.
   Disposable branches from pull requests closed without merge require explicit
   remote and local cleanup.
+- The Issue Form is the enforced issue-creation path, and the pull request
+  template carries the canonical handoff headings. The form's `markdown`
+  introduction is display-only and is not submitted, so the canonical
+  requirement is the ordered Issue Handoff items, not a literal heading in the
+  issue body. Repository validation checks pull request handoff headings only;
+  API- or agent-created Issues are not CI-validated and must reproduce the
+  canonical Issue Handoff items manually.
 - No workflow, token, secret, or control should be represented as active solely
   because it is desired.
 

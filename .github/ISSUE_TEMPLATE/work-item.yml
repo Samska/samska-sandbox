@@ -1,0 +1,117 @@
+name: Work Item
+description: Create a Samska Sandbox issue with the canonical Issue Handoff.
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Issue Handoff
+
+        Complete every field so a future session can resume this work from the
+        issue alone. Issues created through the GitHub API or by an AI agent
+        must reproduce these same fields in this order.
+
+  - type: dropdown
+    id: handoff-status
+    attributes:
+      label: Handoff status
+      description: The controlled work-item state recorded for continuation.
+      options:
+        - Planned
+        - Awaiting approval
+        - In Build
+        - Blocked
+        - Paused
+        - Completed
+    validations:
+      required: true
+
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+      description: The requested outcome and why it matters.
+    validations:
+      required: true
+
+  - type: textarea
+    id: approved-scope
+    attributes:
+      label: Approved scope
+      description: The work that is approved to be implemented.
+    validations:
+      required: true
+
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: Explicitly excluded work, so later sessions do not pull it forward.
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: Observable conditions that make the work complete.
+    validations:
+      required: true
+
+  - type: textarea
+    id: decisions-and-assumptions
+    attributes:
+      label: Decisions and assumptions
+      description: Confirmed decisions and assumptions that shape the work. Write `None` when none exist yet.
+    validations:
+      required: true
+
+  - type: textarea
+    id: relevant-files
+    attributes:
+      label: Relevant files and documentation
+      description: Modules, files, and canonical documentation a future session must read. Write `None` when nothing applies.
+    validations:
+      required: true
+
+  - type: textarea
+    id: verification-plan
+    attributes:
+      label: Verification plan
+      description: Agent, Human, and CI verification expected for this work.
+    validations:
+      required: true
+
+  - type: textarea
+    id: pending-questions
+    attributes:
+      label: Pending questions or blockers
+      description: Open questions, decisions needed, or blockers. Write `None` when none exist.
+    validations:
+      required: true
+
+  - type: input
+    id: next-step
+    attributes:
+      label: Next step
+      description: The next concrete action after the current state.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: project-handoff-update
+    attributes:
+      label: PROJECT_HANDOFF.md update
+      description: Whether this work must update the project snapshot.
+      options:
+        - Required
+        - Not required
+    validations:
+      required: true
+
+  - type: textarea
+    id: project-handoff-reason
+    attributes:
+      label: PROJECT_HANDOFF.md reason
+      description: Why the project snapshot must or must not be updated.
+    validations:
+      required: true

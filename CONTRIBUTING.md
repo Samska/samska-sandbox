@@ -22,6 +22,12 @@ Samska Sandbox is an educational engineering laboratory. Contributions should im
 
 A pull request should explain the requested scope, decisions made, security considerations, verification performed, documentation updates, and remaining risks or follow-up work. When applicable, complete and report Human Verification before commit or pull request creation as defined in [AI Engineering Governance](docs/AI-GOVERNANCE.md). AI-generated output requires the same human review and validation as manually written output.
 
+## Issue and Pull Request Handoff
+
+Every new Issue carries an Issue Handoff and every pull request carries a Pull Request Handoff, as defined in [AI Engineering Governance](docs/AI-GOVERNANCE.md#issue-and-project-handoff-protocol). The Issue Handoff applies to Issues created from this protocol forward; existing and historical Issues, including [#47](https://github.com/Samska/samska-sandbox/issues/47), are not retrofitted. Create Issues through the repository Issue Form so the canonical fields are enforced; Issues created through the GitHub API or by an AI agent must reproduce the same fields in the same order. Pull requests use the [pull request template](.github/pull_request_template.md), and the Repository validation job fails when a required handoff heading is missing from the pull request body.
+
+[PROJECT_HANDOFF.md](PROJECT_HANDOFF.md) is one concise project-level snapshot, not a per-Issue work log. Update it in the same change when project state, durable decisions, active work, or the next step changes.
+
 ## GitHub Work Metadata
 
 Issues are assigned to `Samska`, added to the [Samska Sandbox Project](https://github.com/users/Samska/projects/1), assigned a Project Status and Priority, and given exactly one `type:` label plus any relevant `area:` labels. Project fields are used for status and priority; they are not duplicated as labels.

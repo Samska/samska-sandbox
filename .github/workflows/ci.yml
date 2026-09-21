@@ -2,6 +2,11 @@ name: CI
 
 on:
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
     branches:
       - main
 
@@ -16,6 +21,36 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Validate pull request handoff headings
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          missing=0
+          while IFS= read -r heading; do
+            if ! printf '%s\n' "$PR_BODY" | grep -Fxq -- "$heading"; then
+              printf 'Missing handoff heading: %s\n' "$heading"
+              missing=1
+            fi
+          done <<'HEADINGS'
+          # Pull Request Handoff
+          ## Issue reference
+          ## Confirmed implementation state
+          ## Files changed
+          ## Decisions and deviations
+          ## Agent Verification
+          ## Human Verification
+          ## CI Verification
+          ## Documentation impact
+          ## Remaining risks
+          ## Next step
+          ## PROJECT_HANDOFF update
+          ## Local Environment Changes
+          HEADINGS
+          if [ "$missing" -ne 0 ]; then
+            printf 'The pull request body must include the canonical handoff headings from .github/pull_request_template.md.\n'
+            exit 1
+          fi
 
       - name: Validate Docker Compose configuration
         env:
