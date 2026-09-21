@@ -4,7 +4,7 @@
 - Work date: 2026-09-21
 - Last reviewed: 2026-09-21
 - Work item: [SS-030](https://github.com/Samska/samska-sandbox/issues/47)
-- Pull request: None at Build/Agent Verification stop
+- Pull request: [#48](https://github.com/Samska/samska-sandbox/pull/48)
 - ADRs: None; this is a process decision, not an architecture decision
 - Canonical documentation: [AI Governance](../AI-GOVERNANCE.md), [GitHub controls](../GITHUB.md), [Testing](../TESTING.md), [Contributing](../../CONTRIBUTING.md)
 
@@ -28,7 +28,7 @@
 
 A handoff contract lists the context another session needs to continue work without reading a conversation: objective, scope, exclusions, acceptance criteria, decisions, files, verification plan, open questions, next step, and whether the project snapshot changes. Order matters because it makes the handoff predictable to write and review.
 
-Enforcement depends on the surface. Issues have no CI event trigger, so the GitHub Issue Form and the `blank_issues_enabled: false` setting shape structure only through the web UI. The form is skipped entirely by API- and agent-created Issues, which is why the protocol requires those paths to reproduce the same canonical fields manually. GitHub submits only the form's input fields, so a form-created issue body contains the canonical items in order but not the form's display-only `markdown` introduction or a literal `## Issue Handoff` heading; the contract is the ordered item set, not a body heading. Pull request bodies, by contrast, are read by the workflow on `opened`, `synchronize`, `reopened`, and `edited` events, so heading presence can be automated.
+Enforcement depends on the surface. GitHub Actions supports the `issues` event, including `opened` and `edited`, but this repository has not configured an issues-triggered validation workflow, so the GitHub Issue Form and the `blank_issues_enabled: false` setting shape structure only through the web UI. The form is skipped entirely by API- and agent-created Issues, which is why the protocol requires those paths to reproduce the same canonical fields manually. GitHub submits only the form's input fields, so a form-created issue body contains the canonical items in order but not the form's display-only `markdown` introduction or a literal `## Issue Handoff` heading; the contract is the ordered item set, not a body heading. Pull request bodies, by contrast, are read by the workflow on `opened`, `synchronize`, `reopened`, and `edited` events, so heading presence can be automated.
 
 A controlled vocabulary turns status into a small fixed set: `Planned`, `Awaiting approval`, `In Build`, `Blocked`, `Paused`, `Completed`. Free text drifts; a fixed set stays comparable and scriptable.
 
@@ -51,7 +51,7 @@ Automated content validation, comment bots, required status checks, agent-specif
 ## Reference
 
 - Issue: [SS-030](https://github.com/Samska/samska-sandbox/issues/47)
-- Pull request: None at Build/Agent Verification stop
+- Pull request: [#48](https://github.com/Samska/samska-sandbox/pull/48)
 - Relevant source files: [.github/ISSUE_TEMPLATE/work-item.yml](../../.github/ISSUE_TEMPLATE/work-item.yml), [.github/pull_request_template.md](../../.github/pull_request_template.md), [.github/workflows/ci.yml](../../.github/workflows/ci.yml)
 - ADRs: None
 - Canonical documentation: [AI Governance](../AI-GOVERNANCE.md), [GitHub controls](../GITHUB.md), [Testing](../TESTING.md), [Contributing](../../CONTRIBUTING.md)
