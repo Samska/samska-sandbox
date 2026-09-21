@@ -28,7 +28,7 @@
 
 A handoff contract lists the context another session needs to continue work without reading a conversation: objective, scope, exclusions, acceptance criteria, decisions, files, verification plan, open questions, next step, and whether the project snapshot changes. Order matters because it makes the handoff predictable to write and review.
 
-Enforcement depends on the surface. Issues have no CI event trigger, so the GitHub Issue Form and the `blank_issues_enabled: false` setting shape structure only through the web UI. The form is skipped entirely by API- and agent-created Issues, which is why the protocol requires those paths to reproduce the same canonical fields manually. Pull request bodies, by contrast, are read by the workflow on `opened`, `synchronize`, `reopened`, and `edited` events, so heading presence can be automated.
+Enforcement depends on the surface. Issues have no CI event trigger, so the GitHub Issue Form and the `blank_issues_enabled: false` setting shape structure only through the web UI. The form is skipped entirely by API- and agent-created Issues, which is why the protocol requires those paths to reproduce the same canonical fields manually. GitHub submits only the form's input fields, so a form-created issue body contains the canonical items in order but not the form's display-only `markdown` introduction or a literal `## Issue Handoff` heading; the contract is the ordered item set, not a body heading. Pull request bodies, by contrast, are read by the workflow on `opened`, `synchronize`, `reopened`, and `edited` events, so heading presence can be automated.
 
 A controlled vocabulary turns status into a small fixed set: `Planned`, `Awaiting approval`, `In Build`, `Blocked`, `Paused`, `Completed`. Free text drifts; a fixed set stays comparable and scriptable.
 
@@ -38,7 +38,7 @@ The CI check greps for required heading lines. It cannot judge whether content i
 
 ## How Samska uses it
 
-[.github/ISSUE_TEMPLATE/work-item.yml](../../.github/ISSUE_TEMPLATE/work-item.yml) renders the canonical Issue Handoff for every Issue created through the web UI, and [config.yml](../../.github/ISSUE_TEMPLATE/config.yml) disables blank issues. [.github/pull_request_template.md](../../.github/pull_request_template.md) provides the Pull Request Handoff headings, and the Repository validation job in [.github/workflows/ci.yml](../../.github/workflows/ci.yml) fails when any required heading is missing, including after a body edit. [AI Governance](../AI-GOVERNANCE.md) is the canonical protocol, [AGENTS.md](../../AGENTS.md#session-resume) adds the session resume procedure, [CONTRIBUTING.md](../../CONTRIBUTING.md#issue-and-pull-request-handoff) states contributor expectations, [GitHub controls](../GITHUB.md) records the control while keeping required status checks deferred, and [Testing](../TESTING.md) describes the validation. The Issue Form deliberately sets no labels, assignees, or Project metadata; those remain owner decisions per CONTRIBUTING.
+[.github/ISSUE_TEMPLATE/work-item.yml](../../.github/ISSUE_TEMPLATE/work-item.yml) renders the canonical Issue Handoff for every Issue created through the web UI, and [config.yml](../../.github/ISSUE_TEMPLATE/config.yml) disables blank issues. [.github/pull_request_template.md](../../.github/pull_request_template.md) provides the Pull Request Handoff headings, and the Repository validation job in [.github/workflows/ci.yml](../../.github/workflows/ci.yml) fails when any required heading is missing, including after a body edit. [AI Governance](../AI-GOVERNANCE.md) is the canonical protocol, [AGENTS.md](../../AGENTS.md#session-resume) adds the session resume procedure, [CONTRIBUTING.md](../../CONTRIBUTING.md#issue-and-pull-request-handoff) states contributor expectations, [GitHub controls](../GITHUB.md) records the control while keeping required status checks deferred, and [Testing](../TESTING.md) describes the validation. The Issue Form deliberately sets no labels, assignees, or Project metadata; those remain owner decisions per CONTRIBUTING. Because GitHub renders these templates from the default branch, the composer smoke check cannot run before merge; it stays pending Human Verification after merge under the narrow, owner-approved exception documented in AI Governance, with a corrective PR or Issue required if it fails.
 
 ## Interview perspective
 
@@ -63,6 +63,8 @@ Alternatives considered: a handoff file per Issue (rejected: duplicates the Issu
 ## Common mistakes
 
 - Treating the heading check as proof that handoff content is complete or accurate
+- Expecting the form's `## Issue Handoff` heading to appear in the created issue body
+- Treating a pending post-merge composer check as passed Human Verification
 - Creating Issues through the API or an agent and skipping the canonical fields
 - Using the handoff status as a replacement for the Project Status field
 - Logging every Issue into `PROJECT_HANDOFF.md` instead of keeping it a snapshot

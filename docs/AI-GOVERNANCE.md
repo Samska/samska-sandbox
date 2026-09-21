@@ -37,7 +37,7 @@ The Issue Handoff applies to new Issues created from this protocol forward. Exis
 
 ### Issue Handoff
 
-Every new Issue must contain an `## Issue Handoff` section with these fields in this order:
+Every new Issue must record these canonical Issue Handoff items in this order:
 
 1. Handoff status.
 2. Objective.
@@ -53,7 +53,7 @@ Every new Issue must contain an `## Issue Handoff` section with these fields in 
 
 Handoff status is a controlled value: `Planned`, `Awaiting approval`, `In Build`, `Blocked`, `Paused`, or `Completed`. It records the work-item state for continuation; the Project `Status` field remains the execution state on the board.
 
-The repository [Issue Form](../.github/ISSUE_TEMPLATE/work-item.yml) is the enforced creation path and renders these fields as canonical headings; blank issues are disabled in the same directory's `config.yml`. Issues created through the GitHub API or by an AI agent bypass the form and must manually reproduce the same canonical fields in the same order.
+The repository [Issue Form](../.github/ISSUE_TEMPLATE/work-item.yml) is the enforced creation path; blank issues are disabled in the same directory's `config.yml`. GitHub submits only the form's input fields, so a form-created issue body contains the canonical items in their order but not the form's `markdown` introduction, including its `## Issue Handoff` heading; that heading names the ordered item set and is not required as a literal line in the issue body. Issues created through the GitHub API or by an AI agent bypass the form and must reproduce the same canonical items in the same order.
 
 ### Pull Request Handoff
 
@@ -119,6 +119,16 @@ The human reports the relevant result before the workflow continues. Human Verif
 Pre-commit/pre-PR Human Verification remains the default. A narrow exception is allowed only when the required human-observable behavior exists exclusively in remote CI or PR infrastructure and cannot meaningfully be inspected earlier. The agent must explain that boundary and the remote behavior to inspect. Normal human engineering review of the implementation remains required before commit or PR creation; it is not Human Verification.
 
 For an approved remote-only exception, create only the minimum commit and PR needed to expose the behavior, then stop for actual Human Verification before merge. Keep CI Verification and Human Verification distinct, and never use this exception merely for convenience when meaningful local Human Verification exists.
+
+##### Default-branch-only Human Verification exception
+
+GitHub renders Issue Forms and pull request templates from the default branch, so some composer behavior is observable only after merge. For that case only, the owner may approve a narrow, change-specific exception that allows the merge to proceed with the check recorded as pending Human Verification, provided all of the following hold:
+
+- Human engineering review and CI verification pass before merge.
+- The pending check, its concrete post-merge follow-up, and the corrective action are recorded in the Issue, the pull request, and `PROJECT_HANDOFF.md`.
+- If the post-merge check fails, a corrective pull request or Issue follows immediately.
+
+This exception never applies when the behavior is observable before merge, never relaxes the default pre-merge rule, and must not be used for convenience. A pending check must never be reported as passed.
 
 ## Documentation and Reporting
 
