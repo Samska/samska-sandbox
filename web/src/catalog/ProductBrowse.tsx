@@ -75,7 +75,7 @@ export default function ProductBrowse({
         </div>
       ) : null}
       {!isPending && error === null && productCount > 0 ? (
-        <ul className="grid list-none gap-4 p-0 m-0 min-[44rem]:grid-cols-[repeat(auto-fill,minmax(14rem,17.5rem))] min-[44rem]:justify-start">
+        <ul className="grid list-none gap-4 p-0 m-0 min-[32rem]:grid-cols-2 min-[47rem]:grid-cols-3 min-[62rem]:grid-cols-4">
           {products.map((product) => (
             <li
               key={product.id}
