@@ -18,12 +18,19 @@
 - Idempotent cleanup makes `EXIT`, `SIGINT`, and `SIGTERM` safe when they overlap.
 - Non-interactive Bash inherits environment variables but usually does not run interactive NVM initialization.
 - A launcher orchestrates existing runtime commands; it must not make optional infrastructure appear to be an application dependency.
+- An explicit tool location such as `JAVA_HOME` must outrank an unrelated command that appears earlier on `PATH`.
+- A version probe should adapt to older tools instead of reporting that the version is unknowable.
+- A pre-flight check of required resources turns a confusing late failure into an early, clear refusal.
+- A health response is evidence only while the process that was expected to answer is still running.
 
 ### Core — Know this for interviews
 
 - Process groups and owned-process cleanup
 - Signals, traps, and idempotent shutdown
 - Environment inheritance and NVM in non-interactive shells
+- Authoritative tool selection versus `PATH` resolution
+- Pre-flight resource validation and single-instance safety
+- Binding a health signal to the process you started
 - Orchestration convenience versus runtime architecture
 
 ## Concepts explained
@@ -34,11 +41,17 @@ Killing a Maven or npm wrapper PID alone can leave the Spring Boot JVM or Vite d
 
 A child process inherits its parent environment, but a non-interactive script does not automatically execute interactive shell configuration. NVM is commonly defined as a shell function by `.bashrc`, so the launcher first checks `PATH` and conditionally sources NVM only to run `nvm use` against the repository's `.nvmrc`.
 
+`PATH` order decides which `java` a bare command resolves, and a machine can expose an old Oracle `java8path` shim before the actual JDK. In that situation `java --version` fails because JDK 8 rejects the long option, even though a valid Java 25 JDK is installed and selected through `JAVA_HOME`. `backend/mvnw` already treats `JAVA_HOME` as authoritative, so the launcher applies the same rule: when `JAVA_HOME` points to a valid Java 25 JDK it becomes the selection, its `bin` directory moves to the front of `PATH` for every child, and a differing `PATH` command is reported instead of being fatal. Version detection tries `--version` first and falls back to `-version`, and it understands the legacy `1.x` numbering so an old JDK is rejected with an accurate message.
+
+Two launchers can still collide over the fixed development ports. Vite silently moves to the next free port, and the new backend fails to bind while the first backend keeps answering the health endpoint, so a second invocation can report success for a stack it did not start. The launcher therefore probes the required backend and frontend ports before starting any child: a bare Bash connect through `/dev/tcp` on both loopback families detects an IPv6-only listener such as Vite's, an occupied port produces an early refusal that names the owner-inspection commands, and no process is ever signalled to free a port. Health is also bound to ownership: the launcher checks that its own backend process group is still alive before and after accepting a positive health response, so another instance's backend cannot be mistaken for its own.
+
 ## How Samska uses it
 
-[`scripts/dev.sh`](../../scripts/dev.sh) resolves the repository root from `BASH_SOURCE`, validates prerequisites, and starts the documented Maven Wrapper and Vite commands as separate Bash job-control process groups. It records only those group leaders and verifies the PID/PGID relationship with `ps` before allowing group-wide cleanup.
+[`scripts/dev.sh`](../../scripts/dev.sh) resolves the repository root from `BASH_SOURCE`, validates prerequisites, and starts the documented Maven Wrapper and Vite commands as separate Bash job-control process groups. It records only those group leaders and verifies that each owned process group exists with the same signal-based group check used for cleanup before allowing group-wide cleanup, so no particular `ps` variant is required.
 
-The launcher uses `wait -n`, which is why it requires Bash 4.3 or later. It reports backend health only after the existing Actuator endpoint returns `UP`; Vite keeps its native output so its selected port remains visible.
+For Java, the launcher validates `JAVA_HOME` when it is set, treats that JDK as authoritative, and prepends its `bin` directory to `PATH` so Maven, the forked Spring Boot JVM, and any other child resolve the same `java` and `javac`. When `JAVA_HOME` is absent, it validates `java` and `javac` from `PATH` and reports a clear Java 25 requirement instead of an undetermined version.
+
+The launcher uses `wait -n`, which is why it requires Bash 4.3 or later. Before starting children it requires ports 8080 and 5173 to be free and refuses with an explanation when another instance owns them, without signalling that process. It reports backend health only after the existing Actuator endpoint returns `UP` and its own backend process group is still running; Vite keeps its native output so its selected port remains visible.
 
 [`LOCAL-DEVELOPMENT.md`](../LOCAL-DEVELOPMENT.md) retains the manual backend/frontend commands and the independent Compose PostgreSQL workflow. The launcher neither reads `.env` nor runs Docker because Catalog state remains in [`InMemoryProductStore`](../../backend/src/main/java/io/github/samska/sandbox/catalog/storage/InMemoryProductStore.java), not PostgreSQL.
 
@@ -57,6 +70,10 @@ The launcher does not add `--with-db`. PostgreSQL currently has no application-r
 - Treating a background PID as proof that all descendants will terminate with it.
 - Using `pkill java`, `pkill node`, or `killall` and terminating unrelated developer work.
 - Treating NVM's presence in an interactive terminal as proof that a script can use it.
+- Assuming the first `java` on `PATH` is the JDK a build will use when `JAVA_HOME` selects another one.
+- Failing a launcher because a legacy `PATH` shim cannot report a version while `JAVA_HOME` points to a valid JDK.
+- Letting a second launcher start while the first still owns the required ports.
+- Trusting a health endpoint response without confirming the process you started is the one answering.
 - Running `npm ci` automatically on every launch instead of reporting missing dependencies.
 - Starting PostgreSQL by default merely because Compose configuration exists.
 - Reporting Vite port `5173` as certain when Vite may select another available port.
