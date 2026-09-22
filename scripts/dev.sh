@@ -82,6 +82,18 @@ java_major() {
   return 1
 }
 
+java_home_bin_path() {
+  local java_home_dir="$JAVA_HOME"
+
+  if command -v cygpath >/dev/null 2>&1; then
+    java_home_dir="$(cygpath -u "$JAVA_HOME")"
+  fi
+
+  java_home_dir="${java_home_dir%/}"
+  java_home_dir="${java_home_dir%\\}"
+  printf '%s\n' "$java_home_dir/bin"
+}
+
 if [[ -n ${JAVA_HOME:-} ]]; then
   [[ -x "$JAVA_HOME/bin/java" && -x "$JAVA_HOME/bin/javac" ]] || fail "JAVA_HOME is set but does not contain executable java and javac commands: $JAVA_HOME"
   java_command=("$JAVA_HOME/bin/java")
@@ -100,13 +112,7 @@ if [[ -n ${JAVA_HOME:-} ]]; then
     fi
   fi
 
-  java_home_bin="$JAVA_HOME/bin"
-  if command -v cygpath >/dev/null 2>&1; then
-    java_home_bin="$(cygpath -u "$JAVA_HOME")"
-  fi
-  java_home_bin="${java_home_bin%/}"
-  java_home_bin="${java_home_bin%\\}"
-  export PATH="$java_home_bin/bin:$PATH"
+  export PATH="$(java_home_bin_path):$PATH"
 else
   command -v java >/dev/null 2>&1 || fail "Java 25 JDK is required. Install or select a compatible JDK."
   command -v javac >/dev/null 2>&1 || fail "A Java 25 JDK is required; javac is not available on PATH."
