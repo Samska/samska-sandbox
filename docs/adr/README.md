@@ -25,4 +25,6 @@ Do not create ADRs for routine implementation details, short-lived experiments, 
 
 The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](0001-adopt-modular-monolith.md).
 
-The proposed decision [ADR 0002: Adopt Tailwind CSS v4 for Frontend Styling](0002-adopt-tailwind-css-v4-for-frontend-styling.md) records the frontend styling-foundation direction and remains Proposed until Human Verification approval.
+[ADR 0002: Adopt Tailwind CSS v4 for Frontend Styling](0002-adopt-tailwind-css-v4-for-frontend-styling.md) records the accepted frontend styling foundation.
+
+The accepted decision [ADR 0003: Adopt an Optional Product Media Reference](0003-adopt-optional-product-media-reference.md) records the optional Product media direction.

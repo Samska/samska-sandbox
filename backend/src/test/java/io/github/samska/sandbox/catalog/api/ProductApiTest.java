@@ -46,11 +46,12 @@ class ProductApiTest {
                                 """))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.*", hasSize(4)))
+                .andExpect(jsonPath("$.*", hasSize(5)))
                 .andExpect(jsonPath("$.id").isString())
                 .andExpect(jsonPath("$.name").value("Canvas Tote"))
                 .andExpect(jsonPath("$.description").value("A sturdy everyday tote."))
                 .andExpect(jsonPath("$.price").value(12.50))
+                .andExpect(jsonPath("$.mediaKey").isEmpty())
                 .andReturn();
 
         String id = JsonPath.read(creationResult.getResponse().getContentAsString(), "$.id");
@@ -61,17 +62,66 @@ class ProductApiTest {
         mockMvc.perform(get("/api/products/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.*", hasSize(4)))
+                .andExpect(jsonPath("$.*", hasSize(5)))
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.name").value("Canvas Tote"))
                 .andExpect(jsonPath("$.description").value("A sturdy everyday tote."))
-                .andExpect(jsonPath("$.price").value(12.50));
+                .andExpect(jsonPath("$.price").value(12.50))
+                .andExpect(jsonPath("$.mediaKey").isEmpty());
 
         mockMvc.perform(get("/api/products"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$[*].name", hasItems("Canvas Tote")))
                 .andExpect(jsonPath("$[*].description", hasItems("A sturdy everyday tote.")));
+    }
+
+    @Test
+    void createsProductWithMediaKey() throws Exception {
+        mockMvc.perform(post("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Canvas Tote",
+                                  "description": "A sturdy everyday tote.",
+                                  "price": 12.50,
+                                  "mediaKey": "canvas-market-tote"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.*", hasSize(5)))
+                .andExpect(jsonPath("$.mediaKey").value("canvas-market-tote"));
+    }
+
+    @Test
+    void acceptsWellFormedMediaKeyWithoutLocalAsset() throws Exception {
+        mockMvc.perform(post("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Canvas Tote",
+                                  "description": "A sturdy everyday tote.",
+                                  "price": 12.50,
+                                  "mediaKey": "well-formed-but-unmapped"
+                                }
+                                """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.mediaKey").value("well-formed-but-unmapped"));
+    }
+
+    @Test
+    void rejectsMalformedMediaKey() throws Exception {
+        mockMvc.perform(post("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Canvas Tote",
+                                  "description": "A sturdy everyday tote.",
+                                  "price": 12.50,
+                                  "mediaKey": "Canvas_Tote"
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

@@ -6,7 +6,8 @@ const createdProduct = {
   id: "f84c1a1d-6d7a-4c07-b40f-3c5ca66ab612",
   name: "Canvas Tote",
   description: "A sturdy everyday tote for groceries and market runs.",
-  price: 12.5
+  price: 12.5,
+  mediaKey: null
 };
 
 const emptyCart = { items: [], total: 0 };
@@ -15,8 +16,12 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
+function cartTrigger() {
+  return screen.getByRole("button", { expanded: false });
+}
+
 describe("Catalog", () => {
-  it("browses Products and renders the empty Cart", async () => {
+  it("browses Products and opens the empty Cart drawer", async () => {
     const fetchMock = vi.fn((input: RequestInfo | URL) => {
       if (String(input) === "/api/products") {
         return Promise.resolve(response(200, [createdProduct]));
@@ -30,12 +35,44 @@ describe("Catalog", () => {
     expect(await screen.findByRole("heading", { name: "Products" })).toBeInTheDocument();
     expect(await screen.findByText(createdProduct.name)).toBeInTheDocument();
     expect(screen.getByText(createdProduct.description)).toBeInTheDocument();
-    expect(screen.getByText("Your Cart is empty.")).toBeInTheDocument();
+    expect(screen.getByText("1 product")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Add Canvas Tote to Cart" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "View details for Canvas Tote" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Back to Products" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cart, 0 items, total 0.00" })).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Your Cart" })).not.toBeInTheDocument();
+
+    fireEvent.click(cartTrigger());
+
+    const dialog = await screen.findByRole("dialog", { name: "Your Cart" });
+    expect(dialog).toHaveAttribute("aria-modal", "true");
+    expect(screen.getByRole("heading", { name: "Your Cart" })).toHaveFocus();
+    expect(within(dialog).getByText("Your Cart is empty.")).toBeInTheDocument();
+    expect(within(dialog).getByText("0 items")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Browse Products" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Browse Products" })).not.toBeInTheDocument();
+  });
+
+  it("closes the Cart drawer with Escape and returns focus to the trigger", async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      if (String(input) === "/api/products") {
+        return Promise.resolve(response(200, [createdProduct]));
+      }
+
+      return Promise.resolve(response(200, emptyCart));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<Catalog />);
+
+    const trigger = await screen.findByRole("button", { expanded: false });
+    fireEvent.click(trigger);
+    await screen.findByRole("dialog", { name: "Your Cart" });
+
+    fireEvent.keyDown(screen.getByRole("dialog"), { key: "Escape" });
+
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog", { name: "Your Cart" })).not.toBeInTheDocument();
+      expect(trigger).toHaveFocus();
+    });
   });
 
   it("renders an empty browse state", async () => {
@@ -68,7 +105,7 @@ describe("Catalog", () => {
     expect(screen.getByText(createdProduct.description)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Add Canvas Tote to Cart" })).toBeInTheDocument();
     expect(screen.getByText("12.50")).toBeInTheDocument();
-    expect(screen.getByText("Your Cart is empty.")).toBeInTheDocument();
+    expect(cartTrigger()).toBeInTheDocument();
 
     const backActions = screen.getAllByRole("button", { name: "Back to Products" });
     expect(backActions).toHaveLength(1);
@@ -76,10 +113,35 @@ describe("Catalog", () => {
 
     expect(await screen.findByRole("heading", { name: "Products" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "View details for Canvas Tote" })).toBeInTheDocument();
-    expect(screen.getByText("Your Cart is empty.")).toBeInTheDocument();
   });
 
-  it("renders no empty Cart navigation action while Product details are open", async () => {
+  it("returns focus to the originating View details control after returning to browsing", async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+      if (String(input) === "/api/products") {
+        return Promise.resolve(response(200, [createdProduct]));
+      }
+
+      return Promise.resolve(response(200, emptyCart));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<Catalog />);
+
+    const viewDetails = await screen.findByRole("button", { name: "View details for Canvas Tote" });
+    viewDetails.focus();
+    fireEvent.click(viewDetails);
+
+    const detailHeading = await screen.findByRole("heading", { name: "Canvas Tote", level: 1 });
+    await waitFor(() => expect(detailHeading).toHaveFocus());
+
+    fireEvent.click(screen.getByRole("button", { name: "Back to Products" }));
+
+    const restoredViewDetails = await screen.findByRole("button", {
+      name: "View details for Canvas Tote"
+    });
+    await waitFor(() => expect(restoredViewDetails).toHaveFocus());
+  });
+
+  it("keeps the Cart closed and free of browse navigation while Product details are open", async () => {
     const fetchMock = vi.fn((input: RequestInfo | URL) => {
       if (String(input) === "/api/products") {
         return Promise.resolve(response(200, [createdProduct]));
@@ -92,18 +154,20 @@ describe("Catalog", () => {
 
     fireEvent.click(await screen.findByRole("button", { name: "View details for Canvas Tote" }));
     expect(screen.getByRole("heading", { name: "Canvas Tote", level: 1 })).toBeInTheDocument();
-
-    const cartRegion = screen.getByRole("heading", { name: "Your Cart" }).closest("section") as HTMLElement;
-    expect(within(cartRegion).getByText("Your Cart is empty.")).toBeInTheDocument();
-    expect(within(cartRegion).queryByRole("button", { name: "Back to Products" })).not.toBeInTheDocument();
-    expect(within(cartRegion).queryByRole("button", { name: "Browse Products" })).not.toBeInTheDocument();
-    expect(within(cartRegion).queryByRole("link", { name: "Browse Products" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Your Cart" })).not.toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: "Back to Products" })).toHaveLength(1);
 
-    fireEvent.click(screen.getByRole("button", { name: "Back to Products" }));
+    fireEvent.click(cartTrigger());
 
-    expect(await screen.findByRole("heading", { name: "Products" })).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Canvas Tote", level: 1 })).not.toBeInTheDocument();
+    const dialog = await screen.findByRole("dialog", { name: "Your Cart" });
+    expect(within(dialog).getByText("Your Cart is empty.")).toBeInTheDocument();
+    expect(within(dialog).queryByRole("button", { name: "Back to Products" })).not.toBeInTheDocument();
+    expect(within(dialog).queryByRole("link", { name: "Browse Products" })).not.toBeInTheDocument();
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Close Cart" }));
+
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "Your Cart" })).not.toBeInTheDocument());
+    expect(screen.getByRole("heading", { name: "Canvas Tote", level: 1 })).toBeInTheDocument();
   });
 
   it("adds a Product from the detail presentation and preserves Cart state", async () => {
@@ -134,20 +198,25 @@ describe("Catalog", () => {
     render(<Catalog />);
 
     fireEvent.click(await screen.findByRole("button", { name: "View details for Canvas Tote" }));
-    const addButton = screen.getByRole("button", { name: "Add Canvas Tote to Cart" });
-    fireEvent.click(addButton);
+    fireEvent.click(screen.getByRole("button", { name: "Add Canvas Tote to Cart" }));
 
-    await waitFor(() => expect(screen.getByText("Total").parentElement).toHaveTextContent("12.50"));
-    expect(screen.getByRole("status")).toHaveTextContent("Canvas Tote added to your Cart.");
+    expect(await screen.findByRole("status")).toHaveTextContent("Canvas Tote added to your Cart.");
     expect(fetchMock).toHaveBeenCalledWith("/api/cart/items", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ productId: createdProduct.id, quantity: 1 })
     });
 
+    fireEvent.click(cartTrigger());
+    const dialog = await screen.findByRole("dialog", { name: "Your Cart" });
+    expect(within(dialog).getByText("Total").parentElement).toHaveTextContent("12.50");
+    expect(within(dialog).getByText("1 item")).toBeInTheDocument();
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Close Cart" }));
     fireEvent.click(screen.getByRole("button", { name: "Back to Products" }));
+
     expect(await screen.findByRole("heading", { name: "Products" })).toBeInTheDocument();
-    expect(screen.queryByText("Your Cart is empty.")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cart, 1 item, total 12.50" })).toBeInTheDocument();
   });
 
   it("adds a Product and renders the authoritative Cart response", async () => {
@@ -177,20 +246,22 @@ describe("Catalog", () => {
     vi.stubGlobal("fetch", fetchMock);
     render(<Catalog />);
 
-    expect(await screen.findByText("Your Cart is empty.")).toBeInTheDocument();
     const addButton = await screen.findByRole("button", { name: "Add Canvas Tote to Cart" });
     await waitFor(() => expect(addButton).not.toBeDisabled());
     fireEvent.click(addButton);
 
-    await waitFor(() => expect(screen.getByText("Total").parentElement).toHaveTextContent("12.50"));
-    expect(screen.getByRole("status")).toHaveTextContent("Canvas Tote added to your Cart.");
-    expect(screen.getByText("Unit price")).toBeInTheDocument();
-    expect(screen.getByText("Subtotal")).toBeInTheDocument();
+    expect(await screen.findByRole("status")).toHaveTextContent("Canvas Tote added to your Cart.");
     expect(fetchMock).toHaveBeenCalledWith("/api/cart/items", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ productId: createdProduct.id, quantity: 1 })
     });
+
+    fireEvent.click(cartTrigger());
+    const dialog = await screen.findByRole("dialog", { name: "Your Cart" });
+    expect(within(dialog).getByText("Total").parentElement).toHaveTextContent("12.50");
+    expect(within(dialog).getByText("12.50 each")).toBeInTheDocument();
+    expect(within(dialog).getByText("Subtotal")).toBeInTheDocument();
   });
 
   it("creates a Product with a description and refreshes the browse list", async () => {
@@ -217,7 +288,38 @@ describe("Catalog", () => {
       body: JSON.stringify({
         name: "Canvas Tote",
         description: createdProduct.description,
-        price: 12.5
+        price: 12.5,
+        mediaKey: null
+      })
+    });
+  });
+
+  it("assigns a curated media key when creating a Product", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockImplementationOnce(() => Promise.resolve(response(200, [])))
+      .mockImplementationOnce(() => Promise.resolve(response(200, emptyCart)))
+      .mockImplementationOnce(() => Promise.resolve(response(201, { ...createdProduct, mediaKey: "canvas-market-tote" })))
+      .mockImplementationOnce(() => Promise.resolve(response(200, [{ ...createdProduct, mediaKey: "canvas-market-tote" }])));
+    vi.stubGlobal("fetch", fetchMock);
+    render(<Catalog />);
+
+    fireEvent.click(screen.getByText("Product setup tools"));
+    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Canvas Tote" } });
+    fireEvent.change(screen.getByLabelText("Description"), { target: { value: createdProduct.description } });
+    fireEvent.change(screen.getByLabelText("Price"), { target: { value: "12.50" } });
+    fireEvent.change(screen.getByLabelText("Media"), { target: { value: "canvas-market-tote" } });
+    fireEvent.click(screen.getByRole("button", { name: "Create Product" }));
+
+    expect(await screen.findByText("Product created successfully.")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith("/api/products", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "Canvas Tote",
+        description: createdProduct.description,
+        price: 12.5,
+        mediaKey: "canvas-market-tote"
       })
     });
   });

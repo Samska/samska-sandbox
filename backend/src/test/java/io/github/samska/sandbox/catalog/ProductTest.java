@@ -23,6 +23,46 @@ class ProductTest {
         assertThat(product.name()).isEqualTo("  Canvas Tote  ");
         assertThat(product.description()).isEqualTo("  A sturdy everyday tote.  ");
         assertThat(product.price()).isSameAs(price);
+        assertThat(product.mediaKey()).isNull();
+    }
+
+    @Test
+    void acceptsLowercaseMediaKeySlug() {
+        var product = new Product(FIRST_ID, "Sample", "A sample product", new BigDecimal("12.50"), "canvas-market-tote");
+
+        assertThat(product.mediaKey()).isEqualTo("canvas-market-tote");
+    }
+
+    @Test
+    void acceptsMaximumLengthMediaKey() {
+        var mediaKey = "a".repeat(40);
+
+        var product = new Product(FIRST_ID, "Sample", "A sample product", new BigDecimal("12.50"), mediaKey);
+
+        assertThat(product.mediaKey()).hasSize(40);
+    }
+
+    @Test
+    void rejectsBlankMediaKey() {
+        assertThatExceptionOfType(InvalidProductException.class)
+                .isThrownBy(() -> new Product(FIRST_ID, "Sample", "A sample product", new BigDecimal("12.50"), "   "));
+    }
+
+    @Test
+    void rejectsMediaKeyLongerThanFortyCharacters() {
+        var mediaKey = "a".repeat(41);
+
+        assertThatExceptionOfType(InvalidProductException.class)
+                .isThrownBy(() -> new Product(FIRST_ID, "Sample", "A sample product", new BigDecimal("12.50"), mediaKey));
+    }
+
+    @Test
+    void rejectsMalformedMediaKey() {
+        for (String mediaKey : new String[] { "Canvas-Tote", "canvas_tote", "canvas tote", "-canvas-tote", "canvas-tote-", "canvas--tote", "café" }) {
+            assertThatExceptionOfType(InvalidProductException.class)
+                    .as("media key %s", mediaKey)
+                    .isThrownBy(() -> new Product(FIRST_ID, "Sample", "A sample product", new BigDecimal("12.50"), mediaKey));
+        }
     }
 
     @Test
