@@ -2,6 +2,9 @@ import { useEffect, useRef, type KeyboardEvent } from "react";
 import CartPanel from "./Cart";
 import type { CartResponse } from "./cartApi";
 
+const focusableSelector =
+  'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])';
+
 export default function CartDrawer({
   isOpen,
   onClose,
@@ -38,6 +41,33 @@ export default function CartDrawer({
     };
   }, [isOpen]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const dialog = dialogRef.current;
+
+    if (dialog === null) {
+      return;
+    }
+
+    const activeElement = document.activeElement;
+    const activeElementIsDisabled =
+      activeElement instanceof HTMLButtonElement ||
+      activeElement instanceof HTMLInputElement ||
+      activeElement instanceof HTMLSelectElement ||
+      activeElement instanceof HTMLTextAreaElement
+        ? activeElement.disabled
+        : false;
+
+    if (dialog.contains(activeElement) && !activeElementIsDisabled) {
+      return;
+    }
+
+    dialog.querySelector<HTMLElement>(focusableSelector)?.focus();
+  }, [isOpen, isPending]);
+
   if (!isOpen) {
     return null;
   }
@@ -53,9 +83,7 @@ export default function CartDrawer({
     }
 
     const focusable = Array.from(
-      dialogRef.current.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
-      )
+      dialogRef.current.querySelectorAll<HTMLElement>(focusableSelector)
     );
 
     if (focusable.length === 0) {
@@ -64,14 +92,15 @@ export default function CartDrawer({
 
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
+    const activeElement = document.activeElement;
 
-    if (event.shiftKey && document.activeElement === first) {
+    if (event.shiftKey && (activeElement === first || !focusable.includes(activeElement as HTMLElement))) {
       event.preventDefault();
       last.focus();
       return;
     }
 
-    if (!event.shiftKey && document.activeElement === last) {
+    if (!event.shiftKey && activeElement === last) {
       event.preventDefault();
       first.focus();
     }

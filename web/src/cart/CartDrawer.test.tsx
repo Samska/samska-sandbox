@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import CartDrawer from "./CartDrawer";
 import type { CartResponse } from "./cartApi";
@@ -91,6 +92,51 @@ describe("CartDrawer", () => {
 
     fireEvent.keyDown(dialog, { key: "Tab", shiftKey: true });
     expect(last).toHaveFocus();
+  });
+
+  it("wraps Shift+Tab from the initially focused heading to the last enabled control", () => {
+    renderDrawer();
+
+    const dialog = screen.getByRole("dialog", { name: "Your Cart" });
+    expect(screen.getByRole("heading", { name: "Your Cart" })).toHaveFocus();
+
+    fireEvent.keyDown(dialog, { key: "Tab", shiftKey: true });
+
+    const enabledButtons = screen.getAllByRole("button").filter((button) => !button.hasAttribute("disabled"));
+    expect(enabledButtons[enabledButtons.length - 1]).toHaveFocus();
+    expect(dialog.contains(document.activeElement)).toBe(true);
+  });
+
+  it("keeps focus inside the dialog when the focused control becomes disabled while pending", () => {
+    function PendingDrawer() {
+      const [isPending, setIsPending] = useState(false);
+
+      return (
+        <CartDrawer
+          isOpen={true}
+          onClose={vi.fn()}
+          cart={cart}
+          isPending={isPending}
+          error={null}
+          onRetry={vi.fn()}
+          onUpdateQuantity={async () => {
+            setIsPending(true);
+          }}
+          onRemoveItem={async () => {}}
+        />
+      );
+    }
+
+    render(<PendingDrawer />);
+
+    const increase = screen.getByRole("button", { name: "Increase quantity for Canvas Tote" });
+    increase.focus();
+    fireEvent.click(increase);
+
+    const dialog = screen.getByRole("dialog", { name: "Your Cart" });
+    expect(increase).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Close Cart" })).toHaveFocus();
+    expect(dialog.contains(document.activeElement)).toBe(true);
   });
 
   it("renders Cart pending and error states inside the dialog", () => {
