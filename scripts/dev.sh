@@ -5,7 +5,9 @@ set -uo pipefail
 
 readonly MIN_BASH_MAJOR=4
 readonly MIN_BASH_MINOR=3
-readonly HEALTH_URL="http://localhost:8080/actuator/health"
+readonly BACKEND_PORT=8080
+readonly FRONTEND_PORT=5173
+readonly HEALTH_URL="http://localhost:${BACKEND_PORT}/actuator/health"
 readonly HEALTH_TIMEOUT_SECONDS=90
 readonly SHUTDOWN_GRACE_TENTHS=50
 
@@ -64,7 +66,13 @@ javac_command=()
 
 java_major() {
   local output
-  output="$("$@" --version 2>&1)" || return 1
+  # JDK 8 and earlier reject --version and still use the legacy 1.x numbering.
+  output="$("$@" --version 2>&1)" || output="$("$@" -version 2>&1)" || return 1
+
+  if [[ $output =~ (version\ \"|javac )1\.([0-9]+) ]]; then
+    printf '%s\n' "${BASH_REMATCH[2]}"
+    return 0
+  fi
 
   if [[ $output =~ ([0-9]+)(\.[0-9]+){0,2} ]]; then
     printf '%s\n' "${BASH_REMATCH[1]}"
@@ -79,11 +87,26 @@ if [[ -n ${JAVA_HOME:-} ]]; then
   java_command=("$JAVA_HOME/bin/java")
   javac_command=("$JAVA_HOME/bin/javac")
 
+  java_home_major="$(java_major "${java_command[@]}")" || fail "Unable to determine the Java version selected by JAVA_HOME: $JAVA_HOME"
+  [[ $java_home_major == 25 ]] || fail "JAVA_HOME selects Java $java_home_major, but Java 25 is required. Point JAVA_HOME at a compatible Java 25 JDK."
+
+  # JAVA_HOME is authoritative. An unrelated java earlier on PATH (for example a
+  # legacy Oracle java8path shim) must not fail the launcher, so report the order
+  # and put the selected JDK first for every child process.
   if command -v java >/dev/null 2>&1; then
-    path_java_major="$(java_major java)" || fail "Unable to determine the Java version from PATH."
-    java_home_major="$(java_major "${java_command[@]}")" || fail "Unable to determine the Java version selected by JAVA_HOME."
-    [[ $path_java_major == "$java_home_major" ]] || fail "JAVA_HOME selects Java $java_home_major while PATH selects Java $path_java_major. Set JAVA_HOME to the active Java 25 JDK or unset JAVA_HOME."
+    path_java_major="$(java_major java)" || path_java_major=""
+    if [[ -n $path_java_major && $path_java_major != "$java_home_major" ]]; then
+      printf 'Note: PATH resolves Java %s first; the launcher and its child processes use JAVA_HOME Java %s.\n' "$path_java_major" "$java_home_major" >&2
+    fi
   fi
+
+  java_home_bin="$JAVA_HOME/bin"
+  if command -v cygpath >/dev/null 2>&1; then
+    java_home_bin="$(cygpath -u "$JAVA_HOME")"
+  fi
+  java_home_bin="${java_home_bin%/}"
+  java_home_bin="${java_home_bin%\\}"
+  export PATH="$java_home_bin/bin:$PATH"
 else
   command -v java >/dev/null 2>&1 || fail "Java 25 JDK is required. Install or select a compatible JDK."
   command -v javac >/dev/null 2>&1 || fail "A Java 25 JDK is required; javac is not available on PATH."
@@ -129,12 +152,30 @@ if ! node_is_compatible || ! npm_is_compatible; then
   fi
 fi
 
-command -v ps >/dev/null 2>&1 || fail "ps is required to verify launcher process ownership."
+# Bash's /dev/tcp probes both loopback families, so an IPv6-only listener such as
+# Vite's default is detected as well. This check never signals the owning process.
+port_in_use() {
+  local port="$1" host
+
+  for host in 127.0.0.1 ::1; do
+    (exec 3<>"/dev/tcp/$host/$port") 2>/dev/null && return 0
+  done
+
+  return 1
+}
+
+require_free_port() {
+  local name="$1" port="$2"
+
+  port_in_use "$port" || return 0
+  fail "The required ${name} port ${port} is already in use, so the launcher will not start. Another Samska development instance or another service owns it; stop that process or free the port, then retry. The launcher never stops other processes. Inspect the owner with 'netstat -ano | grep :${port}' on Windows or 'lsof -i :${port}' on macOS/Linux."
+}
+
+require_free_port backend "$BACKEND_PORT"
+require_free_port frontend "$FRONTEND_PORT"
 
 group_is_owned() {
-  local pid="$1" pgid
-  pgid="$(ps -o pgid= -p "$pid" 2>/dev/null | tr -d '[:space:]')"
-  [[ $pgid == "$pid" ]]
+  kill -0 -- "-$1" 2>/dev/null
 }
 
 verify_group_or_fail() {
@@ -216,14 +257,18 @@ verify_group_or_fail "$frontend_pid" frontend
 if command -v curl >/dev/null 2>&1; then
   health_deadline=$((SECONDS + HEALTH_TIMEOUT_SECONDS))
   while ((SECONDS < health_deadline)); do
-    if health_response="$(curl --fail --silent --show-error --connect-timeout 2 "$HEALTH_URL" 2>/dev/null)" && [[ $health_response == *'"status":"UP"'* ]]; then
-      printf 'Backend health check passed.\n'
-      break
-    fi
-
     if ! group_is_running "$backend_pid" || ! group_is_running "$frontend_pid"; then
       printf 'Error: A development process exited before backend health became available.\n' >&2
       exit 1
+    fi
+
+    if health_response="$(curl --fail --silent --show-error --connect-timeout 2 "$HEALTH_URL" 2>/dev/null)" && [[ $health_response == *'"status":"UP"'* ]]; then
+      if group_is_running "$backend_pid"; then
+        printf 'Backend health check passed.\n'
+        break
+      fi
+
+      fail "The backend health endpoint responded, but this launcher's backend is no longer running. Another process may own port ${BACKEND_PORT}; refusing to report health for a backend this launcher did not start."
     fi
 
     sleep 1

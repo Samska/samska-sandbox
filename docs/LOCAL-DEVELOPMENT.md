@@ -21,11 +21,11 @@ Install the following tools before using the matching part of the repository:
 | Docker Engine or Docker Desktop with Compose plugin | Required only for the optional PostgreSQL runtime. No repository minimum is specified. | PostgreSQL infrastructure. |
 | Browser | Required for manual Catalog UI interaction. | Frontend verification. |
 
-`JAVA_HOME` is not mandatory when `java` and `javac` already resolve to a compatible Java 25 JDK. If a tool cannot locate Java, set `JAVA_HOME` to that JDK and restart the shell. The Maven Wrapper does not replace the JDK.
+`JAVA_HOME` is not mandatory when `java` and `javac` already resolve to a compatible Java 25 JDK. When `JAVA_HOME` is set, `scripts/dev.sh` treats that JDK as the authoritative selection: it validates it and prepends its `bin` directory to `PATH` for the backend and frontend child processes. A different `java` earlier on `PATH`, such as a legacy Oracle `java8path` shim, is reported but does not block the launcher while `JAVA_HOME` selects Java 25. Without `JAVA_HOME`, the launcher validates `java` and `javac` from `PATH`. The Maven Wrapper does not replace the JDK.
 
 The committed `package-lock.json` records the frontend dependency graph. Use `npm ci --ignore-scripts` rather than treating an existing `node_modules/` directory as reproducible setup.
 
-`scripts/dev.sh` validates its Bash, Java, Node, npm, Maven Wrapper, and installed frontend dependencies before starting anything. It does not install tools or run `npm ci`. It uses the Node range declared in `web/package.json` and the intended npm version declared in that file.
+`scripts/dev.sh` validates its Bash, Java, Node, npm, Maven Wrapper, installed frontend dependencies, and that the required backend (8080) and frontend (5173) ports are free before starting anything. When a required port is already in use, it exits with an explanation of how to inspect the owner and never stops that process; stop the existing instance yourself and retry. It does not install tools or run `npm ci`. It uses the Node range declared in `web/package.json` and the intended npm version declared in that file.
 
 ## Core Application Setup
 
@@ -206,12 +206,13 @@ docker compose down -v
 | Symptom | Check and action |
 | --- | --- |
 | Java 25 unavailable or incompatible | Run `java --version` and `javac --version`; select a compatible Java 25 JDK. |
-| Java tool mismatch | Inspect `JAVA_HOME`; unset it or point it to the same compatible JDK that `java` resolves. |
+| Java tool mismatch | Inspect `JAVA_HOME`. When set, the launcher uses it and prepends it for child processes; point it at a compatible Java 25 JDK or unset it to select Java from `PATH`. A different `java` earlier on `PATH`, such as a legacy Oracle `java8path` shim, is reported but does not block the launcher while `JAVA_HOME` selects Java 25. |
 | Maven Wrapper cannot run or download | Run `./mvnw --version` from `backend/`; verify Unix execute permission and network access to Maven Central. |
 | Node or npm missing/wrong | Run `node --version` and `npm --version`; select Node 24.20.0 and its intended npm 11.19.0. |
 | Launcher rejects Bash | Use Bash 4.3 or later on a Unix-like system. Windows launcher support is out of scope. |
 | Launcher cannot select Node | Ensure compatible Node/npm are on `PATH`, or make NVM available through `NVM_DIR` or its conventional `$HOME/.nvm` location and install the repository version manually before retrying. |
 | Launcher says frontend dependencies are missing | Run `cd web && npm ci --ignore-scripts`; the launcher intentionally does not install them. |
+| Launcher reports a required port is already in use | Another Samska development instance or another service owns port 8080 or 5173. Stop that process (for example, Ctrl+C in its terminal) or free the port, then retry; the launcher never stops other processes. |
 | Launcher health check times out | Review the visible Maven logs, confirm no process owns port 8080, and open the health URL manually. |
 | Launcher exits after one process stops | Review the visible Maven/Vite logs. The launcher deliberately stops its other owned process so a partial local stack is not left running. |
 | Docker daemon unavailable | Run `docker info`; start Docker Engine/Desktop or resolve local socket permissions. |
