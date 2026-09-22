@@ -50,6 +50,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-028-product-ux-foundation.md](ss-028-product-ux-foundation.md) | Product-oriented hierarchy, responsive UX foundations, accessible interaction design, local state, and risk-based frontend verification. |
 | [ss-029-product-discovery.md](ss-029-product-discovery.md) | Domain and API contract enrichment, strict response validation, local Product selection and detail flow, and accessible in-page navigation. |
 | [ss-030-issue-project-handoff.md](ss-030-issue-project-handoff.md) | Structured Issue and pull request handoff, template enforcement boundaries, and snapshot scope. |
+| [ss-031-product-storefront.md](ss-031-product-storefront.md) | Storefront information hierarchy, container/component boundaries, repetition-driven primitives, feedback tones, optional media reference with fallback, accessible Cart drawer, and focus management. |
 
 Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 

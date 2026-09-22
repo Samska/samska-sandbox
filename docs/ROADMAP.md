@@ -31,11 +31,12 @@ never renumbered.
 
 ### Future Product Sequence
 
-1. Checkout
-2. Payment simulator
-3. Order creation
-4. First Order end-to-end journey
-5. Release `v0.1.0`
+1. Product Storefront UX/UI refinement (SS-031, in progress)
+2. Checkout
+3. Payment simulator
+4. Order creation
+5. First Order end-to-end journey
+6. Release `v0.1.0`
 
 Future capabilities receive their SS identifier when their Issues are created.
 

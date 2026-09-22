@@ -10,7 +10,7 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Target milestone:** `v0.1.0 — First Order` (unreleased)
-- **Current stage:** Product Discovery complete
+- **Current stage:** Product Storefront UX/UI in progress
 - **Next planned work:** Checkout
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
@@ -37,13 +37,14 @@ validation, learning, and risk.
 | Product domain model | Implemented | Framework-independent Catalog rules and identity. |
 | Catalog API | Implemented | Product creation, collection browsing, and retrieval by identity. |
 | Catalog UI | Implemented | Product creation, secondary lookup tools, product-oriented browsing, and Cart selection. |
-| Product Discovery | Implemented | Product descriptions with a selectable detail view, deterministic media, Add to Cart, and a return to browsing. |
+| Product Discovery | Implemented | Product descriptions with a selectable detail view, local product media with a monogram fallback, Add to Cart, and a return to browsing. |
 | Shopping Cart | Implemented | Process-local Cart contents, quantity changes, removal, and server-calculated totals. |
 | Product UX Foundation | Implemented | Commerce-oriented shell, responsive Product browsing, integrated Cart presentation, accessible feedback, and secondary Catalog tools. |
+| Product Storefront UX/UI | In progress | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged; Human Verification passed, CI verification pending. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
-| Checkout, payment, orders, E2E, deployment | Planned | Product Discovery is complete; later First Order capabilities remain future work. |
+| Checkout, payment, orders, E2E, deployment | Planned | Product Storefront UX/UI precedes Checkout and is in progress; Checkout and later First Order capabilities remain future work. |
 
 ## Architecture
 
@@ -114,8 +115,9 @@ components.
 
 ## Roadmap And Next Work
 
-The First Order sequence continues with Checkout, payment simulation, order
-creation, the complete First Order journey, and then the
+The Product Storefront UX/UI refinement is in progress and precedes Checkout by
+owner approval. The First Order sequence continues with Checkout, payment
+simulation, order creation, the complete First Order journey, and then the
 `v0.1.0` release. Future capabilities receive an SS identifier only when their
 GitHub Issue is created; the roadmap does not reserve future identifiers.
 

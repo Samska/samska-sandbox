@@ -2,6 +2,7 @@ export interface CreateProductRequest {
   name: string;
   description: string;
   price: number;
+  mediaKey: string | null;
 }
 
 export interface ProductResponse {
@@ -9,6 +10,7 @@ export interface ProductResponse {
   name: string;
   description: string;
   price: number;
+  mediaKey: string | null;
 }
 
 export type CatalogApiErrorKind =
@@ -120,15 +122,17 @@ function isProductResponse(value: unknown): value is ProductResponse {
   const keys = Object.keys(product);
 
   return (
-    keys.length === 4 &&
+    keys.length === 5 &&
     keys.includes("id") &&
     keys.includes("name") &&
     keys.includes("description") &&
     keys.includes("price") &&
+    keys.includes("mediaKey") &&
     typeof product.id === "string" &&
     typeof product.name === "string" &&
     typeof product.description === "string" &&
     typeof product.price === "number" &&
-    Number.isFinite(product.price)
+    Number.isFinite(product.price) &&
+    (product.mediaKey === null || typeof product.mediaKey === "string")
   );
 }

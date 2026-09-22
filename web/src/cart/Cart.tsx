@@ -1,6 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type KeyboardEvent, type Ref } from "react";
 import type { CartItemResponse, CartResponse } from "./cartApi";
 import { formatAmount } from "../formatAmount";
+import Button from "../ui/Button";
+import StatusMessage from "../ui/StatusMessage";
 
 export default function CartPanel({
   cart,
@@ -8,7 +10,9 @@ export default function CartPanel({
   error,
   onRetry,
   onUpdateQuantity,
-  onRemoveItem
+  onRemoveItem,
+  headingRef,
+  onClose
 }: {
   cart: CartResponse | null;
   isPending: boolean;
@@ -16,51 +20,68 @@ export default function CartPanel({
   onRetry: () => void;
   onUpdateQuantity: (productId: string, quantity: number) => Promise<void>;
   onRemoveItem: (productId: string) => Promise<void>;
+  headingRef?: Ref<HTMLHeadingElement>;
+  onClose?: () => void;
 }) {
+  const itemCount = cart?.items.reduce((total, item) => total + item.quantity, 0) ?? 0;
+
   return (
     <section
       id="cart"
-      className="grid gap-5 self-start rounded-lg border border-border-strong bg-cart-surface p-5 shadow-card sticky top-5 max-[58rem]:static"
+      className="grid gap-4"
       aria-labelledby="cart-heading"
       aria-busy={isPending}
     >
-      <div className="flex items-start justify-between gap-4">
-        <div className="grid gap-2">
-          <h2 className="text-[clamp(1.5rem,3vw,2rem)] leading-[1.15] text-ink">Your Cart</h2>
+      <div className="flex items-center justify-between gap-4 border-b border-border pb-4">
+        <h2
+          id="cart-heading"
+          ref={headingRef}
+          tabIndex={-1}
+          className="text-xl font-extrabold tracking-[-0.02em] text-ink"
+        >
+          Your Cart
+        </h2>
+        <div className="flex items-center gap-2">
+          {cart !== null ? (
+            <span className="rounded-full bg-count-surface px-3 py-1 text-sm font-extrabold text-brand-dark">
+              {itemCount} {itemCount === 1 ? "item" : "items"}
+            </span>
+          ) : null}
+          {onClose === undefined ? null : (
+            <button
+              type="button"
+              className="grid h-9 w-9 place-items-center rounded-full border border-border-strong bg-surface text-lg font-extrabold text-ink hover:bg-surface-muted"
+              onClick={onClose}
+              aria-label="Close Cart"
+            >
+              &times;
+            </button>
+          )}
         </div>
-        {cart !== null ? (
-          <span className="rounded-full bg-count-surface px-2.5 py-1.5 text-[0.8125rem] font-extrabold text-brand-dark">
-            {cart.items.length} items
-          </span>
-        ) : null}
       </div>
-      {isPending && cart === null ? <p role="status">Loading Cart...</p> : null}
+      {isPending && cart === null ? (
+        <StatusMessage tone="neutral">Loading Cart...</StatusMessage>
+      ) : null}
       {isPending && cart !== null ? (
-        <p className="rounded-sm bg-pending-surface px-3 py-2.5" role="status">
-          Updating Cart...
-        </p>
+        <StatusMessage tone="pending">Updating Cart...</StatusMessage>
       ) : null}
       {error !== null ? (
         <div className="grid gap-3">
-          <p role="alert">{error}</p>
-          <button
-            type="button"
-            className="min-h-11 w-fit rounded-sm border border-brand bg-brand px-4 py-2.5 font-bold text-white hover:bg-brand-dark hover:border-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
-            onClick={onRetry}
-            disabled={isPending}
-          >
+          <StatusMessage tone="error">{error}</StatusMessage>
+          <Button onClick={onRetry} disabled={isPending}>
             Reload Cart
-          </button>
+          </Button>
         </div>
       ) : null}
       {cart !== null && cart.items.length === 0 ? (
-        <div className="grid gap-3">
-          <p>Your Cart is empty.</p>
+        <div className="grid gap-2 rounded-lg bg-surface-muted px-4 py-5">
+          <p className="font-bold text-ink">Your Cart is empty.</p>
+          <p className="text-sm text-muted">Products you add from the storefront appear here.</p>
         </div>
       ) : null}
       {cart !== null && cart.items.length > 0 ? (
         <>
-          <ul className="grid list-none gap-4 p-0 m-0" aria-label="Cart items">
+          <ul className="grid list-none gap-3 p-0 m-0" aria-label="Cart items">
             {cart.items.map((item) => (
               <CartItemRow
                 key={item.productId}
@@ -71,9 +92,11 @@ export default function CartPanel({
               />
             ))}
           </ul>
-          <dl className="flex items-baseline justify-between gap-4 border-t-2 border-ink pt-4">
-            <dt className="text-xl font-extrabold text-ink">Total</dt>
-            <dd className="m-0 text-xl font-extrabold text-ink">{formatAmount(cart.total)}</dd>
+          <dl className="flex items-baseline justify-between gap-4 rounded-lg bg-surface-muted px-4 py-3.5">
+            <dt className="text-sm font-bold uppercase tracking-[0.12em] text-muted">Total</dt>
+            <dd className="m-0 text-2xl font-extrabold tracking-[-0.02em] text-ink">
+              {formatAmount(cart.total)}
+            </dd>
           </dl>
         </>
       ) : null}
@@ -94,72 +117,107 @@ function CartItemRow({
 }) {
   const [quantity, setQuantity] = useState(String(item.quantity));
   const [validationError, setValidationError] = useState<string | null>(null);
-  const quantityErrorId = `cart-quantity-error-${item.productId}`;
+  const quantityInputId = `cart-quantity-${item.productId}`;
+  const quantityErrorId = `${quantityInputId}-error`;
 
   useEffect(() => {
     setQuantity(String(item.quantity));
   }, [item.quantity]);
 
-  function handleUpdate() {
-    const numericQuantity = Number(quantity);
-
-    if (quantity.trim().length === 0 || !Number.isInteger(numericQuantity) || numericQuantity < 1) {
+  function commitQuantity(nextQuantity: number) {
+    if (!Number.isInteger(nextQuantity) || nextQuantity < 1) {
       setValidationError("Enter a quantity of one or greater.");
       return;
     }
 
     setValidationError(null);
-    void onUpdateQuantity(item.productId, numericQuantity);
+
+    if (nextQuantity === item.quantity) {
+      setQuantity(String(item.quantity));
+      return;
+    }
+
+    void onUpdateQuantity(item.productId, nextQuantity);
+  }
+
+  function handleQuantityKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      commitQuantity(Number(quantity));
+    }
+
+    if (event.key === "Escape") {
+      setValidationError(null);
+      setQuantity(String(item.quantity));
+    }
   }
 
   return (
-    <li className="grid gap-4 border-b border-border pb-4 last:border-b-0 last:pb-0">
-      <h3 className="text-lg leading-[1.15] text-ink">{item.name}</h3>
-      <dl className="grid gap-2">
-        <div className="flex justify-between gap-4">
-          <dt className="text-sm text-muted">Unit price</dt>
-          <dd className="m-0 font-bold">{formatAmount(item.unitPrice)}</dd>
+    <li className="grid gap-3 rounded-lg border border-border bg-surface p-3.5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="grid gap-0.5">
+          <h3 className="font-bold leading-snug text-ink">{item.name}</h3>
+          <p className="text-sm text-muted">{formatAmount(item.unitPrice)} each</p>
         </div>
-        <div className="flex justify-between gap-4">
-          <dt className="text-sm text-muted">Subtotal</dt>
-          <dd className="m-0 font-bold">{formatAmount(item.lineSubtotal)}</dd>
-        </div>
-      </dl>
-      <div className="grid gap-2.5">
-        <div className="grid gap-2.5">
-          <label className="text-[0.9375rem] font-bold text-ink" htmlFor={`cart-quantity-${item.productId}`}>
-            Quantity for {item.name}
-          </label>
-          <input
-            id={`cart-quantity-${item.productId}`}
-            type="number"
-            min="1"
-            step="1"
-            inputMode="numeric"
-            className="min-h-11 w-full max-w-32 rounded-sm border border-border-strong bg-surface px-3 py-2.5"
-            value={quantity}
-            onChange={(event) => setQuantity(event.target.value)}
-            disabled={isPending}
-            aria-invalid={validationError !== null}
-            aria-describedby={validationError !== null ? quantityErrorId : undefined}
-          />
-        </div>
-        <button
-          type="button"
-          className="min-h-11 w-fit rounded-sm border border-brand bg-brand px-4 py-2.5 font-bold text-white hover:bg-brand-dark hover:border-brand-dark disabled:cursor-not-allowed disabled:opacity-60"
-          onClick={handleUpdate}
-          disabled={isPending}
-        >
-          Update quantity
-        </button>
-        <button
-          type="button"
-          className="min-h-11 w-fit rounded-sm border border-border-strong bg-transparent px-4 py-2.5 font-bold text-danger hover:bg-danger hover:border-danger hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+        <Button
+          variant="danger"
+          size="sm"
           onClick={() => void onRemoveItem(item.productId)}
           disabled={isPending}
+          aria-label={`Remove ${item.name}`}
         >
-          Remove {item.name}
-        </button>
+          Remove
+        </Button>
+      </div>
+      <div className="flex items-center justify-between gap-3">
+        <div className="grid gap-1">
+          <label className="sr-only" htmlFor={quantityInputId}>
+            Quantity for {item.name}
+          </label>
+          <div className="inline-flex items-center overflow-hidden rounded-md border border-border-strong">
+            <button
+              type="button"
+              className="grid h-10 w-10 place-items-center text-lg font-bold text-brand-dark hover:bg-count-surface"
+              onClick={() => commitQuantity(item.quantity - 1)}
+              disabled={isPending || item.quantity <= 1}
+              aria-label={`Decrease quantity for ${item.name}`}
+            >
+              &#8722;
+            </button>
+            <input
+              id={quantityInputId}
+              type="number"
+              min="1"
+              step="1"
+              inputMode="numeric"
+              className="h-10 w-12 border-x border-border-strong bg-surface text-center font-bold"
+              value={quantity}
+              onChange={(event) => setQuantity(event.target.value)}
+              onBlur={() => commitQuantity(Number(quantity))}
+              onKeyDown={handleQuantityKeyDown}
+              disabled={isPending}
+              aria-invalid={validationError !== null}
+              aria-describedby={validationError !== null ? quantityErrorId : undefined}
+            />
+            <button
+              type="button"
+              className="grid h-10 w-10 place-items-center text-lg font-bold text-brand-dark hover:bg-count-surface"
+              onClick={() => commitQuantity(item.quantity + 1)}
+              disabled={isPending}
+              aria-label={`Increase quantity for ${item.name}`}
+            >
+              +
+            </button>
+          </div>
+        </div>
+        <div className="grid justify-items-end gap-0.5">
+          <span className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
+            Subtotal
+          </span>
+          <span className="text-base font-extrabold text-ink">
+            {formatAmount(item.lineSubtotal)}
+          </span>
+        </div>
       </div>
       {validationError !== null ? (
         <p id={quantityErrorId} className="font-bold">

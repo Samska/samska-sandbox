@@ -1,15 +1,24 @@
 package io.github.samska.sandbox.catalog;
 
 import java.math.BigDecimal;
+import java.util.regex.Pattern;
 
 public final class Product {
+
+    private static final int MEDIA_KEY_MAX_LENGTH = 40;
+    private static final Pattern MEDIA_KEY_PATTERN = Pattern.compile("[a-z0-9]+(-[a-z0-9]+)*");
 
     private final ProductId id;
     private String name;
     private String description;
     private BigDecimal price;
+    private final String mediaKey;
 
     public Product(ProductId id, String name, String description, BigDecimal price) {
+        this(id, name, description, price, null);
+    }
+
+    public Product(ProductId id, String name, String description, BigDecimal price, String mediaKey) {
         if (id == null) {
             throw new InvalidProductException("Product ID must not be null");
         }
@@ -18,6 +27,7 @@ public final class Product {
         this.name = validatedName(name);
         this.description = validatedDescription(description);
         this.price = validatedPrice(price);
+        this.mediaKey = validatedMediaKey(mediaKey);
     }
 
     public ProductId id() {
@@ -34,6 +44,10 @@ public final class Product {
 
     public BigDecimal price() {
         return price;
+    }
+
+    public String mediaKey() {
+        return mediaKey;
     }
 
     public void rename(String name) {
@@ -82,5 +96,16 @@ public final class Product {
             throw new InvalidProductException("Product price must not be negative");
         }
         return price;
+    }
+
+    private static String validatedMediaKey(String mediaKey) {
+        if (mediaKey == null) {
+            return null;
+        }
+        if (mediaKey.length() > MEDIA_KEY_MAX_LENGTH || !MEDIA_KEY_PATTERN.matcher(mediaKey).matches()) {
+            throw new InvalidProductException(
+                    "Product media key must be a lowercase slug of at most " + MEDIA_KEY_MAX_LENGTH + " characters");
+        }
+        return mediaKey;
     }
 }

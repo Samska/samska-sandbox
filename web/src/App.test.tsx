@@ -8,7 +8,6 @@ describe("App", () => {
 
     expect(screen.getByRole("link", { name: /Samska market/i })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Skip to main content" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Cart" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Products" })).toBeInTheDocument();
 
     const setupHeading = screen.getByRole("heading", { name: "Product setup tools", level: 2 });

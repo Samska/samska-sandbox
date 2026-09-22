@@ -76,7 +76,3 @@ summary:focus-visible {
   color: var(--color-danger);
   font-weight: 700;
 }
-
-[role="status"] {
-  color: var(--color-success);
-}

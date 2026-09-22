@@ -19,8 +19,8 @@ public class ProductApplicationService implements ProductCatalog {
         this.productStore = productStore;
     }
 
-    public Product createProduct(String name, String description, BigDecimal price) {
-        var product = new Product(ProductId.generate(), name, description, price);
+    public Product createProduct(String name, String description, BigDecimal price, String mediaKey) {
+        var product = new Product(ProductId.generate(), name, description, price, mediaKey);
         productStore.save(product);
         return product;
     }

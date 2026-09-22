@@ -27,7 +27,8 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody CreateProductRequest request) {
-        var product = productApplicationService.createProduct(request.name(), request.description(), request.price());
+        var product = productApplicationService.createProduct(
+                request.name(), request.description(), request.price(), request.mediaKey());
         var response = ProductResponse.from(product);
         var location = URI.create("/api/products/" + response.id());
 
