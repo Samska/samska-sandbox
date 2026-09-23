@@ -16,6 +16,7 @@ export interface ProductResponse {
 export type CatalogApiErrorKind =
   | "bad-request"
   | "not-found"
+  | "conflict"
   | "network"
   | "server"
   | "invalid-response";
@@ -37,8 +38,29 @@ export async function createProduct(request: CreateProductRequest): Promise<Prod
   });
 }
 
-export async function getProduct(id: string): Promise<ProductResponse> {
-  return requestProduct(`/api/products/${encodeURIComponent(id)}`, 200);
+export async function updateProduct(
+  id: string,
+  request: CreateProductRequest
+): Promise<ProductResponse> {
+  return requestProduct(`/api/products/${encodeURIComponent(id)}`, 200, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(request)
+  });
+}
+
+export async function deleteProduct(id: string): Promise<void> {
+  let response: Response;
+
+  try {
+    response = await fetch(`/api/products/${encodeURIComponent(id)}`, { method: "DELETE" });
+  } catch {
+    throw new CatalogApiError("network");
+  }
+
+  if (response.status !== 204) {
+    throw new CatalogApiError(errorKindFor(response.status));
+  }
 }
 
 export async function listProducts(): Promise<ProductResponse[]> {
@@ -108,6 +130,10 @@ function errorKindFor(status: number): CatalogApiErrorKind {
 
   if (status === 404) {
     return "not-found";
+  }
+
+  if (status === 409) {
+    return "conflict";
   }
 
   return "server";

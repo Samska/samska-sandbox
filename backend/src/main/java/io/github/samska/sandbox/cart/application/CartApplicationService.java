@@ -25,6 +25,10 @@ public class CartApplicationService {
         return cartStore.current();
     }
 
+    public boolean currentCartContainsProduct(UUID productId) {
+        return cartStore.current().hasItem(new ProductReference(productId));
+    }
+
     public Cart addItem(UUID productId, Integer quantity) {
         var validatedQuantity = quantity(quantity);
         var product = productCatalog.findById(productId)

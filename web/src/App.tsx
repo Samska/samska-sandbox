@@ -1,6 +1,15 @@
+import AdminProducts from "./admin/AdminProducts";
 import Catalog from "./catalog/Catalog";
+import NotFound from "./NotFound";
+
+const marketPath = "/";
+const adminProductsPath = "/admin/products";
 
 export default function App() {
+  const path = normalizedPath();
+  const isMarket = path === marketPath;
+  const isAdminProducts = path === adminProductsPath;
+
   return (
     <div className="flex min-h-screen flex-col">
       <a
@@ -13,8 +22,8 @@ export default function App() {
         <div className="mx-auto flex min-h-[3.75rem] w-[min(100%-2.5rem,76rem)] items-center justify-between gap-6">
           <a
             className="inline-flex items-center gap-2.5 font-extrabold text-ink no-underline"
-            href="#main-content"
-            aria-label="Samska market"
+            href="/"
+            aria-label="Samska Sandbox home"
           >
             <span
               aria-hidden="true"
@@ -23,10 +32,23 @@ export default function App() {
               S
             </span>
             <span className="text-[1.05rem] tracking-[-0.02em]">Samska</span>
-            <span className="border-l border-border pl-2.5 text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-muted">
-              market
-            </span>
           </a>
+          <nav aria-label="Primary" className="flex items-center gap-1">
+            <a
+              className={navLinkClassName(isMarket)}
+              href="/"
+              aria-current={isMarket ? "page" : undefined}
+            >
+              Market
+            </a>
+            <a
+              className={navLinkClassName(isAdminProducts)}
+              href="/admin/products"
+              aria-current={isAdminProducts ? "page" : undefined}
+            >
+              Admin
+            </a>
+          </nav>
         </div>
       </header>
       <main
@@ -34,14 +56,24 @@ export default function App() {
         id="main-content"
         tabIndex={-1}
       >
-        <Catalog />
+        {isAdminProducts ? <AdminProducts /> : isMarket ? <Catalog /> : <NotFound />}
       </main>
       <footer className="border-t border-border bg-surface">
         <div className="mx-auto flex w-[min(100%-2.5rem,76rem)] flex-wrap items-center justify-between gap-2 py-6 text-sm text-muted">
-          <p className="font-bold text-ink">Samska Market</p>
+          <p className="font-bold text-ink">Samska Sandbox</p>
           <p>A fictional storefront for engineering practice. Product and Cart data reset when the server restarts.</p>
         </div>
       </footer>
     </div>
   );
+}
+
+function normalizedPath(): string {
+  return window.location.pathname.replace(/\/+$/, "") || marketPath;
+}
+
+function navLinkClassName(isCurrent: boolean): string {
+  return `rounded-sm px-3 py-2 text-sm font-extrabold no-underline ${
+    isCurrent ? "bg-count-surface text-brand-dark" : "text-muted hover:bg-surface-muted hover:text-ink"
+  }`;
 }

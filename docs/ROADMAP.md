@@ -29,10 +29,11 @@ never renumbered.
 | Product UX Foundation | SS-028 |
 | Product Discovery | SS-029 |
 | Product Storefront UX/UI refinement | SS-031 |
+| Checkout vertical slice | SS-032 |
 
 ### Future Product Sequence
 
-1. Admin Catalog Management
+1. Admin Catalog Management (in progress, SS-033)
 2. Product Media Upload
 3. Payment simulator
 4. Order creation
@@ -41,16 +42,18 @@ never renumbered.
 
 Future capabilities receive their SS identifier when their Issues are created.
 
-Admin Catalog Management will move Product setup and administrative behavior out
-of the customer Market surface into a distinct Admin Product-management surface
-with Product listing/search that does not require knowing a UUID, plus
-create/edit/delete, kept separate from Market UX. That future Issue will likely
-justify real frontend routing; SS-032 introduces no router, and `/admin` is not
-a security boundary before authentication/authorization exists. Product Media
-Upload follows as a separate capability that will evaluate Product media
-upload/storage and supersede or extend the curated `mediaKey` approach. The
-exact architecture of both capabilities remains subject to their future Issues'
-plans.
+Admin Catalog Management (SS-033) is in progress and is not complete or merged
+until its verification and merge are recorded. It moves Product setup and
+administrative behavior out of the customer Market surface into a distinct Admin
+Product-management surface at `/admin/products` with Product listing,
+case-insensitive name search, create/edit/delete, and a backend `409 Conflict`
+refusal when a Product is in the current Cart. It introduces real URL routing
+with plain same-origin links rather than a router dependency; `/admin/products`
+is navigation, not an access-control boundary before authentication/authorization
+exists. Product Media Upload follows as a separate capability that will evaluate
+Product media upload/storage and supersede or extend the curated `mediaKey`
+approach. The exact architecture of that capability remains subject to its future
+Issue's plan.
 
 ### MVP Boundaries
 

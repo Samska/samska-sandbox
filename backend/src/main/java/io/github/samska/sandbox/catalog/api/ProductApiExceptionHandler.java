@@ -8,6 +8,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import io.github.samska.sandbox.catalog.InvalidProductException;
 import io.github.samska.sandbox.catalog.application.ProductNotFoundException;
+import io.github.samska.sandbox.coordination.ProductInCurrentCartException;
 
 @RestControllerAdvice(assignableTypes = ProductController.class)
 public class ProductApiExceptionHandler {
@@ -24,5 +25,10 @@ public class ProductApiExceptionHandler {
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<Void> handleNotFound() {
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(ProductInCurrentCartException.class)
+    public ResponseEntity<Void> handleConflict() {
+        return ResponseEntity.status(409).build();
     }
 }

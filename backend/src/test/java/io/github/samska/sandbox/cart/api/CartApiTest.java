@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -96,6 +97,72 @@ class CartApiTest {
 
         mockMvc.perform(delete("/api/cart/items/{productId}", "11111111-1111-1111-1111-111111111111"))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void keepsCapturedLineValuesWhenProductIsEdited() throws Exception {
+        String productId = createProduct();
+
+        mockMvc.perform(post("/api/cart/items")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"productId\":\"" + productId + "\",\"quantity\":2}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].unitPrice").value(12.50));
+
+        mockMvc.perform(put("/api/products/{id}", productId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Renamed Tote",
+                                  "description": "An updated tote.",
+                                  "price": 20.00
+                                }
+                                """))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(patch("/api/cart/items/{productId}", productId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"quantity\":3}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].name").value("Canvas Tote"))
+                .andExpect(jsonPath("$.items[0].unitPrice").value(12.50))
+                .andExpect(jsonPath("$.items[0].quantity").value(3))
+                .andExpect(jsonPath("$.items[0].lineSubtotal").value(37.50))
+                .andExpect(jsonPath("$.total").value(37.50));
+
+        mockMvc.perform(post("/api/cart/items")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"productId\":\"" + productId + "\",\"quantity\":1}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].name").value("Canvas Tote"))
+                .andExpect(jsonPath("$.items[0].unitPrice").value(12.50))
+                .andExpect(jsonPath("$.items[0].quantity").value(4))
+                .andExpect(jsonPath("$.total").value(50.00));
+    }
+
+    @Test
+    void capturesCurrentCatalogValuesWhenProductIsAddedAfterEdit() throws Exception {
+        String productId = createProduct();
+
+        mockMvc.perform(put("/api/products/{id}", productId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "name": "Renamed Tote",
+                                  "description": "An updated tote.",
+                                  "price": 20.00
+                                }
+                                """))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/cart/items")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"productId\":\"" + productId + "\",\"quantity\":1}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].name").value("Renamed Tote"))
+                .andExpect(jsonPath("$.items[0].unitPrice").value(20.00))
+                .andExpect(jsonPath("$.items[0].lineSubtotal").value(20.00))
+                .andExpect(jsonPath("$.total").value(20.00));
     }
 
     private String createProduct() throws Exception {

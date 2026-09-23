@@ -67,11 +67,11 @@ export default function ProductBrowse({
         </div>
       ) : null}
       {!isPending && error === null && productCount === 0 ? (
-        <div className="grid gap-3 rounded-lg border border-border bg-surface p-6">
+        <div className="grid gap-2 rounded-lg border border-border bg-surface p-6">
           <p className="font-bold text-ink">No Products are available yet.</p>
-          <a className="w-fit font-bold text-brand-dark" href="#catalog-tools">
-            Create the first Product
-          </a>
+          <p className="text-muted">
+            New Products will appear here once they become available. Check back soon.
+          </p>
         </div>
       ) : null}
       {!isPending && error === null && productCount > 0 ? (

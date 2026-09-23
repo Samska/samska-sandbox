@@ -23,6 +23,16 @@ public class InMemoryProductStore implements ProductStore {
     }
 
     @Override
+    public boolean replace(Product product) {
+        return products.replace(product.id(), product) != null;
+    }
+
+    @Override
+    public boolean deleteById(ProductId id) {
+        return products.remove(id) != null;
+    }
+
+    @Override
     public Optional<Product> findById(ProductId id) {
         return Optional.ofNullable(products.get(id));
     }

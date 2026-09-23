@@ -10,6 +10,10 @@ public interface ProductStore {
 
     void save(Product product);
 
+    boolean replace(Product product);
+
+    boolean deleteById(ProductId id);
+
     Optional<Product> findById(ProductId id);
 
     Collection<Product> findAll();
