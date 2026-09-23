@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Target milestone:** `v0.1.0 — First Order` (unreleased)
-- **Current stage:** Product Storefront UX/UI in progress
-- **Next planned work:** Checkout
+- **Current stage:** Checkout implemented
+- **Next planned work:** Admin Catalog Management
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -23,8 +23,8 @@ are build metadata, not evidence of a published product release.
 
 Samska Sandbox uses a fictional catalog and order journey to demonstrate
 evidence-driven engineering. The current application contains a Java/Spring
-Boot backend, a React/TypeScript frontend, a Catalog boundary for Products, and
-a process-local Cart boundary.
+Boot backend, a React/TypeScript frontend, a Catalog boundary for Products, a
+process-local Cart boundary, and an editable Checkout view over the current Cart.
 
 AI agents are implementation tools operating under repository-defined
 governance. Humans own requirements, architecture, decisions, review,
@@ -40,18 +40,19 @@ validation, learning, and risk.
 | Product Discovery | Implemented | Product descriptions with a selectable detail view, local product media with a monogram fallback, Add to Cart, and a return to browsing. |
 | Shopping Cart | Implemented | Process-local Cart contents, quantity changes, removal, and server-calculated totals. |
 | Product UX Foundation | Implemented | Commerce-oriented shell, responsive Product browsing, integrated Cart presentation, accessible feedback, and secondary Catalog tools. |
-| Product Storefront UX/UI | In progress | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged; Human Verification passed, CI verification pending. |
+| Product Storefront UX/UI | Implemented | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged. |
+| Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource, identity, or snapshot exists yet. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
-| Checkout, payment, orders, E2E, deployment | Planned | Product Storefront UX/UI precedes Checkout and is in progress; Checkout and later First Order capabilities remain future work. |
+| Admin Catalog Management, Product Media Upload, payment, orders, E2E, deployment | Planned | The remaining capabilities after Checkout in the owner-approved sequence; end-to-end automation and deployment follow the local MVP. |
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    User[User / browser] --> UI[React / TypeScript<br/>Catalog and Cart UI]
-    UI --> Adapter[Catalog API adapter]
+    User[User / browser] --> UI[React / TypeScript<br/>Catalog, Cart, and Checkout review UI]
+    UI --> Adapter[Feature API adapters]
     Adapter --> Proxy[Vite development<br/>/api proxy]
     Proxy --> HTTP[Spring Boot<br/>Catalog and Cart HTTP APIs]
     HTTP --> App[Catalog and Cart applications<br/>service coordination]
@@ -65,9 +66,10 @@ flowchart LR
 ```
 
 The Vite proxy is for local development only. Product and Cart data are held in
-process memory and are lost when the backend restarts. PostgreSQL is
-deliberately shown separately because the application has no database connection
-or persistence.
+process memory and are lost when the backend restarts. Checkout is a frontend
+review of the current Cart and holds no server-side state at this stage.
+PostgreSQL is deliberately shown separately because the application has no
+database connection or persistence.
 
 ## Engineering Practices
 
@@ -115,10 +117,14 @@ components.
 
 ## Roadmap And Next Work
 
-The Product Storefront UX/UI refinement is in progress and precedes Checkout by
-owner approval. The First Order sequence continues with Checkout, payment
-simulation, order creation, the complete First Order journey, and then the
-`v0.1.0` release. Future capabilities receive an SS identifier only when their
+The Product Storefront UX/UI refinement (SS-031) is complete and merged through
+PR #52. Checkout (SS-032) is implemented as an editable live view of the current
+Cart; the immutable transactional snapshot is deferred to Payment Simulator
+work. The owner-approved sequence continues with Admin Catalog Management,
+Product Media Upload, Payment Simulator, order creation, the complete First
+Order journey, and then the `v0.1.0` release. Authentication and authorization
+remain deferred until after the local MVP but are mandatory before any hosted
+environment. Future capabilities receive an SS identifier only when their
 GitHub Issue is created; the roadmap does not reserve future identifiers.
 
 See the [roadmap](docs/ROADMAP.md) for product direction and the [live Project](https://github.com/users/Samska/projects/1)
