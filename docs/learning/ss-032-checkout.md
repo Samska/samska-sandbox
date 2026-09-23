@@ -4,7 +4,7 @@
 - Work date: 2026-09-23
 - Last reviewed: 2026-09-23
 - Work item: [SS-032](https://github.com/Samska/samska-sandbox/issues/53)
-- Pull request: None at Build/Agent Verification stop
+- Pull request: [PR #54](https://github.com/Samska/samska-sandbox/pull/54)
 - ADRs: None; follows [ADR 0001](../adr/0001-adopt-modular-monolith.md)
 - Canonical documentation: [Product](../PRODUCT.md), [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md)
 
@@ -60,7 +60,7 @@ Payment simulation, order creation, authentication or user identity, persistence
 ## Reference
 
 - Issue: [SS-032](https://github.com/Samska/samska-sandbox/issues/53)
-- Pull request: None at Build/Agent Verification stop
+- Pull request: [PR #54](https://github.com/Samska/samska-sandbox/pull/54)
 - Relevant source files: `web/src/cart/CartItemRow.tsx`, `web/src/cart/Cart.tsx`, `web/src/cart/CartDrawer.tsx`, `web/src/checkout/CheckoutReview.tsx`, `web/src/catalog/Catalog.tsx`, `backend/src/main/java/io/github/samska/sandbox/cart/Cart.java`, `backend/src/main/java/io/github/samska/sandbox/cart/CartSnapshot.java`, `backend/src/main/java/io/github/samska/sandbox/cart/api/CartResponse.java`, `backend/src/test/java/io/github/samska/sandbox/cart/CartTest.java`
 - ADRs: [ADR 0001](../adr/0001-adopt-modular-monolith.md)
 - Canonical documentation: [Product](../PRODUCT.md), [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md)

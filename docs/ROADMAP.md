@@ -29,16 +29,28 @@ never renumbered.
 | Product UX Foundation | SS-028 |
 | Product Discovery | SS-029 |
 | Product Storefront UX/UI refinement | SS-031 |
-| Checkout vertical slice | SS-032 |
 
 ### Future Product Sequence
 
-1. Payment simulator
-2. Order creation
-3. First Order end-to-end journey
-4. Release `v0.1.0`
+1. Admin Catalog Management
+2. Product Media Upload
+3. Payment simulator
+4. Order creation
+5. First Order end-to-end journey
+6. Release `v0.1.0`
 
 Future capabilities receive their SS identifier when their Issues are created.
+
+Admin Catalog Management will move Product setup and administrative behavior out
+of the customer Market surface into a distinct Admin Product-management surface
+with Product listing/search that does not require knowing a UUID, plus
+create/edit/delete, kept separate from Market UX. That future Issue will likely
+justify real frontend routing; SS-032 introduces no router, and `/admin` is not
+a security boundary before authentication/authorization exists. Product Media
+Upload follows as a separate capability that will evaluate Product media
+upload/storage and supersede or extend the curated `mediaKey` approach. The
+exact architecture of both capabilities remains subject to their future Issues'
+plans.
 
 ### MVP Boundaries
 

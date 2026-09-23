@@ -11,7 +11,7 @@ licensed under the [Apache License 2.0](LICENSE).
 
 - **Target milestone:** `v0.1.0 — First Order` (unreleased)
 - **Current stage:** Checkout implemented
-- **Next planned work:** Payment simulator
+- **Next planned work:** Admin Catalog Management
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -45,7 +45,7 @@ validation, learning, and risk.
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
-| Payment, orders, E2E, deployment | Planned | The remaining First Order capabilities after Checkout; end-to-end automation and deployment follow the local MVP. |
+| Admin Catalog Management, Product Media Upload, payment, orders, E2E, deployment | Planned | The remaining capabilities after Checkout in the owner-approved sequence; end-to-end automation and deployment follow the local MVP. |
 
 ## Architecture
 
@@ -120,12 +120,12 @@ components.
 The Product Storefront UX/UI refinement (SS-031) is complete and merged through
 PR #52. Checkout (SS-032) is implemented as an editable live view of the current
 Cart; the immutable transactional snapshot is deferred to Payment Simulator
-work. The First Order sequence continues with payment simulation, order
-creation, the complete First Order journey, and then the `v0.1.0` release.
-Authentication and authorization remain deferred until after the local MVP but
-are mandatory before any hosted environment. Future capabilities receive an SS
-identifier only when their GitHub Issue is created; the roadmap does not
-reserve future identifiers.
+work. The owner-approved sequence continues with Admin Catalog Management,
+Product Media Upload, Payment Simulator, order creation, the complete First
+Order journey, and then the `v0.1.0` release. Authentication and authorization
+remain deferred until after the local MVP but are mandatory before any hosted
+environment. Future capabilities receive an SS identifier only when their
+GitHub Issue is created; the roadmap does not reserve future identifiers.
 
 See the [roadmap](docs/ROADMAP.md) for product direction and the [live Project](https://github.com/users/Samska/projects/1)
 for execution state.
