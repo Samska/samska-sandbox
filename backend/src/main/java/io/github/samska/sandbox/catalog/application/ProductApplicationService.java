@@ -25,6 +25,20 @@ public class ProductApplicationService implements ProductCatalog {
         return product;
     }
 
+    public Product updateProduct(ProductId id, String name, String description, BigDecimal price, String mediaKey) {
+        var updatedProduct = new Product(id, name, description, price, mediaKey);
+        if (!productStore.replace(updatedProduct)) {
+            throw new ProductNotFoundException(id);
+        }
+        return updatedProduct;
+    }
+
+    public void deleteProduct(ProductId id) {
+        if (!productStore.deleteById(id)) {
+            throw new ProductNotFoundException(id);
+        }
+    }
+
     public Product getProduct(ProductId id) {
         return productStore.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));

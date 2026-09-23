@@ -149,9 +149,9 @@ From `web/`, start Vite:
 npm run dev
 ```
 
-Open the URL printed by Vite, normally <http://localhost:5173>. Vite proxies relative `/api` requests to `http://localhost:8080` only during development. Create a Product, retain its generated ID, and use Find Product to retrieve it. This verifies the current UI flow when backend and frontend are running together.
+Open the URL printed by Vite, normally <http://localhost:5173>. Vite proxies relative `/api` requests to `http://localhost:8080` only during development. Open `/admin/products` directly or use the Admin link in the shell to create, edit, and delete Products; the Market at `/` browses them, adds them to the Cart, and reaches Checkout. This verifies the current UI flow when backend and frontend are running together.
 
-The proxy does not define production routing or establish a Spring Boot CORS policy.
+The proxy does not define production routing or establish a Spring Boot CORS policy. The frontend resolves `/` and `/admin/products` from the browser path; Vite serves the application for direct requests to those paths, and other paths render the in-app not-found view.
 
 ## URLs and Ports
 
@@ -160,13 +160,14 @@ The proxy does not define production routing or establish a Spring Boot CORS pol
 | Spring Boot | `http://localhost:8080` | Default port; no repository override exists. |
 | Health endpoint | `http://localhost:8080/actuator/health` | The only intentionally exposed Actuator endpoint. |
 | Vite development server | `http://localhost:5173` when available | Check Vite startup output for the actual port. |
+| Frontend routes | `/` (Market) and `/admin/products` (Admin) | Served by Vite for direct entry and reload; other paths render the in-app not-found view. Not an access-control boundary. |
 | PostgreSQL | `127.0.0.1:${POSTGRES_HOST_PORT:-5432}` | Optional infrastructure; loopback only. |
 
 ## Runtime and Manual Verification
 
 1. Start the backend and confirm the health response reports `UP`.
-2. Start the frontend, open its reported URL, create a synthetic Product, browse it, add it to the Cart, update its quantity, remove it, and retrieve it by the generated ID.
-3. Stop and restart the backend, then try the same ID again. It must no longer be found.
+2. Start the frontend, open its reported URL, create a synthetic Product from `/admin/products`, edit it, browse it in the Market, add it to the Cart, update its quantity, remove it, and then delete the Product from the Admin surface. Adding a Product to the Cart and then attempting to delete it must report the `409` Cart conflict until it is removed from the Cart.
+3. Stop and restart the backend, then try the same Product ID again. It must no longer be found.
 4. If PostgreSQL is running, use `docker compose ps` and `pg_isready` to verify its container state independently.
 
 These checks demonstrate current runtime behavior. A healthy PostgreSQL container does not prove Spring Boot connectivity, schemas, migrations, or Product persistence.

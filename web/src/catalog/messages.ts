@@ -1,28 +1,6 @@
 import { CatalogApiError } from "./catalogApi";
 import { CartApiError } from "../cart/cartApi";
 
-export function createErrorMessage(error: unknown): string {
-  if (error instanceof CatalogApiError && error.kind === "bad-request") {
-    return "Check the Product name and price, then try again.";
-  }
-
-  return generalErrorMessage(error);
-}
-
-export function lookupErrorMessage(error: unknown): string {
-  if (error instanceof CatalogApiError) {
-    if (error.kind === "bad-request") {
-      return "Enter a valid Product ID.";
-    }
-
-    if (error.kind === "not-found") {
-      return "No Product was found with that ID.";
-    }
-  }
-
-  return generalErrorMessage(error);
-}
-
 export function catalogBrowseErrorMessage(error: unknown): string {
   if (error instanceof CatalogApiError && error.kind === "network") {
     return "The Product service could not be reached. Try again.";

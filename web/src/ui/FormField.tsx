@@ -31,7 +31,7 @@ export default function FormField({
         "aria-describedby": error !== null ? `${id}-error` : undefined
       })}
       {error !== null ? (
-        <p id={`${id}-error`} className="font-bold">
+        <p id={`${id}-error`} role="alert" className="font-bold">
           {error}
         </p>
       ) : null}

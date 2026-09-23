@@ -264,133 +264,29 @@ describe("Catalog", () => {
     expect(within(dialog).getByText("Subtotal")).toBeInTheDocument();
   });
 
-  it("creates a Product with a description and refreshes the browse list", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockImplementationOnce(() => Promise.resolve(response(200, [])))
-      .mockImplementationOnce(() => Promise.resolve(response(200, emptyCart)))
-      .mockImplementationOnce(() => Promise.resolve(response(201, createdProduct)))
-      .mockImplementationOnce(() => Promise.resolve(response(200, [createdProduct])));
-    vi.stubGlobal("fetch", fetchMock);
-    render(<Catalog />);
-
-    fireEvent.click(screen.getByText("Product setup tools"));
-    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Canvas Tote" } });
-    fireEvent.change(screen.getByLabelText("Description"), { target: { value: createdProduct.description } });
-    fireEvent.change(screen.getByLabelText("Price"), { target: { value: "12.50" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create Product" }));
-
-    expect(await screen.findByText("Product created successfully.")).toBeInTheDocument();
-    expect(await screen.findByRole("button", { name: "Add Canvas Tote to Cart" })).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledWith("/api/products", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "Canvas Tote",
-        description: createdProduct.description,
-        price: 12.5,
-        mediaKey: null
-      })
-    });
-  });
-
-  it("assigns a curated media key when creating a Product", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockImplementationOnce(() => Promise.resolve(response(200, [])))
-      .mockImplementationOnce(() => Promise.resolve(response(200, emptyCart)))
-      .mockImplementationOnce(() => Promise.resolve(response(201, { ...createdProduct, mediaKey: "canvas-market-tote" })))
-      .mockImplementationOnce(() => Promise.resolve(response(200, [{ ...createdProduct, mediaKey: "canvas-market-tote" }])));
-    vi.stubGlobal("fetch", fetchMock);
-    render(<Catalog />);
-
-    fireEvent.click(screen.getByText("Product setup tools"));
-    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Canvas Tote" } });
-    fireEvent.change(screen.getByLabelText("Description"), { target: { value: createdProduct.description } });
-    fireEvent.change(screen.getByLabelText("Price"), { target: { value: "12.50" } });
-    fireEvent.change(screen.getByLabelText("Media"), { target: { value: "canvas-market-tote" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create Product" }));
-
-    expect(await screen.findByText("Product created successfully.")).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledWith("/api/products", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "Canvas Tote",
-        description: createdProduct.description,
-        price: 12.5,
-        mediaKey: "canvas-market-tote"
-      })
-    });
-  });
-
-  it("prevents invalid creation input from calling the create API", async () => {
-    const fetchMock = vi.fn((input: RequestInfo | URL) => {
+  it("does not expose Product setup tools or creation controls", async () => {
+    vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL) => {
       if (String(input) === "/api/products") {
         return Promise.resolve(response(200, []));
       }
 
       return Promise.resolve(response(200, emptyCart));
-    });
-    vi.stubGlobal("fetch", fetchMock);
+    }));
     render(<Catalog />);
 
-    fireEvent.click(screen.getByText("Product setup tools"));
-    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "   " } });
-    fireEvent.change(screen.getByLabelText("Description"), { target: { value: "A sample product" } });
-    fireEvent.change(screen.getByLabelText("Price"), { target: { value: "-1" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create Product" }));
-
-    expect(screen.getByRole("alert")).toHaveTextContent("Enter a Product name.");
-    expect(fetchMock).not.toHaveBeenCalledWith("/api/products", expect.objectContaining({ method: "POST" }));
+    expect(await screen.findByText("No Products are available yet.")).toBeInTheDocument();
+    expect(screen.getByText(/new products will appear here/i)).toBeInTheDocument();
+    expect(screen.queryByText(/admin/i)).not.toBeInTheDocument();
+    expect(screen.queryByText("Product setup tools")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Product ID")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Create Product" })).not.toBeInTheDocument();
+    expect(document.querySelector("#catalog-tools")).toBeNull();
+    expect(
+      screen.queryAllByRole("link").filter((link) => link.getAttribute("href")?.includes("/admin"))
+    ).toHaveLength(0);
   });
 
-  it("rejects a blank description without calling the create API", async () => {
-    const fetchMock = vi.fn((input: RequestInfo | URL) => {
-      if (String(input) === "/api/products") {
-        return Promise.resolve(response(200, []));
-      }
-
-      return Promise.resolve(response(200, emptyCart));
-    });
-    vi.stubGlobal("fetch", fetchMock);
-    render(<Catalog />);
-
-    fireEvent.click(screen.getByText("Product setup tools"));
-    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Canvas Tote" } });
-    fireEvent.change(screen.getByLabelText("Description"), { target: { value: "   " } });
-    fireEvent.change(screen.getByLabelText("Price"), { target: { value: "12.50" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create Product" }));
-
-    expect(screen.getByRole("alert")).toHaveTextContent("Enter a Product description.");
-    expect(fetchMock).not.toHaveBeenCalledWith("/api/products", expect.objectContaining({ method: "POST" }));
-  });
-
-  it("retrieves a Product by its trimmed and encoded ID", async () => {
-    const productId = "product/id";
-    const fetchMock = vi.fn((input: RequestInfo | URL) => {
-      const path = String(input);
-      if (path === "/api/products") {
-        return Promise.resolve(response(200, []));
-      }
-      if (path === "/api/cart") {
-        return Promise.resolve(response(200, emptyCart));
-      }
-      return Promise.resolve(response(200, { ...createdProduct, id: productId }));
-    });
-    vi.stubGlobal("fetch", fetchMock);
-    render(<Catalog />);
-
-    fireEvent.click(screen.getByText("Product setup tools"));
-    fireEvent.change(screen.getByLabelText("Product ID"), { target: { value: ` ${productId} ` } });
-    fireEvent.click(screen.getByRole("button", { name: "Find Product" }));
-
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledWith("/api/products/product%2Fid", undefined));
-    expect(await screen.findByText("Product found successfully.")).toBeInTheDocument();
-    expect(screen.getByText(productId)).toBeInTheDocument();
-  });
-
-  it("reports browse and lookup failures without exposing response bodies", async () => {
+  it("reports browse failures without exposing response bodies", async () => {
     const fetchMock = vi.fn((input: RequestInfo | URL) => {
       const path = String(input);
       if (path === "/api/products") {
@@ -404,12 +300,8 @@ describe("Catalog", () => {
     vi.stubGlobal("fetch", fetchMock);
     render(<Catalog />);
 
-    fireEvent.click(screen.getByText("Product setup tools"));
     expect(await screen.findByText("The Product service failed. Try again.")).toBeInTheDocument();
-
-    fireEvent.change(screen.getByLabelText("Product ID"), { target: { value: "product-id" } });
-    fireEvent.click(screen.getByRole("button", { name: "Find Product" }));
-    expect(await screen.findByText("No Product was found with that ID.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Retry Products" })).toBeInTheDocument();
   });
 });
 

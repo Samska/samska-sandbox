@@ -12,15 +12,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.github.samska.sandbox.cart.application.CartApplicationService;
+import io.github.samska.sandbox.coordination.CatalogCartCoordinator;
 
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
 
     private final CartApplicationService cartApplicationService;
+    private final CatalogCartCoordinator catalogCartCoordinator;
 
-    public CartController(CartApplicationService cartApplicationService) {
+    public CartController(
+            CartApplicationService cartApplicationService,
+            CatalogCartCoordinator catalogCartCoordinator) {
         this.cartApplicationService = cartApplicationService;
+        this.catalogCartCoordinator = catalogCartCoordinator;
     }
 
     @GetMapping
@@ -30,7 +35,7 @@ public class CartController {
 
     @PostMapping("/items")
     public CartResponse addItem(@RequestBody AddCartItemRequest request) {
-        return CartResponse.from(cartApplicationService.addItem(request.productId(), request.quantity()));
+        return CartResponse.from(catalogCartCoordinator.addItem(request.productId(), request.quantity()));
     }
 
     @PatchMapping("/items/{productId}")

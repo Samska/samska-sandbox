@@ -12,7 +12,6 @@ import CartTrigger from "../cart/CartTrigger";
 import CheckoutReview from "../checkout/CheckoutReview";
 import ProductBrowse from "./ProductBrowse";
 import ProductDetail from "./ProductDetail";
-import ProductSetupTools from "./ProductSetupTools";
 import StatusMessage from "../ui/StatusMessage";
 import { catalogBrowseErrorMessage, cartErrorMessage } from "./messages";
 
@@ -208,7 +207,6 @@ export default function Catalog() {
         />
       )}
       {cartNotice !== null ? <StatusMessage tone="success">{cartNotice}</StatusMessage> : null}
-      <ProductSetupTools onProductCreated={() => void refreshProducts()} />
       <CartDrawer
         isOpen={isCartOpen}
         onClose={closeCart}
