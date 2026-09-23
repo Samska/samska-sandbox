@@ -4,7 +4,7 @@
 - Work date: 2026-09-23
 - Last reviewed: 2026-09-23
 - Work item: [SS-033](https://github.com/Samska/samska-sandbox/issues/55)
-- Pull request: None yet; created after Human Verification
+- Pull request: [PR #56](https://github.com/Samska/samska-sandbox/pull/56)
 - ADRs: None; follows [ADR 0001](../adr/0001-adopt-modular-monolith.md) and [ADR 0003](../adr/0003-adopt-optional-product-media-reference.md)
 - Canonical documentation: [Product](../PRODUCT.md), [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md), [Security](../SECURITY.md)
 
@@ -58,7 +58,7 @@ Authentication, authorization, roles, and access control; hosting; persistence a
 ## Reference
 
 - Issue: [SS-033](https://github.com/Samska/samska-sandbox/issues/55)
-- Pull request: None yet
+- Pull request: [PR #56](https://github.com/Samska/samska-sandbox/pull/56)
 - Relevant source files: `web/src/App.tsx`, `web/src/NotFound.tsx`, `web/src/admin/AdminProducts.tsx`, `web/src/admin/ProductForm.tsx`, `web/src/admin/messages.ts`, `web/src/catalog/catalogApi.ts`, `web/src/catalog/ProductBrowse.tsx`, `backend/src/main/java/io/github/samska/sandbox/coordination/CatalogCartCoordinator.java`, `backend/src/main/java/io/github/samska/sandbox/catalog/application/ProductApplicationService.java`, `backend/src/main/java/io/github/samska/sandbox/catalog/application/ProductStore.java`, `backend/src/main/java/io/github/samska/sandbox/catalog/storage/InMemoryProductStore.java`, `backend/src/main/java/io/github/samska/sandbox/cart/application/CartApplicationService.java`, `backend/src/test/java/io/github/samska/sandbox/coordination/CatalogCartCoordinatorTest.java`
 - ADRs: [ADR 0001](../adr/0001-adopt-modular-monolith.md), [ADR 0003](../adr/0003-adopt-optional-product-media-reference.md)
 - Canonical documentation: [Product](../PRODUCT.md), [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md), [Security](../SECURITY.md)
