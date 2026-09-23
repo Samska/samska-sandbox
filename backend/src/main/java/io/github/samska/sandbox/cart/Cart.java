@@ -42,6 +42,10 @@ public final class Cart {
         return List.copyOf(items.values());
     }
 
+    public synchronized CartSnapshot snapshot() {
+        return new CartSnapshot(List.copyOf(items.values()), total());
+    }
+
     public synchronized BigDecimal total() {
         return items.values().stream()
                 .map(CartItem::lineSubtotal)

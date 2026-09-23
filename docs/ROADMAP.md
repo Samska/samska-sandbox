@@ -28,17 +28,27 @@ never renumbered.
 | Shopping Cart vertical slice | SS-027 |
 | Product UX Foundation | SS-028 |
 | Product Discovery | SS-029 |
+| Product Storefront UX/UI refinement | SS-031 |
+| Checkout vertical slice | SS-032 |
 
 ### Future Product Sequence
 
-1. Product Storefront UX/UI refinement (SS-031, in progress)
-2. Checkout
-3. Payment simulator
-4. Order creation
-5. First Order end-to-end journey
-6. Release `v0.1.0`
+1. Payment simulator
+2. Order creation
+3. First Order end-to-end journey
+4. Release `v0.1.0`
 
 Future capabilities receive their SS identifier when their Issues are created.
+
+### MVP Boundaries
+
+The local MVP deliberately defers authentication and authorization. They are
+deferred until after the local First Order MVP but are a mandatory prerequisite
+for any hosted environment, and no hosting work begins before the MVP. The MVP
+also remains process-local: Cart state is lost when the backend restarts,
+Checkout holds no server-side state at this stage, and the application has no
+persistence or deployed environment. The immutable transactional snapshot is
+deferred to Payment Simulator work.
 
 ## Versioning And Releases
 

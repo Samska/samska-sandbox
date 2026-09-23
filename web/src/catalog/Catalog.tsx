@@ -9,6 +9,7 @@ import {
 } from "../cart/cartApi";
 import CartDrawer from "../cart/CartDrawer";
 import CartTrigger from "../cart/CartTrigger";
+import CheckoutReview from "../checkout/CheckoutReview";
 import ProductBrowse from "./ProductBrowse";
 import ProductDetail from "./ProductDetail";
 import ProductSetupTools from "./ProductSetupTools";
@@ -25,7 +26,9 @@ export default function Catalog() {
   const [cartError, setCartError] = useState<string | null>(null);
   const [cartNotice, setCartNotice] = useState<string | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const pendingFocusProductId = useRef<string | null>(null);
+  const pendingCartTriggerFocus = useRef(false);
   const viewDetailsButtons = useRef(new Map<string, HTMLButtonElement>());
   const cartTriggerRef = useRef<HTMLButtonElement>(null);
 
@@ -68,6 +71,13 @@ export default function Catalog() {
     }
   }, [selectedProduct]);
 
+  useEffect(() => {
+    if (!isCheckoutOpen && pendingCartTriggerFocus.current) {
+      pendingCartTriggerFocus.current = false;
+      cartTriggerRef.current?.focus();
+    }
+  }, [isCheckoutOpen]);
+
   function handleSelectProduct(product: ProductResponse) {
     setSelectedProduct(product);
   }
@@ -93,6 +103,18 @@ export default function Catalog() {
   function closeCart() {
     setIsCartOpen(false);
     cartTriggerRef.current?.focus();
+  }
+
+  function handleOpenCheckout() {
+    setSelectedProduct(null);
+    setCartNotice(null);
+    setIsCheckoutOpen(true);
+    setIsCartOpen(false);
+  }
+
+  function handleBackToMarket() {
+    pendingCartTriggerFocus.current = true;
+    setIsCheckoutOpen(false);
   }
 
   async function handleAddToCart(product: ProductResponse) {
@@ -154,7 +176,17 @@ export default function Catalog() {
 
   return (
     <div className="grid gap-6">
-      {selectedProduct !== null ? (
+      {isCheckoutOpen && cart !== null ? (
+        <CheckoutReview
+          cart={cart}
+          onBack={handleBackToMarket}
+          onUpdateQuantity={handleUpdateQuantity}
+          onRemoveItem={handleRemoveItem}
+          isPending={cartPending}
+          error={cartError}
+          onRetry={() => void refreshCart()}
+        />
+      ) : selectedProduct !== null ? (
         <ProductDetail
           product={selectedProduct}
           isCartPending={cartPending}
@@ -186,6 +218,7 @@ export default function Catalog() {
         onRetry={() => void refreshCart()}
         onUpdateQuantity={handleUpdateQuantity}
         onRemoveItem={handleRemoveItem}
+        onCheckout={handleOpenCheckout}
       />
     </div>
   );

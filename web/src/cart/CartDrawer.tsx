@@ -13,7 +13,8 @@ export default function CartDrawer({
   error,
   onRetry,
   onUpdateQuantity,
-  onRemoveItem
+  onRemoveItem,
+  onCheckout
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -23,6 +24,7 @@ export default function CartDrawer({
   onRetry: () => void;
   onUpdateQuantity: (productId: string, quantity: number) => Promise<void>;
   onRemoveItem: (productId: string) => Promise<void>;
+  onCheckout?: () => void;
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -129,6 +131,7 @@ export default function CartDrawer({
             onRemoveItem={onRemoveItem}
             headingRef={headingRef}
             onClose={onClose}
+            onCheckout={onCheckout}
           />
         </div>
       </div>

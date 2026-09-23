@@ -166,4 +166,36 @@ describe("CartPanel", () => {
 
     expect(onRetry).not.toHaveBeenCalled();
   });
+
+  it("exposes the Checkout action only for a non-empty Cart", () => {
+    const onCheckout = vi.fn();
+    const { rerender } = render(
+      <CartPanel
+        cart={cart}
+        isPending={false}
+        error={null}
+        onRetry={vi.fn()}
+        onUpdateQuantity={vi.fn()}
+        onRemoveItem={vi.fn()}
+        onCheckout={onCheckout}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
+    expect(onCheckout).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <CartPanel
+        cart={{ items: [], total: 0 }}
+        isPending={false}
+        error={null}
+        onRetry={vi.fn()}
+        onUpdateQuantity={vi.fn()}
+        onRemoveItem={vi.fn()}
+        onCheckout={onCheckout}
+      />
+    );
+
+    expect(screen.queryByRole("button", { name: "Checkout" })).not.toBeInTheDocument();
+  });
 });

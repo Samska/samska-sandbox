@@ -1,10 +1,10 @@
 # SS-031: Elevate Product Storefront UX/UI
 
-- Status: Active
+- Status: Completed
 - Work date: 2026-09-22
-- Last reviewed: 2026-09-22
+- Last reviewed: 2026-09-23
 - Work item: [SS-031](https://github.com/Samska/samska-sandbox/issues/49)
-- Pull request: None at Build/Agent Verification stop
+- Pull request: [PR #52](https://github.com/Samska/samska-sandbox/pull/52) (squash commit `20d9610`)
 - ADRs: [ADR 0003](../adr/0003-adopt-optional-product-media-reference.md); follows [ADR 0001](../adr/0001-adopt-modular-monolith.md) and [ADR 0002](../adr/0002-adopt-tailwind-css-v4-for-frontend-styling.md)
 - Canonical documentation: [Product](../PRODUCT.md), [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md)
 
@@ -66,7 +66,7 @@ Checkout, payments, orders, authentication, persistence, PostgreSQL integration,
 ## Reference
 
 - Issue: [SS-031](https://github.com/Samska/samska-sandbox/issues/49)
-- Pull request: None at Build/Agent Verification stop
+- Pull request: [PR #52](https://github.com/Samska/samska-sandbox/pull/52) (squash commit `20d9610`; Human Verification and CI passed before merge)
 - Relevant source files: `web/src/catalog/Catalog.tsx`, `web/src/catalog/ProductBrowse.tsx`, `web/src/catalog/ProductDetail.tsx`, `web/src/catalog/ProductSetupTools.tsx`, `web/src/catalog/ProductMedia.tsx`, `web/src/catalog/mediaCatalog.ts`, `web/src/catalog/messages.ts`, `web/src/ui/Button.tsx`, `web/src/ui/FormField.tsx`, `web/src/ui/StatusMessage.tsx`, `web/src/cart/Cart.tsx`, `web/src/cart/CartDrawer.tsx`, `web/src/cart/CartTrigger.tsx`, `web/public/media/ATTRIBUTION.md`, `web/src/index.css`
 - ADRs: [ADR 0003](../adr/0003-adopt-optional-product-media-reference.md); follows [ADR 0001](../adr/0001-adopt-modular-monolith.md) and [ADR 0002](../adr/0002-adopt-tailwind-css-v4-for-frontend-styling.md)
 - Canonical documentation: [Product](../PRODUCT.md), [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md), [AI Governance](../AI-GOVERNANCE.md)

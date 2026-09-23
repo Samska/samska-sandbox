@@ -12,6 +12,7 @@ class CartTest {
 
     private static final UUID PRODUCT_ID = UUID.fromString("11111111-1111-1111-1111-111111111111");
     private static final ProductReference PRODUCT = new ProductReference(PRODUCT_ID);
+    private static final UUID OTHER_PRODUCT_ID = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
     @Test
     void addsProductAndCalculatesExactTotal() {
@@ -74,5 +75,34 @@ class CartTest {
                 .isThrownBy(() -> cart.updateQuantity(PRODUCT, new Quantity(1)));
         assertThatExceptionOfType(InvalidCartException.class)
                 .isThrownBy(() -> cart.removeItem(PRODUCT));
+    }
+
+    @Test
+    void snapshotCapturesCartStateAndIsIndependentOfLaterMutation() {
+        var cart = new Cart();
+        cart.addItem(PRODUCT, "Canvas Tote", new BigDecimal("12.50"), new Quantity(2));
+
+        var snapshot = cart.snapshot();
+
+        assertThat(snapshot.items()).hasSize(1);
+        assertThat(snapshot.items().getFirst().quantity().value()).isEqualTo(2);
+        assertThat(snapshot.total()).isEqualByComparingTo("25.00");
+
+        cart.updateQuantity(PRODUCT, new Quantity(4));
+        cart.addItem(new ProductReference(OTHER_PRODUCT_ID), "Pour-Over Set", new BigDecimal("68.50"), new Quantity(1));
+
+        assertThat(snapshot.items()).hasSize(1);
+        assertThat(snapshot.items().getFirst().quantity().value()).isEqualTo(2);
+        assertThat(snapshot.total()).isEqualByComparingTo("25.00");
+        assertThatExceptionOfType(UnsupportedOperationException.class)
+                .isThrownBy(() -> snapshot.items().clear());
+    }
+
+    @Test
+    void snapshotOfEmptyCartIsEmptyWithZeroTotal() {
+        var snapshot = new Cart().snapshot();
+
+        assertThat(snapshot.items()).isEmpty();
+        assertThat(snapshot.total()).isEqualByComparingTo(BigDecimal.ZERO);
     }
 }
