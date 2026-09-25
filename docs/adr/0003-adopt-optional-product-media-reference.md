@@ -1,9 +1,9 @@
 # ADR 0003: Adopt an Optional Product Media Reference
 
-- Status: Accepted
+- Status: Superseded by [ADR 0004](0004-adopt-product-media-upload.md)
 - Date: 2026-09-22
 - Decision makers: Samska (human owner) with AI implementation support
-- Related: [SS-031](https://github.com/Samska/samska-sandbox/issues/49), [ADR 0001](0001-adopt-modular-monolith.md), [ADR 0002](0002-adopt-tailwind-css-v4-for-frontend-styling.md), [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md), [Product](../PRODUCT.md)
+- Related: [SS-031](https://github.com/Samska/samska-sandbox/issues/49), [ADR 0001](0001-adopt-modular-monolith.md), [ADR 0002](0002-adopt-tailwind-css-v4-for-frontend-styling.md), [ADR 0004](0004-adopt-product-media-upload.md), [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md), [Product](../PRODUCT.md)
 
 ## Context
 

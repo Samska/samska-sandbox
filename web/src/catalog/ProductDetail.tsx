@@ -38,7 +38,7 @@ export default function ProductDetail({
       <div className="grid items-start gap-6 px-5 pb-6 min-[52rem]:grid-cols-[minmax(0,1.35fr)_minmax(16rem,1fr)]">
         <div className="grid gap-4">
           <div className="flex items-center gap-3">
-            <ProductMedia name={product.name} mediaKey={product.mediaKey} variant="detail" />
+            <ProductMedia product={product} variant="detail" />
             <div className="grid gap-1.5">
               <p className="text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted">
                 Product

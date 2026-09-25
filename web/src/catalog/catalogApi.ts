@@ -11,12 +11,16 @@ export interface ProductResponse {
   description: string;
   price: number;
   mediaKey: string | null;
+  uploadedMediaId: string | null;
 }
 
 export type CatalogApiErrorKind =
   | "bad-request"
   | "not-found"
   | "conflict"
+  | "too-large"
+  | "storage-full"
+  | "unsupported-media"
   | "network"
   | "server"
   | "invalid-response";
@@ -50,17 +54,25 @@ export async function updateProduct(
 }
 
 export async function deleteProduct(id: string): Promise<void> {
-  let response: Response;
+  return requestWithoutBody(`/api/products/${encodeURIComponent(id)}`, "DELETE");
+}
 
-  try {
-    response = await fetch(`/api/products/${encodeURIComponent(id)}`, { method: "DELETE" });
-  } catch {
-    throw new CatalogApiError("network");
-  }
+export async function getProduct(id: string): Promise<ProductResponse> {
+  return requestProduct(`/api/products/${encodeURIComponent(id)}`, 200);
+}
 
-  if (response.status !== 204) {
-    throw new CatalogApiError(errorKindFor(response.status));
-  }
+export async function uploadProductMedia(id: string, file: File): Promise<ProductResponse> {
+  const body = new FormData();
+  body.append("file", file);
+
+  return requestProduct(`/api/products/${encodeURIComponent(id)}/media`, 200, {
+    method: "PUT",
+    body
+  });
+}
+
+export async function removeProductMedia(id: string): Promise<void> {
+  return requestWithoutBody(`/api/products/${encodeURIComponent(id)}/media`, "DELETE");
 }
 
 export async function listProducts(): Promise<ProductResponse[]> {
@@ -91,6 +103,20 @@ export async function listProducts(): Promise<ProductResponse[]> {
   return payload;
 }
 
+async function requestWithoutBody(path: string, method: string): Promise<void> {
+  let response: Response;
+
+  try {
+    response = await fetch(path, { method });
+  } catch {
+    throw new CatalogApiError("network");
+  }
+
+  if (response.status !== 204) {
+    throw new CatalogApiError(errorKindFor(response.status));
+  }
+}
+
 async function requestProduct(
   path: string,
   expectedStatus: number,
@@ -105,7 +131,7 @@ async function requestProduct(
   }
 
   if (response.status !== expectedStatus) {
-    throw new CatalogApiError(errorKindFor(response.status));
+    throw new CatalogApiError(await errorKindForResponse(response));
   }
 
   let payload: unknown;
@@ -123,6 +149,29 @@ async function requestProduct(
   return payload;
 }
 
+async function errorKindForResponse(response: Response): Promise<CatalogApiErrorKind> {
+  if (response.status === 413 && (await errorCodeFor(response)) === "storage-capacity-exceeded") {
+    return "storage-full";
+  }
+
+  return errorKindFor(response.status);
+}
+
+async function errorCodeFor(response: Response): Promise<string | null> {
+  try {
+    const payload: unknown = await response.json();
+
+    if (typeof payload === "object" && payload !== null && !Array.isArray(payload)) {
+      const code = (payload as Record<string, unknown>).code;
+      return typeof code === "string" ? code : null;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
 function errorKindFor(status: number): CatalogApiErrorKind {
   if (status === 400) {
     return "bad-request";
@@ -134,6 +183,14 @@ function errorKindFor(status: number): CatalogApiErrorKind {
 
   if (status === 409) {
     return "conflict";
+  }
+
+  if (status === 413) {
+    return "too-large";
+  }
+
+  if (status === 415) {
+    return "unsupported-media";
   }
 
   return "server";
@@ -148,17 +205,19 @@ function isProductResponse(value: unknown): value is ProductResponse {
   const keys = Object.keys(product);
 
   return (
-    keys.length === 5 &&
+    keys.length === 6 &&
     keys.includes("id") &&
     keys.includes("name") &&
     keys.includes("description") &&
     keys.includes("price") &&
     keys.includes("mediaKey") &&
+    keys.includes("uploadedMediaId") &&
     typeof product.id === "string" &&
     typeof product.name === "string" &&
     typeof product.description === "string" &&
     typeof product.price === "number" &&
     Number.isFinite(product.price) &&
-    (product.mediaKey === null || typeof product.mediaKey === "string")
+    (product.mediaKey === null || typeof product.mediaKey === "string") &&
+    (product.uploadedMediaId === null || typeof product.uploadedMediaId === "string")
   );
 }

@@ -81,7 +81,7 @@ export default function ProductBrowse({
               key={product.id}
               className="grid grid-rows-[auto_minmax(0,1fr)_auto_auto] gap-4 rounded-lg border border-border bg-surface p-4 hover:border-border-strong hover:shadow-product focus-within:border-border-strong focus-within:shadow-product"
             >
-              <ProductMedia name={product.name} mediaKey={product.mediaKey} variant="card" />
+              <ProductMedia product={product} variant="card" />
               <div className="grid min-w-0 content-start gap-1">
                 <h3 className="text-base font-extrabold leading-snug tracking-[-0.01em] text-ink">
                   {product.name}

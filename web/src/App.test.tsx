@@ -79,6 +79,67 @@ describe("App", () => {
       await screen.findByRole("heading", { name: "Product management", level: 1 })
     ).toBeInTheDocument();
   });
+
+  it("renders the dedicated Create Product form at /admin/products/new", async () => {
+    window.history.replaceState({}, "", "/admin/products/new");
+    stubFetch();
+    render(<App />);
+
+    expect(
+      await screen.findByRole("heading", { name: "Create Product", level: 1 })
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Products", level: 1 })).not.toBeInTheDocument();
+
+    const navigation = screen.getByRole("navigation", { name: "Primary" });
+    expect(within(navigation).getByRole("link", { name: "Admin" })).toHaveAttribute(
+      "aria-current",
+      "page"
+    );
+  });
+
+  it("renders the dedicated edit form at /admin/products/{id}/edit", async () => {
+    const id = "11111111-1111-1111-1111-111111111111";
+    window.history.replaceState({}, "", `/admin/products/${id}/edit`);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(() =>
+        Promise.resolve(
+          response(200, {
+            id,
+            name: "Canvas Tote",
+            description: "A sturdy everyday tote.",
+            price: 12.5,
+            mediaKey: null,
+            uploadedMediaId: null
+          })
+        )
+      )
+    );
+    render(<App />);
+
+    expect(await screen.findByLabelText("Name")).toHaveValue("Canvas Tote");
+    expect(screen.getByRole("heading", { name: "Edit Product", level: 1 })).toBeInTheDocument();
+  });
+
+  it("keeps unknown Admin sub-paths on the not-found surface", () => {
+    window.history.replaceState({}, "", "/admin/products/not-a-route");
+    stubFetch();
+    render(<App />);
+
+    expect(
+      screen.getByRole("heading", { name: "This page does not exist", level: 1 })
+    ).toBeInTheDocument();
+  });
+
+  it("renders the not-found surface for a malformed percent-encoded edit path", () => {
+    window.history.replaceState({}, "", "/admin/products/%E0%A4%A/edit");
+    stubFetch();
+    render(<App />);
+
+    expect(
+      screen.getByRole("heading", { name: "This page does not exist", level: 1 })
+    ).toBeInTheDocument();
+  });
 });
 
 function response(status: number, body?: unknown): Response {

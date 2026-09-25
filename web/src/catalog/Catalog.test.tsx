@@ -7,7 +7,8 @@ const createdProduct = {
   name: "Canvas Tote",
   description: "A sturdy everyday tote for groceries and market runs.",
   price: 12.5,
-  mediaKey: null
+  mediaKey: null,
+  uploadedMediaId: null
 };
 
 const emptyCart = { items: [], total: 0 };

@@ -1,14 +1,19 @@
+import AdminProductCreate from "./admin/AdminProductCreate";
+import AdminProductEdit from "./admin/AdminProductEdit";
 import AdminProducts from "./admin/AdminProducts";
 import Catalog from "./catalog/Catalog";
 import NotFound from "./NotFound";
 
 const marketPath = "/";
 const adminProductsPath = "/admin/products";
+const adminProductNewPath = "/admin/products/new";
+const adminProductEditPattern = /^\/admin\/products\/([^/]+)\/edit$/;
 
 export default function App() {
   const path = normalizedPath();
   const isMarket = path === marketPath;
-  const isAdminProducts = path === adminProductsPath;
+  const isAdmin =
+    path === adminProductsPath || path.startsWith(`${adminProductsPath}/`);
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -42,9 +47,9 @@ export default function App() {
               Market
             </a>
             <a
-              className={navLinkClassName(isAdminProducts)}
+              className={navLinkClassName(isAdmin)}
               href="/admin/products"
-              aria-current={isAdminProducts ? "page" : undefined}
+              aria-current={isAdmin ? "page" : undefined}
             >
               Admin
             </a>
@@ -56,7 +61,7 @@ export default function App() {
         id="main-content"
         tabIndex={-1}
       >
-        {isAdminProducts ? <AdminProducts /> : isMarket ? <Catalog /> : <NotFound />}
+        {renderSurface(path)}
       </main>
       <footer className="border-t border-border bg-surface">
         <div className="mx-auto flex w-[min(100%-2.5rem,76rem)] flex-wrap items-center justify-between gap-2 py-6 text-sm text-muted">
@@ -66,6 +71,40 @@ export default function App() {
       </footer>
     </div>
   );
+}
+
+function renderSurface(path: string) {
+  if (path === marketPath) {
+    return <Catalog />;
+  }
+
+  if (path === adminProductsPath) {
+    return <AdminProducts />;
+  }
+
+  if (path === adminProductNewPath) {
+    return <AdminProductCreate />;
+  }
+
+  const editMatch = adminProductEditPattern.exec(path);
+
+  if (editMatch !== null) {
+    const productId = decodePathSegment(editMatch[1]);
+
+    if (productId !== null) {
+      return <AdminProductEdit productId={productId} />;
+    }
+  }
+
+  return <NotFound />;
+}
+
+function decodePathSegment(segment: string): string | null {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return null;
+  }
 }
 
 function normalizedPath(): string {

@@ -27,4 +27,6 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 
 [ADR 0002: Adopt Tailwind CSS v4 for Frontend Styling](0002-adopt-tailwind-css-v4-for-frontend-styling.md) records the accepted frontend styling foundation.
 
-The accepted decision [ADR 0003: Adopt an Optional Product Media Reference](0003-adopt-optional-product-media-reference.md) records the optional Product media direction.
+[ADR 0003: Adopt an Optional Product Media Reference](0003-adopt-optional-product-media-reference.md) recorded the curated Product media direction; its no-upload decision is superseded by ADR 0004.
+
+[ADR 0004: Adopt Product Media Upload with Bounded In-Memory Storage](0004-adopt-product-media-upload.md) records the accepted upload, storage, validation, and serving direction.

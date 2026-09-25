@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Target milestone:** `v0.1.0 — First Order` (unreleased)
-- **Current stage:** Admin Catalog Management implemented
-- **Next planned work:** Product Media Upload
+- **Current stage:** Product Media Upload implemented
+- **Next planned work:** Payment Simulator
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -23,9 +23,9 @@ are build metadata, not evidence of a published product release.
 
 Samska Sandbox uses a fictional catalog and order journey to demonstrate
 evidence-driven engineering. The current application contains a Java/Spring
-Boot backend, a React/TypeScript frontend, a Catalog boundary for Products, a
-process-local Cart boundary, an editable Checkout view over the current Cart, and
-a separate Admin Product-management surface.
+Boot backend, a React/TypeScript frontend, a Catalog boundary for Products with
+bounded local media upload, a process-local Cart boundary, an editable Checkout
+view over the current Cart, and a separate Admin Product-management surface.
 
 AI agents are implementation tools operating under repository-defined
 governance. Humans own requirements, architecture, decisions, review,
@@ -43,11 +43,12 @@ validation, learning, and risk.
 | Product UX Foundation | Implemented | Commerce-oriented shell, responsive Product browsing, integrated Cart presentation, and accessible feedback. |
 | Product Storefront UX/UI | Implemented | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged. |
 | Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource, identity, or snapshot exists yet. |
-| Admin Catalog Management | Implemented | Distinct `/admin/products` surface with Product listing, case-insensitive name search, create/edit/delete, and explicit delete confirmation; the backend refuses deletion with `409` while the Product is in the current Cart; `/admin/products` is navigation only, not access control. |
+| Admin Catalog Management | Implemented | Compact management list at `/admin/products` with case-insensitive name search, thumbnails, Edit links, and delete confirmation; dedicated `/admin/products/new` and `/admin/products/{id}/edit` forms with staged image selection; Admin paths are navigation only, not access control. |
+| Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in bounded backend process memory; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
-| Product Media Upload, payment, orders, E2E, deployment | Planned | The remaining capabilities after Admin Catalog Management in the owner-approved sequence; end-to-end automation and deployment follow the local MVP. |
+| Payment, orders, E2E, deployment | Planned | The remaining capabilities after Product Media Upload in the owner-approved sequence; end-to-end automation and deployment follow the local MVP. |
 
 ## Architecture
 
@@ -60,15 +61,19 @@ flowchart LR
     HTTP --> App[Catalog and Cart applications<br/>plus Product/Cart<br/>deletion coordination]
     App --> Domain[Product domain]
     App --> Store[ProductStore boundary]
-    Store --> Memory[InMemoryProductStore<br/>process-local]
+    Store --> Memory[InMemoryProductStore<br/>process-local<br/>Product + uploaded media]
     App --> Cart[Cart aggregate]
     Cart --> CartMemory[InMemoryCartStore<br/>single current Cart]
 
     Postgres[(PostgreSQL<br/>optional local Compose infrastructure<br/>not connected to application)]
 ```
 
-The Vite proxy is for local development only. Product and Cart data are held in
-process memory and are lost when the backend restarts. Checkout is a frontend
+The Vite proxy is for local development only. Product and Cart data, including
+uploaded Product media, are held in process memory and are lost when the backend
+restarts. Uploaded media is validated, dimension-checked, and re-encoded as JPEG
+before storage, is limited to one image per Product, and is served only for the
+Product's current media ID; rejection leaves the Product and its current image
+unchanged. Checkout is a frontend
 review of the current Cart and holds no server-side state at this stage. The
 Admin surface is a separate frontend route over the same Catalog API, and
 `/admin/products` provides no access control. Product deletion is refused with
@@ -126,11 +131,11 @@ components.
 The Product Storefront UX/UI refinement (SS-031) is complete and merged through
 PR #52. Checkout (SS-032) is implemented as an editable live view of the current
 Cart; the immutable transactional snapshot is deferred to Payment Simulator
-work. Admin Catalog Management (SS-033) adds a distinct Admin
-Product-management surface at `/admin/products` with local name search and
-Product create/edit/delete, and the backend refuses deletion with `409 Conflict`
-while a Product is in the current Cart. The owner-approved sequence continues
-with Product Media Upload, Payment Simulator, order creation, the complete First
+work. Admin Catalog Management (SS-033) is complete and merged through PR #56.
+Product Media Upload (SS-034) adds bounded, validated, in-memory JPEG upload per
+Product with uploaded-media display precedence and a retained curated/monogram
+fallback. The owner-approved sequence continues
+with Payment Simulator, order creation, the complete First
 Order journey, and then the `v0.1.0` release. Authentication and authorization
 remain deferred until after the local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary.
