@@ -30,30 +30,27 @@ never renumbered.
 | Product Discovery | SS-029 |
 | Product Storefront UX/UI refinement | SS-031 |
 | Checkout vertical slice | SS-032 |
+| Admin Catalog Management | SS-033 |
 
 ### Future Product Sequence
 
-1. Admin Catalog Management (in progress, SS-033)
-2. Product Media Upload
-3. Payment simulator
-4. Order creation
-5. First Order end-to-end journey
-6. Release `v0.1.0`
+1. Product Media Upload (in progress, SS-034)
+2. Payment simulator
+3. Order creation
+4. First Order end-to-end journey
+5. Release `v0.1.0`
 
 Future capabilities receive their SS identifier when their Issues are created.
 
-Admin Catalog Management (SS-033) is in progress and is not complete or merged
-until its verification and merge are recorded. It moves Product setup and
-administrative behavior out of the customer Market surface into a distinct Admin
-Product-management surface at `/admin/products` with Product listing,
-case-insensitive name search, create/edit/delete, and a backend `409 Conflict`
-refusal when a Product is in the current Cart. It introduces real URL routing
-with plain same-origin links rather than a router dependency; `/admin/products`
-is navigation, not an access-control boundary before authentication/authorization
-exists. Product Media Upload follows as a separate capability that will evaluate
-Product media upload/storage and supersede or extend the curated `mediaKey`
-approach. The exact architecture of that capability remains subject to its future
-Issue's plan.
+Admin Catalog Management (SS-033) is complete and merged through PR #56. Product
+Media Upload (SS-034) is in progress and is not complete or merged until its
+verification and merge are recorded. It adds one validated, re-encoded JPEG per
+Product stored in bounded backend process memory, gives uploaded media display
+precedence on Market cards and Product detail, preserves the curated `mediaKey`
+selection and the monogram fallback, and supersedes the no-upload decision of
+ADR 0003 through ADR 0004. Its endpoints are unauthenticated and bound retained
+media, not peak memory; `/admin/products` remains navigation, not an
+access-control boundary. Payment simulator follows as a separate capability.
 
 ### MVP Boundaries
 
@@ -61,9 +58,10 @@ The local MVP deliberately defers authentication and authorization. They are
 deferred until after the local First Order MVP but are a mandatory prerequisite
 for any hosted environment, and no hosting work begins before the MVP. The MVP
 also remains process-local: Cart state is lost when the backend restarts,
-Checkout holds no server-side state at this stage, and the application has no
-persistence or deployed environment. The immutable transactional snapshot is
-deferred to Payment Simulator work.
+uploaded Product media is lost together with its Product, Checkout holds no
+server-side state at this stage, and the application has no persistence or
+deployed environment. The immutable transactional snapshot is deferred to Payment
+Simulator work.
 
 ## Versioning And Releases
 

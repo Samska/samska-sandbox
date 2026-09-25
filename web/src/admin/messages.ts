@@ -1,5 +1,9 @@
 import { CatalogApiError } from "../catalog/catalogApi";
 
+export function isNetworkError(error: unknown): boolean {
+  return error instanceof CatalogApiError && error.kind === "network";
+}
+
 export function adminLoadErrorMessage(error: unknown): string {
   if (error instanceof CatalogApiError && error.kind === "network") {
     return "The Product service could not be reached. Try again.";
@@ -28,6 +32,40 @@ export function adminSaveErrorMessage(error: unknown): string {
 
     if (error.kind === "network") {
       return "The Product service could not be reached. Try again.";
+    }
+
+    if (error.kind === "invalid-response") {
+      return "The Product service returned an unexpected response. Try again.";
+    }
+  }
+
+  return "The Product service failed. Try again.";
+}
+
+export function adminMediaErrorMessage(error: unknown): string {
+  if (error instanceof CatalogApiError) {
+    if (error.kind === "storage-full") {
+      return "Product image storage is full. Remove an uploaded image from another Product, then try again.";
+    }
+
+    if (error.kind === "too-large") {
+      return "The image was rejected because it is too large for the allowed limits. Try a smaller image.";
+    }
+
+    if (error.kind === "unsupported-media") {
+      return "Only JPEG images are accepted.";
+    }
+
+    if (error.kind === "bad-request") {
+      return "The image could not be read. Choose a valid JPEG file.";
+    }
+
+    if (error.kind === "not-found") {
+      return "This Product no longer exists. Reload the Product list.";
+    }
+
+    if (error.kind === "network") {
+      return "The Product service could not be reached. The image change could not be confirmed; check the current image before trying again.";
     }
 
     if (error.kind === "invalid-response") {

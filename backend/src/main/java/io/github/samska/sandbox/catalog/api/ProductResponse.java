@@ -5,14 +5,16 @@ import java.util.UUID;
 
 import io.github.samska.sandbox.catalog.Product;
 
-public record ProductResponse(UUID id, String name, String description, BigDecimal price, String mediaKey) {
+public record ProductResponse(
+        UUID id, String name, String description, BigDecimal price, String mediaKey, UUID uploadedMediaId) {
 
-    public static ProductResponse from(Product product) {
+    public static ProductResponse from(Product product, UUID uploadedMediaId) {
         return new ProductResponse(
                 product.id().value(),
                 product.name(),
                 product.description(),
                 product.price(),
-                product.mediaKey());
+                product.mediaKey(),
+                uploadedMediaId);
     }
 }

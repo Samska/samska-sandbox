@@ -14,9 +14,11 @@ import io.github.samska.sandbox.catalog.ProductId;
 public class ProductApplicationService implements ProductCatalog {
 
     private final ProductStore productStore;
+    private final ProductMediaNormalizer productMediaNormalizer;
 
-    public ProductApplicationService(ProductStore productStore) {
+    public ProductApplicationService(ProductStore productStore, ProductMediaNormalizer productMediaNormalizer) {
         this.productStore = productStore;
+        this.productMediaNormalizer = productMediaNormalizer;
     }
 
     public Product createProduct(String name, String description, BigDecimal price, String mediaKey) {
@@ -25,12 +27,11 @@ public class ProductApplicationService implements ProductCatalog {
         return product;
     }
 
-    public Product updateProduct(ProductId id, String name, String description, BigDecimal price, String mediaKey) {
+    public ProductSnapshot updateProduct(
+            ProductId id, String name, String description, BigDecimal price, String mediaKey) {
         var updatedProduct = new Product(id, name, description, price, mediaKey);
-        if (!productStore.replace(updatedProduct)) {
-            throw new ProductNotFoundException(id);
-        }
-        return updatedProduct;
+        return productStore.replaceProduct(updatedProduct)
+                .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
     public void deleteProduct(ProductId id) {
@@ -40,17 +41,58 @@ public class ProductApplicationService implements ProductCatalog {
     }
 
     public Product getProduct(ProductId id) {
+        return getSnapshot(id).product();
+    }
+
+    public ProductSnapshot getSnapshot(ProductId id) {
         return productStore.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
-    public List<Product> listProducts() {
+    public List<ProductSnapshot> listProducts() {
         return productStore.findAll().stream().toList();
+    }
+
+    public ProductSnapshot uploadMedia(ProductId id, byte[] content) {
+        var normalized = productMediaNormalizer.normalizeJpeg(content);
+        var media = new UploadedMedia(UUID.randomUUID(), normalized);
+        var change = productStore.replaceMedia(id, media);
+
+        return switch (change.result()) {
+            case UPDATED -> change.snapshot();
+            case PRODUCT_NOT_FOUND -> throw new ProductNotFoundException(id);
+            case CAPACITY_EXCEEDED -> throw new MediaCapacityExceededException();
+            case REMOVED, NO_MEDIA -> throw new IllegalStateException(
+                    "Unexpected media replacement result: " + change.result());
+        };
+    }
+
+    public void removeMedia(ProductId id) {
+        var result = productStore.removeMedia(id);
+
+        switch (result) {
+            case REMOVED, NO_MEDIA -> {
+            }
+            case PRODUCT_NOT_FOUND -> throw new ProductNotFoundException(id);
+            case UPDATED, CAPACITY_EXCEEDED -> throw new IllegalStateException(
+                    "Unexpected media removal result: " + result);
+        }
+    }
+
+    public UploadedMedia getMedia(ProductId id, UUID mediaId) {
+        var media = getSnapshot(id).media();
+        if (media == null || !media.id().equals(mediaId)) {
+            throw new MediaNotFoundException();
+        }
+        return media;
     }
 
     @Override
     public Optional<CatalogProduct> findById(UUID id) {
         return productStore.findById(new ProductId(id))
-                .map(product -> new CatalogProduct(product.id().value(), product.name(), product.price()));
+                .map(snapshot -> new CatalogProduct(
+                        snapshot.product().id().value(),
+                        snapshot.product().name(),
+                        snapshot.product().price()));
     }
 }

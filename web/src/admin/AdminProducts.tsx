@@ -1,25 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import {
   CatalogApiError,
-  createProduct,
   deleteProduct,
   listProducts,
-  updateProduct,
   type ProductResponse
 } from "../catalog/catalogApi";
-import ProductForm, { type ProductFormValues } from "./ProductForm";
+import ProductMedia from "../catalog/ProductMedia";
+import { curatedMediaSource } from "../catalog/mediaCatalog";
 import { formatAmount } from "../formatAmount";
 import Button from "../ui/Button";
 import FormField from "../ui/FormField";
 import StatusMessage from "../ui/StatusMessage";
-import { adminDeleteErrorMessage, adminLoadErrorMessage, adminRefreshErrorMessage, adminSaveErrorMessage } from "./messages";
+import { adminDeleteErrorMessage, adminLoadErrorMessage, adminRefreshErrorMessage } from "./messages";
 
 type FocusTarget =
-  | { kind: "edit-button"; productId: string }
   | { kind: "delete-button"; productId: string }
-  | { kind: "edit-submit"; productId: string }
   | { kind: "confirm-cancel"; productId: string }
-  | { kind: "create-submit" }
   | { kind: "products-heading" };
 
 const PRODUCTS_HEADING_ID = "admin-products-heading";
@@ -30,18 +26,12 @@ export default function AdminProducts() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [notice, setNotice] = useState<string | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
-  const [createError, setCreateError] = useState<string | null>(null);
-  const [createFormKey, setCreateFormKey] = useState(0);
-  const [editingProductId, setEditingProductId] = useState<string | null>(null);
-  const [isSavingEdit, setIsSavingEdit] = useState(false);
-  const [editError, setEditError] = useState<string | null>(null);
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deleteIsConflict, setDeleteIsConflict] = useState(false);
   const pendingFocusRef = useRef<FocusTarget | null>(null);
-  const isBusy = isLoading || isCreating || isSavingEdit || isDeleting;
+  const isBusy = isLoading || isDeleting;
 
   useEffect(() => {
     void refreshProducts();
@@ -63,82 +53,23 @@ export default function AdminProducts() {
   });
 
   async function refreshProducts() {
-    await loadProducts(adminLoadErrorMessage);
-  }
-
-  async function refreshProductsAfterMutation() {
-    await loadProducts(() => adminRefreshErrorMessage());
-  }
-
-  async function loadProducts(failureMessage: (error: unknown) => string) {
     setIsLoading(true);
     setLoadError(null);
 
     try {
       setProducts(await listProducts());
     } catch (caughtError) {
-      setLoadError(failureMessage(caughtError));
+      setLoadError(adminLoadErrorMessage(caughtError));
     } finally {
       setIsLoading(false);
     }
   }
 
-  async function handleCreate(values: ProductFormValues) {
-    setIsCreating(true);
-    setCreateError(null);
-    setNotice(null);
-
+  async function refreshProductsAfterMutation() {
     try {
-      const created = await createProduct(values);
-      setNotice(`${created.name} was created.`);
-      setCreateFormKey((key) => key + 1);
-      pendingFocusRef.current = { kind: "edit-button", productId: created.id };
-      await refreshProductsAfterMutation();
-    } catch (caughtError) {
-      setCreateError(adminSaveErrorMessage(caughtError));
-      pendingFocusRef.current = { kind: "create-submit" };
-    } finally {
-      setIsCreating(false);
-    }
-  }
-
-  function startEditing(productId: string) {
-    setEditingProductId(productId);
-    setEditError(null);
-    setConfirmingDeleteId(null);
-    setDeleteError(null);
-    setDeleteIsConflict(false);
-    setNotice(null);
-  }
-
-  function cancelEditing(productId: string) {
-    setEditingProductId(null);
-    setEditError(null);
-    pendingFocusRef.current = { kind: "edit-button", productId };
-  }
-
-  async function handleEdit(values: ProductFormValues) {
-    const productId = editingProductId;
-
-    if (productId === null) {
-      return;
-    }
-
-    setIsSavingEdit(true);
-    setEditError(null);
-    setNotice(null);
-
-    try {
-      const updated = await updateProduct(productId, values);
-      setNotice(`${updated.name} was updated.`);
-      setEditingProductId(null);
-      pendingFocusRef.current = { kind: "edit-button", productId };
-      await refreshProductsAfterMutation();
-    } catch (caughtError) {
-      setEditError(adminSaveErrorMessage(caughtError));
-      pendingFocusRef.current = { kind: "edit-submit", productId };
-    } finally {
-      setIsSavingEdit(false);
+      setProducts(await listProducts());
+    } catch {
+      setLoadError(adminRefreshErrorMessage());
     }
   }
 
@@ -146,7 +77,6 @@ export default function AdminProducts() {
     setConfirmingDeleteId(productId);
     setDeleteError(null);
     setDeleteIsConflict(false);
-    setEditingProductId(null);
     setNotice(null);
   }
 
@@ -189,38 +119,28 @@ export default function AdminProducts() {
 
   return (
     <div className="grid gap-6">
-      <div className="grid gap-1.5">
-        <p className="text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted">Admin</p>
-        <h1
-          id="admin-heading"
-          className="text-[clamp(1.75rem,3.5vw,2.5rem)] leading-[1.1] tracking-[-0.03em] text-ink"
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div className="grid gap-1.5">
+          <p className="text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted">Admin</p>
+          <h1
+            id="admin-heading"
+            className="text-[clamp(1.75rem,3.5vw,2.5rem)] leading-[1.1] tracking-[-0.03em] text-ink"
+          >
+            Product management
+          </h1>
+          <p className="max-w-prose text-muted">
+            Find, edit, and delete Products. This local surface is navigation only and has no access
+            control; the Market and Admin share the same Catalog.
+          </p>
+        </div>
+        <a
+          className="inline-flex min-h-11 items-center justify-center rounded-sm border border-brand bg-brand px-4 py-2.5 font-bold text-white no-underline hover:border-brand-dark hover:bg-brand-dark"
+          href="/admin/products/new"
         >
-          Product management
-        </h1>
-        <p className="max-w-prose text-muted">
-          Create, edit, and delete Products. This local surface is navigation only and has no
-          access control; the Market and Admin share the same Catalog.
-        </p>
-      </div>
-      <section
-        className="grid gap-5 rounded-lg border border-border bg-surface p-5"
-        aria-labelledby="admin-create-heading"
-      >
-        <h2 id="admin-create-heading" className="text-lg leading-[1.15] text-ink">
           Create Product
-        </h2>
-        <ProductForm
-          key={createFormKey}
-          idPrefix="admin-create"
-          headingId="admin-create-heading"
-          submitLabel="Create Product"
-          pendingLabel="Creating Product..."
-          isPending={isCreating}
-          error={createError}
-          onSubmit={(values) => void handleCreate(values)}
-        />
-      </section>
-      <section className="grid gap-4" aria-labelledby={PRODUCTS_HEADING_ID}>
+        </a>
+      </div>
+      <section className="grid gap-4" aria-labelledby={PRODUCTS_HEADING_ID} aria-busy={isBusy}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2
             id={PRODUCTS_HEADING_ID}
@@ -273,7 +193,9 @@ export default function AdminProducts() {
         {!isLoading && loadError === null && products.length === 0 ? (
           <div className="grid gap-2 rounded-lg bg-surface-muted px-4 py-5">
             <p className="font-bold text-ink">No Products exist yet.</p>
-            <p className="text-sm text-muted">Create the first Product with the form above.</p>
+            <p className="text-sm text-muted">
+              Use Create Product to add the first Product to the Catalog.
+            </p>
           </div>
         ) : null}
         {!isLoading && loadError === null && products.length > 0 && visibleProducts.length === 0 ? (
@@ -285,90 +207,53 @@ export default function AdminProducts() {
           </div>
         ) : null}
         {!isLoading && loadError === null && visibleProducts.length > 0 ? (
-          <ul className="grid list-none gap-4 p-0 m-0">
+          <ul className="grid list-none gap-2 p-0 m-0">
             {visibleProducts.map((product) => (
-              <li
-                key={product.id}
-                className="grid gap-4 rounded-lg border border-border bg-surface p-4"
-              >
-                {editingProductId === product.id ? (
-                  <section
-                    className="grid gap-4"
-                    aria-labelledby={`admin-edit-heading-${product.id}`}
-                  >
-                    <h3
-                      id={`admin-edit-heading-${product.id}`}
-                      className="text-lg leading-[1.15] text-ink"
-                    >
-                      Edit {product.name}
+              <li key={product.id} className="rounded-md border border-border bg-surface">
+                <div className="grid gap-3 p-3 min-[40rem]:min-h-16 min-[40rem]:grid-cols-[auto_minmax(0,1fr)_auto_auto] min-[40rem]:items-center min-[40rem]:gap-4">
+                  <ProductMedia product={product} variant="thumbnail" />
+                  <div className="grid min-w-0 gap-0.5">
+                    <h3 className="truncate text-base font-extrabold leading-snug tracking-[-0.01em] text-ink">
+                      {product.name}
                     </h3>
-                    <ProductForm
-                      idPrefix={`admin-edit-${product.id}`}
-                      headingId={`admin-edit-heading-${product.id}`}
-                      initialValues={{
-                        name: product.name,
-                        description: product.description,
-                        price: product.price,
-                        mediaKey: product.mediaKey
-                      }}
-                      submitLabel="Save changes"
-                      pendingLabel="Saving changes..."
-                      isPending={isSavingEdit}
-                      error={editError}
-                      onSubmit={(values) => void handleEdit(values)}
-                      onCancel={() => cancelEditing(product.id)}
+                    <p className="text-sm text-muted">{imageStateLabel(product)}</p>
+                  </div>
+                  <p className="text-base font-extrabold tracking-[-0.01em] text-ink">
+                    {formatAmount(product.price)}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <a
+                      id={`admin-edit-${product.id}`}
+                      className="inline-flex min-h-10 items-center justify-center rounded-sm border border-border-strong bg-surface px-3 text-sm font-bold text-brand-dark no-underline hover:border-brand hover:bg-brand hover:text-white"
+                      href={`/admin/products/${encodeURIComponent(product.id)}/edit`}
+                      aria-label={`Edit ${product.name}`}
+                    >
+                      Edit
+                    </a>
+                    <Button
+                      id={`admin-delete-${product.id}`}
+                      variant="danger"
+                      size="sm"
+                      onClick={() => requestDeletion(product.id)}
+                      disabled={isBusy}
+                      aria-label={`Delete ${product.name}`}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+                {confirmingDeleteId === product.id ? (
+                  <div className="border-t border-border p-3">
+                    <DeleteConfirmation
+                      product={product}
+                      isPending={isDeleting}
+                      error={deleteError}
+                      isConflict={deleteIsConflict}
+                      onCancel={() => cancelDeletion(product.id)}
+                      onConfirm={() => void confirmDeletion(product.id)}
                     />
-                  </section>
-                ) : (
-                  <>
-                    <div className="grid gap-1.5">
-                      <h3 className="text-base font-extrabold leading-snug tracking-[-0.01em] text-ink">
-                        {product.name}
-                      </h3>
-                      <p className="text-sm leading-relaxed text-muted">{product.description}</p>
-                      <dl className="grid gap-x-4 gap-y-1 text-sm [grid-template-columns:minmax(5rem,auto)_minmax(0,1fr)]">
-                        <dt className="text-muted">Product ID</dt>
-                        <dd className="m-0 font-bold [overflow-wrap:anywhere]">{product.id}</dd>
-                        <dt className="text-muted">Price</dt>
-                        <dd className="m-0 font-bold">{formatAmount(product.price)}</dd>
-                        <dt className="text-muted">Media</dt>
-                        <dd className="m-0 font-bold">{product.mediaKey ?? "No media"}</dd>
-                      </dl>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Button
-                        id={`admin-edit-${product.id}`}
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => startEditing(product.id)}
-                        disabled={isBusy}
-                        aria-label={`Edit ${product.name}`}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        id={`admin-delete-${product.id}`}
-                        variant="danger"
-                        size="sm"
-                        onClick={() => requestDeletion(product.id)}
-                        disabled={isBusy}
-                        aria-label={`Delete ${product.name}`}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                    {confirmingDeleteId === product.id ? (
-                      <DeleteConfirmation
-                        product={product}
-                        isPending={isDeleting}
-                        error={deleteError}
-                        isConflict={deleteIsConflict}
-                        onCancel={() => cancelDeletion(product.id)}
-                        onConfirm={() => void confirmDeletion(product.id)}
-                      />
-                    ) : null}
-                  </>
-                )}
+                  </div>
+                ) : null}
               </li>
             ))}
           </ul>
@@ -376,6 +261,20 @@ export default function AdminProducts() {
       </section>
     </div>
   );
+}
+
+function imageStateLabel(product: ProductResponse): string {
+  if (product.uploadedMediaId !== null) {
+    return "Uploaded image";
+  }
+
+  if (product.mediaKey === null) {
+    return "No image";
+  }
+
+  return curatedMediaSource(product.mediaKey) !== undefined
+    ? "Curated image"
+    : "Monogram (media key has no local asset)";
 }
 
 function DeleteConfirmation({
@@ -461,17 +360,11 @@ function adjacentDeleteTarget(displayOrder: string[], removedProductId: string):
 
 function focusTarget(target: FocusTarget) {
   const elementId =
-    target.kind === "edit-button"
-      ? `admin-edit-${target.productId}`
-      : target.kind === "delete-button"
-        ? `admin-delete-${target.productId}`
-        : target.kind === "edit-submit"
-          ? `admin-edit-${target.productId}-submit`
-          : target.kind === "confirm-cancel"
-            ? `admin-confirm-cancel-${target.productId}`
-            : target.kind === "create-submit"
-              ? "admin-create-submit"
-              : PRODUCTS_HEADING_ID;
+    target.kind === "delete-button"
+      ? `admin-delete-${target.productId}`
+      : target.kind === "confirm-cancel"
+        ? `admin-confirm-cancel-${target.productId}`
+        : PRODUCTS_HEADING_ID;
   const element = document.getElementById(elementId);
 
   if (element !== null) {

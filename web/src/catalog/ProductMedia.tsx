@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { mediaSourceFor } from "./mediaCatalog";
+import type { ProductResponse } from "./catalogApi";
+import { productMediaSource } from "./mediaCatalog";
 
 const mediaAccentClassName = [
   "border-media-teal/35 text-media-teal",
@@ -8,29 +9,38 @@ const mediaAccentClassName = [
   "border-media-slate/35 text-media-slate"
 ] as const;
 
-const mediaVariantClassName = {
-  card: "aspect-[16/10] rounded-md",
-  detail: "aspect-[4/3] rounded-lg"
-} as const;
+type ProductMediaVariant = "card" | "detail" | "thumbnail" | "square";
 
-const monogramVariantClassName = {
+const mediaVariantClassName: Record<ProductMediaVariant, string> = {
+  card: "aspect-[16/10] rounded-md",
+  detail: "aspect-[4/3] rounded-lg",
+  thumbnail: "h-12 w-12 rounded-sm",
+  square: "aspect-square rounded-md"
+};
+
+const monogramVariantClassName: Record<ProductMediaVariant, string> = {
   card: "h-14 w-14 text-xl",
-  detail: "h-20 w-20 text-3xl"
-} as const;
+  detail: "h-20 w-20 text-3xl",
+  thumbnail: "h-8 w-8 text-sm",
+  square: "h-16 w-16 text-2xl"
+};
+
+type ProductMediaProduct = Pick<ProductResponse, "id" | "name" | "mediaKey" | "uploadedMediaId">;
 
 export default function ProductMedia({
-  name,
-  mediaKey,
-  variant
+  product,
+  variant,
+  sourceOverride
 }: {
-  name: string;
-  mediaKey: string | null;
-  variant: "card" | "detail";
+  product: ProductMediaProduct;
+  variant: ProductMediaVariant;
+  sourceOverride?: string | null;
 }) {
-  const [failedMediaKey, setFailedMediaKey] = useState<string | null>(null);
-  const source = mediaSourceFor(mediaKey);
+  const [failedSource, setFailedSource] = useState<string | null>(null);
+  const source =
+    sourceOverride !== undefined ? (sourceOverride ?? undefined) : productMediaSource(product);
 
-  if (source !== undefined && failedMediaKey !== mediaKey) {
+  if (source !== undefined && failedSource !== source) {
     return (
       <div
         className={`relative overflow-hidden border border-border bg-surface-muted ${mediaVariantClassName[variant]}`}
@@ -43,7 +53,7 @@ export default function ProductMedia({
           height={500}
           loading="lazy"
           className="h-full w-full object-cover"
-          onError={() => setFailedMediaKey(mediaKey)}
+          onError={() => setFailedSource(source)}
         />
       </div>
     );
@@ -55,9 +65,9 @@ export default function ProductMedia({
       aria-hidden="true"
     >
       <span
-        className={`grid place-items-center rounded-full border bg-surface/80 font-extrabold tracking-[0.04em] ${monogramVariantClassName[variant]} ${mediaAccentClassName[productMediaTone(name)]}`}
+        className={`grid place-items-center rounded-full border bg-surface/80 font-extrabold tracking-[0.04em] ${monogramVariantClassName[variant]} ${mediaAccentClassName[productMediaTone(product.name)]}`}
       >
-        {productInitial(name)}
+        {productInitial(product.name)}
       </span>
     </div>
   );

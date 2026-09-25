@@ -4,7 +4,7 @@
 
 This is the canonical guide for configuring, running, verifying, stopping, and troubleshooting Samska Sandbox locally. It describes the repository's current state; it is not deployment guidance.
 
-The core Catalog and Cart application uses a Java/Spring Boot backend and a React/Vite frontend. Product and Cart data are held in backend process memory and disappear whenever the backend restarts. Docker Compose PostgreSQL is optional local infrastructure: Spring Boot does not connect to it, and it does not persist Products or Cart state.
+The core Catalog and Cart application uses a Java/Spring Boot backend and a React/Vite frontend. Product and Cart data, including uploaded Product media, are held in backend process memory and disappear whenever the backend restarts. Docker Compose PostgreSQL is optional local infrastructure: Spring Boot does not connect to it, and it does not persist Products or Cart state.
 
 ## Prerequisites
 
@@ -111,7 +111,8 @@ Browser
   -> Vite development server (default 5173 when available)
     -> /api proxy
       -> Spring Boot (default 8080)
-        -> InMemoryProductStore and InMemoryCartStore
+        -> InMemoryProductStore (Products and uploaded media)
+        -> InMemoryCartStore
 
 PostgreSQL (127.0.0.1:${POSTGRES_HOST_PORT:-5432})
   -> separate local infrastructure
@@ -149,9 +150,15 @@ From `web/`, start Vite:
 npm run dev
 ```
 
-Open the URL printed by Vite, normally <http://localhost:5173>. Vite proxies relative `/api` requests to `http://localhost:8080` only during development. Open `/admin/products` directly or use the Admin link in the shell to create, edit, and delete Products; the Market at `/` browses them, adds them to the Cart, and reaches Checkout. This verifies the current UI flow when backend and frontend are running together.
+Open the URL printed by Vite, normally <http://localhost:5173>. Vite proxies relative `/api` requests to `http://localhost:8080` only during development. Open `/admin/products` directly or use the Admin link in the shell to find, edit, and delete Products; use Create Product to open `/admin/products/new`, or Edit on a row for `/admin/products/{id}/edit`, where one Product image can be selected, replaced, or removed. The Market at `/` browses them, adds them to the Cart, and reaches Checkout. This verifies the current UI flow when backend and frontend are running together.
 
 The proxy does not define production routing or establish a Spring Boot CORS policy. The frontend resolves `/` and `/admin/products` from the browser path; Vite serves the application for direct requests to those paths, and other paths render the in-app not-found view.
+
+## Product Media Upload
+
+The Admin surface accepts one JPEG image per Product. The limits are a 3 MiB multipart request, a 2 MiB input file, 2048 pixels per side, and 4 million pixels total; the server validates and re-encodes the image to a JPEG of at most 2 MiB, and the backend retains at most 32 MiB of stored media bytes in process memory. A rejected upload leaves the Product and its current image unchanged. Re-encoding discards EXIF metadata and orientation, so a phone photo that depends on EXIF rotation may appear sideways by design.
+
+Uploaded images are runtime data: they are not committed to the repository, are not curated assets under `web/public/media/`, and are lost together with Products when the backend restarts. Do not add uploaded images to the repository or to `ATTRIBUTION.md`.
 
 ## URLs and Ports
 
@@ -160,15 +167,16 @@ The proxy does not define production routing or establish a Spring Boot CORS pol
 | Spring Boot | `http://localhost:8080` | Default port; no repository override exists. |
 | Health endpoint | `http://localhost:8080/actuator/health` | The only intentionally exposed Actuator endpoint. |
 | Vite development server | `http://localhost:5173` when available | Check Vite startup output for the actual port. |
-| Frontend routes | `/` (Market) and `/admin/products` (Admin) | Served by Vite for direct entry and reload; other paths render the in-app not-found view. Not an access-control boundary. |
+| Frontend routes | `/` (Market), `/admin/products` (Admin list), `/admin/products/new` (create), `/admin/products/{id}/edit` (edit) | Served by Vite for direct entry and reload; other paths render the in-app not-found view. Not an access-control boundary. |
 | PostgreSQL | `127.0.0.1:${POSTGRES_HOST_PORT:-5432}` | Optional infrastructure; loopback only. |
 
 ## Runtime and Manual Verification
 
 1. Start the backend and confirm the health response reports `UP`.
-2. Start the frontend, open its reported URL, create a synthetic Product from `/admin/products`, edit it, browse it in the Market, add it to the Cart, update its quantity, remove it, and then delete the Product from the Admin surface. Adding a Product to the Cart and then attempting to delete it must report the `409` Cart conflict until it is removed from the Cart.
-3. Stop and restart the backend, then try the same Product ID again. It must no longer be found.
-4. If PostgreSQL is running, use `docker compose ps` and `pg_isready` to verify its container state independently.
+2. Start the frontend, open its reported URL, create a synthetic Product from `/admin/products/new` (optionally selecting a JPEG before Create), edit it from `/admin/products`, browse it in the Market, add it to the Cart, update its quantity, remove it, and then delete the Product from the Admin list. Adding a Product to the Cart and then attempting to delete it must report the `409` Cart conflict until it is removed from the Cart.
+3. On `/admin/products/{id}/edit`, select a replacement JPEG or stage removal, then Save. The Market card and the Product detail view must reflect the change; replacing must serve the new image and stop serving the previous one, and removing must reveal the curated image or the monogram fallback. A rejected file (non-JPEG, over-limit, or malformed) must report that the details were saved while the image was not, and the current image must be unchanged.
+4. Stop and restart the backend, then try the same Product ID again. It must no longer be found, and its uploaded image must no longer be served.
+5. If PostgreSQL is running, use `docker compose ps` and `pg_isready` to verify its container state independently.
 
 These checks demonstrate current runtime behavior. A healthy PostgreSQL container does not prove Spring Boot connectivity, schemas, migrations, or Product persistence.
 

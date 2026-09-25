@@ -16,3 +16,4 @@ Notes:
 - CC BY 2.0 requires attribution, which this file provides. The CC0 files require no attribution and are credited for traceability.
 - The images are generic depictions of a product category for a fictional storefront. They do not represent a real product for sale.
 - Temporary mockup or review images must not be copied into this directory. New media requires a rights review, optimization, and an entry in this table.
+- Uploaded Product media added through the Admin surface is runtime data, not a curated asset. Uploaded images must not be copied into this directory or listed in this table.

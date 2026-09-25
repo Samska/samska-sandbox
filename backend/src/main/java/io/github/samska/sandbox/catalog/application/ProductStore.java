@@ -10,11 +10,15 @@ public interface ProductStore {
 
     void save(Product product);
 
-    boolean replace(Product product);
+    Optional<ProductSnapshot> replaceProduct(Product product);
 
     boolean deleteById(ProductId id);
 
-    Optional<Product> findById(ProductId id);
+    Optional<ProductSnapshot> findById(ProductId id);
 
-    Collection<Product> findAll();
+    Collection<ProductSnapshot> findAll();
+
+    MediaChange replaceMedia(ProductId id, UploadedMedia media);
+
+    MediaChangeResult removeMedia(ProductId id);
 }

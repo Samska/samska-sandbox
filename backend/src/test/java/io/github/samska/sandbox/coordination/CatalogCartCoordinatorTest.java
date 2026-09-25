@@ -14,8 +14,10 @@ import io.github.samska.sandbox.cart.application.ProductUnavailableException;
 import io.github.samska.sandbox.cart.storage.InMemoryCartStore;
 import io.github.samska.sandbox.catalog.Product;
 import io.github.samska.sandbox.catalog.ProductId;
+import io.github.samska.sandbox.catalog.application.MediaLimits;
 import io.github.samska.sandbox.catalog.application.ProductApplicationService;
 import io.github.samska.sandbox.catalog.application.ProductCatalog;
+import io.github.samska.sandbox.catalog.application.ProductMediaNormalizer;
 import io.github.samska.sandbox.catalog.application.ProductNotFoundException;
 import io.github.samska.sandbox.catalog.storage.InMemoryProductStore;
 
@@ -24,10 +26,16 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class CatalogCartCoordinatorTest {
 
-    private final InMemoryProductStore productStore = new InMemoryProductStore();
+    private static final ProductMediaNormalizer MEDIA_NORMALIZER = new ProductMediaNormalizer(
+            MediaLimits.MAX_INPUT_BYTES,
+            MediaLimits.MAX_DIMENSION_PIXELS,
+            MediaLimits.MAX_PIXELS,
+            MediaLimits.MAX_OUTPUT_BYTES);
+
+    private final InMemoryProductStore productStore = new InMemoryProductStore(MediaLimits.MAX_TOTAL_STORED_BYTES);
     private final InMemoryCartStore cartStore = new InMemoryCartStore();
     private final ProductApplicationService productApplicationService =
-            new ProductApplicationService(productStore);
+            new ProductApplicationService(productStore, MEDIA_NORMALIZER);
     private final CartApplicationService cartApplicationService =
             new CartApplicationService(cartStore, productApplicationService);
     private final CatalogCartCoordinator coordinator =
@@ -127,7 +135,7 @@ class CatalogCartCoordinatorTest {
         var product = createProduct();
         var deletionStarted = new CountDownLatch(1);
         var releaseDeletion = new CountDownLatch(1);
-        var blockingProductService = new ProductApplicationService(productStore) {
+        var blockingProductService = new ProductApplicationService(productStore, MEDIA_NORMALIZER) {
             @Override
             public void deleteProduct(ProductId id) {
                 deletionStarted.countDown();
