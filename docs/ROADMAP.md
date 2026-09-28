@@ -32,13 +32,13 @@ never renumbered.
 | Checkout vertical slice | SS-032 |
 | Admin Catalog Management | SS-033 |
 | Product Media Upload | SS-034 |
+| Payment Simulator | SS-036 |
 
 ### Future Product Sequence
 
-1. Payment simulator (in progress, SS-036)
-2. Order creation
-3. First Order end-to-end journey
-4. Release `v0.1.0`
+1. Order creation (SS-037)
+2. First Order end-to-end journey
+3. Release `v0.1.0`
 
 Future capabilities receive their SS identifier when their Issues are created.
 
@@ -49,12 +49,13 @@ media display precedence on Market cards and Product detail, the curated
 `mediaKey` selection and the monogram fallback retained, and the no-upload
 decision of ADR 0003 superseded by ADR 0004. Its endpoints are unauthenticated
 and bound retained media, not peak memory; `/admin/products` remains navigation,
-not an access-control boundary. Payment Simulator (SS-036) is in progress: it
-captures a revision-checked immutable Cart snapshot, applies one of three
-explicit simulated outcomes, owns identified attempts with UUID replay and GET
-reconciliation, and records at most one approval per unchanged Cart revision in
-a bounded 32-attempt process-local store. CI test result visibility (SS-035) was
-investigated separately and cancelled on 2026-09-28; its issue is closed as not
+not an access-control boundary. Payment Simulator (SS-036) is complete and
+merged through PR #62: it captures a revision-checked immutable Cart snapshot,
+applies one of three explicit simulated outcomes, owns identified attempts with
+UUID replay and GET reconciliation, and records at most one approval per
+unchanged Cart revision in a bounded 32-attempt process-local store. CI test result
+visibility (SS-035) was investigated separately and cancelled on 2026-09-28; its
+issue is closed as not
 planned and its pull request closed without merging, so it delivers nothing and
 is not part of the product sequence.
 

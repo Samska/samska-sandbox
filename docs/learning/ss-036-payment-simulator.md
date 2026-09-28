@@ -1,10 +1,10 @@
 # SS-036: Implement Payment Simulator
 
-- Status: Active
+- Status: Completed
 - Work date: 2026-09-28
 - Last reviewed: 2026-09-28
 - Work item: [SS-036](https://github.com/Samska/samska-sandbox/issues/61)
-- Pull request: Pending
+- Pull request: [#62](https://github.com/Samska/samska-sandbox/pull/62)
 - ADRs: [ADR 0005](../adr/0005-adopt-payment-attempt-store-with-cart-revision.md)
 - Canonical documentation: [Product](../PRODUCT.md), [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md), [Security](../SECURITY.md)
 
@@ -57,7 +57,7 @@ Order creation and First Order end-to-end automation, persistence and PostgreSQL
 ## Reference
 
 - Issue: [SS-036](https://github.com/Samska/samska-sandbox/issues/61)
-- Pull request: Pending
+- Pull request: [#62](https://github.com/Samska/samska-sandbox/pull/62)
 - Relevant source files: `backend/src/main/java/io/github/samska/sandbox/cart/Cart.java`, `backend/src/main/java/io/github/samska/sandbox/payment/storage/InMemoryPaymentStore.java`, `backend/src/main/java/io/github/samska/sandbox/payment/application/PaymentApplicationService.java`, `backend/src/main/java/io/github/samska/sandbox/payment/api/PaymentController.java`, `web/src/payment/paymentApi.ts`, `web/src/payment/PaymentResult.tsx`, `web/src/checkout/CheckoutReview.tsx`, `web/src/catalog/Catalog.tsx`
 - ADRs: [ADR 0005](../adr/0005-adopt-payment-attempt-store-with-cart-revision.md); follows [ADR 0001](../adr/0001-adopt-modular-monolith.md)
 - Canonical documentation: [Product](../PRODUCT.md), [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md), [Security](../SECURITY.md)
