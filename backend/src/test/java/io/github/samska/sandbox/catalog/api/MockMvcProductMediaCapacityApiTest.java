@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest(properties = "catalog.media.max-total-bytes=1")
-class ProductMediaCapacityApiTest {
+class MockMvcProductMediaCapacityApiTest {
 
     private MockMvc mockMvc;
 

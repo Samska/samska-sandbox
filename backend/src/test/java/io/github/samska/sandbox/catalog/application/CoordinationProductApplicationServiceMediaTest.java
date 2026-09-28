@@ -15,7 +15,7 @@ import io.github.samska.sandbox.catalog.storage.InMemoryProductStore;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ProductApplicationServiceMediaTest {
+class CoordinationProductApplicationServiceMediaTest {
 
     private static final ProductMediaNormalizer NORMALIZER = new ProductMediaNormalizer(
             MediaLimits.MAX_INPUT_BYTES,

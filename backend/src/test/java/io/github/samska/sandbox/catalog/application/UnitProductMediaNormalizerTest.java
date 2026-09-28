@@ -12,7 +12,7 @@ import io.github.samska.sandbox.catalog.JpegTestImages;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-class ProductMediaNormalizerTest {
+class UnitProductMediaNormalizerTest {
 
     private final ProductMediaNormalizer normalizer = new ProductMediaNormalizer(
             MediaLimits.MAX_INPUT_BYTES,

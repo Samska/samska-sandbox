@@ -1,78 +1,78 @@
-# SS-035: CI Test Visibility Without Mandatory Classification
+# SS-035: CI Test Result Visibility Through Suite Names
 
 - Status: Active
 - Work date: 2026-09-28
 - Last reviewed: 2026-09-28
 - Work item: [SS-035](https://github.com/Samska/samska-sandbox/issues/59)
-- Pull request: None yet
+- Pull request: [#60](https://github.com/Samska/samska-sandbox/pull/60)
 - ADRs: None
 - Canonical documentation: [Testing](../TESTING.md), [AI Engineering Governance](../AI-GOVERNANCE.md), [GitHub Controls](../GITHUB.md)
 
 ## What you should learn
 
-- Reporting clarity versus reporting precision: proving what a test ran matters more than summing arbitrary buckets
-- Why a mandatory classification inventory creates maintenance and CI-failure risk
-- The difference between a Job Summary, a Check Run, and an artifact as evidence surfaces
-- Honest layer terminology: MockMvc and jsdom are component tests, not browser end-to-end
-- Why "we can show per-layer totals" is a stronger claim than it looks
-- Superseding an approach while keeping its evidence clearly labeled
+- Putting the layer where reviewers already look instead of beside the report
+- Why the first attempt—prose guidance in the summary—failed human review
+- The boundary between a descriptive naming convention and an enforced taxonomy
+- Honest layer terms: smoke, unit, in-memory, coordination, MockMvc, jsdom, helper
+- How an unlabelled test still stays visible
+- Superseding a rejected approach without hiding its evidence
 
 ### Core — Know this for interviews
 
-- Reporting decisions carry maintenance costs that outlive the original need
-- CI failures should reflect evidence loss or product risk, not bookkeeping
+- The suite name in JUnit XML is the heading a reviewer sees for each case
+- Naming conventions persuade; they must not gate
 - Evidence surfaces answer different review questions
 
 ## Concepts explained
 
-**Visibility is not the same as taxonomy.** A reviewer wants to know what ran, what failed, and what it proves. The existing reporter already answers "what ran and failed" with overall counts and per-suite result tables in each Job Summary. Turning those numbers into per-layer totals requires deciding every suite's layer, keeping that decision current, and treating a missing decision as a failure. That is a data-maintenance program, not visibility.
+**Names travel with the result.** Surefire names a suite after the test class and Vitest after the test file; the publisher groups individual cases under that suite name in the Job Summary. A layer-bearing name therefore labels every case where reviewers look, with no parser, registry, or configuration.
 
-**A mandatory inventory changes the failure mode.** With an explicit class/file inventory and a custom XML classifier, an ordinary refactor (a renamed suite, a split file, a new test) can fail CI even when every test passed and no product risk changed. The owner rejected that: classification-only failures are bookkeeping failures, not engineering signal.
+**Prose guidance did not survive review.** PR #60 added a `job_summary_text` paragraph to each summary. The owner inspected the rendered summaries and found that it described the suite in aggregate without identifying each test's layer. A paragraph is read once; a suite heading is read next to every case. That failed review is the evidence behind the replacement.
 
-**Static guidance is cheap and honest.** A short `job_summary_text` paragraph explains what the suite mixes and what it cannot prove—MockMvc exercises HTTP in-process, jsdom is not a browser, PostgreSQL integration does not exist—without claiming a per-layer count or that suites were classified. It can become stale as suites evolve, but it requires no per-file registry and it does not cause classification-only CI failures.
+**Convention, not gate.** The renames are one-time and descriptive. A future unlabelled test still runs in the unfiltered jobs and appears under its own name; no CI check fails for a missing or mistaken label, and no per-layer totals are claimed. The convention can drift as the suite evolves; it costs no registry, and it cannot block a green run.
 
-**Evidence surfaces.** Check Runs carry aggregate results and annotations; the Job Summary is the review panel; the XML artifact is the raw record. The replacement keeps all three and adds guidance where reviewers already look.
+**Honest terminology.** `InMemoryProductStoreTest` keeps its in-memory name because it primarily exercises store behavior, not coordination; the latch-controlled interleaving suites use the `Coordination` prefix. MockMvc and jsdom suites are component tests, not browser end-to-end.
 
 ## How Samska uses it
 
-`.github/workflows/ci.yml` passes a static `job_summary_text` to every pinned report step: the Backend publish step and its fork annotation step, and the Frontend publish step and its fork annotation step. The text distinguishes the executed layers from browser end-to-end and database integration, states that totals are overall rather than per-layer, and leaves the existing commands, publication, artifacts, permissions, `continue-on-error` flow, and failure gates unchanged. `docs/TESTING.md` documents the same boundaries. This record also preserves the superseded inventory/classifier lesson so the rejected direction is not rediscovered as new.
+Backend headings: `ApplicationSmokeTest`; `UnitProductTest`, `UnitCartTest`, `UnitProductMediaNormalizerTest`, `UnitUploadedMediaTest`; `InMemoryProductStoreTest`; `CoordinationCatalogCartCoordinatorTest`, `CoordinationProductApplicationServiceMediaTest`; `MockMvcProductApiTest`, `MockMvcProductMediaCapacityApiTest`, `MockMvcCartApiTest`. Frontend files carry `.jsdom-component` before `.test.tsx` or `.isolated-helper` before `.test.ts`. The CI jobs, their unfiltered commands, publishing, artifacts, permissions, fork handling, and failure gates are unchanged, and the shortened `job_summary_text` still states that MockMvc and jsdom are not browser end-to-end and that no PostgreSQL integration tests exist. `docs/TESTING.md` documents the same limits.
 
 ## Interview perspective
 
-Expect questions about when a reporting improvement is worth its maintenance cost, how you would notice and correct stale or ambiguous suite guidance, and why jsdom and MockMvc tests are not end-to-end tests. A strong answer separates the evidence a reviewer needs from the metadata bookkeeping would require, and explains why CI should fail for lost evidence rather than for an uncategorized test.
+Expect questions about how to make test results navigable without building a taxonomy engine, why a naming convention is safer than an enforced inventory, and how you would notice that a convention has drifted. A strong answer explains that the suite name is the artifact reviewers already read, that labels must not gate CI, and that no per-layer totals are inferred from names alone.
 
 ## What not to worry about yet
 
-Per-layer totals, coverage thresholds, test-analytics platforms, flaky-test quarantine, Playwright or browser end-to-end frameworks, and PostgreSQL or Testcontainers integration. Those become relevant only when a concrete decision needs them.
+Per-layer totals, tag/project-filtered report groups, coverage thresholds, test-analytics platforms, flaky-test quarantine, Playwright or browser end-to-end frameworks, and PostgreSQL or Testcontainers integration.
 
 ## Reference
 
 - Issue: [SS-035](https://github.com/Samska/samska-sandbox/issues/59)
-- Pull request: None yet
-- Relevant files: `.github/workflows/ci.yml`, `docs/TESTING.md`, `README.md`
-- Superseded evidence: the removed inventory, classifier, and fixture tests, and the 99/107 aggregation runs recorded under them, are evidence of the withdrawn approach only
+- Pull request: [#60](https://github.com/Samska/samska-sandbox/pull/60)
+- Relevant files: backend test classes under `backend/src/test/java/`, frontend test files under `web/src/`, `.github/workflows/ci.yml`, `docs/TESTING.md`, `README.md`
+- Superseded evidence: the withdrawn inventory/classifier (20 fixture tests and 99/107 aggregation results) and the rejected static-guidance presentation on PR #60 head `a45a4ce` are evidence of earlier approaches only and are not verification of the naming replacement
 - ADRs: None
 - Canonical documentation: [Testing](../TESTING.md), [AI Engineering Governance](../AI-GOVERNANCE.md)
 
 ## Why this design
 
-Three options were compared. Improving only the existing report with static guidance costs almost nothing and cannot produce a false CI failure. Renaming suites to communicate layers helps human readers but still provides no reliable totals and imposes naming judgment on every change. Splitting suites into separate CI jobs with framework-native selection (Surefire tag groups, Vitest projects) can provide real per-layer counts, but duplicates setup, increases runner cost, and can silently hide tests when selection and sources drift. The explicit inventory plus custom XML classifier was withdrawn by owner decision for exactly the maintenance and failure-mode reasons above. The project accepts descriptive clarity without per-layer totals.
+Alternatives were compared: a custom XML classifier with a per-file inventory (rejected: maintenance and classification-only failure risk); static prose guidance (rejected by failed Human Verification of the rendered presentation on `a45a4ce`); separate tag/project-filtered report groups (real per-layer counts but extra runtime, duplicated setup, and a completeness risk that could hide tests); and descriptive suite names (chosen: the cheapest change that labels each case where reviewers look, with no gate). The accepted limit is that names are not enforced and no automatic per-layer totals exist.
 
 ## Common mistakes
 
-- Treating per-layer totals as free when they require ongoing classification decisions
-- Letting a classification bookkeeping error fail a green test run
-- Claiming jsdom or MockMvc tests are end-to-end
-- Implying that every present or future suite has been classified
-- Assuming a green reporting step replaces the test-failure gate
+- Claiming a naming convention is mechanically enforced
+- Presenting suite-name counts as automatic per-layer totals
+- Calling store tests coordination or MockMvc/jsdom tests end-to-end
+- Letting a rename break discovery (Java names must still match `*Test`/`*Tests`; frontend files must still match `*.test.ts(x)`)
+- Assuming prose in the summary identifies each test's layer
 
 ## Interview vocabulary
 
-- **Job Summary**: the Markdown panel a workflow publishes for review, distinct from logs and artifacts.
-- **Check Run**: the per-commit status object that can carry aggregate results and annotations.
-- **Component test**: an in-process test of a slice through framework boundaries, not a browser journey.
-- **Superseded evidence**: verification that belongs to a withdrawn implementation and must not be reused to claim the replacement works.
+- **Suite heading**: the class or file name under which the publisher groups individual cases.
+- **Descriptive convention**: a reviewable naming habit without enforcement.
+- **Classification-only failure**: a CI failure caused solely by missing or mistaken metadata; explicitly rejected here.
+- **Superseded evidence**: verification belonging to a withdrawn or rejected approach that must not be reused.
 
 ## Deeper — Useful later
 
-If reliable per-layer totals ever matter, framework-native selection (JUnit tags, Vitest projects) inside separate jobs is the honest path, with an explicit completeness check so untagged tests are reported rather than hidden. Until then, descriptive guidance and the existing publisher remain the cheapest honest evidence.
+If automatic per-layer totals ever matter, native tag/project selection in separate jobs is the honest path, with a completeness check so ungrouped tests are reported rather than hidden. Until then, layer-bearing names plus the existing publisher remain the cheapest honest evidence.

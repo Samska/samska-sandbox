@@ -24,7 +24,7 @@ import io.github.samska.sandbox.catalog.storage.InMemoryProductStore;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-class CatalogCartCoordinatorTest {
+class CoordinationCatalogCartCoordinatorTest {
 
     private static final ProductMediaNormalizer MEDIA_NORMALIZER = new ProductMediaNormalizer(
             MediaLimits.MAX_INPUT_BYTES,

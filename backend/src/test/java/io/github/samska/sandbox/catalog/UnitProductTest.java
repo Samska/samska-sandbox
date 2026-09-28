@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-class ProductTest {
+class UnitProductTest {
 
     private static final ProductId FIRST_ID = new ProductId(UUID.fromString("11111111-1111-1111-1111-111111111111"));
     private static final ProductId SECOND_ID = new ProductId(UUID.fromString("22222222-2222-2222-2222-222222222222"));
