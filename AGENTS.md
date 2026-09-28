@@ -26,10 +26,14 @@ Read the relevant detailed guidance in [docs/AI-GOVERNANCE.md](docs/AI-GOVERNANC
 
 ## Session Resume
 
-Before implementation in a new or resumed session:
+For a new or resumed work session, use the active Issue and any pull request as the working handoff; do not require the owner to copy their status into a new prompt.
 
-1. Fetch and refresh the repository and confirm the current branch, clean working tree, and that local `main` equals `origin/main`.
-2. Read [PROJECT_HANDOFF.md](PROJECT_HANDOFF.md) for the confirmed project snapshot.
-3. Verify GitHub state: the active Issue's state, Project status, priority, assignee, and labels, and whether an open pull request already exists.
-4. Inspect the active Issue Handoff items and Pull Request Handoff sections, including pending questions, blockers, verification status, and the next step.
-5. Report the confirmed state and next step before implementation, and stop when the handoff disagrees with repository or GitHub state.
+Before implementation:
+
+1. Fetch and refresh the repository; confirm the branch, working tree, and that local `main` equals `origin/main`. In a read-only Plan session, compare local refs with the remote state without changing them, and state that limitation.
+2. Read [PROJECT_HANDOFF.md](PROJECT_HANDOFF.md) as the concise project snapshot. Verify the active Issue's state, Project status, priority, assignee, and labels; check for an existing pull request and its current state.
+3. Read the Issue Handoff and, when a pull request exists, the Pull Request Handoff. Confirm approved scope, decisions, pending questions, blockers, Agent/Human/CI Verification, and the next step against repository and GitHub evidence.
+4. Briefly report the confirmed state and next step. Stop for an owner decision if a material conflict, missing approval, or unresolved decision prevents the proposed work; do not silently treat stale handoff text as current state.
+5. Keep the Issue and pull request handoffs current at material transitions and decisions, including verification evidence and the next step. Give the owner a concise update when a decision or verification action is needed, rather than repeating the full status on every routine step. Update [PROJECT_HANDOFF.md](PROJECT_HANDOFF.md) only under its project-snapshot rule.
+
+Explicit owner decisions, engineering review, required Human Verification before commit or pull request, CI evidence, and explicit merge authorization remain required by [AI Engineering Governance](docs/AI-GOVERNANCE.md).
