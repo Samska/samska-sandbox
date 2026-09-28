@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { CartResponse } from "../cart/cartApi";
 import CartItemRow from "../cart/CartItemRow";
 import { formatAmount } from "../formatAmount";
+import { unconfirmedPaymentMessage } from "../payment/messages";
+import type { PaymentScenario } from "../payment/paymentApi";
 import Button from "../ui/Button";
 import StatusMessage from "../ui/StatusMessage";
 
@@ -19,7 +21,12 @@ export default function CheckoutReview({
   onRemoveItem,
   isPending,
   error,
-  onRetry
+  onRetry,
+  paymentPending,
+  paymentError,
+  paymentCanCheckResult,
+  onSimulatePayment,
+  onCheckPaymentResult
 }: {
   cart: CartResponse;
   onBack: () => void;
@@ -28,12 +35,19 @@ export default function CheckoutReview({
   isPending: boolean;
   error: string | null;
   onRetry: () => void;
+  paymentPending: boolean;
+  paymentError: string | null;
+  paymentCanCheckResult: boolean;
+  onSimulatePayment: (scenario: PaymentScenario) => Promise<void>;
+  onCheckPaymentResult: () => void;
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const emptyStateRef = useRef<HTMLHeadingElement>(null);
   const mutationIntentRef = useRef<MutationIntent | null>(null);
+  const [scenario, setScenario] = useState<PaymentScenario>("approve");
+  const controlsDisabled = isPending || paymentPending;
 
   useEffect(() => {
     headingRef.current?.focus();
@@ -109,10 +123,10 @@ export default function CheckoutReview({
       ref={sectionRef}
       className="grid min-w-0 gap-5 overflow-hidden rounded-lg border border-border bg-surface shadow-card"
       aria-labelledby="checkout-heading"
-      aria-busy={isPending}
+      aria-busy={controlsDisabled}
     >
       <div className="flex items-center justify-between gap-4 border-b border-border px-5 py-3">
-        <Button variant="quiet" size="sm" onClick={onBack}>
+        <Button variant="quiet" size="sm" onClick={onBack} disabled={paymentPending}>
           <span aria-hidden="true">&#8592;</span> Back to Market
         </Button>
       </div>
@@ -143,6 +157,16 @@ export default function CheckoutReview({
             </Button>
           </div>
         ) : null}
+        {paymentError !== null || paymentCanCheckResult ? (
+          <div className="grid gap-3">
+            <StatusMessage tone="error">{paymentError ?? unconfirmedPaymentMessage}</StatusMessage>
+            {paymentCanCheckResult ? (
+              <Button onClick={onCheckPaymentResult} disabled={controlsDisabled}>
+                Check result
+              </Button>
+            ) : null}
+          </div>
+        ) : null}
         {cart.items.length === 0 ? (
           <div className="grid gap-2 rounded-lg bg-surface-muted px-4 py-5">
             <h2
@@ -171,7 +195,7 @@ export default function CheckoutReview({
                 <CartItemRow
                   key={item.productId}
                   item={item}
-                  isPending={isPending}
+                  isPending={controlsDisabled}
                   onUpdateQuantity={handleUpdateQuantity}
                   onRemoveItem={handleRemoveItem}
                 />
@@ -183,6 +207,40 @@ export default function CheckoutReview({
                 {formatAmount(cart.total)}
               </dd>
             </dl>
+            <div className="grid gap-3 rounded-lg border border-border px-4 py-4">
+              <h2 id="checkout-payment-heading" className="text-lg leading-[1.15] text-ink">
+                Simulated payment
+              </h2>
+              <p className="max-w-prose text-sm text-muted">
+                This is a local simulation. No real payment is made, no Order is created, and no
+                card or personal information should be entered.
+              </p>
+              <div className="grid gap-1">
+                <label htmlFor="checkout-payment-scenario" className="text-sm font-bold text-ink">
+                  Demo outcome
+                </label>
+                <select
+                  id="checkout-payment-scenario"
+                  value={scenario}
+                  onChange={(event) => setScenario(event.target.value as PaymentScenario)}
+                  disabled={controlsDisabled}
+                  className="h-11 rounded-md border border-border-strong bg-surface px-3 font-bold text-ink"
+                >
+                  <option value="approve">Approve</option>
+                  <option value="decline">Decline</option>
+                  <option value="temporary-failure">Temporary failure</option>
+                </select>
+              </div>
+              {paymentPending ? (
+                <StatusMessage tone="pending">Simulating payment...</StatusMessage>
+              ) : null}
+              <Button
+                onClick={() => void onSimulatePayment(scenario)}
+                disabled={controlsDisabled || error !== null || paymentCanCheckResult}
+              >
+                Simulate payment
+              </Button>
+            </div>
           </>
         )}
       </div>

@@ -31,26 +31,32 @@ never renumbered.
 | Product Storefront UX/UI refinement | SS-031 |
 | Checkout vertical slice | SS-032 |
 | Admin Catalog Management | SS-033 |
+| Product Media Upload | SS-034 |
 
 ### Future Product Sequence
 
-1. Product Media Upload (in progress, SS-034)
-2. Payment simulator
-3. Order creation
-4. First Order end-to-end journey
-5. Release `v0.1.0`
+1. Payment simulator (in progress, SS-036)
+2. Order creation
+3. First Order end-to-end journey
+4. Release `v0.1.0`
 
 Future capabilities receive their SS identifier when their Issues are created.
 
 Admin Catalog Management (SS-033) is complete and merged through PR #56. Product
-Media Upload (SS-034) is in progress and is not complete or merged until its
-verification and merge are recorded. It adds one validated, re-encoded JPEG per
-Product stored in bounded backend process memory, gives uploaded media display
-precedence on Market cards and Product detail, preserves the curated `mediaKey`
-selection and the monogram fallback, and supersedes the no-upload decision of
-ADR 0003 through ADR 0004. Its endpoints are unauthenticated and bound retained
-media, not peak memory; `/admin/products` remains navigation, not an
-access-control boundary. Payment simulator follows as a separate capability.
+Media Upload (SS-034) is complete and merged through PR #58: one validated,
+re-encoded JPEG per Product stored in bounded backend process memory, uploaded
+media display precedence on Market cards and Product detail, the curated
+`mediaKey` selection and the monogram fallback retained, and the no-upload
+decision of ADR 0003 superseded by ADR 0004. Its endpoints are unauthenticated
+and bound retained media, not peak memory; `/admin/products` remains navigation,
+not an access-control boundary. Payment Simulator (SS-036) is in progress: it
+captures a revision-checked immutable Cart snapshot, applies one of three
+explicit simulated outcomes, owns identified attempts with UUID replay and GET
+reconciliation, and records at most one approval per unchanged Cart revision in
+a bounded 32-attempt process-local store. CI test result visibility (SS-035) was
+investigated separately and cancelled on 2026-09-28; its issue is closed as not
+planned and its pull request closed without merging, so it delivers nothing and
+is not part of the product sequence.
 
 ### MVP Boundaries
 
@@ -58,10 +64,12 @@ The local MVP deliberately defers authentication and authorization. They are
 deferred until after the local First Order MVP but are a mandatory prerequisite
 for any hosted environment, and no hosting work begins before the MVP. The MVP
 also remains process-local: Cart state is lost when the backend restarts,
-uploaded Product media is lost together with its Product, Checkout holds no
-server-side state at this stage, and the application has no persistence or
-deployed environment. The immutable transactional snapshot is deferred to Payment
-Simulator work.
+uploaded Product media is lost together with its Product, and simulated payment
+attempts, including their captured snapshots and duplicate protection, are lost
+on restart. Payment Simulator captures the immutable revision-checked Cart
+snapshot inside a bounded process-local store, and its unauthenticated scenario
+selector and endpoints are a local-only use constraint, not access control or a
+hosting posture. The application has no persistence or deployed environment.
 
 ## Versioning And Releases
 

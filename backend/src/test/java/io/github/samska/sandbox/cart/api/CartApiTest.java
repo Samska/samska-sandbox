@@ -36,7 +36,8 @@ class CartApiTest {
         mockMvc.perform(get("/api/cart"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items").isEmpty())
-                .andExpect(jsonPath("$.total").value(0));
+                .andExpect(jsonPath("$.total").value(0))
+                .andExpect(jsonPath("$.revision").value(0));
     }
 
     @Test
@@ -51,26 +52,30 @@ class CartApiTest {
                 .andExpect(jsonPath("$.items[0].quantity").value(2))
                 .andExpect(jsonPath("$.items[0].unitPrice").value(12.50))
                 .andExpect(jsonPath("$.items[0].lineSubtotal").value(25.00))
-                .andExpect(jsonPath("$.total").value(25.00));
+                .andExpect(jsonPath("$.total").value(25.00))
+                .andExpect(jsonPath("$.revision").value(1));
 
         mockMvc.perform(post("/api/cart/items")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"productId\":\"" + productId + "\",\"quantity\":3}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items[0].quantity").value(5))
-                .andExpect(jsonPath("$.total").value(62.50));
+                .andExpect(jsonPath("$.total").value(62.50))
+                .andExpect(jsonPath("$.revision").value(2));
 
         mockMvc.perform(patch("/api/cart/items/{productId}", productId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"quantity\":4}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items[0].quantity").value(4))
-                .andExpect(jsonPath("$.total").value(50.00));
+                .andExpect(jsonPath("$.total").value(50.00))
+                .andExpect(jsonPath("$.revision").value(3));
 
         mockMvc.perform(delete("/api/cart/items/{productId}", productId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.items").isEmpty())
-                .andExpect(jsonPath("$.total").value(0));
+                .andExpect(jsonPath("$.total").value(0))
+                .andExpect(jsonPath("$.revision").value(4));
     }
 
     @Test

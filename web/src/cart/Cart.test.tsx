@@ -11,14 +11,15 @@ const cart: CartResponse = {
     unitPrice: 12.5,
     lineSubtotal: 25
   }],
-  total: 25
+  total: 25,
+  revision: 1
 };
 
 describe("CartPanel", () => {
   it("renders an empty Cart", () => {
     render(
       <CartPanel
-        cart={{ items: [], total: 0 }}
+        cart={{ items: [], total: 0, revision: 0 }}
         isPending={false}
         error={null}
         onRetry={vi.fn()}
@@ -129,7 +130,8 @@ describe("CartPanel", () => {
   it("disables decreasing the quantity below one", () => {
     const singleItemCart: CartResponse = {
       items: [{ ...cart.items[0], quantity: 1, lineSubtotal: 12.5 }],
-      total: 12.5
+      total: 12.5,
+      revision: 1
     };
     render(
       <CartPanel
@@ -186,7 +188,7 @@ describe("CartPanel", () => {
 
     rerender(
       <CartPanel
-        cart={{ items: [], total: 0 }}
+        cart={{ items: [], total: 0, revision: 0 }}
         isPending={false}
         error={null}
         onRetry={vi.fn()}

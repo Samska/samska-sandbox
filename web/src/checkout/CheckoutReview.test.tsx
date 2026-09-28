@@ -20,7 +20,8 @@ const cart: CartResponse = {
       lineSubtotal: 68.5
     }
   ],
-  total: 93.5
+  total: 93.5,
+  revision: 1
 };
 
 function renderReview(overrides: Partial<Parameters<typeof CheckoutReview>[0]> = {}) {
@@ -28,6 +29,8 @@ function renderReview(overrides: Partial<Parameters<typeof CheckoutReview>[0]> =
   const onUpdateQuantity = vi.fn().mockResolvedValue(undefined);
   const onRemoveItem = vi.fn().mockResolvedValue(undefined);
   const onRetry = vi.fn();
+  const onSimulatePayment = vi.fn().mockResolvedValue(undefined);
+  const onCheckPaymentResult = vi.fn();
   const result = render(
     <CheckoutReview
       cart={cart}
@@ -37,11 +40,16 @@ function renderReview(overrides: Partial<Parameters<typeof CheckoutReview>[0]> =
       isPending={false}
       error={null}
       onRetry={onRetry}
+      paymentPending={false}
+      paymentError={null}
+      paymentCanCheckResult={false}
+      onSimulatePayment={onSimulatePayment}
+      onCheckPaymentResult={onCheckPaymentResult}
       {...overrides}
     />
   );
 
-  return { ...result, onBack, onUpdateQuantity, onRemoveItem, onRetry };
+  return { ...result, onBack, onUpdateQuantity, onRemoveItem, onRetry, onSimulatePayment, onCheckPaymentResult };
 }
 
 describe("CheckoutReview", () => {
@@ -73,13 +81,70 @@ describe("CheckoutReview", () => {
   });
 
   it("renders the empty state without item controls", () => {
-    renderReview({ cart: { items: [], total: 0 } });
+    renderReview({ cart: { items: [], total: 0, revision: 0 } });
 
     const emptyHeading = screen.getByRole("heading", { name: "Your Cart is empty.", level: 2 });
     expect(emptyHeading).toHaveAttribute("tabindex", "-1");
     expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Remove/ })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Back to Market" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Simulate payment" })).not.toBeInTheDocument();
+  });
+
+  it("simulates payment with the selected demo outcome", () => {
+    const { onSimulatePayment } = renderReview();
+
+    expect(screen.getByLabelText("Demo outcome")).toHaveValue("approve");
+    expect(screen.getByText(/no real payment is made/i)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Demo outcome"), { target: { value: "decline" } });
+    fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
+
+    expect(onSimulatePayment).toHaveBeenCalledWith("decline");
+  });
+
+  it("disables payment and Cart editing while a simulated payment is pending", () => {
+    renderReview({ paymentPending: true });
+
+    expect(screen.getByRole("button", { name: "Simulate payment" })).toBeDisabled();
+    expect(screen.getByLabelText("Demo outcome")).toBeDisabled();
+    expect(screen.getByRole("status")).toHaveTextContent("Simulating payment...");
+    expect(screen.getByLabelText("Quantity for Canvas Tote")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Remove Canvas Tote" })).toBeDisabled();
+  });
+
+  it("shows payment errors and offers result reconciliation when unconfirmed", () => {
+    const { onCheckPaymentResult } = renderReview({
+      paymentError: "We could not confirm the payment result. No decision is confirmed.",
+      paymentCanCheckResult: true
+    });
+
+    expect(screen.getByRole("alert")).toHaveTextContent("We could not confirm the payment result.");
+
+    fireEvent.click(screen.getByRole("button", { name: "Check result" }));
+
+    expect(onCheckPaymentResult).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps Check result available and blocks initiation while a result is unconfirmed", () => {
+    renderReview({ paymentError: null, paymentCanCheckResult: true });
+
+    expect(screen.getByRole("alert")).toHaveTextContent("We could not confirm the payment result.");
+    expect(screen.getByRole("button", { name: "Check result" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Simulate payment" })).toBeDisabled();
+  });
+
+  it("prevents leaving Checkout while a simulated payment is pending", () => {
+    renderReview({ paymentPending: true });
+
+    expect(screen.getByRole("button", { name: "Back to Market" })).toBeDisabled();
+  });
+
+  it("blocks initiation while the Cart is in an error state", () => {
+    renderReview({ error: "The Cart service failed. Try again." });
+
+    expect(screen.getByRole("button", { name: "Simulate payment" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Reload Cart" })).toBeInTheDocument();
   });
 
   it("shows pending state and disables conflicting controls", () => {

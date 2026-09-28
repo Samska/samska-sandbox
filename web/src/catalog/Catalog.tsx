@@ -10,6 +10,15 @@ import {
 import CartDrawer from "../cart/CartDrawer";
 import CartTrigger from "../cart/CartTrigger";
 import CheckoutReview from "../checkout/CheckoutReview";
+import PaymentResult from "../payment/PaymentResult";
+import {
+  getPaymentAttempt,
+  initiatePaymentAttempt,
+  PaymentApiError,
+  type PaymentAttemptResponse,
+  type PaymentScenario
+} from "../payment/paymentApi";
+import { isUnconfirmedPaymentError, paymentErrorMessage } from "../payment/messages";
 import ProductBrowse from "./ProductBrowse";
 import ProductDetail from "./ProductDetail";
 import StatusMessage from "../ui/StatusMessage";
@@ -26,6 +35,10 @@ export default function Catalog() {
   const [cartNotice, setCartNotice] = useState<string | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [paymentPending, setPaymentPending] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
+  const [paymentUncertainAttemptId, setPaymentUncertainAttemptId] = useState<string | null>(null);
+  const [paymentAttempt, setPaymentAttempt] = useState<PaymentAttemptResponse | null>(null);
   const pendingFocusProductId = useRef<string | null>(null);
   const pendingCartTriggerFocus = useRef(false);
   const viewDetailsButtons = useRef(new Map<string, HTMLButtonElement>());
@@ -107,6 +120,8 @@ export default function Catalog() {
   function handleOpenCheckout() {
     setSelectedProduct(null);
     setCartNotice(null);
+    setPaymentError(null);
+    setPaymentAttempt(null);
     setIsCheckoutOpen(true);
     setIsCartOpen(false);
   }
@@ -120,6 +135,7 @@ export default function Catalog() {
     setCartPending(true);
     setCartError(null);
     setCartNotice(null);
+    setPaymentError(null);
 
     try {
       setCart(await addCartItem(product.id, 1));
@@ -135,6 +151,7 @@ export default function Catalog() {
     setCartPending(true);
     setCartError(null);
     setCartNotice(null);
+    setPaymentError(null);
 
     try {
       setCart(await updateCartItem(productId, quantity));
@@ -150,6 +167,7 @@ export default function Catalog() {
     setCartPending(true);
     setCartError(null);
     setCartNotice(null);
+    setPaymentError(null);
 
     try {
       setCart(await removeCartItem(productId));
@@ -159,6 +177,85 @@ export default function Catalog() {
     } finally {
       setCartPending(false);
     }
+  }
+
+  async function handleSimulatePayment(scenario: PaymentScenario) {
+    if (
+      cart === null ||
+      cart.items.length === 0 ||
+      cartPending ||
+      paymentPending ||
+      cartError !== null ||
+      paymentUncertainAttemptId !== null
+    ) {
+      return;
+    }
+
+    const attemptId = crypto.randomUUID();
+    setPaymentPending(true);
+    setPaymentError(null);
+    setCartNotice(null);
+
+    try {
+      setPaymentAttempt(await initiatePaymentAttempt(attemptId, cart.revision, scenario));
+    } catch (caughtError) {
+      if (caughtError instanceof PaymentApiError && caughtError.kind === "cart-changed") {
+        setPaymentError(paymentErrorMessage(caughtError));
+        await refreshCart();
+      } else if (
+        caughtError instanceof PaymentApiError &&
+        caughtError.kind === "already-approved" &&
+        caughtError.existingAttemptId !== null
+      ) {
+        setPaymentError(paymentErrorMessage(caughtError));
+        await loadPaymentAttempt(caughtError.existingAttemptId);
+      } else if (caughtError instanceof PaymentApiError && isUnconfirmedPaymentError(caughtError.kind)) {
+        setPaymentError(paymentErrorMessage(caughtError));
+        setPaymentUncertainAttemptId(attemptId);
+      } else {
+        setPaymentError(paymentErrorMessage(caughtError));
+      }
+    } finally {
+      setPaymentPending(false);
+    }
+  }
+
+  async function handleCheckPaymentResult() {
+    if (paymentUncertainAttemptId === null || paymentPending) {
+      return;
+    }
+
+    setPaymentPending(true);
+    setPaymentError(null);
+
+    try {
+      await loadPaymentAttempt(paymentUncertainAttemptId);
+    } finally {
+      setPaymentPending(false);
+    }
+  }
+
+  async function loadPaymentAttempt(attemptId: string) {
+    try {
+      setPaymentAttempt(await getPaymentAttempt(attemptId));
+      setPaymentUncertainAttemptId(null);
+    } catch (caughtError) {
+      setPaymentError(paymentErrorMessage(caughtError));
+
+      if (caughtError instanceof PaymentApiError && caughtError.kind === "not-found") {
+        setPaymentUncertainAttemptId(null);
+        await refreshCart();
+      } else {
+        setPaymentUncertainAttemptId(attemptId);
+      }
+    }
+  }
+
+  function handleReturnToCheckout() {
+    setPaymentAttempt(null);
+    setPaymentError(null);
+    setPaymentUncertainAttemptId(null);
+    setCartNotice(null);
   }
 
   const cartItemCount = cart?.items.reduce((total, item) => total + item.quantity, 0) ?? 0;
@@ -176,15 +273,24 @@ export default function Catalog() {
   return (
     <div className="grid gap-6">
       {isCheckoutOpen && cart !== null ? (
-        <CheckoutReview
-          cart={cart}
-          onBack={handleBackToMarket}
-          onUpdateQuantity={handleUpdateQuantity}
-          onRemoveItem={handleRemoveItem}
-          isPending={cartPending}
-          error={cartError}
-          onRetry={() => void refreshCart()}
-        />
+        paymentAttempt !== null ? (
+          <PaymentResult attempt={paymentAttempt} onBackToCheckout={handleReturnToCheckout} />
+        ) : (
+          <CheckoutReview
+            cart={cart}
+            onBack={handleBackToMarket}
+            onUpdateQuantity={handleUpdateQuantity}
+            onRemoveItem={handleRemoveItem}
+            isPending={cartPending}
+            error={cartError}
+            onRetry={() => void refreshCart()}
+            paymentPending={paymentPending}
+            paymentError={paymentError}
+            paymentCanCheckResult={paymentUncertainAttemptId !== null}
+            onSimulatePayment={handleSimulatePayment}
+            onCheckPaymentResult={() => void handleCheckPaymentResult()}
+          />
+        )
       ) : selectedProduct !== null ? (
         <ProductDetail
           product={selectedProduct}

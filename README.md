@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Target milestone:** `v0.1.0 — First Order` (unreleased)
-- **Current stage:** Product Media Upload implemented
-- **Next planned work:** Payment Simulator
+- **Current stage:** Payment Simulator implemented
+- **Next planned work:** Order creation
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -25,7 +25,8 @@ Samska Sandbox uses a fictional catalog and order journey to demonstrate
 evidence-driven engineering. The current application contains a Java/Spring
 Boot backend, a React/TypeScript frontend, a Catalog boundary for Products with
 bounded local media upload, a process-local Cart boundary, an editable Checkout
-view over the current Cart, and a separate Admin Product-management surface.
+view over the current Cart with a simulated payment flow, and a separate Admin
+Product-management surface.
 
 AI agents are implementation tools operating under repository-defined
 governance. Humans own requirements, architecture, decisions, review,
@@ -42,28 +43,31 @@ validation, learning, and risk.
 | Shopping Cart | Implemented | Process-local Cart contents, quantity changes, removal, and server-calculated totals. |
 | Product UX Foundation | Implemented | Commerce-oriented shell, responsive Product browsing, integrated Cart presentation, and accessible feedback. |
 | Product Storefront UX/UI | Implemented | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged. |
-| Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource, identity, or snapshot exists yet. |
+| Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource or identity exists; payment initiation captures the immutable revision-checked snapshot. |
+| Payment Simulator | Implemented | An explicit local-demo outcome (Approve, Decline, or Temporary failure) over a revision-checked immutable Cart snapshot; Payment owns identified attempts with UUID replay, GET reconciliation, one approval per unchanged Cart revision, and a 32-attempt process-local limit without eviction. No real payment, credentials, provider, or Order is created; attempts and duplicate protection are lost on restart, and the endpoints are unauthenticated and local-only. |
 | Admin Catalog Management | Implemented | Compact management list at `/admin/products` with case-insensitive name search, thumbnails, Edit links, and delete confirmation; dedicated `/admin/products/new` and `/admin/products/{id}/edit` forms with staged image selection; Admin paths are navigation only, not access control. |
 | Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in bounded backend process memory; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
-| Payment, orders, E2E, deployment | Planned | The remaining capabilities after Product Media Upload in the owner-approved sequence; end-to-end automation and deployment follow the local MVP. |
+| Orders, E2E, deployment | Planned | The remaining capabilities after Payment Simulator in the owner-approved sequence; end-to-end automation and deployment follow the local MVP. |
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    User[User / browser] --> UI[React / TypeScript<br/>Market, Admin, Cart,<br/>and Checkout UI]
+    User[User / browser] --> UI[React / TypeScript<br/>Market, Admin, Cart,<br/>Checkout, and Payment UI]
     UI --> Adapter[Feature API adapters]
     Adapter --> Proxy[Vite development<br/>/api proxy]
-    Proxy --> HTTP[Spring Boot<br/>Catalog and Cart HTTP APIs]
-    HTTP --> App[Catalog and Cart applications<br/>plus Product/Cart<br/>deletion coordination]
+    Proxy --> HTTP[Spring Boot<br/>Catalog, Cart, and<br/>Payment HTTP APIs]
+    HTTP --> App[Catalog, Cart, and Payment<br/>applications plus Product/Cart<br/>deletion coordination]
     App --> Domain[Product domain]
     App --> Store[ProductStore boundary]
     Store --> Memory[InMemoryProductStore<br/>process-local<br/>Product + uploaded media]
     App --> Cart[Cart aggregate]
     Cart --> CartMemory[InMemoryCartStore<br/>single current Cart]
+    App --> Payment[Payment application<br/>revision-checked snapshots,<br/>replay, and approvals]
+    Payment --> Cart
 
     Postgres[(PostgreSQL<br/>optional local Compose infrastructure<br/>not connected to application)]
 ```
@@ -74,7 +78,10 @@ restarts. Uploaded media is validated, dimension-checked, and re-encoded as JPEG
 before storage, is limited to one image per Product, and is served only for the
 Product's current media ID; rejection leaves the Product and its current image
 unchanged. Checkout is a frontend
-review of the current Cart and holds no server-side state at this stage. The
+review of the current Cart; payment initiation captures an immutable,
+revision-checked Cart snapshot owned by the bounded process-local Payment attempt
+store, which keeps at most 32 attempts and replays identical submissions by
+attempt ID. No real payment, credentials, provider, or Order is created. The
 Admin surface is a separate frontend route over the same Catalog API, and
 `/admin/products` provides no access control. Product deletion is refused with
 `409` while the Product is in the current Cart through a process-local
@@ -130,17 +137,18 @@ components.
 
 The Product Storefront UX/UI refinement (SS-031) is complete and merged through
 PR #52. Checkout (SS-032) is implemented as an editable live view of the current
-Cart; the immutable transactional snapshot is deferred to Payment Simulator
-work. Admin Catalog Management (SS-033) is complete and merged through PR #56.
-Product Media Upload (SS-034) adds bounded, validated, in-memory JPEG upload per
-Product with uploaded-media display precedence and a retained curated/monogram
-fallback. The owner-approved sequence continues
-with Payment Simulator, order creation, the complete First
-Order journey, and then the `v0.1.0` release. Authentication and authorization
+Cart. Admin Catalog Management (SS-033) is complete and merged through PR #56.
+Product Media Upload (SS-034) is complete and merged through PR #58. Payment
+Simulator (SS-036) provides explicit simulated payment outcomes over a
+revision-checked immutable Cart snapshot owned by a bounded process-local attempt
+store. The owner-approved sequence continues
+with order creation, the complete First Order journey, and then the `v0.1.0`
+release. Authentication and authorization
 remain deferred until after the local MVP but are mandatory before any hosted
-environment; `/admin/products` is navigation and not an access-control boundary.
-Future capabilities receive an SS identifier only when their GitHub Issue is
-created; the roadmap does not reserve future identifiers.
+environment; `/admin/products` is navigation and not an access-control boundary,
+and the simulated-payment endpoints are unauthenticated and local-only. Future
+capabilities receive an SS identifier only when their GitHub Issue is created;
+the roadmap does not reserve future identifiers.
 
 See the [roadmap](docs/ROADMAP.md) for product direction and the [live Project](https://github.com/users/Samska/projects/1)
 for execution state.
