@@ -13,7 +13,7 @@ function stubFetch() {
       return Promise.resolve(response(200, []));
     }
 
-    return Promise.resolve(response(200, { items: [], total: 0 }));
+    return Promise.resolve(response(200, { items: [], total: 0, revision: 0 }));
   }));
 }
 

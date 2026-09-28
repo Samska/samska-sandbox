@@ -9,6 +9,7 @@ export interface CartItemResponse {
 export interface CartResponse {
   items: CartItemResponse[];
   total: number;
+  revision: number;
 }
 
 export type CartApiErrorKind = "bad-request" | "not-found" | "network" | "server" | "invalid-response";
@@ -97,12 +98,15 @@ function isCartResponse(value: unknown): value is CartResponse {
   const keys = Object.keys(cart);
 
   return (
-    keys.length === 2 &&
+    keys.length === 3 &&
     keys.includes("items") &&
     keys.includes("total") &&
+    keys.includes("revision") &&
     Array.isArray(cart.items) &&
     cart.items.every(isCartItemResponse) &&
-    isFiniteNumber(cart.total)
+    isFiniteNumber(cart.total) &&
+    isInteger(cart.revision) &&
+    cart.revision >= 0
   );
 }
 

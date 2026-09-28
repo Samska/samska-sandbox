@@ -30,3 +30,5 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 [ADR 0003: Adopt an Optional Product Media Reference](0003-adopt-optional-product-media-reference.md) recorded the curated Product media direction; its no-upload decision is superseded by ADR 0004.
 
 [ADR 0004: Adopt Product Media Upload with Bounded In-Memory Storage](0004-adopt-product-media-upload.md) records the accepted upload, storage, validation, and serving direction.
+
+[ADR 0005: Adopt a Payment-Owned In-Memory Attempt Store with Revision-Checked Cart Snapshots](0005-adopt-payment-attempt-store-with-cart-revision.md) records the accepted simulated-payment attempt ownership, atomic capture, replay, approval, and capacity direction.

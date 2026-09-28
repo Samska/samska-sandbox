@@ -5,13 +5,14 @@ import java.util.List;
 
 import io.github.samska.sandbox.cart.Cart;
 
-public record CartResponse(List<CartItemResponse> items, BigDecimal total) {
+public record CartResponse(List<CartItemResponse> items, BigDecimal total, long revision) {
 
     public static CartResponse from(Cart cart) {
         var snapshot = cart.snapshot();
 
         return new CartResponse(
                 snapshot.items().stream().map(CartItemResponse::from).toList(),
-                snapshot.total());
+                snapshot.total(),
+                snapshot.revision());
     }
 }

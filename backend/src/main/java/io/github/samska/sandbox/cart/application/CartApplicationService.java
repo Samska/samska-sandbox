@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import io.github.samska.sandbox.cart.Cart;
+import io.github.samska.sandbox.cart.CartSnapshot;
 import io.github.samska.sandbox.cart.InvalidCartException;
 import io.github.samska.sandbox.cart.ProductReference;
 import io.github.samska.sandbox.cart.Quantity;
@@ -23,6 +24,10 @@ public class CartApplicationService {
 
     public Cart currentCart() {
         return cartStore.current();
+    }
+
+    public CartSnapshot captureSnapshot(long expectedRevision) {
+        return cartStore.current().snapshotForRevision(expectedRevision);
     }
 
     public boolean currentCartContainsProduct(UUID productId) {

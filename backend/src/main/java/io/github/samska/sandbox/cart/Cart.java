@@ -8,6 +8,7 @@ import java.util.Map;
 public final class Cart {
 
     private final Map<ProductReference, CartItem> items = new LinkedHashMap<>();
+    private long revision;
 
     public synchronized void addItem(
             ProductReference product,
@@ -18,6 +19,7 @@ public final class Cart {
         items.put(product, existingItem == null
                 ? new CartItem(product, name, unitPrice, quantity)
                 : existingItem.addQuantity(quantity));
+        revision++;
     }
 
     public synchronized boolean hasItem(ProductReference product) {
@@ -30,12 +32,14 @@ public final class Cart {
             throw new InvalidCartException("Cart item was not found");
         }
         items.put(product, existingItem.withQuantity(quantity));
+        revision++;
     }
 
     public synchronized void removeItem(ProductReference product) {
         if (items.remove(product) == null) {
             throw new InvalidCartException("Cart item was not found");
         }
+        revision++;
     }
 
     public synchronized List<CartItem> items() {
@@ -43,7 +47,15 @@ public final class Cart {
     }
 
     public synchronized CartSnapshot snapshot() {
-        return new CartSnapshot(List.copyOf(items.values()), total());
+        return new CartSnapshot(List.copyOf(items.values()), total(), revision);
+    }
+
+    public synchronized CartSnapshot snapshotForRevision(long expectedRevision) {
+        if (revision != expectedRevision) {
+            throw new CartRevisionMismatchException(expectedRevision, revision);
+        }
+
+        return snapshot();
     }
 
     public synchronized BigDecimal total() {

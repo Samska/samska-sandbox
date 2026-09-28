@@ -11,7 +11,7 @@ const createdProduct = {
   uploadedMediaId: null
 };
 
-const emptyCart = { items: [], total: 0 };
+const emptyCart = { items: [], total: 0, revision: 0 };
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -180,7 +180,8 @@ describe("Catalog", () => {
         unitPrice: createdProduct.price,
         lineSubtotal: createdProduct.price
       }],
-      total: createdProduct.price
+      total: createdProduct.price,
+      revision: 1
     };
     const fetchMock = vi.fn((input: RequestInfo | URL, options?: RequestInit) => {
       const path = String(input);
@@ -229,7 +230,8 @@ describe("Catalog", () => {
         unitPrice: createdProduct.price,
         lineSubtotal: createdProduct.price
       }],
-      total: createdProduct.price
+      total: createdProduct.price,
+      revision: 1
     };
     const fetchMock = vi.fn((input: RequestInfo | URL, options?: RequestInit) => {
       const path = String(input);

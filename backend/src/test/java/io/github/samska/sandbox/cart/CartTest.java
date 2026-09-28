@@ -23,6 +23,7 @@ class CartTest {
         assertThat(cart.items()).hasSize(1);
         assertThat(cart.items().getFirst().lineSubtotal()).isEqualByComparingTo("25.00");
         assertThat(cart.total()).isEqualByComparingTo("25.00");
+        assertThat(cart.snapshot().revision()).isEqualTo(1);
     }
 
     @Test
@@ -36,6 +37,7 @@ class CartTest {
         assertThat(item.quantity().value()).isEqualTo(5);
         assertThat(item.name()).isEqualTo("Original name");
         assertThat(item.unitPrice()).isEqualByComparingTo("2.50");
+        assertThat(cart.snapshot().revision()).isEqualTo(2);
     }
 
     @Test
@@ -49,6 +51,7 @@ class CartTest {
         cart.removeItem(PRODUCT);
         assertThat(cart.items()).isEmpty();
         assertThat(cart.total()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(cart.snapshot().revision()).isEqualTo(3);
     }
 
     @Test
@@ -87,6 +90,7 @@ class CartTest {
         assertThat(snapshot.items()).hasSize(1);
         assertThat(snapshot.items().getFirst().quantity().value()).isEqualTo(2);
         assertThat(snapshot.total()).isEqualByComparingTo("25.00");
+        assertThat(snapshot.revision()).isEqualTo(1);
 
         cart.updateQuantity(PRODUCT, new Quantity(4));
         cart.addItem(new ProductReference(OTHER_PRODUCT_ID), "Pour-Over Set", new BigDecimal("68.50"), new Quantity(1));
@@ -94,8 +98,34 @@ class CartTest {
         assertThat(snapshot.items()).hasSize(1);
         assertThat(snapshot.items().getFirst().quantity().value()).isEqualTo(2);
         assertThat(snapshot.total()).isEqualByComparingTo("25.00");
+        assertThat(snapshot.revision()).isEqualTo(1);
+        assertThat(cart.snapshot().revision()).isEqualTo(3);
         assertThatExceptionOfType(UnsupportedOperationException.class)
                 .isThrownBy(() -> snapshot.items().clear());
+    }
+
+    @Test
+    void capturesSnapshotForMatchingRevisionAndRejectsStaleRevisions() {
+        var cart = new Cart();
+
+        var emptySnapshot = cart.snapshotForRevision(0);
+        assertThat(emptySnapshot.items()).isEmpty();
+        assertThat(emptySnapshot.revision()).isZero();
+
+        cart.addItem(PRODUCT, "Canvas Tote", new BigDecimal("12.50"), new Quantity(2));
+
+        assertThatExceptionOfType(CartRevisionMismatchException.class)
+                .isThrownBy(() -> cart.snapshotForRevision(0));
+
+        var snapshot = cart.snapshotForRevision(1);
+        assertThat(snapshot.items()).hasSize(1);
+        assertThat(snapshot.total()).isEqualByComparingTo("25.00");
+
+        cart.updateQuantity(PRODUCT, new Quantity(3));
+
+        assertThatExceptionOfType(CartRevisionMismatchException.class)
+                .isThrownBy(() -> cart.snapshotForRevision(1));
+        assertThat(cart.snapshotForRevision(2).items().getFirst().quantity().value()).isEqualTo(3);
     }
 
     @Test
@@ -104,5 +134,6 @@ class CartTest {
 
         assertThat(snapshot.items()).isEmpty();
         assertThat(snapshot.total()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(snapshot.revision()).isZero();
     }
 }

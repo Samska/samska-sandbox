@@ -21,7 +21,8 @@ const cart: CartResponse = {
       lineSubtotal: 68.5
     }
   ],
-  total: 93.5
+  total: 93.5,
+  revision: 1
 };
 
 function renderDrawer(overrides: Partial<Parameters<typeof CartDrawer>[0]> = {}) {

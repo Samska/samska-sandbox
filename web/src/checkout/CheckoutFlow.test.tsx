@@ -11,7 +11,7 @@ const product = {
   uploadedMediaId: null
 };
 
-const emptyCart = { items: [], total: 0 };
+const emptyCart = { items: [], total: 0, revision: 0 };
 
 const toteItem = {
   productId: product.id,
@@ -29,12 +29,12 @@ const pourOverItem = {
   lineSubtotal: 68.5
 };
 
-const cartWithTote = { items: [toteItem], total: 25 };
-const cartWithTwoItems = { items: [toteItem, pourOverItem], total: 93.5 };
-const increasedCart = { items: [{ ...toteItem, quantity: 3, lineSubtotal: 37.5 }], total: 37.5 };
-const decreasedCart = { items: [{ ...toteItem, quantity: 1, lineSubtotal: 12.5 }], total: 12.5 };
-const quadrupledCart = { items: [{ ...toteItem, quantity: 4, lineSubtotal: 50 }], total: 50 };
-const oneItemCart = { items: [pourOverItem], total: 68.5 };
+const cartWithTote = { items: [toteItem], total: 25, revision: 1 };
+const cartWithTwoItems = { items: [toteItem, pourOverItem], total: 93.5, revision: 1 };
+const increasedCart = { items: [{ ...toteItem, quantity: 3, lineSubtotal: 37.5 }], total: 37.5, revision: 2 };
+const decreasedCart = { items: [{ ...toteItem, quantity: 1, lineSubtotal: 12.5 }], total: 12.5, revision: 2 };
+const quadrupledCart = { items: [{ ...toteItem, quantity: 4, lineSubtotal: 50 }], total: 50, revision: 2 };
+const oneItemCart = { items: [pourOverItem], total: 68.5, revision: 2 };
 
 afterEach(() => {
   vi.unstubAllGlobals();
