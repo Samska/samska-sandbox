@@ -46,7 +46,7 @@ validation, learning, and risk.
 | Admin Catalog Management | Implemented | Compact management list at `/admin/products` with case-insensitive name search, thumbnails, Edit links, and delete confirmation; dedicated `/admin/products/new` and `/admin/products/{id}/edit` forms with staged image selection; Admin paths are navigation only, not access control. |
 | Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in bounded backend process memory; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
-| Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
+| Structured CI test reporting | Implemented | Named backend/frontend Check Runs, Job Summaries with test-layer guidance, annotations, and XML artifacts. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
 | Payment, orders, E2E, deployment | Planned | The remaining capabilities after Product Media Upload in the owner-approved sequence; end-to-end automation and deployment follow the local MVP. |
 
@@ -87,7 +87,7 @@ database connection or persistence.
 - Modular-monolith backend direction with explicit business boundaries.
 - Short-lived branches, focused pull requests, and squash-only merges.
 - Risk-based backend, frontend, repository, and security verification.
-- Independent CI jobs with structured test-result publication.
+- Independent CI jobs with structured test-result publication and test-layer guidance.
 - Immutable GitHub Action pins and least-privilege workflow permissions.
 - CodeQL and GitGuardian checks remain separate from application CI.
 - ADRs record significant, durable architecture decisions.

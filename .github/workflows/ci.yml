@@ -113,6 +113,12 @@ jobs:
           fail_on_parse_error: true
           require_tests: true
           job_summary: true
+          job_summary_text: |
+            Understanding this report: the backend suite mixes an application smoke test,
+            pure unit tests, process-local in-memory coordination tests, and Spring/MockMvc
+            API component tests. MockMvc exercises the HTTP layer in-process; it is not a
+            browser end-to-end test, and no PostgreSQL integration tests exist. The totals
+            below are overall counts, not per-layer totals.
           detailed_summary: true
           include_passed: true
           group_suite: true
@@ -130,6 +136,12 @@ jobs:
           fail_on_parse_error: true
           require_tests: true
           job_summary: true
+          job_summary_text: |
+            Understanding this report: the backend suite mixes an application smoke test,
+            pure unit tests, process-local in-memory coordination tests, and Spring/MockMvc
+            API component tests. MockMvc exercises the HTTP layer in-process; it is not a
+            browser end-to-end test, and no PostgreSQL integration tests exist. The totals
+            below are overall counts, not per-layer totals.
           detailed_summary: true
           include_passed: true
           group_suite: true
@@ -194,6 +206,11 @@ jobs:
           fail_on_parse_error: true
           require_tests: true
           job_summary: true
+          job_summary_text: |
+            Understanding this report: the frontend suite runs in jsdom with mocked network
+            access and covers rendering, accessibility semantics, route selection, and
+            component flows. jsdom is not a real browser, so these are not browser
+            end-to-end tests. The totals below are overall counts, not per-layer totals.
           detailed_summary: true
           include_passed: true
           group_suite: true
@@ -211,6 +228,11 @@ jobs:
           fail_on_parse_error: true
           require_tests: true
           job_summary: true
+          job_summary_text: |
+            Understanding this report: the frontend suite runs in jsdom with mocked network
+            access and covers rendering, accessibility semantics, route selection, and
+            component flows. jsdom is not a real browser, so these are not browser
+            end-to-end tests. The totals below are overall counts, not per-layer totals.
           detailed_summary: true
           include_passed: true
           group_suite: true

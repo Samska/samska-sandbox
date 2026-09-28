@@ -54,6 +54,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-032-checkout.md](ss-032-checkout.md) | Live Checkout review over the current Cart, single source of truth in the frontend, atomic Cart reads, and deferring the transactional snapshot to Payment. |
 | [ss-033-admin-catalog.md](ss-033-admin-catalog.md) | Real URL routing without a router, navigation versus authorization, cross-module coordination without cycles, scoped concurrency guarantees, atomic replace/delete, and captured Cart snapshots. |
 | [ss-034-product-media-upload.md](ss-034-product-media-upload.md) | Untrusted upload validation, layered limits versus peak memory, atomic parent/child publication, linearization and versioned media identity, and fallback-first rendering. |
+| [ss-035-test-classification.md](ss-035-test-classification.md) | CI test visibility through existing Check Runs and Job Summaries, honest layer guidance without mandatory classification, and why per-layer totals and an inventory/classifier were not adopted. |
 
 Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 
