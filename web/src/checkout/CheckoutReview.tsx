@@ -26,7 +26,8 @@ export default function CheckoutReview({
   paymentError,
   paymentCanCheckResult,
   onSimulatePayment,
-  onCheckPaymentResult
+  onCheckPaymentResult,
+  onViewOrder
 }: {
   cart: CartResponse;
   onBack: () => void;
@@ -40,6 +41,7 @@ export default function CheckoutReview({
   paymentCanCheckResult: boolean;
   onSimulatePayment: (scenario: PaymentScenario) => Promise<void>;
   onCheckPaymentResult: () => void;
+  onViewOrder?: () => void;
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
@@ -167,6 +169,7 @@ export default function CheckoutReview({
             ) : null}
           </div>
         ) : null}
+        {onViewOrder ? <Button variant="quiet" onClick={onViewOrder}>View saved Order</Button> : null}
         {cart.items.length === 0 ? (
           <div className="grid gap-2 rounded-lg bg-surface-muted px-4 py-5">
             <h2

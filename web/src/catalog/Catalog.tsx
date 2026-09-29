@@ -19,6 +19,9 @@ import {
   type PaymentScenario
 } from "../payment/paymentApi";
 import { isUnconfirmedPaymentError, paymentErrorMessage } from "../payment/messages";
+import OrderResult from "../order/OrderResult";
+import { createOrder, getOrderByPaymentAttempt, OrderApiError, type OrderResponse } from "../order/orderApi";
+import { missingApprovalMessage, orderErrorMessage, unconfirmedOrderMessage } from "../order/messages";
 import ProductBrowse from "./ProductBrowse";
 import ProductDetail from "./ProductDetail";
 import StatusMessage from "../ui/StatusMessage";
@@ -39,10 +42,18 @@ export default function Catalog() {
   const [paymentError, setPaymentError] = useState<string | null>(null);
   const [paymentUncertainAttemptId, setPaymentUncertainAttemptId] = useState<string | null>(null);
   const [paymentAttempt, setPaymentAttempt] = useState<PaymentAttemptResponse | null>(null);
+  const [order, setOrder] = useState<OrderResponse | null>(null);
+  const [orderVisible, setOrderVisible] = useState(false);
+  const [orderPending, setOrderPending] = useState(false);
+  const [orderError, setOrderError] = useState<string | null>(null);
+  const [orderUncertainAttemptId, setOrderUncertainAttemptId] = useState<string | null>(null);
+  const [orderRetryReady, setOrderRetryReady] = useState(false);
+  const [orderBlocked, setOrderBlocked] = useState(false);
   const pendingFocusProductId = useRef<string | null>(null);
   const pendingCartTriggerFocus = useRef(false);
   const viewDetailsButtons = useRef(new Map<string, HTMLButtonElement>());
   const cartTriggerRef = useRef<HTMLButtonElement>(null);
+  const orderInFlightRef = useRef(false);
 
   async function refreshProducts() {
     setProductsPending(true);
@@ -121,7 +132,10 @@ export default function Catalog() {
     setSelectedProduct(null);
     setCartNotice(null);
     setPaymentError(null);
-    setPaymentAttempt(null);
+    // A confirmed approval and any unresolved Order identity survive in-app navigation.
+    if (paymentAttempt?.status !== "approved" && orderUncertainAttemptId === null) {
+      setPaymentAttempt(null);
+    }
     setIsCheckoutOpen(true);
     setIsCartOpen(false);
   }
@@ -192,6 +206,11 @@ export default function Catalog() {
     }
 
     const attemptId = crypto.randomUUID();
+    setOrderVisible(false);
+    setOrderError(null);
+    setOrderUncertainAttemptId(null);
+    setOrderRetryReady(false);
+    setOrderBlocked(false);
     setPaymentPending(true);
     setPaymentError(null);
     setCartNotice(null);
@@ -252,10 +271,92 @@ export default function Catalog() {
   }
 
   function handleReturnToCheckout() {
+    if (orderUncertainAttemptId !== null) return;
     setPaymentAttempt(null);
     setPaymentError(null);
     setPaymentUncertainAttemptId(null);
     setCartNotice(null);
+    setOrderVisible(false);
+  }
+
+  async function handleCreateOrder() {
+    const attempt = paymentAttempt;
+    if (attempt?.status !== "approved" || orderInFlightRef.current || orderBlocked ||
+        (orderUncertainAttemptId !== null && !orderRetryReady)) return;
+    orderInFlightRef.current = true;
+    setOrderPending(true);
+    setOrderError(null);
+    setOrderRetryReady(false);
+    try {
+      const created = await createOrder(attempt.attemptId);
+      if (created.paymentAttemptId !== attempt.attemptId || created.cartRevision !== attempt.cartRevision) {
+        throw new OrderApiError("invalid-response");
+      }
+      setOrder(created);
+      setOrderVisible(true);
+      setOrderUncertainAttemptId(null);
+    } catch (caught) {
+      setOrderError(orderErrorMessage(caught));
+      if (caught instanceof OrderApiError && ["bad-request", "not-found", "not-approved", "capacity"].includes(caught.kind)) {
+        setOrderBlocked(true);
+        setOrderUncertainAttemptId(null);
+      } else {
+        setOrderUncertainAttemptId(attempt.attemptId);
+      }
+    } finally {
+      orderInFlightRef.current = false;
+      setOrderPending(false);
+    }
+  }
+
+  async function handleCheckOrder() {
+    const id = orderUncertainAttemptId;
+    if (id === null || orderInFlightRef.current || paymentAttempt?.attemptId !== id) return;
+    orderInFlightRef.current = true;
+    setOrderPending(true);
+    setOrderError(null);
+    try {
+      const found = await getOrderByPaymentAttempt(id);
+      if (found.paymentAttemptId !== id || found.cartRevision !== paymentAttempt.cartRevision) {
+        throw new OrderApiError("invalid-response");
+      }
+      setOrder(found);
+      setOrderVisible(true);
+      setOrderUncertainAttemptId(null);
+      setOrderRetryReady(false);
+    } catch (caught) {
+      if (caught instanceof OrderApiError && caught.kind === "not-found") {
+        try {
+          const attempt = await getPaymentAttempt(id);
+          if (attempt.attemptId === id && attempt.status === "approved" &&
+              attempt.cartRevision === paymentAttempt.cartRevision) {
+            setOrderRetryReady(true);
+            setOrderError("No Order was found. The approved attempt is confirmed. You may explicitly create an Order with the same attempt ID.");
+          } else {
+            setOrderBlocked(true);
+            setOrderUncertainAttemptId(null);
+            setPaymentAttempt(null);
+            setPaymentError(missingApprovalMessage);
+            await refreshCart();
+          }
+        } catch (paymentError) {
+          if (paymentError instanceof PaymentApiError && paymentError.kind === "not-found") {
+            setOrderBlocked(true);
+            setOrderUncertainAttemptId(null);
+            setPaymentAttempt(null);
+            setPaymentError(missingApprovalMessage);
+            await refreshCart();
+          } else {
+            setOrderError(unconfirmedOrderMessage);
+          }
+        }
+      } else {
+        setOrderError(unconfirmedOrderMessage);
+      }
+    } finally {
+      orderInFlightRef.current = false;
+      setOrderPending(false);
+    }
   }
 
   const cartItemCount = cart?.items.reduce((total, item) => total + item.quantity, 0) ?? 0;
@@ -273,8 +374,15 @@ export default function Catalog() {
   return (
     <div className="grid gap-6">
       {isCheckoutOpen && cart !== null ? (
-        paymentAttempt !== null ? (
-          <PaymentResult attempt={paymentAttempt} onBackToCheckout={handleReturnToCheckout} />
+        order !== null && orderVisible ? (
+          <OrderResult order={order} onBackToMarket={handleBackToMarket} onBackToCheckout={handleReturnToCheckout} />
+        ) : paymentAttempt !== null ? (
+          <PaymentResult attempt={paymentAttempt} onBackToCheckout={handleReturnToCheckout}
+            onBackToMarket={handleBackToMarket} onCreateOrder={() => void handleCreateOrder()}
+            onViewOrder={order?.paymentAttemptId === paymentAttempt.attemptId ? () => setOrderVisible(true) : undefined}
+            onCheckOrder={() => void handleCheckOrder()} orderPending={orderPending}
+            orderError={orderError} orderUnconfirmed={orderUncertainAttemptId !== null}
+            orderRetryReady={orderRetryReady} orderBlocked={orderBlocked} />
         ) : (
           <CheckoutReview
             cart={cart}
@@ -289,6 +397,7 @@ export default function Catalog() {
             paymentCanCheckResult={paymentUncertainAttemptId !== null}
             onSimulatePayment={handleSimulatePayment}
             onCheckPaymentResult={() => void handleCheckPaymentResult()}
+            onViewOrder={order === null ? undefined : () => setOrderVisible(true)}
           />
         )
       ) : selectedProduct !== null ? (

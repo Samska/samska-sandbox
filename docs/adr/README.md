@@ -32,3 +32,5 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 [ADR 0004: Adopt Product Media Upload with Bounded In-Memory Storage](0004-adopt-product-media-upload.md) records the accepted upload, storage, validation, and serving direction.
 
 [ADR 0005: Adopt a Payment-Owned In-Memory Attempt Store with Revision-Checked Cart Snapshots](0005-adopt-payment-attempt-store-with-cart-revision.md) records the accepted simulated-payment attempt ownership, atomic capture, replay, approval, and capacity direction.
+
+[ADR 0006: Adopt an Order-Owned In-Memory Store from Approved Payment Attempts](0006-adopt-order-owned-in-memory-store.md) records Order ownership, source-attempt idempotency, capacity, lock ordering, and reconciliation.

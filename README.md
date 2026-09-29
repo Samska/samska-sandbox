@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Target milestone:** `v0.1.0 — First Order` (unreleased)
-- **Current stage:** Payment Simulator implemented
-- **Next planned work:** Order creation
+- **Current stage:** Order creation (SS-037) delivered for review
+- **Next planned work:** First Order end-to-end journey after Order review and integration
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -26,7 +26,8 @@ evidence-driven engineering. The current application contains a Java/Spring
 Boot backend, a React/TypeScript frontend, a Catalog boundary for Products with
 bounded local media upload, a process-local Cart boundary, an editable Checkout
 view over the current Cart with a simulated payment flow, and a separate Admin
-Product-management surface.
+Product-management surface. Order is a separate process-local boundary that copies
+approved simulated-payment data on an explicit action; it does not change the Cart.
 
 AI agents are implementation tools operating under repository-defined
 governance. Humans own requirements, architecture, decisions, review,
@@ -44,23 +45,24 @@ validation, learning, and risk.
 | Product UX Foundation | Implemented | Commerce-oriented shell, responsive Product browsing, integrated Cart presentation, and accessible feedback. |
 | Product Storefront UX/UI | Implemented | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged. |
 | Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource or identity exists; payment initiation captures the immutable revision-checked snapshot. |
-| Payment Simulator | Implemented | An explicit local-demo outcome (Approve, Decline, or Temporary failure) over a revision-checked immutable Cart snapshot; Payment owns identified attempts with UUID replay, GET reconciliation, one approval per unchanged Cart revision, and a 32-attempt process-local limit without eviction. No real payment, credentials, provider, or Order is created; attempts and duplicate protection are lost on restart, and the endpoints are unauthenticated and local-only. |
+| Payment Simulator | Implemented | An explicit local-demo outcome over a revision-checked immutable Cart snapshot; Payment owns identified attempts with UUID replay, GET reconciliation, one approval per unchanged Cart revision, and a 32-attempt process-local limit without eviction. Approval alone creates no Order or real payment; attempts are lost on restart. |
+| Order creation | In review | Explicit creation from an approved attempt, immutable copied lines and total, same-attempt replay and GET reconciliation, and a defensive 32-Order process-local cap. |
 | Admin Catalog Management | Implemented | Compact management list at `/admin/products` with case-insensitive name search, thumbnails, Edit links, and delete confirmation; dedicated `/admin/products/new` and `/admin/products/{id}/edit` forms with staged image selection; Admin paths are navigation only, not access control. |
 | Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in bounded backend process memory; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
-| Orders, E2E, deployment | Planned | The remaining capabilities after Payment Simulator in the owner-approved sequence; end-to-end automation and deployment follow the local MVP. |
+| First Order journey, E2E, deployment | Planned | The complete journey follows reviewed Order creation; end-to-end automation and deployment remain later work. |
 
 ## Architecture
 
 ```mermaid
 flowchart LR
-    User[User / browser] --> UI[React / TypeScript<br/>Market, Admin, Cart,<br/>Checkout, and Payment UI]
+    User[User / browser] --> UI[React / TypeScript<br/>Market, Admin, Cart,<br/>Checkout, Payment, and Order UI]
     UI --> Adapter[Feature API adapters]
     Adapter --> Proxy[Vite development<br/>/api proxy]
-    Proxy --> HTTP[Spring Boot<br/>Catalog, Cart, and<br/>Payment HTTP APIs]
-    HTTP --> App[Catalog, Cart, and Payment<br/>applications plus Product/Cart<br/>deletion coordination]
+    Proxy --> HTTP[Spring Boot<br/>Catalog, Cart, Payment,<br/>and Order HTTP APIs]
+    HTTP --> App[Catalog, Cart, Payment, and Order<br/>applications plus Product/Cart<br/>deletion coordination]
     App --> Domain[Product domain]
     App --> Store[ProductStore boundary]
     Store --> Memory[InMemoryProductStore<br/>process-local<br/>Product + uploaded media]
@@ -68,6 +70,8 @@ flowchart LR
     Cart --> CartMemory[InMemoryCartStore<br/>single current Cart]
     App --> Payment[Payment application<br/>revision-checked snapshots,<br/>replay, and approvals]
     Payment --> Cart
+    App --> Order[Order application<br/>immutable records and<br/>attempt replay]
+    Order --> Payment
 
     Postgres[(PostgreSQL<br/>optional local Compose infrastructure<br/>not connected to application)]
 ```
@@ -81,8 +85,10 @@ unchanged. Checkout is a frontend
 review of the current Cart; payment initiation captures an immutable,
 revision-checked Cart snapshot owned by the bounded process-local Payment attempt
 store, which keeps at most 32 attempts and replays identical submissions by
-attempt ID. No real payment, credentials, provider, or Order is created. The
-Admin surface is a separate frontend route over the same Catalog API, and
+attempt ID. Approval alone creates no Order; an explicit action copies the
+approved frozen attempt into a bounded process-local Order. No real payment,
+credentials, or provider is involved. The Admin surface is a separate frontend
+route over the same Catalog API, and
 `/admin/products` provides no access control. Product deletion is refused with
 `409` while the Product is in the current Cart through a process-local
 coordination lock that covers the HTTP add-to-Cart and delete-Product paths.
@@ -141,9 +147,10 @@ Cart. Admin Catalog Management (SS-033) is complete and merged through PR #56.
 Product Media Upload (SS-034) is complete and merged through PR #58. Payment
 Simulator (SS-036) provides explicit simulated payment outcomes over a
 revision-checked immutable Cart snapshot owned by a bounded process-local attempt
-store. The owner-approved sequence continues
-with order creation, the complete First Order journey, and then the `v0.1.0`
-release. Authentication and authorization
+store. Order creation (SS-037) is delivered for review; the owner observed the
+main browser flow, while API replay, uncertain-response recovery, and
+accessibility checks remain pending. The owner-approved sequence continues with
+the complete First Order journey, then the `v0.1.0` release. Authentication and authorization
 remain deferred until after the local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary,
 and the simulated-payment endpoints are unauthenticated and local-only. Future

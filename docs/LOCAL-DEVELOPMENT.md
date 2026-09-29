@@ -4,7 +4,7 @@
 
 This is the canonical guide for configuring, running, verifying, stopping, and troubleshooting Samska Sandbox locally. It describes the repository's current state; it is not deployment guidance.
 
-The core Catalog, Cart, and Payment application uses a Java/Spring Boot backend and a React/Vite frontend. Product and Cart data, including uploaded Product media, and simulated payment attempts are held in backend process memory and disappear whenever the backend restarts. Docker Compose PostgreSQL is optional local infrastructure: Spring Boot does not connect to it, and it does not persist Products, Cart state, or payment attempts.
+The core Catalog, Cart, Payment, and Order application uses a Java/Spring Boot backend and a React/Vite frontend. Product and Cart data, including uploaded Product media, simulated payment attempts, and Orders are held in backend process memory and disappear whenever the backend restarts. Docker Compose PostgreSQL is optional local infrastructure: Spring Boot does not connect to it, and it does not persist these resources.
 
 ## Prerequisites
 
