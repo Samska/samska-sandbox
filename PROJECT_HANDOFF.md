@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-037 — Order creation from approved simulated payment (#63)
+
+- Delivered for review on short-lived branch `feat/ss-037-order-creation`; not merged. Order owns immutable records copied from approved Payment attempts, with one Order per attempt, replay and two-lookup reconciliation, a defensive 32-Order process-local cap, and an explicit UI action. [ADR 0006](docs/adr/0006-adopt-order-owned-in-memory-store.md) records the ownership and lock ordering. The complete First Order journey remains later work.
+- Verification: Agent Verification passed (backend 135 tests; frontend typecheck, 143 tests across 17 files, and production build; local HTTP checks; documentation checks). Human Verification is owner-reported for the main browser flow only — Order creation, in-app navigation, and the frozen Order after a Cart change. API replay, uncertain-response recovery, and accessibility have not been observed in a real browser and remain pending; mocked tests do not establish real-browser behavior. CI Verification is pending on the pull request head. No merge is authorized.
+- Next step: complete the pending real-browser observations and CI Verification on the exact head, then obtain explicit owner authorization before merge.
+
 ## SS-036 — Implement Payment Simulator (#61)
 
 - Completed and merged via PR #62 (squash commit `9e70955`, merged 2026-09-28). Payment owns identified, immutable simulated-payment attempts in a bounded 32-attempt process-local store. Cart revisions support atomic, revision-checked capture of the server-calculated snapshot under the Payment → Cart lock order. Same-ID requests replay, GET reconciles uncertain responses, and at most one attempt approves an unchanged Cart revision. Checkout offers three explicit demo outcomes and displays the frozen result. Approval makes no real payment and creates no Order; restart loses Cart, attempts, and duplicate protection. See [ADR 0005](docs/adr/0005-adopt-payment-attempt-store-with-cart-revision.md).
@@ -30,7 +36,7 @@ Update rule: this snapshot must be updated in the same change when project state
 
 ## Next Capability Sequence (owner-approved 2026-09-23)
 
-- Product Media Upload (SS-034) is complete and merged via PR #58. Payment Simulator (SS-036) is complete and merged via PR #62. Order creation is planned in SS-037 (#63) and awaits explicit Build authorization; the BDD Human Verification pilot is a separate future evaluation in SS-038 (#64). The First Order end-to-end journey and the `v0.1.0` release follow Order. Product Media Upload superseded the curated-only media direction by owner decision, and its ADR 0004 supersedes the no-upload decision of ADR 0003 while preserving the curated mapping, nullable `mediaKey`, and fallback rules; ADR 0005 records the simulated-payment snapshot ownership and atomicity direction. Identifiers are allocated only when Issues are created; no future identifier is reserved.
+- Product Media Upload (SS-034) is complete and merged via PR #58. Payment Simulator (SS-036) is complete and merged via PR #62. Order creation is in Build under explicit owner authorization in SS-037 (#63); the BDD Human Verification pilot is a separate future evaluation in SS-038 (#64). The First Order end-to-end journey and the `v0.1.0` release follow Order. Product Media Upload superseded the curated-only media direction by owner decision, and its ADR 0004 supersedes the no-upload decision of ADR 0003 while preserving the curated mapping, nullable `mediaKey`, and fallback rules; ADR 0005 records the simulated-payment snapshot ownership and atomicity direction; ADR 0006 records Order ownership. Identifiers are allocated only when Issues are created; no future identifier is reserved.
 
 ## SS-031 — Elevate Product Storefront UX/UI (#49)
 

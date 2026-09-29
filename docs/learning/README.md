@@ -55,6 +55,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-033-admin-catalog.md](ss-033-admin-catalog.md) | Real URL routing without a router, navigation versus authorization, cross-module coordination without cycles, scoped concurrency guarantees, atomic replace/delete, and captured Cart snapshots. |
 | [ss-034-product-media-upload.md](ss-034-product-media-upload.md) | Untrusted upload validation, layered limits versus peak memory, atomic parent/child publication, linearization and versioned media identity, and fallback-first rendering. |
 | [ss-036-payment-simulator.md](ss-036-payment-simulator.md) | Idempotent attempt identity, revision-checked atomic snapshots, Payment → Cart lock ordering, one approval per revision, bounded capacity without eviction, and honest unconfirmed-outcome handling. |
+| [ss-037-order-creation.md](ss-037-order-creation.md) | Order ownership, value copies, one Order per approved attempt, replay before capacity, and honest two-lookup reconciliation. |
 
 Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 

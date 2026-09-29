@@ -10,7 +10,7 @@ import io.github.samska.sandbox.payment.PaymentAttempt;
 import io.github.samska.sandbox.payment.PaymentScenario;
 
 @Service
-public class PaymentApplicationService {
+public class PaymentApplicationService implements PaymentAttempts {
 
     private final PaymentStore paymentStore;
     private final CartApplicationService cartApplicationService;
@@ -35,6 +35,7 @@ public class PaymentApplicationService {
                 cartApplicationService::captureSnapshot);
     }
 
+    @Override
     public PaymentAttempt getAttempt(UUID attemptId) {
         return paymentStore.findAttempt(attemptId)
                 .orElseThrow(() -> new PaymentAttemptNotFoundException(attemptId));

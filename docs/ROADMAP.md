@@ -36,7 +36,7 @@ never renumbered.
 
 ### Future Product Sequence
 
-1. Order creation (SS-037)
+1. Order creation (SS-037, delivered for review; real-browser checks pending)
 2. First Order end-to-end journey
 3. Release `v0.1.0`
 
@@ -59,6 +59,8 @@ issue is closed as not
 planned and its pull request closed without merging, so it delivers nothing and
 is not part of the product sequence.
 
+Order creation is a separate explicit step from simulated approval. It copies the frozen approved attempt into an immutable process-local record, with same-attempt replay and lookup; no full-page UI recovery or Cart clearing is introduced. The complete First Order end-to-end journey remains future work.
+
 ### MVP Boundaries
 
 The local MVP deliberately defers authentication and authorization. They are
@@ -66,8 +68,8 @@ deferred until after the local First Order MVP but are a mandatory prerequisite
 for any hosted environment, and no hosting work begins before the MVP. The MVP
 also remains process-local: Cart state is lost when the backend restarts,
 uploaded Product media is lost together with its Product, and simulated payment
-attempts, including their captured snapshots and duplicate protection, are lost
-on restart. Payment Simulator captures the immutable revision-checked Cart
+attempts, including their captured snapshots and duplicate protection, and
+Orders are lost on restart. Payment Simulator captures the revision-checked Cart
 snapshot inside a bounded process-local store, and its unauthenticated scenario
 selector and endpoints are a local-only use constraint, not access control or a
 hosting posture. The application has no persistence or deployed environment.
