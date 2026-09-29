@@ -1,10 +1,10 @@
 # SS-037: Order Creation from an Approved Simulated Payment
 
-- Status: In Build
+- Status: Completed
 - Work date: 2026-09-28
 - Last reviewed: 2026-09-28
 - Work item: [SS-037](https://github.com/Samska/samska-sandbox/issues/63)
-- Pull request: Pending
+- Pull request: [#67](https://github.com/Samska/samska-sandbox/pull/67)
 - ADRs: [ADR 0006](../adr/0006-adopt-order-owned-in-memory-store.md), [ADR 0005](../adr/0005-adopt-payment-attempt-store-with-cart-revision.md)
 
 ## What you should learn
@@ -45,7 +45,7 @@ Persistence, hosted access controls, customers, inventory, tax, delivery, multip
 ## Reference
 
 - Issue: [SS-037](https://github.com/Samska/samska-sandbox/issues/63)
-- Pull request: Pending
+- Pull request: [#67](https://github.com/Samska/samska-sandbox/pull/67)
 - ADR: [ADR 0006](../adr/0006-adopt-order-owned-in-memory-store.md)
 - Prior boundary: [ADR 0005](../adr/0005-adopt-payment-attempt-store-with-cart-revision.md)
 - Canonical documentation: [Architecture](../ARCHITECTURE.md), [Product](../PRODUCT.md), [Testing](../TESTING.md), [Security](../SECURITY.md)

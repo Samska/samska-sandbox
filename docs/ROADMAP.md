@@ -33,12 +33,12 @@ never renumbered.
 | Admin Catalog Management | SS-033 |
 | Product Media Upload | SS-034 |
 | Payment Simulator | SS-036 |
+| Order creation | SS-037 |
 
 ### Future Product Sequence
 
-1. Order creation (SS-037, delivered for review; real-browser checks pending)
-2. First Order end-to-end journey
-3. Release `v0.1.0`
+1. First Order end-to-end journey
+2. Release `v0.1.0`
 
 Future capabilities receive their SS identifier when their Issues are created.
 
@@ -59,7 +59,7 @@ issue is closed as not
 planned and its pull request closed without merging, so it delivers nothing and
 is not part of the product sequence.
 
-Order creation is a separate explicit step from simulated approval. It copies the frozen approved attempt into an immutable process-local record, with same-attempt replay and lookup; no full-page UI recovery or Cart clearing is introduced. The complete First Order end-to-end journey remains future work.
+Order creation is a separate explicit step from simulated approval. It copies the frozen approved attempt into an immutable process-local record, with same-attempt replay and lookup; no full-page UI recovery or Cart clearing is introduced. Order creation (SS-037) is complete and merged through PR #67; the owner verified the main browser flow, while API replay, uncertain-response recovery, and accessibility remain unobserved real-browser checks. The complete First Order end-to-end journey remains future work.
 
 ### MVP Boundaries
 

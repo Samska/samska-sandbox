@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Target milestone:** `v0.1.0 — First Order` (unreleased)
-- **Current stage:** Order creation (SS-037) delivered for review
-- **Next planned work:** First Order end-to-end journey after Order review and integration
+- **Current stage:** Order creation (SS-037) implemented and merged
+- **Next planned work:** First Order end-to-end journey
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -46,13 +46,13 @@ validation, learning, and risk.
 | Product Storefront UX/UI | Implemented | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged. |
 | Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource or identity exists; payment initiation captures the immutable revision-checked snapshot. |
 | Payment Simulator | Implemented | An explicit local-demo outcome over a revision-checked immutable Cart snapshot; Payment owns identified attempts with UUID replay, GET reconciliation, one approval per unchanged Cart revision, and a 32-attempt process-local limit without eviction. Approval alone creates no Order or real payment; attempts are lost on restart. |
-| Order creation | In review | Explicit creation from an approved attempt, immutable copied lines and total, same-attempt replay and GET reconciliation, and a defensive 32-Order process-local cap. |
+| Order creation | Implemented | Explicit creation from an approved attempt, immutable copied lines and total, same-attempt replay and GET reconciliation, and a defensive 32-Order process-local cap. |
 | Admin Catalog Management | Implemented | Compact management list at `/admin/products` with case-insensitive name search, thumbnails, Edit links, and delete confirmation; dedicated `/admin/products/new` and `/admin/products/{id}/edit` forms with staged image selection; Admin paths are navigation only, not access control. |
 | Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in bounded backend process memory; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
-| First Order journey, E2E, deployment | Planned | The complete journey follows reviewed Order creation; end-to-end automation and deployment remain later work. |
+| First Order journey, E2E, deployment | Planned | The complete journey is the next owner-approved capability; end-to-end automation and deployment remain later work. |
 
 ## Architecture
 
@@ -147,10 +147,11 @@ Cart. Admin Catalog Management (SS-033) is complete and merged through PR #56.
 Product Media Upload (SS-034) is complete and merged through PR #58. Payment
 Simulator (SS-036) provides explicit simulated payment outcomes over a
 revision-checked immutable Cart snapshot owned by a bounded process-local attempt
-store. Order creation (SS-037) is delivered for review; the owner observed the
-main browser flow, while API replay, uncertain-response recovery, and
-accessibility checks remain pending. The owner-approved sequence continues with
-the complete First Order journey, then the `v0.1.0` release. Authentication and authorization
+store. Order creation (SS-037) is implemented and merged through PR #67; the
+owner observed the main browser flow, while API replay, uncertain-response
+recovery, and accessibility checks remain unobserved. The owner-approved
+sequence continues with the complete First Order journey, then the `v0.1.0`
+release. Authentication and authorization
 remain deferred until after the local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary,
 and the simulated-payment endpoints are unauthenticated and local-only. Future
