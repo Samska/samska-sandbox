@@ -38,6 +38,8 @@ const oneItemCart = { items: [pourOverItem], total: 68.5, revision: 2 };
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  window.history.replaceState({}, "", "/");
+  window.sessionStorage.clear();
 });
 
 function response(status: number, body?: unknown): Response {

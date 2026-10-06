@@ -34,12 +34,37 @@ const declinedAttempt = { ...approvedAttempt, status: "declined" };
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  window.history.replaceState({}, "", "/");
+  window.sessionStorage.clear();
 });
 
 function response(status: number, body?: unknown): Response {
   return {
     status,
     json: async () => body
+  } as Response;
+}
+
+async function withAttemptId(result: Response, attemptId: string): Promise<Response> {
+  if (result.status !== 200 && result.status !== 201) {
+    return result;
+  }
+
+  let payload: unknown;
+
+  try {
+    payload = await result.json();
+  } catch {
+    return result;
+  }
+
+  if (typeof payload !== "object" || payload === null) {
+    return result;
+  }
+
+  return {
+    status: result.status,
+    json: async () => ({ ...(payload as Record<string, unknown>), attemptId })
   } as Response;
 }
 
@@ -61,13 +86,21 @@ function createFetchMock(overrides: {
     }
 
     if (path === "/api/payment-attempts" && options?.method === "POST") {
-      return Promise.resolve(overrides.payment ? overrides.payment() : response(201, approvedAttempt));
+      const body = JSON.parse(String(options.body)) as { attemptId: string };
+      return Promise.resolve(overrides.payment ? overrides.payment() : response(201, approvedAttempt)).then(
+        (result) => withAttemptId(result, body.attemptId)
+      );
     }
 
     if (path.startsWith("/api/payment-attempts/") && options === undefined) {
+      const attemptId = path.split("/").at(-1) ?? "";
       return Promise.resolve(
         overrides.paymentResult ? overrides.paymentResult() : response(200, approvedAttempt)
-      );
+      ).then((result) => withAttemptId(result, attemptId));
+    }
+
+    if (path.startsWith("/api/orders/payment-attempts/") && options === undefined) {
+      return Promise.resolve(response(404));
     }
 
     if (path.startsWith("/api/cart/items")) {
@@ -102,14 +135,20 @@ function countPaymentPosts(fetchMock: ReturnType<typeof createFetchMock>) {
   ).length;
 }
 
+function countPaymentLookups(fetchMock: ReturnType<typeof createFetchMock>) {
+  return fetchMock.mock.calls.filter(
+    ([input, options]) => String(input).startsWith("/api/payment-attempts/") && options === undefined
+  ).length;
+}
+
 function latestPaymentLookup(fetchMock: ReturnType<typeof createFetchMock>) {
   return fetchMock.mock.calls
-    .filter(([input]) => String(input).startsWith("/api/payment-attempts/"))
+    .filter(([input, options]) => String(input).startsWith("/api/payment-attempts/") && options === undefined)
     .at(-1);
 }
 
 describe("Checkout simulated payment flow", () => {
-  it("initiates an approved simulated payment against the reviewed revision", async () => {
+  it("initiates an approved simulated payment against the reviewed revision and addresses the attempt URL", async () => {
     const fetchMock = createFetchMock();
     vi.stubGlobal("fetch", fetchMock);
     render(<Catalog />);
@@ -127,11 +166,15 @@ describe("Checkout simulated payment flow", () => {
     expect(body.cartRevision).toBe(1);
     expect(body.scenario).toBe("approve");
     expect(body.attemptId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    expect(window.location.pathname).toBe(`/checkout/attempts/${body.attemptId}`);
+    expect(window.sessionStorage.getItem("samska.latest-payment-attempt")).toBe(body.attemptId);
+    expect(countPaymentLookups(fetchMock)).toBe(0);
 
     fireEvent.click(screen.getByRole("button", { name: "Back to Checkout" }));
 
     const checkoutHeading = await screen.findByRole("heading", { name: "Checkout", level: 1 });
     await waitFor(() => expect(checkoutHeading).toHaveFocus());
+    expect(window.location.pathname).toBe("/checkout");
   });
 
   it("lets the customer select decline and try again with the current Cart", async () => {
@@ -156,7 +199,7 @@ describe("Checkout simulated payment flow", () => {
     expect(screen.getByRole("button", { name: "Simulate payment" })).toBeEnabled();
   });
 
-  it("treats a lost response as unconfirmed and reconciles the original attempt", async () => {
+  it("treats a lost response as unconfirmed and reconciles only on an explicit check", async () => {
     const fetchMock = createFetchMock({
       payment: () => Promise.reject(new Error("connection lost")),
       paymentResult: () => Promise.resolve(response(200, approvedAttempt))
@@ -167,31 +210,34 @@ describe("Checkout simulated payment flow", () => {
     await enterCheckout();
     fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "We could not confirm the payment result."
-    );
+    const uncertainHeading = await screen.findByRole("heading", {
+      name: "Payment result is unconfirmed. Check this attempt before trying again.",
+      level: 1
+    });
+    expect(uncertainHeading).toBeInTheDocument();
     expect(
       screen.queryByRole("heading", { name: "Simulated payment approved", level: 1 })
     ).not.toBeInTheDocument();
 
     const attemptId = paymentRequestBody(fetchMock).attemptId;
-    fireEvent.click(screen.getByRole("button", { name: "Check result" }));
+    expect(window.location.pathname).toBe(`/checkout/attempts/${attemptId}`);
+    expect(countPaymentLookups(fetchMock)).toBe(0);
+
+    fireEvent.click(screen.getByRole("button", { name: "Check this attempt" }));
 
     const heading = await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
     await waitFor(() => expect(heading).toHaveFocus());
 
-    const lookup = fetchMock.mock.calls.find(([input]) =>
-      String(input).startsWith("/api/payment-attempts/")
-    );
-    expect(String(lookup?.[0])).toBe(`/api/payment-attempts/${attemptId}`);
+    expect(String(latestPaymentLookup(fetchMock)?.[0])).toBe(`/api/payment-attempts/${attemptId}`);
+    expect(countPaymentPosts(fetchMock)).toBe(1);
   });
 
-  it("reloads the Cart and asks for a new attempt when the result is gone after a restart", async () => {
+  it("keeps an unavailable reference unresolved and requires explicit abandonment before a new attempt", async () => {
     let cartCalls = 0;
     const fetchMock = createFetchMock({
       cart: () => {
         cartCalls += 1;
-        return Promise.resolve(response(200, cartCalls === 1 ? cartWithTote : emptyCart));
+        return Promise.resolve(response(200, cartCalls === 1 ? cartWithTote : cartWithTote));
       },
       payment: () => Promise.reject(new Error("connection lost")),
       paymentResult: () => Promise.resolve(response(404))
@@ -201,27 +247,53 @@ describe("Checkout simulated payment flow", () => {
 
     await enterCheckout();
     fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
-    await screen.findByRole("alert");
+    await screen.findByRole("heading", {
+      name: "Payment result is unconfirmed. Check this attempt before trying again.",
+      level: 1
+    });
 
-    fireEvent.click(screen.getByRole("button", { name: "Check result" }));
+    fireEvent.click(screen.getByRole("button", { name: "Check this attempt" }));
 
-    await waitFor(() =>
-      expect(screen.getByRole("alert")).toHaveTextContent("no longer available")
-    );
-    await waitFor(() =>
-      expect(
-        fetchMock.mock.calls.filter(
-          ([input, options]) => String(input) === "/api/cart" && options === undefined
-        ).length
-      ).toBeGreaterThanOrEqual(2)
-    );
     expect(
-      screen.queryByRole("heading", { level: 1, name: /Simulated payment/ })
-    ).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Your Cart is empty.", level: 2 })).toBeInTheDocument();
+      await screen.findByRole("heading", {
+        name: "We couldn't confirm a result for this reference.",
+        level: 1
+      })
+    ).toBeInTheDocument();
+    expect(screen.getByText(/does not tell us why it is unavailable/i)).toBeInTheDocument();
+
+    const attemptId = paymentRequestBody(fetchMock).attemptId;
+
+    fireEvent.click(screen.getByRole("button", { name: "Back to Checkout" }));
+    await screen.findByRole("heading", { name: "Checkout", level: 1 });
+
+    const blockedSimulate = screen.getByRole("button", { name: "Simulate payment" });
+    expect(blockedSimulate).toBeDisabled();
+    fireEvent.click(blockedSimulate);
+    expect(countPaymentPosts(fetchMock)).toBe(1);
+    expect(screen.getByRole("button", { name: "View attempt" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "View attempt" }));
+    await screen.findByRole("heading", {
+      name: "We couldn't confirm a result for this reference.",
+      level: 1
+    });
+    expect(window.location.pathname).toBe(`/checkout/attempts/${attemptId}`);
+
+    fireEvent.click(screen.getByRole("button", { name: "Stop following this reference" }));
+    expect(screen.getByText(/does not cancel a request or delete a record/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Stop following" }));
+
+    await waitFor(() => expect(window.location.pathname).toBe("/checkout"));
+    expect(window.sessionStorage.getItem("samska.latest-payment-attempt")).toBeNull();
+    expect(countPaymentPosts(fetchMock)).toBe(1);
+
+    const reloadedSimulate = await screen.findByRole("button", { name: "Simulate payment" });
+    await waitFor(() => expect(reloadedSimulate).toBeEnabled());
+    expect(screen.queryByRole("button", { name: "View attempt" })).not.toBeInTheDocument();
   });
 
-  it("reports a stale Cart revision and refreshes the Cart for review", async () => {
+  it("reports a stale Cart revision on Checkout without leaving a phantom attempt", async () => {
     const fetchMock = createFetchMock({
       payment: () => Promise.resolve(response(409, { code: "cart-changed" }))
     });
@@ -234,20 +306,15 @@ describe("Checkout simulated payment flow", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       "The Cart changed since you reviewed it."
     );
-    await waitFor(() =>
-      expect(
-        fetchMock.mock.calls.filter(
-          ([input, options]) => String(input) === "/api/cart" && options === undefined
-        ).length
-      ).toBeGreaterThanOrEqual(2)
-    );
+    await waitFor(() => expect(window.location.pathname).toBe("/checkout"));
+    expect(window.sessionStorage.getItem("samska.latest-payment-attempt")).toBeNull();
     expect(
       screen.queryByRole("heading", { level: 1, name: /Simulated payment/ })
     ).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Simulate payment" })).toBeEnabled();
   });
 
-  it("shows the existing result for an already-approved revision", async () => {
+  it("aligns the URL and latest reference with an already-approved existing attempt", async () => {
     const fetchMock = createFetchMock({
       payment: () =>
         Promise.resolve(
@@ -263,14 +330,17 @@ describe("Checkout simulated payment flow", () => {
 
     const heading = await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
     await waitFor(() => expect(heading).toHaveFocus());
-    expect(screen.getByText(/No Order has been created/i)).toBeInTheDocument();
     expect(screen.getByText("Canvas Tote × 2")).toBeInTheDocument();
-    expect(screen.getByText("Captured total").parentElement).toHaveTextContent("25.00");
 
-    const lookup = fetchMock.mock.calls.find(([input]) =>
-      String(input).startsWith("/api/payment-attempts/")
+    const body = paymentRequestBody(fetchMock);
+    expect(body.attemptId).not.toBe(approvedAttempt.attemptId);
+    expect(window.location.pathname).toBe(`/checkout/attempts/${approvedAttempt.attemptId}`);
+    expect(window.sessionStorage.getItem("samska.latest-payment-attempt")).toBe(
+      approvedAttempt.attemptId
     );
-    expect(String(lookup?.[0])).toBe(`/api/payment-attempts/${approvedAttempt.attemptId}`);
+    expect(String(latestPaymentLookup(fetchMock)?.[0])).toBe(
+      `/api/payment-attempts/${approvedAttempt.attemptId}`
+    );
     expect(countPaymentPosts(fetchMock)).toBe(1);
   });
 
@@ -289,10 +359,12 @@ describe("Checkout simulated payment flow", () => {
     expect(
       screen.queryByRole("heading", { level: 1, name: /Simulated payment/ })
     ).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Check result" })).not.toBeInTheDocument();
+    expect(window.location.pathname).toBe("/checkout");
+    expect(countPaymentLookups(fetchMock)).toBe(0);
+    expect(screen.getByRole("button", { name: "Simulate payment" })).toBeEnabled();
   });
 
-  it("disables payment and editing while the attempt is in flight and ignores duplicate clicks", async () => {
+  it("keeps a pending attempt pending across navigation and never duplicates the POST", async () => {
     let resolvePayment: (value: Response) => void = () => {};
     const pendingPayment = new Promise<Response>((resolve) => {
       resolvePayment = resolve;
@@ -304,23 +376,31 @@ describe("Checkout simulated payment flow", () => {
     await enterCheckout();
     fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
 
+    expect(await screen.findByRole("heading", { name: "Payment in progress", level: 1 })).toBeInTheDocument();
     expect(screen.getByRole("status")).toHaveTextContent("Simulating payment...");
-    expect(screen.getByRole("button", { name: "Simulate payment" })).toBeDisabled();
-    expect(screen.getByLabelText("Demo outcome")).toBeDisabled();
-    expect(screen.getByLabelText("Quantity for Canvas Tote")).toBeDisabled();
+    expect(countPaymentPosts(fetchMock)).toBe(1);
+    expect(countPaymentLookups(fetchMock)).toBe(0);
 
-    fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
+    fireEvent.click(screen.getByRole("button", { name: "Back to Market" }));
+
+    expect(await screen.findByRole("heading", { name: "Products", level: 1 })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "View latest journey" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("link", { name: "View latest journey" }));
+
+    expect(await screen.findByRole("heading", { name: "Payment in progress", level: 1 })).toBeInTheDocument();
+    expect(countPaymentPosts(fetchMock)).toBe(1);
 
     resolvePayment(response(201, declinedAttempt));
 
-    await screen.findByRole("heading", { name: "Simulated payment declined", level: 1 });
-    const posts = fetchMock.mock.calls.filter(
-      ([input, options]) => String(input) === "/api/payment-attempts" && options?.method === "POST"
-    );
-    expect(posts).toHaveLength(1);
+    expect(
+      await screen.findByRole("heading", { name: "Simulated payment declined", level: 1 })
+    ).toBeInTheDocument();
+    expect(countPaymentPosts(fetchMock)).toBe(1);
+    expect(countPaymentLookups(fetchMock)).toBe(0);
   });
 
-  it("blocks a new attempt while a result is unconfirmed and keeps Check result available", async () => {
+  it("preserves an unconfirmed attempt across navigation and blocks a replacement until resolved", async () => {
     let resultUnavailable = true;
     const fetchMock = createFetchMock({
       payment: () => Promise.reject(new Error("connection lost")),
@@ -335,33 +415,34 @@ describe("Checkout simulated payment flow", () => {
     await enterCheckout();
     fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "We could not confirm the payment result."
-    );
+    await screen.findByRole("heading", {
+      name: "Payment result is unconfirmed. Check this attempt before trying again.",
+      level: 1
+    });
     const attemptId = paymentRequestBody(fetchMock).attemptId;
-    const simulate = screen.getByRole("button", { name: "Simulate payment" });
-    expect(simulate).toBeDisabled();
-    fireEvent.click(simulate);
+
+    fireEvent.click(screen.getByRole("button", { name: "Back to Market" }));
+    expect(await screen.findByRole("heading", { name: "Products", level: 1 })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("link", { name: "View latest journey" }));
+    expect(
+      await screen.findByRole("heading", {
+        name: "Payment result is unconfirmed. Check this attempt before trying again.",
+        level: 1
+      })
+    ).toBeInTheDocument();
     expect(countPaymentPosts(fetchMock)).toBe(1);
+    expect(countPaymentLookups(fetchMock)).toBe(0);
 
-    fireEvent.click(screen.getByRole("button", { name: "Check result" }));
+    fireEvent.click(screen.getByRole("button", { name: "Check this attempt" }));
 
-    await waitFor(() => expect(screen.getByRole("button", { name: "Check result" })).toBeEnabled());
-    expect(screen.getByRole("button", { name: "Simulate payment" })).toBeDisabled();
+    expect(
+      await screen.findByRole("heading", { name: "We couldn't check this reference. Try again.", level: 1 })
+    ).toBeInTheDocument();
     expect(countPaymentPosts(fetchMock)).toBe(1);
-    expect(String(latestPaymentLookup(fetchMock)?.[0])).toBe(`/api/payment-attempts/${attemptId}`);
-
-    fireEvent.click(screen.getByRole("button", { name: "Increase quantity for Canvas Tote" }));
-
-    expect(await screen.findByText("Cart updated.")).toBeInTheDocument();
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "We could not confirm the payment result."
-    );
-    expect(screen.getByRole("button", { name: "Check result" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Simulate payment" })).toBeDisabled();
 
     resultUnavailable = false;
-    fireEvent.click(screen.getByRole("button", { name: "Check result" }));
+    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
 
     await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
     expect(countPaymentPosts(fetchMock)).toBe(1);
@@ -397,78 +478,5 @@ describe("Checkout simulated payment flow", () => {
 
     await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
     expect(countPaymentPosts(fetchMock)).toBe(1);
-  });
-
-  it("keeps the user in Checkout while an attempt is in flight", async () => {
-    let resolvePayment: (value: Response) => void = () => {};
-    const pendingPayment = new Promise<Response>((resolve) => {
-      resolvePayment = resolve;
-    });
-    const fetchMock = createFetchMock({ payment: () => pendingPayment });
-    vi.stubGlobal("fetch", fetchMock);
-    render(<Catalog />);
-
-    await enterCheckout();
-    expect(screen.getByRole("button", { name: "Back to Market" })).toBeEnabled();
-
-    fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
-
-    const backToMarket = screen.getByRole("button", { name: "Back to Market" });
-    expect(backToMarket).toBeDisabled();
-    fireEvent.click(backToMarket);
-    expect(screen.getByRole("heading", { name: "Checkout", level: 1 })).toBeInTheDocument();
-
-    resolvePayment(response(201, declinedAttempt));
-
-    await screen.findByRole("heading", { name: "Simulated payment declined", level: 1 });
-  });
-
-  it("preserves an unconfirmed attempt across Back to Market and Checkout reopen", async () => {
-    let resultUnavailable = true;
-    const fetchMock = createFetchMock({
-      payment: () => Promise.reject(new Error("connection lost")),
-      paymentResult: () =>
-        resultUnavailable
-          ? Promise.reject(new Error("still unreachable"))
-          : Promise.resolve(response(200, approvedAttempt))
-    });
-    vi.stubGlobal("fetch", fetchMock);
-    render(<Catalog />);
-
-    await enterCheckout();
-    fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
-
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "We could not confirm the payment result."
-    );
-    const attemptId = paymentRequestBody(fetchMock).attemptId;
-
-    fireEvent.click(screen.getByRole("button", { name: "Back to Market" }));
-    expect(await screen.findByRole("heading", { name: "Products" })).toBeInTheDocument();
-
-    await enterCheckout();
-
-    expect(screen.getByRole("alert")).toHaveTextContent(
-      "We could not confirm the payment result."
-    );
-    expect(screen.getByRole("button", { name: "Check result" })).toBeInTheDocument();
-    const simulate = screen.getByRole("button", { name: "Simulate payment" });
-    expect(simulate).toBeDisabled();
-    fireEvent.click(simulate);
-    expect(countPaymentPosts(fetchMock)).toBe(1);
-
-    fireEvent.click(screen.getByRole("button", { name: "Check result" }));
-
-    await waitFor(() => expect(screen.getByRole("button", { name: "Check result" })).toBeEnabled());
-    expect(String(latestPaymentLookup(fetchMock)?.[0])).toBe(`/api/payment-attempts/${attemptId}`);
-    expect(screen.getByRole("button", { name: "Simulate payment" })).toBeDisabled();
-    expect(countPaymentPosts(fetchMock)).toBe(1);
-
-    resultUnavailable = false;
-    fireEvent.click(screen.getByRole("button", { name: "Check result" }));
-
-    await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
-    expect(countPaymentPosts(fetchMock)).toBe(1);
-    expect(String(latestPaymentLookup(fetchMock)?.[0])).toBe(`/api/payment-attempts/${attemptId}`);
   });
 });

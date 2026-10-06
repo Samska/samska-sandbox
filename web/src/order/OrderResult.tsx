@@ -17,7 +17,7 @@ export default function OrderResult({ order, onBackToMarket, onBackToCheckout }:
         Order created
       </h1>
       <p className="text-muted">Order ID: <span className="break-all font-bold text-ink">{order.orderId}</span></p>
-      <p className="text-muted">This Order records the approved simulated payment snapshot. No real payment was made. Your live Cart may have changed.</p>
+      <p className="text-muted">This Order records the approved simulated payment snapshot. No real payment was made. Your live Cart was not cleared and may have changed.</p>
       <h2 className="text-lg text-ink">Ordered items</h2>
       <ul className="grid gap-3">
         {order.items.map((item) => (

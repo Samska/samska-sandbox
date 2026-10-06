@@ -3,15 +3,16 @@ import AdminProductEdit from "./admin/AdminProductEdit";
 import AdminProducts from "./admin/AdminProducts";
 import Catalog from "./catalog/Catalog";
 import NotFound from "./NotFound";
+import { attemptIdForPath, checkoutPath, marketPath, usePath } from "./journey/routes";
 
-const marketPath = "/";
 const adminProductsPath = "/admin/products";
 const adminProductNewPath = "/admin/products/new";
 const adminProductEditPattern = /^\/admin\/products\/([^/]+)\/edit$/;
 
 export default function App() {
-  const path = normalizedPath();
+  const path = usePath();
   const isMarket = path === marketPath;
+  const isStorefront = isMarket || path === checkoutPath || attemptIdForPath(path) !== null;
   const isAdmin =
     path === adminProductsPath || path.startsWith(`${adminProductsPath}/`);
 
@@ -40,9 +41,9 @@ export default function App() {
           </a>
           <nav aria-label="Primary" className="flex items-center gap-1">
             <a
-              className={navLinkClassName(isMarket)}
+              className={navLinkClassName(isStorefront)}
               href="/"
-              aria-current={isMarket ? "page" : undefined}
+              aria-current={isStorefront ? "page" : undefined}
             >
               Market
             </a>
@@ -74,7 +75,7 @@ export default function App() {
 }
 
 function renderSurface(path: string) {
-  if (path === marketPath) {
+  if (path === marketPath || path === checkoutPath || attemptIdForPath(path) !== null) {
     return <Catalog />;
   }
 
@@ -105,10 +106,6 @@ function decodePathSegment(segment: string): string | null {
   } catch {
     return null;
   }
-}
-
-function normalizedPath(): string {
-  return window.location.pathname.replace(/\/+$/, "") || marketPath;
 }
 
 function navLinkClassName(isCurrent: boolean): string {

@@ -5,6 +5,7 @@ import App from "./App";
 afterEach(() => {
   vi.unstubAllGlobals();
   window.history.replaceState({}, "", "/");
+  window.sessionStorage.clear();
 });
 
 function stubFetch() {
@@ -133,6 +134,60 @@ describe("App", () => {
 
   it("renders the not-found surface for a malformed percent-encoded edit path", () => {
     window.history.replaceState({}, "", "/admin/products/%E0%A4%A/edit");
+    stubFetch();
+    render(<App />);
+
+    expect(
+      screen.getByRole("heading", { name: "This page does not exist", level: 1 })
+    ).toBeInTheDocument();
+  });
+
+  it("renders the Checkout surface at /checkout with the current Cart state", async () => {
+    window.history.replaceState({}, "", "/checkout");
+    stubFetch();
+    render(<App />);
+
+    expect(await screen.findByText("Your Cart is empty.")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Checkout", level: 1 })).toBeInTheDocument();
+
+    const navigation = screen.getByRole("navigation", { name: "Primary" });
+    expect(within(navigation).getByRole("link", { name: "Market" })).toHaveAttribute(
+      "aria-current",
+      "page"
+    );
+  });
+
+  it("renders attempt recovery for an unknown reference at its URL", async () => {
+    const id = "aaaaaaaa-1111-1111-1111-111111111111";
+    window.history.replaceState({}, "", `/checkout/attempts/${id}`);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn((input: RequestInfo | URL) => {
+        const path = String(input);
+
+        if (path === "/api/products") {
+          return Promise.resolve(response(200, []));
+        }
+
+        if (path === "/api/cart") {
+          return Promise.resolve(response(200, { items: [], total: 0, revision: 0 }));
+        }
+
+        return Promise.resolve(response(404));
+      })
+    );
+    render(<App />);
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "We couldn't confirm a result for this reference.",
+        level: 1
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("keeps malformed attempt references on the not-found surface", () => {
+    window.history.replaceState({}, "", "/checkout/attempts/not-a-uuid");
     stubFetch();
     render(<App />);
 

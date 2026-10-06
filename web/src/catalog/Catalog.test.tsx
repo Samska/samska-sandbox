@@ -15,6 +15,8 @@ const emptyCart = { items: [], total: 0, revision: 0 };
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  window.history.replaceState({}, "", "/");
+  window.sessionStorage.clear();
 });
 
 function cartTrigger() {
@@ -267,7 +269,7 @@ describe("Catalog", () => {
     expect(within(dialog).getByText("Subtotal")).toBeInTheDocument();
   });
 
-  it("does not expose Product setup tools or creation controls", async () => {
+  it("guides toward Admin Product creation when the Market is empty", async () => {
     vi.stubGlobal("fetch", vi.fn((input: RequestInfo | URL) => {
       if (String(input) === "/api/products") {
         return Promise.resolve(response(200, []));
@@ -278,15 +280,11 @@ describe("Catalog", () => {
     render(<Catalog />);
 
     expect(await screen.findByText("No Products are available yet.")).toBeInTheDocument();
-    expect(screen.getByText(/new products will appear here/i)).toBeInTheDocument();
-    expect(screen.queryByText(/admin/i)).not.toBeInTheDocument();
-    expect(screen.queryByText("Product setup tools")).not.toBeInTheDocument();
-    expect(screen.queryByLabelText("Product ID")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Create Product" })).not.toBeInTheDocument();
-    expect(document.querySelector("#catalog-tools")).toBeNull();
     expect(
-      screen.queryAllByRole("link").filter((link) => link.getAttribute("href")?.includes("/admin"))
-    ).toHaveLength(0);
+      screen.getByRole("link", { name: "Create a synthetic Product" })
+    ).toHaveAttribute("href", "/admin/products/new");
+    expect(screen.queryByLabelText("Product ID")).not.toBeInTheDocument();
+    expect(document.querySelector("#catalog-tools")).toBeNull();
   });
 
   it("reports browse failures without exposing response bodies", async () => {

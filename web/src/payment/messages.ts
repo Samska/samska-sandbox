@@ -30,7 +30,7 @@ export function paymentErrorMessage(error: unknown): string {
     case "capacity":
       return capacityMessage;
     case "not-found":
-      return "That payment result is no longer available. The simulator may have restarted; review the Cart and try again.";
+      return "We couldn't confirm a result for this reference.";
     case "network":
     case "server":
     case "invalid-response":
