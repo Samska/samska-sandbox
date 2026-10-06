@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { CartResponse } from "../cart/cartApi";
 import CartItemRow from "../cart/CartItemRow";
 import { formatAmount } from "../formatAmount";
-import { unconfirmedPaymentMessage } from "../payment/messages";
+import { unconfirmedPaymentPrimary } from "../journey/messages";
 import type { PaymentScenario } from "../payment/paymentApi";
 import Button from "../ui/Button";
 import StatusMessage from "../ui/StatusMessage";
@@ -12,6 +12,7 @@ type MutationIntent = {
   productId: string;
   order: string[];
   control: HTMLElement | null;
+  seenPending: boolean;
 };
 
 export default function CheckoutReview({
@@ -24,10 +25,10 @@ export default function CheckoutReview({
   onRetry,
   paymentPending,
   paymentError,
-  paymentCanCheckResult,
-  onSimulatePayment,
-  onCheckPaymentResult,
-  onViewOrder
+  paymentBlocked,
+  blockedPaymentMessage,
+  onViewAttempt,
+  onSimulatePayment
 }: {
   cart: CartResponse;
   onBack: () => void;
@@ -38,10 +39,10 @@ export default function CheckoutReview({
   onRetry: () => void;
   paymentPending: boolean;
   paymentError: string | null;
-  paymentCanCheckResult: boolean;
+  paymentBlocked: boolean;
+  blockedPaymentMessage: string | null;
+  onViewAttempt?: () => void;
   onSimulatePayment: (scenario: PaymentScenario) => Promise<void>;
-  onCheckPaymentResult: () => void;
-  onViewOrder?: () => void;
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
@@ -63,10 +64,16 @@ export default function CheckoutReview({
     }
 
     if (isPending) {
+      intent.seenPending = true;
+
       if (intent.control !== null && !sectionRef.current?.contains(document.activeElement)) {
         focusItemRow(listRef.current, intent.productId);
       }
 
+      return;
+    }
+
+    if (!intent.seenPending) {
       return;
     }
 
@@ -103,7 +110,8 @@ export default function CheckoutReview({
       control:
         activeElement instanceof HTMLElement && sectionRef.current?.contains(activeElement)
           ? activeElement
-          : null
+          : null,
+      seenPending: false
     };
   }
 
@@ -128,7 +136,7 @@ export default function CheckoutReview({
       aria-busy={controlsDisabled}
     >
       <div className="flex items-center justify-between gap-4 border-b border-border px-5 py-3">
-        <Button variant="quiet" size="sm" onClick={onBack} disabled={paymentPending}>
+        <Button variant="quiet" size="sm" onClick={onBack}>
           <span aria-hidden="true">&#8592;</span> Back to Market
         </Button>
       </div>
@@ -159,17 +167,19 @@ export default function CheckoutReview({
             </Button>
           </div>
         ) : null}
-        {paymentError !== null || paymentCanCheckResult ? (
+        {paymentError !== null ? <StatusMessage tone="error">{paymentError}</StatusMessage> : null}
+        {paymentBlocked ? (
           <div className="grid gap-3">
-            <StatusMessage tone="error">{paymentError ?? unconfirmedPaymentMessage}</StatusMessage>
-            {paymentCanCheckResult ? (
-              <Button onClick={onCheckPaymentResult} disabled={controlsDisabled}>
-                Check result
+            <StatusMessage tone="error">
+              {blockedPaymentMessage ?? unconfirmedPaymentPrimary}
+            </StatusMessage>
+            {onViewAttempt ? (
+              <Button onClick={onViewAttempt} disabled={controlsDisabled}>
+                View attempt
               </Button>
             ) : null}
           </div>
         ) : null}
-        {onViewOrder ? <Button variant="quiet" onClick={onViewOrder}>View saved Order</Button> : null}
         {cart.items.length === 0 ? (
           <div className="grid gap-2 rounded-lg bg-surface-muted px-4 py-5">
             <h2
@@ -215,8 +225,8 @@ export default function CheckoutReview({
                 Simulated payment
               </h2>
               <p className="max-w-prose text-sm text-muted">
-                This is a local simulation. No real payment is made, no Order is created, and no
-                card or personal information should be entered.
+                This is a local simulation. No real payment is made and no card or personal
+                information should be entered. Creating an Order is a separate explicit step.
               </p>
               <div className="grid gap-1">
                 <label htmlFor="checkout-payment-scenario" className="text-sm font-bold text-ink">
@@ -239,7 +249,7 @@ export default function CheckoutReview({
               ) : null}
               <Button
                 onClick={() => void onSimulatePayment(scenario)}
-                disabled={controlsDisabled || error !== null || paymentCanCheckResult}
+                disabled={controlsDisabled || error !== null || paymentBlocked}
               >
                 Simulate payment
               </Button>

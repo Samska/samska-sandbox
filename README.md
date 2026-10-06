@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Target milestone:** `v0.1.0 — First Order` (unreleased)
-- **Current stage:** Order creation (SS-037) implemented and merged
-- **Next planned work:** First Order end-to-end journey
+- **Current stage:** First Order end-to-end journey (SS-039) implemented for review; required Human Verification pending
+- **Next planned work:** Owner Human Verification, then the `v0.1.0` release
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -28,6 +28,10 @@ bounded local media upload, a process-local Cart boundary, an editable Checkout
 view over the current Cart with a simulated payment flow, and a separate Admin
 Product-management surface. Order is a separate process-local boundary that copies
 approved simulated-payment data on an explicit action; it does not change the Cart.
+The journey is attempt-addressed: `/checkout` hosts the editable Cart and
+`/checkout/attempts/{attemptId}` recovers the simulated payment result or Order
+confirmation through lookup APIs after a full-page reload, direct entry, or
+history navigation, without persistence or a router dependency.
 
 AI agents are implementation tools operating under repository-defined
 governance. Humans own requirements, architecture, decisions, review,
@@ -47,12 +51,13 @@ validation, learning, and risk.
 | Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource or identity exists; payment initiation captures the immutable revision-checked snapshot. |
 | Payment Simulator | Implemented | An explicit local-demo outcome over a revision-checked immutable Cart snapshot; Payment owns identified attempts with UUID replay, GET reconciliation, one approval per unchanged Cart revision, and a 32-attempt process-local limit without eviction. Approval alone creates no Order or real payment; attempts are lost on restart. |
 | Order creation | Implemented | Explicit creation from an approved attempt, immutable copied lines and total, same-attempt replay and GET reconciliation, and a defensive 32-Order process-local cap. |
+| First Order journey | Implemented for review | Attempt-addressed `/checkout` and `/checkout/attempts/{attemptId}` surfaces recover the simulated payment result or Order confirmation through lookup APIs after reload, direct entry, and history; route reads are GET-only with pending-operation and stale-response guards; a recovered result does not require the live Cart, the live Cart is never cleared, and one `sessionStorage` reference is only a discovery hint. Required Human Verification pending. |
 | Admin Catalog Management | Implemented | Compact management list at `/admin/products` with case-insensitive name search, thumbnails, Edit links, and delete confirmation; dedicated `/admin/products/new` and `/admin/products/{id}/edit` forms with staged image selection; Admin paths are navigation only, not access control. |
 | Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in bounded backend process memory; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
-| First Order journey, E2E, deployment | Planned | The complete journey is the next owner-approved capability; end-to-end automation and deployment remain later work. |
+| Automated browser E2E, deployment | Planned | No browser end-to-end framework or deployment exists; real-browser journey checks remain Human Verification. |
 
 ## Architecture
 
@@ -86,7 +91,11 @@ review of the current Cart; payment initiation captures an immutable,
 revision-checked Cart snapshot owned by the bounded process-local Payment attempt
 store, which keeps at most 32 attempts and replays identical submissions by
 attempt ID. Approval alone creates no Order; an explicit action copies the
-approved frozen attempt into a bounded process-local Order. No real payment,
+approved frozen attempt into a bounded process-local Order. The First Order
+journey is attempt-addressed: after a reload or direct entry, the attempt URL
+resolves the Payment result or Order through read-only lookups, never by
+resending a request, and a result cannot be confirmed by only a missing record.
+No real payment,
 credentials, or provider is involved. The Admin surface is a separate frontend
 route over the same Catalog API, and
 `/admin/products` provides no access control. Product deletion is refused with
@@ -149,8 +158,13 @@ Simulator (SS-036) provides explicit simulated payment outcomes over a
 revision-checked immutable Cart snapshot owned by a bounded process-local attempt
 store. Order creation (SS-037) is implemented and merged through PR #67; the
 owner observed the main browser flow, while API replay, uncertain-response
-recovery, and accessibility checks remain unobserved. The owner-approved
-sequence continues with the complete First Order journey, then the `v0.1.0`
+recovery, and accessibility checks remain unobserved for SS-037 itself. The
+First Order journey (SS-039) is implemented for review: `/checkout` and
+attempt-addressed result surfaces recover approved snapshots and frozen Orders
+after reload, direct entry, and history with GET-only reconciliation, explicit
+abandonment, and no Cart clearing; required Human Verification is pending.
+The owner-approved
+sequence continues with owner Human Verification of the journey, then the `v0.1.0`
 release. Authentication and authorization
 remain deferred until after the local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary,

@@ -37,7 +37,7 @@ never renumbered.
 
 ### Future Product Sequence
 
-1. First Order end-to-end journey
+1. First Order end-to-end journey (SS-039) — implemented for review; required Human Verification and merge remain
 2. Release `v0.1.0`
 
 Future capabilities receive their SS identifier when their Issues are created.
@@ -59,7 +59,7 @@ issue is closed as not
 planned and its pull request closed without merging, so it delivers nothing and
 is not part of the product sequence.
 
-Order creation is a separate explicit step from simulated approval. It copies the frozen approved attempt into an immutable process-local record, with same-attempt replay and lookup; no full-page UI recovery or Cart clearing is introduced. Order creation (SS-037) is complete and merged through PR #67; the owner verified the main browser flow, while API replay, uncertain-response recovery, and accessibility remain unobserved real-browser checks. The complete First Order end-to-end journey remains future work.
+Order creation is a separate explicit step from simulated approval. It copies the frozen approved attempt into an immutable process-local record, with same-attempt replay and lookup; no full-page UI recovery or Cart clearing is introduced by that capability alone. Order creation (SS-037) is complete and merged through PR #67; the owner verified the main browser flow, while API replay, uncertain-response recovery, and accessibility remain unobserved real-browser checks for SS-037 itself. The First Order end-to-end journey (SS-039) is implemented for review: `/checkout` and `/checkout/attempts/{attemptId}` recover the simulated result or frozen Order through read-only lookups after reload, direct entry, and history, keep the live Cart editable, and require explicit abandonment before a new journey replaces an unresolved reference. Required Human Verification and merge of SS-039 remain.
 
 ### MVP Boundaries
 
@@ -69,7 +69,9 @@ for any hosted environment, and no hosting work begins before the MVP. The MVP
 also remains process-local: Cart state is lost when the backend restarts,
 uploaded Product media is lost together with its Product, and simulated payment
 attempts, including their captured snapshots and duplicate protection, and
-Orders are lost on restart. Payment Simulator captures the revision-checked Cart
+Orders are lost on restart. The attempt-addressed URL and one browser-session
+reference are lookup hints for recovery and do not add persistence or
+cross-process guarantees. Payment Simulator captures the revision-checked Cart
 snapshot inside a bounded process-local store, and its unauthenticated scenario
 selector and endpoints are a local-only use constraint, not access control or a
 hosting posture. The application has no persistence or deployed environment.

@@ -34,3 +34,5 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 [ADR 0005: Adopt a Payment-Owned In-Memory Attempt Store with Revision-Checked Cart Snapshots](0005-adopt-payment-attempt-store-with-cart-revision.md) records the accepted simulated-payment attempt ownership, atomic capture, replay, approval, and capacity direction.
 
 [ADR 0006: Adopt an Order-Owned In-Memory Store from Approved Payment Attempts](0006-adopt-order-owned-in-memory-store.md) records Order ownership, source-attempt idempotency, capacity, lock ordering, and reconciliation.
+
+[ADR 0007: Adopt Attempt-Addressed Browser Recovery for the First Order Journey](0007-adopt-attempt-addressed-browser-recovery.md) records the attempt-addressed URL surfaces, GET-only recovery, reference lifecycle, stale-response guards, and browser/holder security boundaries that supplement ADRs 0005 and 0006 without adding persistence.

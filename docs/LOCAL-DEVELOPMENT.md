@@ -114,6 +114,7 @@ Browser
         -> InMemoryProductStore (Products and uploaded media)
         -> InMemoryCartStore
         -> InMemoryPaymentStore (up to 32 simulated attempts)
+        -> InMemoryOrderStore (up to 32 Orders copied from approved attempts)
 
 PostgreSQL (127.0.0.1:${POSTGRES_HOST_PORT:-5432})
   -> separate local infrastructure
@@ -174,7 +175,7 @@ Payment simulation is local-only: no real payment is processed, no credentials o
 | Spring Boot | `http://localhost:8080` | Default port; no repository override exists. |
 | Health endpoint | `http://localhost:8080/actuator/health` | The only intentionally exposed Actuator endpoint. |
 | Vite development server | `http://localhost:5173` when available | Check Vite startup output for the actual port. |
-| Frontend routes | `/` (Market), `/admin/products` (Admin list), `/admin/products/new` (create), `/admin/products/{id}/edit` (edit) | Served by Vite for direct entry and reload; other paths render the in-app not-found view. Not an access-control boundary. |
+| Frontend routes | `/` (Market), `/checkout` (editable Checkout), `/checkout/attempts/{attemptId}` (Payment result and Order confirmation), `/admin/products` (Admin list), `/admin/products/new` (create), `/admin/products/{id}/edit` (edit) | Served by Vite for direct entry and reload; the attempt route recovers results through read-only API lookups. Other paths render the in-app not-found view. Not an access-control boundary. |
 | PostgreSQL | `127.0.0.1:${POSTGRES_HOST_PORT:-5432}` | Optional infrastructure; loopback only. |
 
 ## Runtime and Manual Verification
@@ -184,7 +185,8 @@ Payment simulation is local-only: no real payment is processed, no credentials o
 3. On `/admin/products/{id}/edit`, select a replacement JPEG or stage removal, then Save. The Market card and the Product detail view must reflect the change; replacing must serve the new image and stop serving the previous one, and removing must reveal the curated image or the monogram fallback. A rejected file (non-JPEG, over-limit, or malformed) must report that the details were saved while the image was not, and the current image must be unchanged.
 4. Stop and restart the backend, then try the same Product ID again. It must no longer be found, and its uploaded image must no longer be served. Any earlier simulated payment attempt must also return not found, because payment state is process-local.
 5. In Checkout, initiate a simulated payment. Selecting Decline or Temporary failure must state that no payment was made and offer another attempt; approving must state that no real payment was made and no Order was created. Editing the Cart, then attempting payment again after a Cart change, must refresh the displayed Cart instead of deciding on stale values. Stopping and restarting the backend must clear the Cart and attempts.
-6. If PostgreSQL is running, use `docker compose ps` and `pg_isready` to verify its container state independently.
+6. After an approval, reload the `/checkout/attempts/{attemptId}` page: the approved captured snapshot must be recovered from the API, not resent. Create the Order explicitly, reload again, and the frozen Order must remain retrievable. An unknown attempt URL must show that the result cannot be confirmed; a missing record must never be presented as proof that the backend restarted. The live Cart must remain editable after Order creation.
+7. If PostgreSQL is running, use `docker compose ps` and `pg_isready` to verify its container state independently.
 
 These checks demonstrate current runtime behavior. A healthy PostgreSQL container does not prove Spring Boot connectivity, schemas, migrations, or Product persistence.
 

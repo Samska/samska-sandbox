@@ -30,7 +30,7 @@ function renderReview(overrides: Partial<Parameters<typeof CheckoutReview>[0]> =
   const onRemoveItem = vi.fn().mockResolvedValue(undefined);
   const onRetry = vi.fn();
   const onSimulatePayment = vi.fn().mockResolvedValue(undefined);
-  const onCheckPaymentResult = vi.fn();
+  const onViewAttempt = vi.fn();
   const result = render(
     <CheckoutReview
       cart={cart}
@@ -42,14 +42,15 @@ function renderReview(overrides: Partial<Parameters<typeof CheckoutReview>[0]> =
       onRetry={onRetry}
       paymentPending={false}
       paymentError={null}
-      paymentCanCheckResult={false}
+      paymentBlocked={false}
+      blockedPaymentMessage={null}
+      onViewAttempt={onViewAttempt}
       onSimulatePayment={onSimulatePayment}
-      onCheckPaymentResult={onCheckPaymentResult}
       {...overrides}
     />
   );
 
-  return { ...result, onBack, onUpdateQuantity, onRemoveItem, onRetry, onSimulatePayment, onCheckPaymentResult };
+  return { ...result, onBack, onUpdateQuantity, onRemoveItem, onRetry, onSimulatePayment, onViewAttempt };
 }
 
 describe("CheckoutReview", () => {
@@ -113,31 +114,33 @@ describe("CheckoutReview", () => {
     expect(screen.getByRole("button", { name: "Remove Canvas Tote" })).toBeDisabled();
   });
 
-  it("shows payment errors and offers result reconciliation when unconfirmed", () => {
-    const { onCheckPaymentResult } = renderReview({
-      paymentError: "We could not confirm the payment result. No decision is confirmed.",
-      paymentCanCheckResult: true
+  it("shows the blocked journey notice with a View attempt action", () => {
+    const { onViewAttempt } = renderReview({
+      paymentBlocked: true,
+      blockedPaymentMessage: "Payment result is unconfirmed. Check this attempt before trying again."
     });
 
-    expect(screen.getByRole("alert")).toHaveTextContent("We could not confirm the payment result.");
+    expect(screen.getByRole("alert")).toHaveTextContent("Payment result is unconfirmed.");
 
-    fireEvent.click(screen.getByRole("button", { name: "Check result" }));
+    fireEvent.click(screen.getByRole("button", { name: "View attempt" }));
 
-    expect(onCheckPaymentResult).toHaveBeenCalledTimes(1);
+    expect(onViewAttempt).toHaveBeenCalledTimes(1);
   });
 
-  it("keeps Check result available and blocks initiation while a result is unconfirmed", () => {
-    renderReview({ paymentError: null, paymentCanCheckResult: true });
+  it("blocks initiation while a reference is unresolved and offers the attempt surface", () => {
+    renderReview({ paymentBlocked: true });
 
-    expect(screen.getByRole("alert")).toHaveTextContent("We could not confirm the payment result.");
-    expect(screen.getByRole("button", { name: "Check result" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Simulate payment" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "View attempt" })).toBeEnabled();
   });
 
-  it("prevents leaving Checkout while a simulated payment is pending", () => {
-    renderReview({ paymentPending: true });
+  it("allows leaving the Checkout surface while a simulated payment is pending", () => {
+    const { onBack } = renderReview({ paymentPending: true });
 
-    expect(screen.getByRole("button", { name: "Back to Market" })).toBeDisabled();
+    const back = screen.getByRole("button", { name: "Back to Market" });
+    expect(back).toBeEnabled();
+    fireEvent.click(back);
+    expect(onBack).toHaveBeenCalledTimes(1);
   });
 
   it("blocks initiation while the Cart is in an error state", () => {

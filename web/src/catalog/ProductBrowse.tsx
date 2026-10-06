@@ -70,8 +70,12 @@ export default function ProductBrowse({
         <div className="grid gap-2 rounded-lg border border-border bg-surface p-6">
           <p className="font-bold text-ink">No Products are available yet.</p>
           <p className="text-muted">
-            New Products will appear here once they become available. Check back soon.
+            Create a synthetic Product in Admin to start a First Order journey. New Products will
+            appear here once they exist.
           </p>
+          <a className="w-fit font-bold text-brand-dark" href="/admin/products/new">
+            Create a synthetic Product
+          </a>
         </div>
       ) : null}
       {!isPending && error === null && productCount > 0 ? (
