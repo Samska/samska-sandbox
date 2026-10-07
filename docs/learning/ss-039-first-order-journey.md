@@ -1,10 +1,10 @@
 # SS-039: First Order End-to-End Journey with Attempt-Addressed Recovery
 
-- Status: In Build
+- Status: Completed
 - Work date: 2026-10-06
 - Last reviewed: 2026-10-06
 - Work item: [SS-039](https://github.com/Samska/samska-sandbox/issues/69)
-- Pull request: Pending
+- Pull request: [#70](https://github.com/Samska/samska-sandbox/pull/70)
 - ADRs: [ADR 0007](../adr/0007-adopt-attempt-addressed-browser-recovery.md), [ADR 0006](../adr/0006-adopt-order-owned-in-memory-store.md), [ADR 0005](../adr/0005-adopt-payment-attempt-store-with-cart-revision.md)
 
 ## What you should learn
@@ -50,6 +50,7 @@ Persistence, authentication, hosting, Order history, cross-device discovery, inv
 ## Reference
 
 - Issue: [SS-039](https://github.com/Samska/samska-sandbox/issues/69)
+- Pull request: [#70](https://github.com/Samska/samska-sandbox/pull/70)
 - ADR: [ADR 0007](../adr/0007-adopt-attempt-addressed-browser-recovery.md)
 - Prior boundaries: [ADR 0005](../adr/0005-adopt-payment-attempt-store-with-cart-revision.md), [ADR 0006](../adr/0006-adopt-order-owned-in-memory-store.md)
 - Canonical documentation: [Architecture](../ARCHITECTURE.md), [Product](../PRODUCT.md), [Testing](../TESTING.md), [Security](../SECURITY.md)
