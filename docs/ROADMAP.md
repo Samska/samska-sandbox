@@ -34,11 +34,11 @@ never renumbered.
 | Product Media Upload | SS-034 |
 | Payment Simulator | SS-036 |
 | Order creation | SS-037 |
+| First Order end-to-end journey | SS-039 |
 
 ### Future Product Sequence
 
-1. First Order end-to-end journey (SS-039) — implemented for review; required Human Verification and merge remain
-2. Release `v0.1.0`
+1. Release `v0.1.0`
 
 Future capabilities receive their SS identifier when their Issues are created.
 
@@ -59,7 +59,7 @@ issue is closed as not
 planned and its pull request closed without merging, so it delivers nothing and
 is not part of the product sequence.
 
-Order creation is a separate explicit step from simulated approval. It copies the frozen approved attempt into an immutable process-local record, with same-attempt replay and lookup; no full-page UI recovery or Cart clearing is introduced by that capability alone. Order creation (SS-037) is complete and merged through PR #67; the owner verified the main browser flow, while API replay, uncertain-response recovery, and accessibility remain unobserved real-browser checks for SS-037 itself. The First Order end-to-end journey (SS-039) is implemented for review: `/checkout` and `/checkout/attempts/{attemptId}` recover the simulated result or frozen Order through read-only lookups after reload, direct entry, and history, keep the live Cart editable, and require explicit abandonment before a new journey replaces an unresolved reference. Required Human Verification and merge of SS-039 remain.
+Order creation is a separate explicit step from simulated approval. It copies the frozen approved attempt into an immutable process-local record, with same-attempt replay and lookup; no full-page UI recovery or Cart clearing is introduced by that capability alone. Order creation (SS-037) is complete and merged through PR #67; the owner verified the main browser flow, while API replay, uncertain-response recovery, and accessibility remain unobserved real-browser checks for SS-037 itself. The First Order end-to-end journey (SS-039) is complete and merged through PR #70: `/checkout` and `/checkout/attempts/{attemptId}` recover the simulated result or frozen Order through read-only lookups after reload, direct entry, and history, keep the live Cart editable, and require explicit abandonment before a new journey replaces an unresolved reference.
 
 ### MVP Boundaries
 
