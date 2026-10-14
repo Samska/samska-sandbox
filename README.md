@@ -9,15 +9,18 @@ licensed under the [Apache License 2.0](LICENSE).
 
 ## Current Milestone
 
-- **Target milestone:** `v0.1.0 — First Order` (unreleased)
-- **Current stage:** First Order end-to-end journey (SS-039) complete and merged via PR #70
-- **Next planned work:** The `v0.1.0` release
+- **Target milestone:** `v0.1.0 — First Order` (unreleased; release prepared, awaiting publication)
+- **Current stage:** `v0.1.0` release prepared (SS-040); awaiting merge and publication approval
+- **Next planned work:** Owner review and merge of the preparation, then publication approval
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
-The product release is still future. No Git tag or GitHub Release exists yet.
-The backend's `0.1.0-SNAPSHOT` and the private frontend package's `0.1.0`
-are build metadata, not evidence of a published product release.
+The release is prepared but not published. No Git tag or GitHub Release exists
+yet, and publication requires separate owner approval of the exact release
+candidate. See the [v0.1.0 release notes](docs/releases/v0.1.0.md) and
+[Releasing](docs/RELEASING.md). The backend's `0.1.0-SNAPSHOT` and the private
+frontend package's `0.1.0` are build metadata, not evidence of a published
+product release.
 
 ## Purpose And Scope
 
@@ -163,8 +166,9 @@ First Order journey (SS-039) is complete and merged through PR #70: `/checkout`
 and attempt-addressed result surfaces recover approved snapshots and frozen
 Orders after reload, direct entry, and history with GET-only reconciliation,
 explicit abandonment, and no Cart clearing. The owner-approved
-sequence continues with the `v0.1.0`
-release. Authentication and authorization
+sequence continues with the `v0.1.0` release: preparation (SS-040) is complete
+and awaits merge and publication approval; no tag or GitHub Release exists yet.
+Authentication and authorization
 remain deferred until after the local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary,
 and the simulated-payment endpoints are unauthenticated and local-only. Future
@@ -197,6 +201,7 @@ for setup, verification, troubleshooting, and shutdown.
 - [Testing strategy](docs/TESTING.md)
 - [Security engineering](docs/SECURITY.md)
 - [GitHub controls](docs/GITHUB.md)
+- [Releasing](docs/RELEASING.md)
 - [AI engineering governance](docs/AI-GOVERNANCE.md)
 - [Engineering Learning Journal](docs/learning/README.md)
 - [Architecture Decision Records](docs/adr/README.md)

@@ -36,11 +36,11 @@ not necessarily change on the same date.
 | Control | Status | Rationale |
 | --- | --- | --- |
 | Required status checks | Deferred | The active `Main` ruleset does not require named status checks. |
-| Dependabot | Deferred | Dependency-update automation is not configured. |
+| Dependabot | Deferred | Dependency-update automation is not configured. GitHub dependency alerts are active for the public repository, and current open alerts are reviewed and recorded during release preparation (SS-040, 2026-10-14: seven development-only `undici` findings, all fixed in 8.10.2). |
 | Dependency Review | Deferred | Dependency-change automation is not configured. |
 | GitHub Environments | Deferred | Deployment environments do not exist yet. |
 | GitHub Container Registry | Deferred | Image distribution is not justified yet. |
-| Releases | Deferred | The first versioned release has not begun. |
+| Releases | Prepared | The first versioned release (`v0.1.0 — First Order`) is prepared and awaiting publication; no tag or GitHub Release exists yet. Publication is planned as an annotated, immutable `v0.1.0` tag with a normal (not prerelease) GitHub Release and source-only automatically generated archives, and requires separate owner approval of the exact release candidate. No release workflow or release automation is added. See `docs/RELEASING.md` and `docs/releases/v0.1.0.md`. |
 | SBOM and artifact attestations | Deferred | Build and release outputs do not exist yet. |
 
 ## Configuration Rules
