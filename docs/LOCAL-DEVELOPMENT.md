@@ -226,7 +226,7 @@ What the runner does and expects:
 - If `8080` or `5173` is already in use, the run refuses to start with an explicit `already used` error and never stops the existing owner. Stop the other process yourself and retry.
 - Each invocation owns a fresh backend process: Products, Cart, payment attempts, and Orders are empty at start and are lost when the run ends.
 - Tests run serially (one worker, no retries) and clear the shared Cart through the existing Cart API before each test; no application reset endpoint exists or is added.
-- On failure, traces and screenshots are written under `web/test-results/`, and the HTML report under `web/playwright-report/` (`npx playwright show-report`); open a recorded trace with `npx playwright show-trace test-results/<test-directory>/trace.zip`. Both directories are ignored by Git, so local failure artifacts are review material and CI uploads them only when the run fails. Inspect failure artifacts before rerunning the suite: every new run cleans `web/test-results/` and overwrites `web/playwright-report/`, so a preserved copy of any diagnostics you want to keep must live outside those directories.
+- On failure, traces and screenshots are written under `web/test-results/`, and the HTML report under `web/playwright-report/` (`npx playwright show-report`); open a recorded trace with `npx playwright show-trace test-results/<test-directory>/trace.zip`. Both directories are ignored by Git, so local failure artifacts are review material and CI uploads them only when the run fails. Owned-server output is printed to the terminal and appears in the CI job log; it is not written into those artifact directories. Inspect failure artifacts before rerunning the suite: every new run cleans `web/test-results/` and overwrites `web/playwright-report/`, so a preserved copy of any diagnostics you want to keep must live outside those directories.
 - Run a subset with `npm run test:e2e -- e2e/first-order.spec.ts` and watch locally with `npx playwright test --headed`.
 
 Windows and Git Bash notes:
@@ -234,7 +234,20 @@ Windows and Git Bash notes:
 - Playwright supports Windows 11 natively and manages its own child processes; this is separate from `scripts/dev.sh`, whose Windows limitation still applies to that launcher only.
 - Chromium binaries are installed by `npx playwright install chromium` under `%LOCALAPPDATA%\ms-playwright` (on Linux, `~/.cache/ms-playwright`); on Linux use `npx playwright install --with-deps chromium` for required system libraries.
 - `Ctrl+C` in the launcher terminal stops the run and cleans up the processes this run owns. Verified Agent evidence on Windows: after a normal exit and after controlled test failures, both ports were released within a second and no owned descendant processes remained.
-- Documented limitation: closing the terminal window or force-killing the runner before it can clean up can leave the owned backend and Vite processes running. Recover with identity-checked commands: confirm the listener with `netstat -ano | grep -E ":(8080|5173) "`, confirm that the owning process command line references this repository (`powershell -NoProfile -Command "Get-CimInstance Win32_Process -Filter \"Name='java.exe' or Name='node.exe'\" | Where-Object { $_.CommandLine -match 'samska-sandbox' } | Select-Object ProcessId,ParentProcessId,Name,CommandLine"`), then terminate only the verified process tree with `taskkill /PID <pid> /T /F`. Never terminate by image name or port alone.
+- Documented limitation: closing the terminal window or force-killing the runner before it can clean up can leave the owned backend and Vite processes running. Recover from Git Bash with three identity-checked steps: confirm the listener, verify that the owning process references this repository, then terminate only the verified tree. Never terminate by image name or port alone.
+
+```bash
+# 1. Find the listener and its Windows PID (last column)
+netstat -ano | grep -E ':(8080|5173) '
+
+# 2. Verify which processes belong to this repository. Single quotes keep Bash
+#    from expanding $_ before PowerShell receives it.
+powershell -NoProfile -Command 'Get-CimInstance Win32_Process | Where-Object { $_.Name -in "java.exe","node.exe" -and $_.CommandLine -match "samska-sandbox" } | Select-Object ProcessId,ParentProcessId,Name,CommandLine'
+
+# 3. Terminate only the verified process tree. The double slashes keep Git Bash
+#    (MSYS) from rewriting the Windows-style switches into paths.
+taskkill //PID <verified-pid> //T //F
+```
 
 ## Shutdown and Reset
 
