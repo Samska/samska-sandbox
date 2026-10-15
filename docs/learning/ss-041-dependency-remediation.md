@@ -1,6 +1,6 @@
 # SS-041: Lockfile-Only Dependency Remediation and Alert-State Honesty
 
-- Status: Active
+- Status: Completed
 - Work date: 2026-10-15
 - Last reviewed: 2026-10-15
 - Work item: [SS-041](https://github.com/Samska/samska-sandbox/issues/74)
@@ -36,7 +36,7 @@
 
 ## How Samska uses it
 
-`web/package-lock.json` resolves `undici` 8.10.2 through `jsdom@30.0.1` and `source-map-js` 1.2.2 through `vite` -> `postcss`, `@tailwindcss/vite` -> `@tailwindcss/node`, and `jsdom` -> `css-tree`; `npm audit` and `npm audit --omit=dev` report 0 vulnerabilities. The remediation PR records `npm ls undici source-map-js`, the two-entry lockfile diff, `npm ci --ignore-scripts`, the frontend typecheck, tests, and production build, and the alert-state distinction; `docs/releases/v0.1.0.md` carries the release-level dependency statement, and `docs/GITHUB.md` records the alert state.
+`web/package-lock.json` resolves `undici` 8.10.2 through `jsdom@30.0.1` and `source-map-js` 1.2.2 through `vite` -> `postcss`, `@tailwindcss/vite` -> `@tailwindcss/node`, and `jsdom` -> `css-tree`; `npm audit` and `npm audit --omit=dev` report 0 vulnerabilities, and GitHub shows 0 open Dependabot alerts with the recorded `undici` alerts in state `fixed`. The remediation PR records `npm ls undici source-map-js`, the two-entry lockfile diff, `npm ci --ignore-scripts`, the frontend typecheck, tests, and production build, and the alert-state distinction; `docs/releases/v0.1.0.md` carries the release-level dependency statement, and `docs/GITHUB.md` records the alert state.
 
 ## Interview perspective
 
@@ -50,5 +50,6 @@ Automated dependency updates, overrides and resolutions strategies, SCA tooling 
 
 - Issue: [SS-041](https://github.com/Samska/samska-sandbox/issues/74)
 - Pull request: [#75](https://github.com/Samska/samska-sandbox/pull/75)
+- Release: [v0.1.0 — First Order](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0)
 - Prior record: [SS-040](ss-040-release-preparation.md)
 - Canonical documentation: [Releasing](../RELEASING.md), [v0.1.0 release notes](../releases/v0.1.0.md), [GitHub controls](../GITHUB.md)
