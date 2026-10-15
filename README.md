@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; next capability selected — SS-042, in build
-- **Next planned work:** [SS-042](https://github.com/Samska/samska-sandbox/issues/77) — minimal real-browser First Order regression suite (Playwright/Chromium); the BDD Human Verification pilot remains a separate future evaluation (SS-038)
+- **Current stage:** `v0.1.0` released; SS-042 browser E2E completed and merged; no next capability selected
+- **Next planned work:** None selected; the next capability receives its SS identifier when its Issue is created, and the BDD Human Verification pilot remains a separate future evaluation (SS-038)
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -170,9 +170,10 @@ Orders after reload, direct entry, and history with GET-only reconciliation,
 explicit abandonment, and no Cart clearing. The `v0.1.0` release is published
 (SS-040 preparation and SS-041 dependency remediation complete;
 [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0),
-2026-10-15). The next capability is selected: SS-042 (#77), a minimal
-real-browser First Order regression suite using Playwright/Chromium, in
-build with two tests against the real stack. SS-038 remains a separate
+2026-10-15). SS-042 — the minimal real-browser First Order regression suite
+using Playwright/Chromium — is complete and merged through PR #78 (squash
+`eb829cc`, merged 2026-10-15). No next capability is selected and no
+identifier is reserved. SS-038 remains a separate
 future evaluation and is not part of SS-042. Authentication and authorization
 remain deferred until after the local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary,
