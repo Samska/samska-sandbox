@@ -1,6 +1,6 @@
 # SS-040: Preparing a Versioned Release Without Publishing It
 
-- Status: Active
+- Status: Completed
 - Work date: 2026-10-14
 - Last reviewed: 2026-10-14
 - Work item: [SS-040](https://github.com/Samska/samska-sandbox/issues/72)
@@ -43,7 +43,7 @@
 
 ## How Samska uses it
 
-`docs/RELEASING.md` records the versioning model, readiness checks, the final candidate gate, the release-notes versus release-body rule, the publication sequence, and the post-publication reconciliation. `docs/releases/v0.1.0.md` is the final release note, currently marked "Prepared; awaiting publication", with the preparation-only text explicitly excluded from the published body. The dependency assessment is recorded in [SS-040](https://github.com/Samska/samska-sandbox/issues/72) and PR [#73](https://github.com/Samska/samska-sandbox/pull/73) from the live Dependabot alerts API, distinguishing application-runtime from developer/CI exposure. `docs/GITHUB.md` records the release control as prepared rather than enabled.
+`docs/RELEASING.md` records the versioning model, readiness checks, the final candidate gate, the release-notes versus release-body rule, the publication sequence, and the post-publication reconciliation. `docs/releases/v0.1.0.md` is the final release note, published on 2026-10-15 and reconciled to the published state on the default branch, with the preparation-only text excluded from the published body. The dependency assessment is recorded in [SS-040](https://github.com/Samska/samska-sandbox/issues/72) and PR [#73](https://github.com/Samska/samska-sandbox/pull/73) from the live Dependabot alerts API, distinguishing application-runtime from developer/CI exposure. `docs/GITHUB.md` records the release control as configured with the published `v0.1.0` release.
 
 ## Interview perspective
 
@@ -57,4 +57,5 @@ SBOM generation, artifact signing, SLSA-style provenance, release automation, de
 
 - Issue: [SS-040](https://github.com/Samska/samska-sandbox/issues/72)
 - Pull request: [#73](https://github.com/Samska/samska-sandbox/pull/73)
+- Release: [v0.1.0 — First Order](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0)
 - Canonical documentation: [Releasing](../RELEASING.md), [v0.1.0 release notes](../releases/v0.1.0.md), [Roadmap](../ROADMAP.md), [GitHub controls](../GITHUB.md), [AI engineering governance](../AI-GOVERNANCE.md)

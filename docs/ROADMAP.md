@@ -35,12 +35,11 @@ never renumbered.
 | Payment Simulator | SS-036 |
 | Order creation | SS-037 |
 | First Order end-to-end journey | SS-039 |
+| Release v0.1.0 — First Order (published 2026-10-15) | SS-040, SS-041 |
 
 ### Future Product Sequence
 
-1. Release `v0.1.0` (prepared; awaiting publication)
-
-Future capabilities receive their SS identifier when their Issues are created.
+The next capability is not yet selected. Future capabilities receive their SS identifier when their Issues are created.
 
 Admin Catalog Management (SS-033) is complete and merged through PR #56. Product
 Media Upload (SS-034) is complete and merged through PR #58: one validated,
@@ -84,12 +83,13 @@ versions are independent. Releases are milestone-based rather than
 Issue-based, and Git tags use `vMAJOR.MINOR.PATCH`.
 
 Versions below `1.0.0` represent evolving, pre-stable product milestones. The
-first planned release is `v0.1.0 — First Order`. Its preparation (SS-040)
-records the approved decisions and adds [release guidance](RELEASING.md) and
-[release notes](releases/v0.1.0.md); no Git tag or GitHub Release exists yet,
-and publication requires separate owner approval of the exact release
-candidate SHA. See [Releasing](RELEASING.md) for the documented publication
-sequence and the post-publication documentation reconciliation.
+first release, `v0.1.0 — First Order`, was published on 2026-10-15 from commit
+`23cebe2e08912d22f7364ad9f20198f9c92d2241` as a source-only release with
+GitHub-generated archives and no additional assets; the annotated `v0.1.0` tag
+is immutable. Its preparation (SS-040) and dependency remediation (SS-041) are
+complete, and the [release notes](releases/v0.1.0.md) are reconciled to the
+published state. See [Releasing](RELEASING.md) for the publication sequence and
+the post-publication reconciliation.
 
 ## Directional Evolution
 

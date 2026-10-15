@@ -9,18 +9,18 @@ licensed under the [Apache License 2.0](LICENSE).
 
 ## Current Milestone
 
-- **Target milestone:** `v0.1.0 — First Order` (unreleased; release prepared, awaiting publication)
-- **Current stage:** `v0.1.0` release prepared (SS-040); awaiting merge and publication approval
-- **Next planned work:** Owner review and merge of the preparation, then publication approval
+- **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
+- **Current stage:** `v0.1.0` released; no next capability selected
+- **Next planned work:** Owner decision on the next capability; the BDD Human Verification pilot remains a separate future evaluation (SS-038)
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
-The release is prepared but not published. No Git tag or GitHub Release exists
-yet, and publication requires separate owner approval of the exact release
-candidate. See the [v0.1.0 release notes](docs/releases/v0.1.0.md) and
+The product release exists: `v0.1.0 — First Order` is published from commit
+`23cebe2e08912d22f7364ad9f20198f9c92d2241` as a source-only release with
+GitHub-generated source archives and no additional assets. See the
+[v0.1.0 release notes](docs/releases/v0.1.0.md) and
 [Releasing](docs/RELEASING.md). The backend's `0.1.0-SNAPSHOT` and the private
-frontend package's `0.1.0` are build metadata, not evidence of a published
-product release.
+frontend package's `0.1.0` are build metadata, not the product release version.
 
 ## Purpose And Scope
 
@@ -165,10 +165,11 @@ recovery, and accessibility checks remain unobserved for SS-037 itself. The
 First Order journey (SS-039) is complete and merged through PR #70: `/checkout`
 and attempt-addressed result surfaces recover approved snapshots and frozen
 Orders after reload, direct entry, and history with GET-only reconciliation,
-explicit abandonment, and no Cart clearing. The owner-approved
-sequence continues with the `v0.1.0` release: preparation (SS-040) is complete
-and awaits merge and publication approval; no tag or GitHub Release exists yet.
-Authentication and authorization
+explicit abandonment, and no Cart clearing. The `v0.1.0` release is published
+(SS-040 preparation and SS-041 dependency remediation complete;
+[`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0),
+2026-10-15). No next capability is selected and no identifier is reserved;
+SS-038 remains a separate future evaluation. Authentication and authorization
 remain deferred until after the local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary,
 and the simulated-payment endpoints are unauthenticated and local-only. Future

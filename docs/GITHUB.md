@@ -30,17 +30,17 @@ not necessarily change on the same date.
 | Issue Forms | Configured | One generic Issue Form defines the canonical Issue Handoff ordered items, and blank issues are disabled; created issue bodies contain the submitted items in order, while the form's `markdown` introduction is display-only. | `.github/ISSUE_TEMPLATE/`; becomes effective on the default branch when merged. |
 | CodeQL | Configured | GitHub-managed CodeQL analysis is active. Current successful checks analyze GitHub Actions, Java/Kotlin, and JavaScript/TypeScript. | GitHub Advanced Security CodeQL check and dynamic `github-code-scanning/codeql` workflow observed on PR #37, 2026-09-19. |
 | GitGuardian | Configured | GitGuardian Security Checks are active as a separate secret-related PR check. | Successful GitGuardian Security Checks observed on PR #37, 2026-09-19. |
+| Releases | Configured | The first versioned release, `v0.1.0 — First Order`, is published (2026-10-15) from commit `23cebe2e08912d22f7364ad9f20198f9c92d2241` as a source-only release with GitHub-generated archives and no additional assets; the annotated `v0.1.0` tag peels to that commit. | API-verified 2026-10-15 |
 
 ## Deferred Controls
 
 | Control | Status | Rationale |
 | --- | --- | --- |
 | Required status checks | Deferred | The active `Main` ruleset does not require named status checks. |
-| Dependabot | Deferred | Dependency-update automation is not configured. GitHub dependency alerts are active for the public repository, and current open alerts are reviewed and recorded during release preparation (SS-040, 2026-10-14: seven `undici` findings in the development/test dependency path; application runtime exposure is none, while developer/CI exposure remained). A separate lockfile-only remediation (SS-041, PR #75) updated the resolved `undici` to 8.10.2, the first patched version for all seven advisories, and, under an owner-approved extension, the resolved `source-map-js` to 1.2.2 for CVE-2026-93749; `npm audit` and `npm audit --omit=dev` report 0 vulnerabilities. GitHub alert state may refresh asynchronously after the fix reaches `main`, and the `source-map-js` advisory was never listed in the repository's Dependabot alerts. |
+| Dependabot | Deferred | Dependency-update automation is not configured. GitHub dependency alerts are active for the public repository, and current open alerts are reviewed and recorded during release preparation (SS-040, 2026-10-14: seven `undici` findings in the development/test dependency path; application runtime exposure is none, while developer/CI exposure remained). A separate lockfile-only remediation (SS-041, PR #75) updated the resolved `undici` to 8.10.2, the first patched version for all seven advisories, and, under an owner-approved extension, the resolved `source-map-js` to 1.2.2 for CVE-2026-93749; `npm audit` and `npm audit --omit=dev` report 0 vulnerabilities. After the fix reached `main`, the previously open `undici` alerts are `fixed` and the repository shows 0 open Dependabot alerts (observed 2026-10-15); the `source-map-js` advisory was never listed. |
 | Dependency Review | Deferred | Dependency-change automation is not configured. |
 | GitHub Environments | Deferred | Deployment environments do not exist yet. |
 | GitHub Container Registry | Deferred | Image distribution is not justified yet. |
-| Releases | Prepared | The first versioned release (`v0.1.0 — First Order`) is prepared and awaiting publication; no tag or GitHub Release exists yet. Publication is planned as an annotated, immutable `v0.1.0` tag with a normal (not prerelease) GitHub Release and source-only automatically generated archives, and requires separate owner approval of the exact release candidate. No release workflow or release automation is added. See `docs/RELEASING.md` and `docs/releases/v0.1.0.md`. |
 | SBOM and artifact attestations | Deferred | Build and release outputs do not exist yet. |
 
 ## Configuration Rules
