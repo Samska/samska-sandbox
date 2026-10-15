@@ -26,17 +26,17 @@
 
 **Resolved version versus declared range.** `package.json` declares `jsdom`, and `jsdom` declares `undici: ^8.9.0`. The lockfile records which version actually resolves. A remediation can change only the resolved entry while keeping the declared range and every other package untouched.
 
-**Minimum patched version.** The advisories are fixed in 8.10.2. Updating to the latest in-range version (8.12.1 at the time) would also fix them but exceeds the authorized change; selecting the first patched version is the smallest correct move and keeps the diff reviewable.
+**Minimum patched version.** The `undici` advisories are fixed in 8.10.2 and the `source-map-js` advisory in 1.2.2. Updating `undici` to the latest in-range version (8.12.1 at the time) would also fix them but exceeds the authorized change; selecting the first patched version is the smallest correct move and keeps the diff reviewable.
 
 **Integrity validation.** A lockfile entry carries the tarball URL and a `sha512` integrity hash. Editing the version without the matching hash makes `npm ci` fail; running it proves the artifact matches and the install is reproducible.
 
 **Alert state versus installed state.** GitHub Dependabot alerts track the default branch and refresh asynchronously; they can stay open after a fix is merged, and they may not yet contain an advisory that `npm audit` already reports. Claim resolution only from the installed resolved version plus the advisory's patched range.
 
-**Scope discipline.** Verification surfaced a high `source-map-js` advisory outside the authorized scope. The correct action is to record it with its exposure path and available fix, and leave acceptance or remediation to the owner — not to expand the change silently.
+**Scope discipline.** Verification surfaced a high `source-map-js` advisory outside the originally authorized scope. The correct action was to record it with its exposure path and available fix and leave acceptance or remediation to the owner — not to expand the change silently. The owner then authorized the extension explicitly, and the same lockfile-only method was applied to the second package.
 
 ## How Samska uses it
 
-`web/package-lock.json` resolves `undici` 8.10.2 through `jsdom@30.0.1`. The remediation PR records `npm ls undici`, the one-entry lockfile diff, `npm ci --ignore-scripts`, the frontend typecheck, tests, and production build, and the alert-state distinction; `docs/releases/v0.1.0.md` carries the release-level dependency statement, and `docs/GITHUB.md` records the alert state.
+`web/package-lock.json` resolves `undici` 8.10.2 through `jsdom@30.0.1` and `source-map-js` 1.2.2 through `vite` -> `postcss`, `@tailwindcss/vite` -> `@tailwindcss/node`, and `jsdom` -> `css-tree`; `npm audit` and `npm audit --omit=dev` report 0 vulnerabilities. The remediation PR records `npm ls undici source-map-js`, the two-entry lockfile diff, `npm ci --ignore-scripts`, the frontend typecheck, tests, and production build, and the alert-state distinction; `docs/releases/v0.1.0.md` carries the release-level dependency statement, and `docs/GITHUB.md` records the alert state.
 
 ## Interview perspective
 

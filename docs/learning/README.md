@@ -58,7 +58,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-037-order-creation.md](ss-037-order-creation.md) | Order ownership, value copies, one Order per approved attempt, replay before capacity, and honest two-lookup reconciliation. |
 | [ss-039-first-order-journey.md](ss-039-first-order-journey.md) | Attempt-addressed URL recovery, GET-only reconciliation, pending-operation guards, stale-response invalidation, honest absence, and explicit abandonment. |
 | [ss-040-release-preparation.md](ss-040-release-preparation.md) | Release preparation versus publication, annotated immutable tags, source-only releases, build metadata versus product version, and exposure-based dependency triage. |
-| [ss-041-undici-remediation.md](ss-041-undici-remediation.md) | Lockfile-only dependency remediation, minimum patched version versus latest, integrity validation with `npm ci`, and alert-database state versus installed version. |
+| [ss-041-dependency-remediation.md](ss-041-dependency-remediation.md) | Lockfile-only dependency remediation (`undici`, `source-map-js`), minimum patched version versus latest, integrity validation with `npm ci`, and alert-database state versus installed version. |
 
 Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 
