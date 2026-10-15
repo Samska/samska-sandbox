@@ -39,7 +39,15 @@ never renumbered.
 
 ### Future Product Sequence
 
-The next capability is not yet selected. Future capabilities receive their SS identifier when their Issues are created.
+The next capability is SS-042 — Minimal real-browser First Order regression
+suite (#77), in build. It adds two Playwright/TypeScript Chromium tests that
+drive the real frontend through the Vite proxy against a fresh, exclusively
+owned backend: the First Order success journey with attempt-addressed
+recovery, frozen data, explicit Order creation, and focused keyboard/focus
+checks, plus a declined outcome that exposes no Order path. Execution is
+serialized on Windows 11 Pro/Git Bash locally and Ubuntu 24.04 in a new
+Browser E2E CI job, using synthetic data and existing APIs only. Future
+capabilities receive their SS identifier when their Issues are created.
 
 Admin Catalog Management (SS-033) is complete and merged through PR #56. Product
 Media Upload (SS-034) is complete and merged through PR #58: one validated,
