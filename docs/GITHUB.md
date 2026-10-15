@@ -36,7 +36,7 @@ not necessarily change on the same date.
 | Control | Status | Rationale |
 | --- | --- | --- |
 | Required status checks | Deferred | The active `Main` ruleset does not require named status checks. |
-| Dependabot | Deferred | Dependency-update automation is not configured. GitHub dependency alerts are active for the public repository, and current open alerts are reviewed and recorded during release preparation (SS-040, 2026-10-14: seven `undici` findings in the development/test dependency path, all fixed in 8.10.2; application runtime exposure is none, while developer/CI exposure remains). |
+| Dependabot | Deferred | Dependency-update automation is not configured. GitHub dependency alerts are active for the public repository, and current open alerts are reviewed and recorded during release preparation (SS-040, 2026-10-14: seven `undici` findings in the development/test dependency path; application runtime exposure is none, while developer/CI exposure remained). A separate lockfile-only remediation (SS-041, PR #75) updated the resolved `undici` to 8.10.2, the first patched version for all seven advisories; GitHub alert state may refresh asynchronously after the fix reaches `main`. A high `source-map-js` finding (CVE-2026-93749, fixed in 1.2.2) observed via `npm audit` is not in the current Dependabot alerts and remains an owner decision. |
 | Dependency Review | Deferred | Dependency-change automation is not configured. |
 | GitHub Environments | Deferred | Deployment environments do not exist yet. |
 | GitHub Container Registry | Deferred | Image distribution is not justified yet. |
