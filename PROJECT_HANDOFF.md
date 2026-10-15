@@ -4,10 +4,10 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
-## Reconstruction planning — awaiting owner approval
+## SS-043 — Reconstruction R1 — approved, in build (#80)
 
-- The owner rejected the incremental-refactoring proposal in `0fad2be` and clarified that the implementation must be rebuilt from scratch, with the current application only a product/requirements/behavior reference. The [revised executive plan](docs/rebuild/RECONSTRUCTION.md) replaces the old P0–P7 backlog; the [diagnosis](docs/rebuild/PLAN.md) and [verification record](docs/rebuild/VERIFICATION.md) are retained. [ADR 0008](docs/adr/0008-rebuild-with-exclusive-candidate-runtime.md) is Proposed, not accepted.
-- This proposal does not supersede accepted ADRs, select a new product capability, authorize SS-038, or permit application changes. Next step: owner reviews and approves or revises the plan before Build. Pull requests and merges each require explicit owner authorization.
+- The owner approved the from-scratch direction, current stack/behaviors and only directly necessary preparation plus R1: new Product create/list/detail domain/API/UI, current English texts, functional accessibility, no broad redesign. [Issue #80](https://github.com/Samska/samska-sandbox/issues/80), [R1 handoff](docs/rebuild/R1.md), [frozen parity matrix](docs/rebuild/PARITY.md) and [executive plan](docs/rebuild/RECONSTRUCTION.md) are the active resume context. The reference is ec92cd3; implementation is not based on extracting old code.
+- No cutover, removal of old capabilities, R2+, persistence/auth/hosting, SS-038, PR or merge is authorized. Next: complete R1 implementation, tests and independent review, then stop for owner local Human Verification before implementation commit/PR. ADR 0008 remains Proposed for the full transition; R1 candidate preparation is specifically authorized. Project Status/Priority remain unverified because the token lacks read:project; no scopes changed.
 
 ## SS-042 — Minimal real-browser First Order regression suite (#77)
 

@@ -2,12 +2,13 @@
 
 ## Estado, intenção e limites
 
-**Revisão 2 — Awaiting approval — 2026-10-15.** O proprietário definiu reconstrução da implementação do zero, não refatoração incremental. O plano anterior do commit `0fad2be` não foi aprovado; seu backlog P0–P7 está substituído por este documento. [Diagnóstico e fontes já levantadas](PLAN.md#diagnóstico-do-produto), [evidências anteriores](VERIFICATION.md) e histórico Git permanecem disponíveis.
+**Revisão 2 — R1 approved / In Build — 2026-10-15.** O proprietário aprovou a direção do zero, stack/comportamentos e preparação diretamente necessária + R1 (criar/listar/detalhar Product novo), mantendo textos/idioma e UI funcional/acessível. Não aprovou cutover, remoção, R2+, persistência, auth, hosting, PR ou merge. O plano anterior `0fad2be` foi rejeitado e seu backlog P0–P7 substituído. [Diagnóstico](PLAN.md#diagnóstico-do-produto), [evidências](VERIFICATION.md) e histórico Git preservados. Trabalho ativo: [SS-043 / #80](https://github.com/Samska/samska-sandbox/issues/80), [handoff R1](R1.md).
 
 - Escrever novos domínio, serviços, adaptadores HTTP, interface e protocolo de jornada. Código existente é referência consultável de requisitos/contratos e comportamento, não base para copiar, mover, renomear ou extrair componentes como entrega reconstruída.
 - Podem permanecer licença, documentação/ADRs, build wrappers, manifests/lockfile, assets com atribuição válida, ferramentas, workflows e testes de comportamento úteis. Essa reutilização de suporte não equivale a reutilizar a aplicação.
 - Não é clean-room jurídico: os autores podem consultar o código atual. Testes estruturais acoplados à implementação antiga não prescrevem a nova estrutura.
 - Nesta fase editar somente planejamento/handoff. Não criar scaffolds, endpoints, scripts ou tests de implementação; não apagar/mover código antigo nem rodar processos novos.
+- A restrição de somente planejamento acima descrevia a revisão; após aprovação do proprietário, implementação/testes/execução candidatos R1 e preparação necessária estão autorizados. A proibição de cutover/remoção permanece. Interromper após entregar R1 para validação humana antes de commit de comportamento, PR ou próxima entrega.
 - Referência funcional congelada: `ec92cd35073ea3b52afa13a740f75fb0788f6c2b` (mesmo código da base documental `0fad2be`). Cada linha da matriz registra SHA/oráculo; mudança posterior na referência exige revisão explícita, não atualização silenciosa das expectativas. Nenhum teste já executado é prova do futuro código novo.
 - Trabalho futuro na worktree `C:\Users\Samuel\Desktop\samska-sandbox-rebuild`, branch `rebuild/maestri`, mesmo repositório Samska/samska-sandbox. Checkout original intocado. PRs e merges exigem autorização explícita, inclusive integração de branches de especialistas.
 
@@ -200,4 +201,4 @@ Modelos, proibição de cobrança extra, limite de dois especialistas e necessid
 
 ## Próximo passo
 
-Apresentar mudanças e consultas pontuais, registrar evidência documental e **aguardar aprovação deste plano revisado**. Não executar R1–R10, criar candidato, substituir/remover aplicação, abrir PR ou integrar branches agora.
+Executar somente preparação e R1 aprovados, respeitando matriz anterior ao código e checkpoints de revisão/verificação humana. Apresentar R1 e aguardar resultado humano antes de commit de comportamento e qualquer próxima entrega. R2+, cutover, remoção, PR e merge continuam sem autorização.
