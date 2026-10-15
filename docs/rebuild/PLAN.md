@@ -3,11 +3,12 @@
 ## Estado e autorização
 
 - Data: 2026-10-15. Estado: **Awaiting approval**.
+- Revisão 2: o proprietário rejeitou a direção de refatoração incremental do commit `0fad2be` e definiu reconstrução da implementação do zero, em entregas pequenas. Essa intenção está decidida; arquitetura, backlog e transição revisados ainda aguardam aprovação.
 - Esta entrega prepara o ambiente e propõe o plano; não autoriza implementação.
 - A implementação existente permanece integral. Nenhuma dependência ou configuração de aplicação versionada foi alterada nesta fase; alterações se limitam aos documentos de planejamento e handoff.
 - Repositório preservado: <https://github.com/Samska/samska-sandbox>.
 - Evidências e limites da verificação: [VERIFICATION.md](VERIFICATION.md).
-- A proposta não substitui requisitos, ADRs, governança ou roadmap aceitos. Divergências precisam de decisão explícita.
+- Diagnóstico existente reaproveitado abaixo. O plano executivo vigente está em [RECONSTRUCTION.md](RECONSTRUCTION.md), que substitui o backlog P0–P7 anterior. Requisitos, ADRs, governança e roadmap não são silenciosamente substituídos.
 
 ## Diagnóstico do produto
 
@@ -39,9 +40,9 @@ Os caminhos Java abaixo são relativos a `backend/src/main/java/io/github/samska
 - `payment/storage/InMemoryPaymentStore.java`: replay antes de novo snapshot/capacidade; conflito se o mesmo UUID muda revisão/cenário; captura sob lock Payment → Cart; aprovação indexada pela revisão.
 - `order/storage/InMemoryOrderStore.java`: replay antes de capacidade; aprovação consultada pelo contrato `PaymentAttempts`; lock Order → Payment, cópia dos valores e ausência de mutação do Cart.
 - `web/src/App.tsx` e `web/src/journey/routes.ts`: seleção por pathname/History API, sem biblioteca de router.
-- `web/src/catalog/Catalog.tsx`: concentra carregamento, Cart, navegação, Payment, Order, recuperação, refs de operação e guards contra respostas obsoletas. Essa concentração é um alvo plausível de simplificação; sua complexidade protege invariantes reais e não pode ser apagada sem caracterização.
+- `web/src/catalog/Catalog.tsx`: concentra carregamento, Cart, navegação, Payment, Order, recuperação, refs de operação e guards contra respostas obsoletas. Serve de referência para caracterização do protocolo; não será a base de extração de hooks da implementação nova.
 - `web/e2e/first-order.spec.ts`: suíte real com sucesso e recusa, contagem de POSTs, confirmação congelada, reload/entrada direta/histórico e foco/teclado. Não equivale a cobertura de todas as falhas nem a auditoria completa de acessibilidade.
-- `catalog/application/ProductSnapshot.java` e `catalog/storage/InMemoryProductStore.java`: snapshot retém referência a Product mutável. É risco de encapsulamento observado estaticamente, não corrupção via HTTP demonstrada. Correção fica fora das extrações frontend e exige fatia própria aprovada.
+- `catalog/application/ProductSnapshot.java` e `catalog/storage/InMemoryProductStore.java`: snapshot retém referência a Product mutável. É risco observado estaticamente, não corrupção via HTTP demonstrada. A nova implementação deve encapsular seu estado, sem precisar corrigir previamente a implementação antiga ou reproduzir seu alias interno.
 - Preço não tem escala/teto de negócio; `web/src/formatAmount.ts` exibe duas casas sem definir regra monetária backend. O Cart mantém nome/preço capturados na primeira inclusão. Não impor arredondamento, moeda, reprecificação ou limites como correção implícita; decisões monetárias permanecem fora do escopo até aprovação específica.
 
 ### Contratos HTTP e integrações
@@ -67,9 +68,9 @@ Integrações atuais: browser → adaptadores feature-local → `/api` via proxy
 
 ### Proposta de base preservada
 
-- Backend: monólito modular Java 25 / Spring Boot 4.1.1, módulos Catalog, Cart, Payment e Order, preservando também `coordination/CatalogCartCoordinator`; contratos explícitos, domínio independente de transporte e stores em memória.
+- Backend proposto: novo monólito modular Java 25 / Spring Boot 4.1.1, módulos Catalog, Cart, Payment e Order e coordenação explícita Catalog/Cart; preservar responsabilidades/garantias, não classes ou stores atuais.
 - Dependências direcionais: Cart → Catalog; Payment → Cart; Order → Payment. Coordenação Catalog/Cart explícita; não introduzir ciclos ou lock inverso.
-- Frontend: React 19 / TypeScript / Vite / Tailwind v4, componentes por capacidade, adaptadores tipados e primitivas pequenas. Separar orquestração da jornada da apresentação por extrações graduais, não por nova plataforma de estado.
+- Frontend proposto: implementação nova em React 19 / TypeScript / Vite / Tailwind v4, organizada por capacidade, com adaptadores tipados e protocolo de jornada explícito. Não extrair e renomear o contêiner antigo como substituto de reconstrução.
 - Ferramentas: Maven Wrapper, npm lockfile, JUnit/MockMvc, Vitest/RTL, Playwright Chromium e CI existente.
 
 | Instrução/decisão | Tratamento proposto | Justificativa |
@@ -93,13 +94,17 @@ Também foram conferidos o exemplo HTTP de Local Development que omite `descript
 
 ### Hipóteses, não requisitos aprovados
 
-1. Reconstrução significa melhorar clareza/manutenção preservando capacidades, não reduzir o produto a um novo bootstrap.
-2. O principal benefício inicial virá de reduzir a concentração de responsabilidades de `Catalog.tsx`; isso ainda não é uma medição de defeitos, performance ou custo de mudança.
-3. Não há redesign visual, mudança de idioma, moeda, stack, autenticação ou persistência implicitamente autorizado.
+1. Preservar escopo funcional atual e contratos observáveis, salvo desvios aprovados; não exigir reprodução de estrutura interna, bugs ou composição visual pixel a pixel.
+2. Manter stack reduz variáveis durante a reconstrução, mas não obriga reutilizar implementação de domínio, componentes ou protocolos antigos.
+3. Redesign visual, idioma, moeda, autenticação e persistência continuam sem autorização implícita. Reconstrução do zero já é a intenção explícita, não uma dúvida em aberto.
 
-Se o objetivo desejado for reescrita total ou outro produto, este plano precisa ser revisto antes de Build.
+O plano executivo revisado a seguir substitui integralmente a antiga proposta de refatoração P0–P7, preservada no histórico Git em `0fad2be`. Não executar aquele backlog.
 
-## Escopo recomendado e transição
+## Histórico rejeitado — não executar
+
+O conteúdo abaixo é a proposta anterior, mantida apenas para rastrear a decisão recusada. Não constitui recomendação vigente, autorização ou backlog ativo. Para todas as entregas e decisões, usar exclusivamente [RECONSTRUCTION.md](RECONSTRUCTION.md).
+
+### Antigo escopo recomendado e transição
 
 **Recomendação:** reconstrução incremental com paridade funcional. Manter backend e contratos testados; reconstruir a composição frontend e a documentação em fatias pequenas. Não criar uma aplicação paralela completa nem apagar diretórios existentes. Uma reescrita total tem custo e risco de perda de contratos sem benefício demonstrado nesta descoberta.
 
@@ -111,7 +116,7 @@ Se o objetivo desejado for reescrita total ou outro produto, este plano precisa 
 6. Solicitar autorização separada para cada PR e merge. Sem autorização, manter branch de trabalho; não alterar `main` nem o checkout original.
 7. Rollback por fatia: interromper e corrigir a branch ou propor revert de um commit próprio revisável; nunca reset/force push, perda de trabalho alheio ou modificação do checkout original. Não há migração de dados persistidos nesta proposta.
 
-## Backlog proposto
+### Antigo backlog proposto
 
 Cada linha é uma entrega pequena; itens maiores devem ser subdivididos no planejamento da Issue. Nenhum está em Build.
 
@@ -134,7 +139,7 @@ Cada fatia referencia as linhas afetadas da matriz P1; P7 aceita paridade por es
 
 Revisão do backend nesta sequência é de compatibilidade e fronteiras; não inclui sua reescrita. Uma nova fatia backend exige problema concreto, escopo e aprovação, não apenas disponibilidade de um agente.
 
-## Riscos, testes e gates
+### Riscos e gates do plano anterior
 
 | Risco | Evidência exigida antes de aceitar a fatia |
 | --- | --- |
@@ -151,7 +156,7 @@ Gates comuns: Maven verify, frontend typecheck/test/build; E2E quando jornada/ro
 
 Gate documental completo pré-PR: markdownlint com configuração do repositório, lychee offline incluindo fragments, EditorConfig e `docker compose config --quiet` com `POSTGRES_PASSWORD` sintético apenas no ambiente (sem arquivo/serviço/volume). Se houver PR autorizada, validar os doze campos canônicos do PR Handoff e seu heading conforme workflow/template. Required checks seguem documentados como diferidos; não confundir CI histórica com verificação do novo SHA. Ferramenta indisponível implica lacuna declarada, não instalação ou CI alegada silenciosamente.
 
-## Coordenação e isolamento
+### Coordenação anterior (substituída)
 
 - Orquestrador: único escritor dos documentos desta fase, integrador, verificador dos relatos, dono do registro de decisões e das operações Git.
 - Arquitetura: descoberta somente leitura nesta fase; futuro desenho/autor técnico de uma fatia por vez.
@@ -162,7 +167,7 @@ Gate documental completo pré-PR: markdownlint com configuração do repositóri
 - Integração de branches exige autorização de merge. Alternativa inicial recomendada: execução serial na branch de trabalho, revisão somente leitura em paralelo, sem branches adicionais desnecessárias.
 - Registro futuro: Issue Handoff para cada entrega, revisão com achados e evidência, PR Handoff somente quando autorizado, snapshot do projeto nas transições materiais. Learning record quando o trabalho aprovado produzir decisão/lição material; ADR novo somente para decisão durável realmente alterada.
 
-## Decisões solicitadas ao proprietário
+### Perguntas anteriores (substituídas)
 
 1. Aprova a reconstrução incremental com paridade ou deseja uma reescrita integral? Qual problema principal quer resolver: manutenção, UX, aprendizagem ou outro?
 2. Confirma preservar stack, rotas/APIs, capacidades atuais, dados em memória e operação local? Qualquer remoção ou mudança precisa ser enumerada.
@@ -170,6 +175,6 @@ Gate documental completo pré-PR: markdownlint com configuração do repositóri
 4. Aprova iniciar por P1 e P2 após P0, mantendo SS-038 separado e sem infraestrutura nova?
 5. Distribuição de modelos resolvida pelo proprietário: Orquestrador GPT-6.1 Sol Medium; especialistas Go selecionados pelo Orquestrador. O teste inicial preserva a limitação de effort da época; configuração posterior e evidência em [MODELS.md](MODELS.md).
 
-## Próximo passo
+## Próximo passo vigente
 
-**Parar e aguardar aprovação do plano.** Não executar P1–P7, não abrir PR, não fazer merge, não remover a implementação existente. Eventuais commits/pushes desta fase devem conter apenas planejamento e registro de evidências, sem indicar aprovação da proposta.
+**Parar e aguardar aprovação do plano revisado em RECONSTRUCTION.md.** Não executar o backlog anterior nem a nova reconstrução, não abrir PR, não fazer merge, não remover a implementação existente. Commits/pushes desta fase contêm apenas planejamento/evidências, sem indicar aprovação.

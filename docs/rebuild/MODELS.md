@@ -4,7 +4,7 @@
 
 O proprietário autorizou o Orquestrador a escolher os modelos e confirmou que os dois planos já estão configurados, sem consumo extra: ao atingir limites, aguardar reset. Retomada somente de revisão do planejamento; implementação ainda aguarda aprovação. Não recrutar especialistas OpenAI nem permitir recrutamento recursivo. Limite: dois especialistas. Nenhuma configuração de cobrança, crédito, credencial ou provider foi criada ou alterada.
 
-Os documentos PLAN.md e VERIFICATION.md foram preservados e receberam revisão independente dos dois especialistas; correções documentais foram incorporadas pelo Orquestrador. Não se presume aprovação dos revisores para as correções posteriores nem aprovação humana do plano. Nenhum push, PR ou merge foi feito até este registro.
+O plano inicial em `0fad2be` recebeu revisão independente, mas o proprietário rejeitou sua direção de refatoração. A intenção agora é implementar do zero; [RECONSTRUCTION.md](RECONSTRUCTION.md) é o plano executivo revisado, ainda sem aprovação. As consultas seguintes são pontuais, não repetição do diagnóstico. Nenhum push, PR ou merge foi feito até este registro.
 
 ## Verificação de configuração
 
@@ -26,6 +26,12 @@ Os documentos PLAN.md e VERIFICATION.md foram preservados e receberam revisão i
 Orquestrador permanece GPT-6.1 Sol Medium. Provider de acesso dos especialistas: OpenCode Go; famílias/modelos respectivamente Kimi (Moonshot), DeepSeek, MiniMax e GLM (Z.ai). Não usar modelos GPT por Go como forma de alegar diversificação de família.
 
 Catálogo Go local completo nesta consulta: `gemini-4-argon-contributor`, `cat-jam-free`, `claude-haiku-5-5`, `longcat-2.5-preview-free`, `space-bunny`, `mimo-v2.6-pro`, `gpt-6-luna`, `grok-4.7`, `step-5-preview-free`, `deepseek-v4.1-flash`, `muse-spark-1.3-contributor`, `hy4-preview`, `glm-5.3-flash`, `qwen3.8-flash`, `glm-5.3`, `qwen3.8-max`, `kimi-k3`, `kimi-k2.7-code`, `qwen3.7-plus`, `minimax-m3`, `deepseek-v4-pro`, `mimo-v2.5`, `mimo-v2.5-pro`, `minimax-m2.7`. Todos com prefixo `opencode-go/`. Disponibilidade futura pode mudar; conferir catálogo antes de aplicar.
+
+### Papéis futuros — não recrutados
+
+O [plano revisado](RECONSTRUCTION.md#7-equipe-modelos-e-momento-de-entrada) define Backend em `opencode-go/kimi-k2.7-code` Default, Frontend em `opencode-go/minimax-m3#thinking`, Revisor em `opencode-go/deepseek-v4-pro#high` e Infraestrutura/CI em `opencode-go/glm-5.3-flash#high`. Nesta revisão o catálogo confirmou os três últimos IDs e variantes; Kimi já é usado por Arquitetura. Isso confirma disponibilidade no catálogo, não configuração de terminais ainda inexistentes nem benchmark de adequação.
+
+Nenhum desses novos especialistas foi criado. Entrada só após aprovação e necessidade concreta, em turnos com no máximo dois especialistas trabalhando; candidatos só recebem tarefa substantiva após seleção real e confirmação por metadados da sessão e de um turno curto. Proibição de recrutamento recursivo permanece. O Orquestrador é o único recrutador/integrador.
 
 ## Aplicação e comprovação após escolha
 
@@ -66,4 +72,4 @@ Os dois relatórios chegaram de tarefas já iniciadas, não de novas delegaçõe
 
 ## Próximo passo
 
-Revisão independente recebida e modelo confirmado nos turnos posteriores à troca. Aguardar aprovação humana do plano; especialistas sem novas tarefas. Aprovar distribuição de modelos não aprova implementação da reconstrução. Sem nova pergunta ao proprietário sobre cobrança: sua confirmação foi registrada.
+Distribuição do trio mantida e consultas pontuais concluídas; especialistas sem novas tarefas. Aguardar aprovação humana antes de implementar ou recrutar papéis futuros. Aprovar distribuição de modelos não aprova implementação da reconstrução. Sem nova pergunta ao proprietário sobre cobrança: sua confirmação foi registrada.

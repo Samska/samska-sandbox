@@ -6,7 +6,7 @@ Update rule: this snapshot must be updated in the same change when project state
 
 ## Reconstruction planning — awaiting owner approval
 
-- The owner requested environment preparation and a reconstruction proposal in the existing repository, not implementation. The diagnostic, proposed scope, small-delivery backlog, coordination rules, open decisions, and evidence are recorded in [the reconstruction plan](docs/rebuild/PLAN.md) and [verification record](docs/rebuild/VERIFICATION.md).
+- The owner rejected the incremental-refactoring proposal in `0fad2be` and clarified that the implementation must be rebuilt from scratch, with the current application only a product/requirements/behavior reference. The [revised executive plan](docs/rebuild/RECONSTRUCTION.md) replaces the old P0–P7 backlog; the [diagnosis](docs/rebuild/PLAN.md) and [verification record](docs/rebuild/VERIFICATION.md) are retained. [ADR 0008](docs/adr/0008-rebuild-with-exclusive-candidate-runtime.md) is Proposed, not accepted.
 - This proposal does not supersede accepted ADRs, select a new product capability, authorize SS-038, or permit application changes. Next step: owner reviews and approves or revises the plan before Build. Pull requests and merges each require explicit owner authorization.
 
 ## SS-042 — Minimal real-browser First Order regression suite (#77)
