@@ -36,7 +36,7 @@ not necessarily change on the same date.
 | Control | Status | Rationale |
 | --- | --- | --- |
 | Required status checks | Deferred | The active `Main` ruleset does not require named status checks. |
-| Dependabot | Deferred | Dependency-update automation is not configured. GitHub dependency alerts are active for the public repository, and current open alerts are reviewed and recorded during release preparation (SS-040, 2026-10-14: seven development-only `undici` findings, all fixed in 8.10.2). |
+| Dependabot | Deferred | Dependency-update automation is not configured. GitHub dependency alerts are active for the public repository, and current open alerts are reviewed and recorded during release preparation (SS-040, 2026-10-14: seven `undici` findings in the development/test dependency path, all fixed in 8.10.2; application runtime exposure is none, while developer/CI exposure remains). |
 | Dependency Review | Deferred | Dependency-change automation is not configured. |
 | GitHub Environments | Deferred | Deployment environments do not exist yet. |
 | GitHub Container Registry | Deferred | Image distribution is not justified yet. |

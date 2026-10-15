@@ -15,19 +15,36 @@ Concise guidance for preparing, approving, and publishing a Samska Sandbox produ
 ## Release Readiness
 
 - The exact release candidate is a full commit SHA on `main`; the preparation pull request and its merge complete first.
-- CI passes on the exact final pull request head, and evidence stays distinct: Agent Verification, Human Verification, and CI Verification.
+- CI passes on the exact final preparation pull request head. That evidence applies to the reviewed head; it is not presented as checks executed on the merged squash commit, which the final candidate gate verifies separately.
+- Release evidence keeps three things distinct: the preparation pull request's CI result on its exact final head, the historical SS-039 verification for the merged implementation, and the final candidate verification on the resulting `main` SHA.
 - Release notes exist at `docs/releases/vX.Y.Z.md` with status "prepared; awaiting publication".
-- Current dependency alerts are reviewed with fresh evidence and recorded: advisory, affected resolved version and path, runtime/build/test exposure, exploit conditions, available fix, and release relevance. Remediation or acceptance of a material risk is an owner decision, and release preparation does not change dependencies.
+- Current dependency alerts are reviewed with fresh evidence and recorded: advisory, affected resolved version and path, application-runtime exposure versus developer/CI exposure, exploit conditions, available fix, and release relevance. A source-only release does not remove dependency risk: the tagged source archive contains the committed lockfile, so installing dependencies from it reproduces the same resolved versions until the lockfile is updated. Remediation or acceptance of a material risk is an owner decision, and release preparation does not change dependencies.
 - Deliberate limitations are preserved accurately and never presented as resolved: synthetic data and simulated payments only, no authentication or authorization, no hosting or persistence, process-local state that is lost on restart, and no automated browser end-to-end suite.
+
+## Release Notes And Release Body
+
+- `docs/releases/vX.Y.Z.md` is the canonical release notes file on the default branch. Its status block and preparation-only statements describe the preparation state and must not be published.
+- The GitHub Release body is a separate, publication-ready text derived from the durable sections of the release notes (delivered capabilities, journey, verification, limitations, build metadata, dependency review) with all preparation-status text omitted. It is written in published tense and never claims that the tag or release does not exist.
+- The exact published body is prepared and recorded when publication is authorized; it may add the final candidate SHA and the verification identifiers recorded during the gate.
+- The tag points at a commit whose `docs/releases/vX.Y.Z.md` still contains preparation-status text. The tagged file remains a historical preparation snapshot and is not edited; the post-publication reconciliation updates the default branch to the published state, so the default branch and the tag differ by that documentation change. This is expected and does not invalidate the tag.
+
+## Final Candidate Gate
+
+Performed after the authorized squash merge of the preparation pull request, before any tag exists:
+
+1. Record the full resulting `main` SHA.
+2. Verify tree equivalence to the approved pull request head (for example, `git diff --quiet <approved-head> <main-sha>` reports no differences) and record the result; stop on material divergence.
+3. Perform and record the planned final candidate verification on that exact `main` SHA. Checks executed on the pull request head are evidence for the reviewed head only and are not represented as checks executed on the squash commit.
+4. Stop for owner approval of that exact SHA. One explicit publication authorization may then cover the routine tag, release, and verification sequence; stop if the candidate diverges materially.
 
 ## Publication Sequence
 
-Documented for the approved release; each step requires explicit owner authorization.
+Documented for the approved release; publication follows the final candidate gate and explicit owner authorization.
 
-1. The owner authorizes merging the preparation pull request; verify `main` equals the approved release candidate SHA.
-2. The owner approves the exact full commit SHA for the tag.
+1. The owner authorizes merging the preparation pull request; record the resulting full `main` SHA and complete the final candidate gate.
+2. The owner approves the exact full commit SHA for the tag (the publication authorization).
 3. Create an annotated, immutable tag `vX.Y.Z` targeting that SHA, and push the tag.
-4. Create a GitHub Release for the tag: a normal milestone release (not marked prerelease) with the body from `docs/releases/vX.Y.Z.md`, source-only with GitHub-generated source archives, and no binary, package, or container assets.
+4. Create a GitHub Release for the tag: a normal milestone release (not marked prerelease) with the prepared publication body, source-only with GitHub-generated source archives, and no binary, package, or container assets.
 5. Verify the tag, the release, and the rendered notes. A published tag is immutable: never move or reuse it. If a release is wrong, document the correction and publish a new version.
 6. Reconcile documentation after publication as described below.
 
@@ -35,7 +52,7 @@ No release workflow, release automation, SBOM, or artifact attestation exists or
 
 ## Post-Publication Documentation Reconciliation
 
-After publication, update the release notes status, the `README.md` milestone and next-work wording, `docs/ROADMAP.md`, `docs/GITHUB.md`, `PROJECT_HANDOFF.md`, and the related learning record to the published state. Until that change lands, documentation must continue to describe the release as prepared and awaiting publication. Documentation must never describe a release as published before the tag and GitHub Release exist.
+After publication, update the release notes status, the `README.md` milestone and next-work wording, `docs/ROADMAP.md`, `docs/GITHUB.md`, `PROJECT_HANDOFF.md`, and the related learning record to the published state. Until that change lands, documentation must continue to describe the release as prepared and awaiting publication. Documentation must never describe a release as published before the tag and GitHub Release exist. The tagged `docs/releases/vX.Y.Z.md` remains a historical preparation snapshot; only the default branch is reconciled.
 
 ## Related Documentation
 

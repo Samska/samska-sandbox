@@ -4,7 +4,7 @@
 - Work date: 2026-10-14
 - Last reviewed: 2026-10-14
 - Work item: [SS-040](https://github.com/Samska/samska-sandbox/issues/72)
-- Pull request: Pending
+- Pull request: [#73](https://github.com/Samska/samska-sandbox/pull/73)
 - ADRs: None
 - Canonical documentation: [Releasing](../RELEASING.md), [v0.1.0 release notes](../releases/v0.1.0.md), [Roadmap](../ROADMAP.md), [GitHub controls](../GITHUB.md)
 
@@ -13,15 +13,17 @@
 - Preparation and publication as two separately approved states
 - Annotated versus lightweight tags, and why published tags are immutable
 - Product version versus build metadata versus work-item identifiers
-- Source-only releases and provenance honesty
+- Source-only releases and provenance honesty, including why source-only does not mean dependency-risk-free
 - Reviewing dependency alerts by exposure path, not by severity count
+- Why a squash merge needs a final candidate gate on a new SHA
 - Documentation that must not run ahead of reality
 
 ### Core — Know this for interviews
 
 - A release is an approval boundary: preparing artifacts and publishing them are different decisions with different evidence
-- Severity is not exposure: a high advisory in a dev-only test dependency is not the same risk as the same advisory in shipped runtime code
+- Severity is not exposure: a high advisory in a development/test dependency is not the same as the same advisory in application runtime code, and neither can be dismissed by calling the release "source-only"
 - An immutable annotated tag makes the release candidate auditable; you fix forward and never move a published tag
+- A squash merge creates a new commit, so checks that ran on the pull request head are not checks on the released SHA
 
 ## Concepts explained
 
@@ -31,19 +33,21 @@
 
 **Version, metadata, identifier.** The product version (`v0.1.0`) names the milestone. Build metadata (`0.1.0-SNAPSHOT` for the backend, `0.1.0` for the private frontend package) describes build tooling, and SS identifiers identify work items. Conflating them creates false claims: a Maven version is not a release.
 
-**Source-only release.** Publishing the tag and letting GitHub generate source archives gives consumers exactly the tagged commit. No binary, package, container, SBOM, or attestation is claimed, so nothing implies a provenance guarantee that was never produced.
+**Source-only release.** Publishing the tag and letting GitHub generate source archives gives consumers exactly the tagged commit. No binary, package, container, SBOM, or attestation is claimed, so nothing implies a provenance guarantee that was never produced. Source-only also does not remove dependency risk: the tagged source still contains the committed lockfile, so installing dependencies from it reproduces the same resolved versions until the lockfile is updated.
 
-**Exposure-based vulnerability triage.** A dependency advisory matters through its path: runtime code, build tooling, or tests. The same seven advisories change meaning when the package is a development-only transitive dependency that never ships and whose affected features (shared caches, pools, retry interceptors) the tests do not exercise.
+**Exposure-based vulnerability triage.** A dependency advisory matters through its path: application runtime code, build tooling, or development and CI test tooling. The same seven advisories change meaning when the package's implementation is not bundled into the application and no production path imports it — but the committed lockfile still pins the vulnerable resolved version, and `npm ci` installs it for development and CI. The correct statement is "no application runtime exposure; developer/CI exposure present", not "not shipped, so no risk".
 
-**Documentation honesty.** A release note is part of the release. While a release is pending, every document must say so; the post-publication reconciliation updates the status only after the tag and release exist.
+**Squash commits and verified heads.** A squash merge produces a new commit with the same tree and a different SHA. Checks that ran on the pull request head are evidence for the reviewed head, not for the squash commit. A final candidate gate records the resulting `main` SHA, verifies tree equivalence to the approved head, runs the planned verification on that exact SHA, and stops for approval before tagging.
+
+**Documentation honesty.** A release note is part of the release. While a release is pending, every document must say so; the published GitHub Release body is prepared separately from preparation-status text, and the post-publication reconciliation updates only the default branch — the tagged preparation snapshot is historical and is not edited.
 
 ## How Samska uses it
 
-`docs/RELEASING.md` records the versioning model, readiness checks, the documented publication sequence, and the post-publication reconciliation. `docs/releases/v0.1.0.md` is the final release note, currently marked "Prepared; awaiting publication". The dependency assessment is recorded in [SS-040](https://github.com/Samska/samska-sandbox/issues/72) from the live Dependabot alerts API, and `docs/GITHUB.md` records the release control as prepared rather than enabled.
+`docs/RELEASING.md` records the versioning model, readiness checks, the final candidate gate, the release-notes versus release-body rule, the publication sequence, and the post-publication reconciliation. `docs/releases/v0.1.0.md` is the final release note, currently marked "Prepared; awaiting publication", with the preparation-only text explicitly excluded from the published body. The dependency assessment is recorded in [SS-040](https://github.com/Samska/samska-sandbox/issues/72) and PR [#73](https://github.com/Samska/samska-sandbox/pull/73) from the live Dependabot alerts API, distinguishing application-runtime from developer/CI exposure. `docs/GITHUB.md` records the release control as prepared rather than enabled.
 
 ## Interview perspective
 
-Be ready to explain why publishing is a separate approval from building, how annotated tags differ from lightweight tags and branches, why "the build says 0.1.0" is not release evidence, and how you would triage a severity-9 advisory that lives only in a test dependency. Discuss what a source-only release guarantees and what it deliberately does not.
+Be ready to explain why publishing is a separate approval from building, how annotated tags differ from lightweight tags and branches, why "the build says 0.1.0" is not release evidence, and how you would triage a high advisory that lives only in a development/test dependency without either dismissing it or overstating it. Discuss why a squash merge forces a final candidate gate, what a source-only release guarantees and what it does not, and how you would keep preparation status text out of a published release body.
 
 ## What not to worry about yet
 
@@ -52,5 +56,5 @@ SBOM generation, artifact signing, SLSA-style provenance, release automation, de
 ## Reference
 
 - Issue: [SS-040](https://github.com/Samska/samska-sandbox/issues/72)
-- Pull request: Pending
+- Pull request: [#73](https://github.com/Samska/samska-sandbox/pull/73)
 - Canonical documentation: [Releasing](../RELEASING.md), [v0.1.0 release notes](../releases/v0.1.0.md), [Roadmap](../ROADMAP.md), [GitHub controls](../GITHUB.md), [AI engineering governance](../AI-GOVERNANCE.md)
