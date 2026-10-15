@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; SS-042 browser E2E completed and merged; no next capability selected
-- **Next planned work:** None selected; the next capability receives its SS identifier when its Issue is created, and the BDD Human Verification pilot remains a separate future evaluation (SS-038)
+- **Current stage:** `v0.1.0` released; SS-044 Market Product-name search (#81) implementation in review
+- **Next planned work:** SS-044 in review on `feat/ss-044-market-product-search`; the next capability receives its SS identifier when its Issue is created, and the BDD Human Verification pilot remains a separate future evaluation (SS-038)
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -51,6 +51,7 @@ validation, learning, and risk.
 | Shopping Cart | Implemented | Process-local Cart contents, quantity changes, removal, and server-calculated totals. |
 | Product UX Foundation | Implemented | Commerce-oriented shell, responsive Product browsing, integrated Cart presentation, and accessible feedback. |
 | Product Storefront UX/UI | Implemented | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged. |
+| Market Product-name search | Implemented | Case- and accent-insensitive substring filter on `Product.name` in the Market; term is held in `Catalog` while mounted, never written to the URL/history/storage/logs, and never sent to the API (`GET /api/products` is unchanged); Admin keeps its accent-sensitive filter by decision. |
 | Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource or identity exists; payment initiation captures the immutable revision-checked snapshot. |
 | Payment Simulator | Implemented | An explicit local-demo outcome over a revision-checked immutable Cart snapshot; Payment owns identified attempts with UUID replay, GET reconciliation, one approval per unchanged Cart revision, and a 32-attempt process-local limit without eviction. Approval alone creates no Order or real payment; attempts are lost on restart. |
 | Order creation | Implemented | Explicit creation from an approved attempt, immutable copied lines and total, same-attempt replay and GET reconciliation, and a defensive 32-Order process-local cap. |
@@ -172,8 +173,12 @@ explicit abandonment, and no Cart clearing. The `v0.1.0` release is published
 [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0),
 2026-10-15). SS-042 — the minimal real-browser First Order regression suite
 using Playwright/Chromium — is complete and merged through PR #78 (squash
-`eb829cc`, merged 2026-10-15). No next capability is selected and no
-identifier is reserved. SS-038 remains a separate
+`eb829cc`, merged 2026-10-15). SS-044 — Market Product-name search (#81) —
+is in review on branch `feat/ss-044-market-product-search`: a local,
+case- and accent-insensitive substring filter on `Product.name`; term lives in
+`Catalog` while mounted, never reaches the URL, history, storage, logs, or
+API; Admin keeps its accent-sensitive filter by decision. No next capability
+is selected and no identifier is reserved. SS-038 remains a separate
 future evaluation and is not part of SS-042. Authentication and authorization
 remain deferred until after the local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary,

@@ -59,6 +59,7 @@ export default function Catalog() {
   const [products, setProducts] = useState<ProductResponse[]>([]);
   const [productsPending, setProductsPending] = useState(true);
   const [productsError, setProductsError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedProduct, setSelectedProduct] = useState<ProductResponse | null>(null);
   const [cart, setCart] = useState<CartResponse | null>(null);
   const [cartPending, setCartPending] = useState(true);
@@ -82,6 +83,7 @@ export default function Catalog() {
   const pendingFocusProductId = useRef<string | null>(null);
   const pendingCartTriggerFocus = useRef(false);
   const viewDetailsButtons = useRef(new Map<string, HTMLButtonElement>());
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
   const cartTriggerRef = useRef<HTMLButtonElement>(null);
   const paymentInFlightRef = useRef<string | null>(null);
   const orderInFlightRef = useRef(new Set<string>());
@@ -240,7 +242,12 @@ export default function Catalog() {
     if (selectedProduct === null && pendingFocusProductId.current !== null) {
       const productId = pendingFocusProductId.current;
       pendingFocusProductId.current = null;
-      viewDetailsButtons.current.get(productId)?.focus();
+      const viewDetailsButton = viewDetailsButtons.current.get(productId);
+      if (viewDetailsButton !== undefined) {
+        viewDetailsButton.focus();
+      } else {
+        searchInputRef.current?.focus();
+      }
     }
   }, [selectedProduct]);
 
@@ -474,6 +481,10 @@ export default function Catalog() {
     }
 
     viewDetailsButtons.current.set(productId, node);
+  }
+
+  function registerSearchInput(node: HTMLInputElement | null) {
+    searchInputRef.current = node;
   }
 
   function openCart() {
@@ -1017,6 +1028,9 @@ export default function Catalog() {
           onSelect={handleSelectProduct}
           onViewDetailsRef={registerViewDetailsButton}
           cartTrigger={cartTrigger}
+          searchTerm={searchTerm}
+          onSearchTermChange={setSearchTerm}
+          onSearchInputRef={registerSearchInput}
         />
       )}
       {referenceNotice !== null ? <StatusMessage tone="neutral">{referenceNotice}</StatusMessage> : null}

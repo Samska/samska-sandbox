@@ -1,9 +1,11 @@
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import type { ProductResponse } from "./catalogApi";
 import ProductMedia from "./ProductMedia";
 import Button from "../ui/Button";
 import StatusMessage from "../ui/StatusMessage";
+import FormField from "../ui/FormField";
 import { formatAmount } from "../formatAmount";
+import { filterProductsByName } from "./productSearch";
 
 export default function ProductBrowse({
   products,
@@ -14,7 +16,10 @@ export default function ProductBrowse({
   onAdd,
   onSelect,
   onViewDetailsRef,
-  cartTrigger
+  cartTrigger,
+  searchTerm,
+  onSearchTermChange,
+  onSearchInputRef
 }: {
   products: ProductResponse[];
   isPending: boolean;
@@ -25,8 +30,38 @@ export default function ProductBrowse({
   onSelect: (product: ProductResponse) => void;
   onViewDetailsRef: (productId: string, node: HTMLButtonElement | null) => void;
   cartTrigger: ReactNode;
+  searchTerm: string;
+  onSearchTermChange: (value: string) => void;
+  onSearchInputRef: (node: HTMLInputElement | null) => void;
 }) {
   const productCount = products.length;
+  const visibleProducts = filterProductsByName(products, searchTerm);
+  const trimmedTerm = searchTerm.trim();
+  const showSearch = !isPending && error === null && productCount > 0;
+  const searchInputNodeRef = useRef<HTMLInputElement | null>(null);
+  const registerSearchInput = (node: HTMLInputElement | null) => {
+    searchInputNodeRef.current = node;
+    onSearchInputRef(node);
+  };
+
+  function handleClearSearch() {
+    onSearchTermChange("");
+    searchInputNodeRef.current?.focus();
+  }
+
+  const countBadge =
+    !isPending && error === null && productCount > 0 ? (
+      <p
+        aria-live="polite"
+        className="rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm font-bold text-muted"
+      >
+        {trimmedTerm.length === 0
+          ? `${productCount} ${productCount === 1 ? "product" : "products"}`
+          : `${visibleProducts.length} of ${productCount} ${productCount === 1 ? "product" : "products"}`}
+      </p>
+    ) : (
+      <span aria-hidden="true" />
+    );
 
   return (
     <section
@@ -47,14 +82,32 @@ export default function ProductBrowse({
         </h1>
         <p className="text-muted">Browse available products for your next order.</p>
       </div>
+      {showSearch ? (
+        <div className="grid gap-3 min-[36rem]:grid-cols-[minmax(0,24rem)_auto] min-[36rem]:items-end">
+          <FormField id="market-search" label="Search Products by name" error={null}>
+            {(control) => (
+              <input
+                {...control}
+                type="search"
+                value={searchTerm}
+                onChange={(event) => onSearchTermChange(event.target.value)}
+                ref={registerSearchInput}
+              />
+            )}
+          </FormField>
+          {searchTerm.length > 0 ? (
+            <Button
+              variant="secondary"
+              className="justify-self-start"
+              onClick={handleClearSearch}
+            >
+              Clear search
+            </Button>
+          ) : null}
+        </div>
+      ) : null}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        {!isPending && error === null && productCount > 0 ? (
-          <p className="rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm font-bold text-muted">
-            {productCount} {productCount === 1 ? "product" : "products"}
-          </p>
-        ) : (
-          <span aria-hidden="true" />
-        )}
+        {countBadge}
         {cartTrigger}
       </div>
       {isPending ? <StatusMessage tone="neutral">Loading Products...</StatusMessage> : null}
@@ -78,9 +131,15 @@ export default function ProductBrowse({
           </a>
         </div>
       ) : null}
-      {!isPending && error === null && productCount > 0 ? (
+      {!isPending && error === null && productCount > 0 && visibleProducts.length === 0 ? (
+        <div className="grid gap-2 rounded-lg border border-border bg-surface p-6">
+          <p className="font-bold text-ink">No Products match &quot;{trimmedTerm}&quot;.</p>
+          <p className="text-muted">Clear the search to see the full Product list.</p>
+        </div>
+      ) : null}
+      {!isPending && error === null && visibleProducts.length > 0 ? (
         <ul className="grid list-none gap-4 p-0 m-0 min-[32rem]:grid-cols-2 min-[47rem]:grid-cols-3 min-[62rem]:grid-cols-4">
-          {products.map((product) => (
+          {visibleProducts.map((product) => (
             <li
               key={product.id}
               className="grid grid-rows-[auto_minmax(0,1fr)_auto_auto] gap-4 rounded-lg border border-border bg-surface p-4 hover:border-border-strong hover:shadow-product focus-within:border-border-strong focus-within:shadow-product"
