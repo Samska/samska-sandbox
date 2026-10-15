@@ -4,6 +4,11 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## Reconstruction planning — awaiting owner approval
+
+- The owner requested environment preparation and a reconstruction proposal in the existing repository, not implementation. The diagnostic, proposed scope, small-delivery backlog, coordination rules, open decisions, and evidence are recorded in [the reconstruction plan](docs/rebuild/PLAN.md) and [verification record](docs/rebuild/VERIFICATION.md).
+- This proposal does not supersede accepted ADRs, select a new product capability, authorize SS-038, or permit application changes. Next step: owner reviews and approves or revises the plan before Build. Pull requests and merges each require explicit owner authorization.
+
 ## SS-042 — Minimal real-browser First Order regression suite (#77)
 
 - Completed and merged via PR #78 (squash `eb829cc4e9e1aeba5e1400c1174bf267da4be94e`, merged 2026-10-15; tree `c532516485f57f6f7667062e217627fb1599b929` identical to the reviewed head `cffb421`): two Chromium Playwright/TypeScript tests against the real frontend, Vite proxy, and a fresh exclusively owned Spring Boot backend. The First Order test covers browse → Cart → Checkout → explicit simulated approval, reload and empty-storage direct-entry recovery of the same attempt, frozen data after live Cart changes, explicit keyboard-activated Order creation, a real Back/Forward traversal, and focused keyboard/focus checks; the declined test proves the same recovery surfaces expose no Order path. Serialized one-worker execution, synthetic fixtures and Cart cleanup through existing APIs (no reset endpoints), `@playwright/test` pinned exactly to 1.64.1, Windows 11 Pro/Git Bash locally and a new Ubuntu Browser E2E CI job, failure diagnostics (trace, screenshot, HTML report) with seven-day CI retention, and owned-server output in the CI job log.
