@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; SS-044 Market Product-name search (#81) implementation in review
-- **Next planned work:** SS-044 in review on `feat/ss-044-market-product-search`; the next capability receives its SS identifier when its Issue is created, and the BDD Human Verification pilot remains a separate future evaluation (SS-038)
+- **Current stage:** `v0.1.0` released; SS-044 Market Product-name search (#81) complete and merged
+- **Next planned work:** the selected next engineering task is tool-agnostic, versioned agent role instructions for orchestrators and specialized agents, with tool-specific integration kept separate; the next product capability remains unselected and receives its SS identifier when its Issue is created, and the BDD Human Verification pilot remains a separate future evaluation (SS-038)
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -174,11 +174,14 @@ explicit abandonment, and no Cart clearing. The `v0.1.0` release is published
 2026-10-15). SS-042 — the minimal real-browser First Order regression suite
 using Playwright/Chromium — is complete and merged through PR #78 (squash
 `eb829cc`, merged 2026-10-15). SS-044 — Market Product-name search (#81) —
-is in review on branch `feat/ss-044-market-product-search`: a local,
-case- and accent-insensitive substring filter on `Product.name`; term lives in
-`Catalog` while mounted, never reaches the URL, history, storage, logs, or
-API; Admin keeps its accent-sensitive filter by decision. No next capability
-is selected and no identifier is reserved. SS-038 remains a separate
+is complete and merged through PR #82 (squash `8b32000`, merged 2026-10-15):
+a local, case- and accent-insensitive substring filter on `Product.name`;
+term lives in `Catalog` while mounted, never reaches the URL, history,
+storage, logs, or API; Admin keeps its accent-sensitive filter by decision.
+The selected next engineering task is tool-agnostic, versioned agent role
+instructions with tool-specific integration kept separate; the next product
+capability remains unselected and no identifier is reserved. SS-038 remains
+a separate
 future evaluation and is not part of SS-042. Authentication and authorization
 remain deferred until after the local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary,
