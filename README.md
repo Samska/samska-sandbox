@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; no next capability selected
-- **Next planned work:** Owner decision on the next capability; the BDD Human Verification pilot remains a separate future evaluation (SS-038)
+- **Current stage:** `v0.1.0` released; next capability selected — SS-042, in build
+- **Next planned work:** [SS-042](https://github.com/Samska/samska-sandbox/issues/77) — minimal real-browser First Order regression suite (Playwright/Chromium); the BDD Human Verification pilot remains a separate future evaluation (SS-038)
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -59,8 +59,9 @@ validation, learning, and risk.
 | Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in bounded backend process memory; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
+| Automated browser E2E | Implemented | Two Chromium Playwright tests against the real frontend, Vite proxy, and a fresh exclusively owned backend: First Order success with reload/direct-entry recovery, frozen data, explicit Order creation, and keyboard/focus checks, plus a declined outcome without an Order path; serialized execution, synthetic fixtures through existing APIs, diagnostics on failure. |
 | PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
-| Automated browser E2E, deployment | Planned | No browser end-to-end framework or deployment exists; real-browser journey checks remain Human Verification. |
+| Deployment | Planned | No deployment exists; interactive browser checks and real-browser accessibility remain Human Verification concerns. |
 
 ## Architecture
 
@@ -126,11 +127,12 @@ flowchart LR
     CI --> Repo[Repository validation]
     CI --> Backend[Backend build / test / reporting]
     CI --> Frontend[Frontend typecheck / test / build / reporting]
+    CI --> E2E[Browser E2E / Playwright Chromium]
     PR --> CodeQL[CodeQL]
     PR --> GG[GitGuardian Security Checks]
 ```
 
-The `CI` workflow contains three independent jobs. CodeQL is GitHub-managed
+The `CI` workflow contains four independent jobs. The Browser E2E job starts its own backend and Vite servers, runs the two Playwright/Chromium journey tests, and uploads traces, screenshots, and reports only when the run fails. CodeQL is GitHub-managed
 and currently analyzes GitHub Actions, Java/Kotlin, and JavaScript/TypeScript.
 GitGuardian remains a separate secret-related check. Secret scanning and push
 protection are repository controls documented in [GitHub controls](docs/GITHUB.md).
@@ -141,13 +143,13 @@ protection are repository controls documented in [GitHub controls](docs/GITHUB.m
 | --- | --- |
 | Backend | Java 25, Spring Boot 4.1.1, Maven Wrapper |
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS v4 |
-| Testing | JUnit/Surefire, Spring MockMvc, Vitest, React Testing Library |
+| Testing | JUnit/Surefire, Spring MockMvc, Vitest, React Testing Library, Playwright (Chromium) |
 | Local infrastructure | PostgreSQL 18 via Docker Compose, not application-integrated |
 | CI/CD | GitHub Actions, structured JUnit reporting, immutable Action pins |
 | Security | CodeQL, GitGuardian, GitHub secret protection controls |
 | AI-assisted engineering | Repository-governed coding agents with human ownership |
 
-Future technologies such as Redis, RabbitMQ, Playwright, Testcontainers,
+Future technologies such as Redis, RabbitMQ, Testcontainers,
 OpenTelemetry, Terraform, and deployment platforms are not current stack
 components.
 
@@ -168,8 +170,10 @@ Orders after reload, direct entry, and history with GET-only reconciliation,
 explicit abandonment, and no Cart clearing. The `v0.1.0` release is published
 (SS-040 preparation and SS-041 dependency remediation complete;
 [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0),
-2026-10-15). No next capability is selected and no identifier is reserved;
-SS-038 remains a separate future evaluation. Authentication and authorization
+2026-10-15). The next capability is selected: SS-042 (#77), a minimal
+real-browser First Order regression suite using Playwright/Chromium, in
+build with two tests against the real stack. SS-038 remains a separate
+future evaluation and is not part of SS-042. Authentication and authorization
 remain deferred until after the local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary,
 and the simulated-payment endpoints are unauthenticated and local-only. Future
