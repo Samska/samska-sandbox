@@ -14,7 +14,15 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:rebuild": "vite --config vite.rebuild.config.ts",
+    "start:rebuild": "node ../scripts/rebuild.mjs",
+    "typecheck:rebuild": "tsc -p tsconfig.rebuild.json && tsc -p tsconfig.rebuild-e2e.json",
+    "test:rebuild": "vitest run --config vite.rebuild.config.ts",
+    "build:rebuild": "vite build --config vite.rebuild.config.ts",
+    "test:e2e:rebuild": "playwright test --config playwright.rebuild.config.ts",
+    "test:lifecycle:rebuild": "node --test ../scripts/rebuild.test.mjs",
+    "a11y:contrast:rebuild": "node ../scripts/contrast-check.mjs"
   },
   "dependencies": {
     "react": "19.2.8",

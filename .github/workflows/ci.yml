@@ -148,6 +148,12 @@ jobs:
         if: ${{ always() && steps.test.outcome == 'failure' }}
         run: exit 1
 
+      # Rebuild R1 candidate (R10 support): the standard runtime keeps its own
+      # verify above; the Maven `rebuild` profile builds the new
+      # io.github.samska.commerce entry with its own test run.
+      - name: Build and test rebuild backend
+        run: ./mvnw -Prebuild --batch-mode --no-transfer-progress verify
+
   frontend:
     name: Frontend
     runs-on: ubuntu-24.04
@@ -233,6 +239,16 @@ jobs:
         if: ${{ steps.test.outcome == 'success' }}
         run: npm run build
 
+      # Rebuild R1 candidate frontend checks, run strictly after the standard
+      # ones (scripts integrated into web/package.json by the Orquestrador).
+      - name: Run rebuild frontend checks
+        run: |
+          npm run test:lifecycle:rebuild
+          npm run typecheck:rebuild
+          npm run test:rebuild
+          npm run build:rebuild
+          npm run a11y:contrast:rebuild
+
   browser-e2e:
     name: Browser E2E
     runs-on: ubuntu-24.04
@@ -271,6 +287,14 @@ jobs:
       - name: Run browser E2E tests
         working-directory: web
         run: npm run test:e2e
+
+      # Rebuild R1 candidate E2E, strictly sequential after the standard suite
+      # so the candidate launcher starts with 8080/5173 already released by
+      # the standard webServers; the launcher refuses occupied ports without
+      # stopping their owner.
+      - name: Run rebuild browser E2E tests
+        working-directory: web
+        run: npm run test:e2e:rebuild
 
       - name: Upload Playwright diagnostics on failure
         if: ${{ failure() }}

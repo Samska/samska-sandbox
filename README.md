@@ -12,6 +12,7 @@ licensed under the [Apache License 2.0](LICENSE).
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
 - **Current stage:** `v0.1.0` released; SS-042 browser E2E completed and merged; no next capability selected
 - **Next planned work:** None selected; the next capability receives its SS identifier when its Issue is created, and the BDD Human Verification pilot remains a separate future evaluation (SS-038)
+- **Active reconstruction:** [SS-043 / R1](https://github.com/Samska/samska-sandbox/issues/80) rebuilds Product creation, collection browsing and detail from scratch as a partial local candidate; the current application is preserved, with no cutover. Implementation is in progress and Human Verification is pending. See the [R1 scope](docs/rebuild/R1.md) and [local validation guide](docs/rebuild/R1-VALIDATION.md).
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -199,6 +200,12 @@ cd ..
 The launcher starts Spring Boot and Vite. PostgreSQL is optional and is not
 required for the current application. See [Local Development](docs/LOCAL-DEVELOPMENT.md)
 for setup, verification, troubleshooting, and shutdown.
+
+The R1 reconstruction candidate has a separate entry point, not a replacement
+for this default application. Its planned `node scripts/rebuild.mjs` launcher
+uses the same ports exclusively; do not run both stacks together. Follow the
+[R1 guide](docs/rebuild/R1-VALIDATION.md) for implementation/verification status
+before using the candidate. No database, authentication or hosting is added.
 
 ## Documentation
 

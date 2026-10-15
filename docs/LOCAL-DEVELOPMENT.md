@@ -138,7 +138,7 @@ The Catalog API creates Products with `POST /api/products` and retrieves them wi
 ```bash
 curl -i -X POST http://localhost:8080/api/products \
   -H 'Content-Type: application/json' \
-  --data '{"name":"Canvas Tote","price":12.50}'
+  --data '{"name":"Canvas Tote","description":"Synthetic canvas tote","price":12.50}'
 curl -i http://localhost:8080/api/products/<returned-id>
 ```
 
@@ -248,6 +248,14 @@ powershell -NoProfile -Command 'Get-CimInstance Win32_Process | Where-Object { $
 #    (MSYS) from rewriting the Windows-style switches into paths.
 taskkill //PID <verified-pid> //T //F
 ```
+
+## R1 Reconstruction Candidate
+
+The [SS-043 handoff](rebuild/R1.md) and [candidate validation guide](rebuild/R1-VALIDATION.md) describe the new Product create/list/detail slice and its current verification state. It is partial and does not replace the standard application. No cutover or capability removal is authorized.
+
+R1 adds a separate Java bootstrap selected by Maven profile `rebuild`, candidate build output under `backend/target/rebuild`, and a new frontend root in `web/rebuild`. The planned safe root launcher is `node scripts/rebuild.mjs`; the guide must record successful execution before the candidate is reported ready. The candidate identity is `GET /api/rebuild/runtime` with `{"runtime":"rebuild-r1"}`, not default health alone. Both stacks use 8080/5173; run only one at a time and stop your own instance with Ctrl+C before switching. Process-local Product state resets on backend restart.
+
+The existing `scripts/dev.sh`, manual default commands and ports remain the standard application's workflow and are not repurposed to launch the candidate. No changes to that launcher are intended: the new launcher owns candidate supervision separately and must be verified on Windows for R1. Keep the existing launcher/platform limitation distinct from candidate results. No new JDK/Node/npm version, database service, `.env`, credential, volume or data migration is required.
 
 ## Shutdown and Reset
 

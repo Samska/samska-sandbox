@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "composite": false,
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.rebuild.tsbuildinfo",
+    "types": ["vite/client", "vitest/globals"]
+  },
+  "include": ["./rebuild/**/*.ts", "./rebuild/**/*.tsx"],
+  "exclude": ["../src", "../dist", "../node_modules", "./rebuild/dist"]
+}

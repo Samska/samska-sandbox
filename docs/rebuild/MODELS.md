@@ -1,5 +1,34 @@
 # Distribuição de modelos — configuração aplicada
 
+## Política operacional atual — escolha por tarefa
+
+O proprietário substituiu a distribuição fixa e as restrições anteriores: o Orquestrador pode escolher/trocar seu próprio modelo e os dos especialistas, inclusive OpenAI quando justificado, somente pelos planos existentes. Economia de cota é requisito. Relato do proprietário: aproximadamente 78% da janela OpenAI de cinco horas consumida em menos de uma hora; não é telemetria consultada pelo agente.
+
+Priorizar Go na execução/integração corrente para aliviar OpenAI; selecionar o menor esforço adequado à complexidade, contexto e risco. Usar revisão mais capaz em mudanças de alto risco, reduzir para trabalho delimitado quando apropriado e evitar alternâncias por mensagem. Não há roteador automático comprovado: são seleções explícitas por sessão via API V2 ou `/models`, verificadas em `session.get` e no próximo metadado assistant. Papel no prompt não seleciona modelo. Em troca, preservar arquivos, relatórios e estado da entrega; não interromper geração/ferramenta ativa.
+
+Catálogo consultado nesta revisão: 6 modelos OpenAI disponíveis e 23 Go. OpenAI: gpt-6.1-sol, gpt-6-luna, gpt-6-astra, gpt-5.6-terra, gpt-5.5 e gpt-5.3-codex-spark. Go inclui DeepSeek V4.1 Flash/Pro, GLM-5.3 Flash, MiniMax M3, Kimi K2.7 Code e outras opções. Availability/variants foram consultados; preços por token retornados pelo catálogo não comprovam pesos de consumo das assinaturas. Não há medição aqui de saldo/reset por modelo, nem multiplicadores inventados. Nenhuma configuração de crédito, overage ou serviço pago novo é autorizada.
+
+Ponto seguro R1 antes da troca do Orquestrador: autores encerraram escrita; revisão inicial Crivo identificou B1 (proxy intercepta módulos frontend), D1 (novo submit após saved/error) e D2 (moeda/apresentação); Trama relatou correções com 63 testes. Orquestrador confirmou backend padrão e candidato com 188 testes cada, manifests corretos e aplicação antiga preservada; primeiro E2E candidato falhou por UI branca (trace disponível); nova rodada e revisão final pendentes. Código permanece sem commit aguardando Human Verification. Checkpoint documental publicado: 0dd38de, upstream origin/rebuild/maestri. Logs e código não serão descartados na troca.
+
+O histórico abaixo registra seleções anteriores e não impõe mais modelos fixos nem proibição geral de especialistas OpenAI.
+
+## Terminais ativos e nomes funcionais
+
+Nomes padronizados por responsabilidade (sem apelidos): Orquestrador, Arquitetura, Qualidade, Backend, Frontend, Design UX/UI, Revisão de Código, Infraestrutura/CI.
+
+| Terminal | Modelo efetivo (verificado) | Responsabilidade |
+| --- | --- | --- |
+| Orquestrador | `opencode-go/deepseek-v4.1-flash#high` | Coordenação, integração, verificação das evidências, operações Git |
+| Arquitetura | `opencode-go/kimi-k2.7-code#default` | Requisitos, contratos, decisões técnicas, revisão de plano |
+| Qualidade | `opencode-go/deepseek-v4.1-flash#high` | Estratégia de testes, automação, execução e evidências |
+| Backend | `opencode-go/kimi-k2.7-code#default` | Domínio, APIs e persistência (futura, só se aprovada) |
+| Frontend | `opencode-go/minimax-m3#thinking` | Interface, acessibilidade, integração e direção visual do candidato |
+| Design UX/UI | `opencode-go/minimax-m3#thinking` | Revisão visual independente e crítica de experiência (read-only) |
+| Revisão de Código | `opencode-go/deepseek-v4-pro#high` | Revisão independente de código e aderência a requisitos |
+| Infraestrutura/CI | `opencode-go/glm-5.3-flash#high` | Ambiente, launcher e pipelines |
+
+Renomear no Maestri exige `recruit --replace` (reinicia o processo; a sessão é retomada pelo `--session`), portanto só é feito com o terminal ocioso. O terminal do Orquestrador aparece no canvas como `Maestro` e não pôde ser renomeado durante a sessão em execução, porque isso encerraria a própria sessão; renamá-lo exige ação na interface ou reinício autorizado.
+
 ## Estado em 2026-10-15
 
 O proprietário autorizou o Orquestrador a escolher os modelos e confirmou que os dois planos já estão configurados, sem consumo extra: ao atingir limites, aguardar reset. Retomada somente de revisão do planejamento; implementação ainda aguarda aprovação. Não recrutar especialistas OpenAI nem permitir recrutamento recursivo. Limite: dois especialistas. Nenhuma configuração de cobrança, crédito, credencial ou provider foi criada ou alterada.
