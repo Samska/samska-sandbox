@@ -4,7 +4,7 @@
 - Work date: 2026-10-15
 - Last reviewed: 2026-10-15
 - Work item: [SS-042](https://github.com/Samska/samska-sandbox/issues/77)
-- Pull request: None
+- Pull request: [#78](https://github.com/Samska/samska-sandbox/pull/78)
 - ADRs: [ADR 0007](../adr/0007-adopt-attempt-addressed-browser-recovery.md)
 - Canonical documentation: [Testing](../TESTING.md), [Local Development](../LOCAL-DEVELOPMENT.md), [Security](../SECURITY.md)
 
@@ -49,7 +49,7 @@ Cross-browser and mobile matrices, sharding, retry strategies, visual regression
 ## Reference
 
 - Issue: [SS-042](https://github.com/Samska/samska-sandbox/issues/77)
-- Pull request: None yet
+- Pull request: [#78](https://github.com/Samska/samska-sandbox/pull/78)
 - Relevant source files: `web/playwright.config.ts`, `web/e2e/global-setup.ts`, `web/e2e/fixtures.ts`, `web/e2e/first-order.spec.ts`, `web/tsconfig.e2e.json`, `.github/workflows/ci.yml`
 - ADRs: [ADR 0007](../adr/0007-adopt-attempt-addressed-browser-recovery.md)
 - Canonical documentation: [Testing](../TESTING.md), [Local Development](../LOCAL-DEVELOPMENT.md), [Security](../SECURITY.md)
