@@ -1,5 +1,7 @@
 # Reconstrução do zero — plano executivo revisado
 
+> **ENCERRADA por decisão do proprietário (2026-10-15).** Este documento é histórico; não é o plano ativo. O desenvolvimento voltou para a aplicação original no checkout `C:\Users\Samuel\Desktop\samska-sandbox`. A branch `rebuild/maestri` e sua worktree são preservadas como referência e nunca serão integradas a `main`. Detalhes do encerramento em [R1.md](R1.md#reconstruction-closed).
+
 ## Estado, intenção e limites
 
 **Revisão 2 — R1 approved / In Build — 2026-10-15.** O proprietário aprovou a direção do zero, stack/comportamentos e preparação diretamente necessária + R1 (criar/listar/detalhar Product novo), mantendo textos/idioma e UI funcional/acessível. Não aprovou cutover, remoção, R2+, persistência, auth, hosting, PR ou merge. O plano anterior `0fad2be` foi rejeitado e seu backlog P0–P7 substituído. [Diagnóstico](PLAN.md#diagnóstico-do-produto), [evidências](VERIFICATION.md) e histórico Git preservados. Trabalho ativo: [SS-043 / #80](https://github.com/Samska/samska-sandbox/issues/80), [handoff R1](R1.md).

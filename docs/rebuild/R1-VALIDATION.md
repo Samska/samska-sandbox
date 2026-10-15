@@ -1,5 +1,7 @@
 # R1 — local validation and execution evidence
 
+> **Historical record — reconstruction closed by owner decision.** R1 was functionally verified and then rejected at final acceptance; it is not integrated and will not be merged. See [R1.md](R1.md#reconstruction-closed).
+
 ## Current state
 
 Implementation is complete for the authorized R1 slice, verified and independently reviewed. Human Verification is Required and pending. R1 does not replace the current application or implement First Order.

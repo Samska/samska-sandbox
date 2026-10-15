@@ -4,6 +4,14 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## Reconstruction — closed by owner decision (2026-10-15)
+
+- The owner ended the reconstruction and returned development to the original application in `C:\Users\Samuel\Desktop\samska-sandbox`. **R1 is not approved for integration and will not be merged.**
+- Functional R1 behaviour was validated by the owner and every automated check passed (63 candidate component tests, 5/5 candidate browser tests, 29-pair WCAG AA gate, 9/9 launcher lifecycle, 188 backend tests per profile, plus the preserved application's 173 tests and 2/2 First Order E2E). Final acceptance was nonetheless rejected: the owner judged the improvement insufficient and the UX/UI inferior to the original. Passing tests are not acceptance, and the two records stay distinct.
+- Preserved as historical reference and never merged into `main`: branch `rebuild/maestri` (head `5ef39de`, pushed to `origin/rebuild/maestri`) and its worktree `C:\Users\Samuel\Desktop\samska-sandbox-rebuild`. Nothing was deleted. [R1 handoff](docs/rebuild/R1.md), [closed plan](docs/rebuild/RECONSTRUCTION.md), [parity matrix](docs/rebuild/PARITY.md), [visual direction](docs/rebuild/R1-VISUAL-DIRECTION.md) and [validation guide](docs/rebuild/R1-VALIDATION.md) are all historical.
+- Development continues on the original application: `main` at `ec92cd3`, in sync with `origin/main`, clean. ADR 0008 remains Proposed and unimplemented. No next capability is selected.
+- Next step: wait for the owner's next task on the original application; work happens on short-lived branches with PR/merge requiring explicit authorization.
+
 ## SS-043 — Reconstruction R1 — approved, in build (#80)
 
 - The owner approved the from-scratch direction, current stack/behaviors and only directly necessary preparation plus R1: new Product create/list/detail domain/API/UI, current English texts, functional accessibility, no broad redesign. [Issue #80](https://github.com/Samska/samska-sandbox/issues/80), [R1 handoff](docs/rebuild/R1.md), [frozen parity matrix](docs/rebuild/PARITY.md) and [executive plan](docs/rebuild/RECONSTRUCTION.md) are the active resume context. The reference is ec92cd3; implementation is not based on extracting old code.

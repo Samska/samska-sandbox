@@ -1,6 +1,6 @@
 # SS-043: A New Implementation Behind a Frozen Contract
 
-- Status: Draft — implementation and validation in progress
+- Status: Historical — reconstruction closed by owner decision; R1 not integrated
 - Work date: 2026-10-15
 - Last reviewed: 2026-10-15
 - Work item: [SS-043](https://github.com/Samska/samska-sandbox/issues/80)
