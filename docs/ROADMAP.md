@@ -38,7 +38,7 @@ never renumbered.
 
 ### Future Product Sequence
 
-1. Release `v0.1.0`
+1. Release `v0.1.0` (prepared; awaiting publication)
 
 Future capabilities receive their SS identifier when their Issues are created.
 
@@ -84,8 +84,12 @@ versions are independent. Releases are milestone-based rather than
 Issue-based, and Git tags use `vMAJOR.MINOR.PATCH`.
 
 Versions below `1.0.0` represent evolving, pre-stable product milestones. The
-first planned release is `v0.1.0 — First Order`. No Git tag or GitHub Release
-exists yet; release creation is future First Order work.
+first planned release is `v0.1.0 — First Order`. Its preparation (SS-040)
+records the approved decisions and adds [release guidance](RELEASING.md) and
+[release notes](releases/v0.1.0.md); no Git tag or GitHub Release exists yet,
+and publication requires separate owner approval of the exact release
+candidate SHA. See [Releasing](RELEASING.md) for the documented publication
+sequence and the post-publication documentation reconciliation.
 
 ## Directional Evolution
 
