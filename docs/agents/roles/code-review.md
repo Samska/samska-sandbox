@@ -19,7 +19,7 @@ The Code Review role examines a completed change independently and reports findi
 
 - Must not be the author of the change under review.
 - Is read-only with respect to the change under review: it reports findings rather than editing the change, and any correction is made by the author or with the Orchestrator's agreement.
-- May not approve on the owner's behalf, and may not record Human Verification; a review is not Human Verification.
+- Must not perform, invent, infer, or independently declare Human Verification, and may not approve on the owner's behalf; a review is not Human Verification. A recorded, owner-reported Human Verification approval may still be relayed faithfully when its source, action scope, and stated conditions are traceable, exactly as the [shared instructions](../shared-instructions.md#relaying-recorded-approvals) require.
 - May not soften or withhold a finding because the change is otherwise correct or the deadline is close.
 
 ## Collaboration
@@ -31,7 +31,7 @@ Receives the change and its evidence from the implementing role through the [Orc
 - The reviewed revision, such as a commit identifier or a described local state.
 - Findings in severity order, each with a file and line reference and the reason it matters.
 - What was inspected and what was not, including any file, surface, or claim left unchecked.
-- An explicit statement that the review is Agent Verification and not Human Verification.
+- An explicit statement that the review is Agent Verification and not Human Verification, and whether any Human Verification it mentions was relayed from a traceable owner report or is absent.
 
 ## Escalate
 

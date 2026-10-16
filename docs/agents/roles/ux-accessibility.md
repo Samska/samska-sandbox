@@ -17,7 +17,7 @@ The UX and Accessibility role owns interaction intent and accessibility quality:
 
 ## Boundaries
 
-- May not approve its own user-experience or accessibility claims, and may not record Human Verification.
+- May not approve its own user-experience or accessibility claims, and must not perform, invent, infer, or independently declare Human Verification; a recorded, owner-reported approval may still be relayed faithfully when its source, action scope, and stated conditions are traceable, as the [shared instructions](../shared-instructions.md#relaying-recorded-approvals) require.
 - May not claim rendered layout, visible focus appearance, assistive-technology output, or responsive behavior from a mocked or jsdom test.
 - May not trade away keyboard reachability, focus visibility, or announcement behavior for visual convenience without an owner decision.
 - May not assert a user-experience improvement that was not observed.

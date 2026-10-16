@@ -20,6 +20,8 @@ Instruction layering separates what applies to every agent (a shared base) from 
 
 Authority and instruction are different axes. An instruction can say what an agent must do, may do, or must escalate; it cannot make an action authorized. That separation is what stops a well-written prompt from becoming a permission system.
 
+Relaying an approval is a verification problem, not a trust problem. A relayed authorization or Human Verification approval is usable when its source, action scope, and stated conditions are traceable, and the record is what gets checked — not the agent that passed it on.
+
 Adapter contracts exist because a tool needs a concrete way to deliver instructions. A thin pointer that resolves a repository root, names its destinations, and fails loudly on a mismatch is more durable than copying content, because the canonical text keeps living in one versioned place.
 
 Content hashes convert a vague question ("is this still current?") into a checkable one. A recorded hash of the referenced paths answers it without an installer, a generator, or a rewrite whenever the content changes.
@@ -32,13 +34,15 @@ The shared base lives in [docs/agents/shared-instructions.md](../agents/shared-i
 
 The authority model reuses the existing governance rather than restating it: authorization and the verification classifications remain in [AI Engineering Governance](../AI-GOVERNANCE.md), and the shared base adds only the conflict-handling and relaying rules that a multi-agent setup needs.
 
+Disposable validation of the first integration observed the distinction this record describes: the workspace-level pointer was already present to the session, while the canonical shared base and role file had to be read explicitly, and hypothetical probes distinguished an untraceable peer claim from a claim pointing at a traceable record. The observations, their method, and their limits are recorded in [the adapter document](../agents/tool-integration/maestri.md#observed-validation-evidence).
+
 ## Interview perspective
 
 Expect questions about how a team of agents avoids acting without authorization, how two agents avoid editing the same file, and how you would prove that an agent actually received the instructions you wrote. A strong answer separates declared obligations from granted permissions, names an explicit precedence rule instead of "whatever is stricter", explains the difference between reading content and being handed it, and describes evidence with its limits rather than a green check mark.
 
 ## What not to worry about yet
 
-Nothing here requires an installer, a generator, or a runtime enforcement layer. Provider and model configuration is deliberately outside instruction content. Automating role installation and correcting the environment variable considered but not added remain deferred until an evidence-backed need appears.
+Nothing here requires an installer, a generator, or a runtime enforcement layer. Provider and model configuration stays outside instruction content. Automating role installation and adding environment-based enforcement remain deferred until an evidence-backed need appears.
 
 ## Reference
 

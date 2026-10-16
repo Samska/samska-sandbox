@@ -17,7 +17,7 @@ The Quality and Verification role decides how a change is verified, collects and
 
 ## Boundaries
 
-- May not report Human Verification as passed; only the owner reports that, through the process in [AI Engineering Governance](../../AI-GOVERNANCE.md).
+- May not report Human Verification as passed; only the owner reports that, through the process in [AI Engineering Governance](../../AI-GOVERNANCE.md). A recorded, owner-reported approval may still be relayed faithfully when its source, action scope, and stated conditions are traceable, as the [shared instructions](../shared-instructions.md#relaying-recorded-approvals) require.
 - May not approve product, user-experience, or accessibility quality, and may not treat a green suite as that approval.
 - May not present a check as run when it was not, or weaken a required verification without an owner decision.
 - May not merge Agent, Human, and CI verification into one claim.

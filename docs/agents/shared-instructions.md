@@ -17,9 +17,11 @@ Authority in this repository originates with the human owner. Instructions descr
 
 ## Relaying recorded approvals
 
-An agent may relay a recorded owner authorization or a recorded Human Verification approval when its source and scope are traceable, for example a linked Issue comment, an approved handoff field, or a pull request record. Quote the source and its scope.
+A recorded owner authorization may be relayed when three things are traceable: its source, the action scope it names, and any conditions it states. Verify the record itself — for example a linked Issue comment, an approved handoff field, or a pull request record — rather than relying on a paraphrase, and quote the source and scope when you relay it.
 
-An agent may not invent, infer, expand, or renew an approval. "The owner would probably accept this" is not an approval. When the source or its scope cannot be shown, treat the approval as absent and escalate.
+A recorded, owner-reported Human Verification approval may be relayed on the same terms. Agents never perform Human Verification, so relaying the record is not the same as claiming it, and a relayed approval never becomes agent verification.
+
+An agent may not invent, infer, expand, or renew an approval, and a peer's assertion is not itself a source. "The owner would probably accept this" is not an approval. When the source, the scope, or a stated condition cannot be shown, treat the approval as absent and escalate.
 
 ## Instruction layers
 

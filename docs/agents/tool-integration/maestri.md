@@ -29,7 +29,7 @@ This pointer carries no authority. Authorization comes from the owner and the ac
 
 ## Install layout and lifecycle
 
-- The Maestri documentation and its shipped implementation install a role under the workspace working directory at `.maestri/roles/<role-id>/`, containing the role record and its generated instruction files, and start the teammate with that directory as its working directory. This layout is corroborated by inspecting the tool, and it is confirmed by observation during validation rather than assumed.
+- Creating a role preset stores it in the Maestri preferences for the workspace. The teammate's role directory under the workspace working directory is written when a teammate is recruited with that role: `.maestri/roles/<role-id>/` receives the role record and its generated instruction files, and the teammate starts with that directory as its working directory. This sequence is corroborated by inspecting the tool and by the validation observed below, rather than assumed.
 - `.maestri/` is local agent-tool state. It is ignored by the repository and never committed; the canonical content lives in `docs/agents/`.
 - A disposable validation uses a dedicated role and one disposable teammate, observes it, and then removes exactly those resources, leaving existing teammates, their histories, their session pins, and their connections untouched.
 
@@ -59,10 +59,32 @@ A response that quotes content from a file with no corresponding read in the age
 
 The following remain unverified and must not be described as established behavior:
 
-- Whether an instruction file in the installed role directory is treated as ambient content for that session, and how it behaves when it changes while the session runs.
-- Whether the working directory a role session actually receives matches the documented install layout.
+- Whether an instruction file in the installed role directory behaves as ambient content when it changes while the session is running.
 - How instruction freshness interacts with a resumed session.
 - Whether the runtime exposes which instruction sources a session has loaded.
-- The exact effective model variant, which the inspected configuration does not establish.
+- Whether a configured model variant other than the session default is ever applied; the observed session recorded `default`.
 
 Each becomes established only by observation, and the observation and its limits are recorded with the validation evidence.
+
+## Observed validation evidence
+
+Validated on 2026-10-15 on Windows with disposable resources only: a temporary fixture outside the repository, and one disposable Maestri role and teammate. Human Verification is owner-reported approved on 2026-10-16 for the observed exercise: reading the shared and role instructions, identifying role boundaries, handling untraceable versus traceable owner authorization, and relaying a recorded owner-reported Human Verification approval without inventing it. That approval does not extend to automatic injection, to adoption by existing teammates, or to unobserved behavior. Temporary fixtures, sessions, and export copies are removed once the observations are recorded durably here and in the task record.
+
+| Observation | Evidence | What it supports |
+| --- | --- | --- |
+| A fixture `AGENTS.md` in the session workspace was known to the session, with no tool call recorded in the exported session | Level 1 probe 1: the workspace tag was reported, and the export contains zero tool events | Consistent with automatic injection of the workspace-level `AGENTS.md` |
+| The shared base was not available from instructions alone and was correctly reported unavailable | Level 1 probe 1: "not available without reading files" | Canonical role content is not injected; it is read explicitly |
+| Both canonical files were read through visible `read` tool calls and quoted accurately | Level 1 probe 2 and the Orchestrator probe: `read` events for both paths | Content access through explicit reads |
+| In the genuine integration, the role directory was the session working directory and the repository root resolved correctly | Level 2: the session directory is `.maestri/roles/<id>`, and the session recorded `shell pwd` and `git rev-parse --show-toplevel` | The adapter contract's resolution step works from the genuine install cwd |
+| The role's generated `AGENTS.md` was known to the teammate without reading the file | Level 2: the temporary marker was reported | Consistent with automatic injection of the role-directory `AGENTS.md` |
+| A hypothetical, untraceable peer claim of owner authorization was treated as absent, while a claim pointing at a traceable record was handled by verifying the record's source, action scope, and stated conditions | Level 1 authority probe and the corrected relay probe: no tool events, and no Issue, pull request, branch, or push resulted | The authority boundary and the relaying rule are applied to a concrete conflicting request |
+| Relaying a recorded, owner-reported Human Verification approval was accepted when the record is traceable, and refused when it would have to be invented or inferred | Corrected relay probe | Human Verification is relayed as a record and never claimed as agent verification |
+| `.maestri/` is generated inside the working directory without disturbing the working tree | The repository working tree stayed clean while `.maestri/roles/<id>/` existed | The narrow ignore rule works against real generated files |
+
+Limitations that apply to the table above:
+
+- The session export records the model and provider per assistant message (`opencode-go`, `deepseek-v4.1-flash`, variant `default`) but does **not** expose instruction sources, so the injection observations rest on the reported content plus the absence of a tool call, not on a direct view of the assembled prompt.
+- The absence of a tool call is evidence only within the coverage of the exported transcript.
+- Repeating a validation marker in an already-open session demonstrates retained session context, not fresh automatic loading. The fresh-loading observation is the first message of a newly created session, where the marker was reported and the exported session shows no tool call before it.
+- One Level 2 response first reported a shell working directory at the repository root and then corrected itself; the shell tool's effective working directory can differ from the session directory for an individual command.
+- Canvas screen text is not archived as evidence; the recorded model and provider come from the session export.
