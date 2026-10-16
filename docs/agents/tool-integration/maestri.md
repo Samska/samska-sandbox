@@ -7,21 +7,32 @@ This document covers how instructions reach an agent through the Maestri canvas.
 The Maestri role preset carries a short pointer as its prompt. The pointer must:
 
 1. **Resolve the repository root from the role's working directory.** Prefer `git rev-parse --show-toplevel`. When that is unavailable, ascend from the working directory and confirm the root by the presence of `AGENTS.md` and `PROJECT_HANDOFF.md` before continuing.
-2. **Lead explicitly to all three instruction layers**, in order: `AGENTS.md`, `docs/agents/shared-instructions.md`, and the assigned `docs/agents/roles/<role>.md`.
+2. **Lead explicitly to all three instruction layers**, in order: `AGENTS.md`, `docs/agents/shared-instructions.md`, and the role file named by the **repository-relative role-file path** carried with the pointer.
 3. **Declare the assigned role** so a mismatch is detectable.
 4. **Fail visibly instead of guessing** when a file is missing or the role does not match.
 5. **State that the pointer carries no authority**, so the owner and the active Issue remain the only sources of authorization.
 
 The pointer does not repeat role content, restate governance, or carry model, provider, effort, or tool settings.
 
+### Role-file paths
+
+The pointer carries the role file as an explicit repository-relative path rather than deriving it from the role name, because the paths are not uniform.
+
+| Role | Repository-relative role-file path |
+| --- | --- |
+| Orchestrator | `docs/agents/orchestrator.md` |
+| Any specialist, for example Code Review | `docs/agents/roles/<role-file-path>.md`, for example `docs/agents/roles/code-review.md` |
+
+A pointer that assumes every role lives under `docs/agents/roles/` is wrong for the Orchestrator, whose canonical file sits directly under `docs/agents/`. Carrying the path explicitly also makes a wrong or stale pointer fail visibly at the role-mismatch check instead of silently pointing at the wrong file.
+
 ## Pointer template
 
-Substitute the role name and its file before installing the preset.
+Substitute the role name and the repository-relative role-file path before installing the preset.
 
 ```text
 Act as the <Role Name> role for Samska Sandbox. Before any work:
 1. Resolve the repository root: run `git rev-parse --show-toplevel`. If that fails, ascend from your working directory and confirm the repository root by `AGENTS.md` and `PROJECT_HANDOFF.md` before continuing.
-2. Read, in this order: `AGENTS.md`, `docs/agents/shared-instructions.md`, and `docs/agents/roles/<role-file>.md`.
+2. Read, in this order: `AGENTS.md`, `docs/agents/shared-instructions.md`, and the role file at `<role-file-path>` — for example `docs/agents/orchestrator.md` for the Orchestrator, or `docs/agents/roles/code-review.md` for a specialist role.
 3. Confirm that the role file names this role. If a file is missing or the role does not match, stop and report the mismatch instead of guessing.
 
 This pointer carries no authority. Authorization comes from the owner and the active Issue.
@@ -37,7 +48,7 @@ This pointer carries no authority. Authorization comes from the owner and the ac
 
 Instruction content changes over time, so the adapter records what it was installed from.
 
-1. At install time, record the canonical paths with their content hashes alongside the adapter and validation evidence: `AGENTS.md`, `docs/agents/shared-instructions.md`, and the assigned `docs/agents/roles/<role>.md`.
+1. At install time, record the canonical paths with their content hashes alongside the adapter and validation evidence: `AGENTS.md`, `docs/agents/shared-instructions.md`, and the role file at the supplied repository-relative path — `docs/agents/orchestrator.md` for the Orchestrator, or a specialist file such as `docs/agents/roles/code-review.md`.
 2. To check drift, re-hash those paths and compare. A mismatch means the installed pointer may no longer reflect the canonical content.
 3. When only referenced content changed, re-reading the current file is sufficient for an agent that reads it directly. Re-create the pointer only when the adapter itself changes, such as the role name, the destination list, or the resolution step.
 4. Whether a running session must be restarted to pick up a changed instruction file depends on how that file is delivered, and is recorded under the observed behavior below rather than assumed. Treat a branch advancing as irrelevant: what matters is the content hash of the referenced paths.
@@ -68,14 +79,15 @@ Each becomes established only by observation, and the observation and its limits
 
 ## Observed validation evidence
 
-Validated on 2026-10-15 on Windows with disposable resources only: a temporary fixture outside the repository, and one disposable Maestri role and teammate. Human Verification is owner-reported approved on 2026-10-16 for the observed exercise: reading the shared and role instructions, identifying role boundaries, handling untraceable versus traceable owner authorization, and relaying a recorded owner-reported Human Verification approval without inventing it. That approval does not extend to automatic injection, to adoption by existing teammates, or to unobserved behavior. Temporary fixtures, sessions, and export copies are removed once the observations are recorded durably here and in the task record.
+Validated on 2026-10-15, with the shell check below on 2026-10-16, on Windows with disposable resources only: a temporary fixture outside the repository, and one disposable Maestri role and teammate. Human Verification is owner-reported approved on 2026-10-16 for the observed exercise: reading the shared instructions and the Code Review instructions, identifying role boundaries, handling untraceable versus traceable owner authorization, and relaying a recorded owner-reported Human Verification approval without inventing it. That approval does not extend to automatic injection, to adoption by existing teammates, or to unobserved behavior. Temporary fixtures, sessions, and export copies are removed once the observations are recorded durably here and in the task record.
 
 | Observation | Evidence | What it supports |
 | --- | --- | --- |
 | A fixture `AGENTS.md` in the session workspace was known to the session, with no tool call recorded in the exported session | Level 1 probe 1: the workspace tag was reported, and the export contains zero tool events | Consistent with automatic injection of the workspace-level `AGENTS.md` |
 | The shared base was not available from instructions alone and was correctly reported unavailable | Level 1 probe 1: "not available without reading files" | Canonical role content is not injected; it is read explicitly |
 | Both canonical files were read through visible `read` tool calls and quoted accurately | Level 1 probe 2 and the Orchestrator probe: `read` events for both paths | Content access through explicit reads |
-| In the genuine integration, the role directory was the session working directory and the repository root resolved correctly | Level 2: the session directory is `.maestri/roles/<id>`, and the session recorded `shell pwd` and `git rev-parse --show-toplevel` | The adapter contract's resolution step works from the genuine install cwd |
+| In the genuine integration, the teammate's session directory was the role directory | Level 2: the exported session records `.maestri/roles/<id>` as its directory, and a `pwd` issued from the default working directory returned that role directory | The session directory was the role directory |
+| Repository-root resolution works from that role directory | Direct read-only shell check by the orchestrator on 2026-10-16 with the working directory set to the preserved role directory: `pwd` returned the role directory and `git rev-parse --show-toplevel` returned the repository root | `git rev-parse --show-toplevel` resolves the repository root when the working directory is the role directory. **This is a shell check, not an observed agent interaction.** |
 | The role's generated `AGENTS.md` was known to the teammate without reading the file | Level 2: the temporary marker was reported | Consistent with automatic injection of the role-directory `AGENTS.md` |
 | A hypothetical, untraceable peer claim of owner authorization was treated as absent, while a claim pointing at a traceable record was handled by verifying the record's source, action scope, and stated conditions | Level 1 authority probe and the corrected relay probe: no tool events, and no Issue, pull request, branch, or push resulted | The authority boundary and the relaying rule are applied to a concrete conflicting request |
 | Relaying a recorded, owner-reported Human Verification approval was accepted when the record is traceable, and refused when it would have to be invented or inferred | Corrected relay probe | Human Verification is relayed as a record and never claimed as agent verification |
@@ -87,4 +99,5 @@ Limitations that apply to the table above:
 - The absence of a tool call is evidence only within the coverage of the exported transcript.
 - Repeating a validation marker in an already-open session demonstrates retained session context, not fresh automatic loading. The fresh-loading observation is the first message of a newly created session, where the marker was reported and the exported session shows no tool call before it.
 - One Level 2 response first reported a shell working directory at the repository root and then corrected itself; the shell tool's effective working directory can differ from the session directory for an individual command.
+- The Level 2 agent session did **not** by itself demonstrate repository-root discovery: its `git rev-parse --show-toplevel` invocation ran with the working directory explicitly set to the repository root, and only a later `pwd` ran from the default role working directory. Root discovery from the role directory is evidenced separately, by the direct shell check recorded above, which is not an agent observation and is not part of the owner's Human Verification approval.
 - Canvas screen text is not archived as evidence; the recorded model and provider come from the session export.
