@@ -24,6 +24,10 @@ Follow these rules:
 
 Read the relevant detailed guidance in [docs/AI-GOVERNANCE.md](docs/AI-GOVERNANCE.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/architecture/principles.md](docs/architecture/principles.md), [docs/TESTING.md](docs/TESTING.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/learning/README.md](docs/learning/README.md), and [docs/adr/README.md](docs/adr/README.md).
 
+## Agent Role Instructions
+
+This repository version-controls the tool-agnostic instructions for orchestrating agents and specialized roles under [docs/agents/](docs/agents/README.md). Every agent follows the [shared instructions](docs/agents/shared-instructions.md), then its assigned [role](docs/agents/README.md#role-catalogue), then the active Issue, in that order. Roles add responsibilities and boundaries; they never grant authorization.
+
 ## Session Resume
 
 For a new or resumed work session, use the active Issue and any pull request as the working handoff; do not require the owner to copy their status into a new prompt.
