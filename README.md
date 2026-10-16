@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; SS-044 Market Product-name search (#81) complete and merged; SS-045 agent role instructions (#84) in Build
-- **Next planned work:** SS-045 — versioned, tool-agnostic agent role instructions for orchestrators and specialized agents, with tool-specific integration kept separate — is in Build; the next product capability remains unselected and receives its SS identifier when its Issue is created, and the BDD Human Verification pilot remains a separate future evaluation (SS-038)
+- **Current stage:** `v0.1.0` released; SS-044 Market Product-name search (#81) complete and merged; SS-045 agent role instructions (#84) complete and merged
+- **Next planned work:** the next product capability remains unselected and receives its SS identifier when its Issue is created, and the BDD Human Verification pilot remains a separate future evaluation (SS-038)
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -179,9 +179,10 @@ a local, case- and accent-insensitive substring filter on `Product.name`;
 term lives in `Catalog` while mounted, never reaches the URL, history,
 storage, logs, or API; Admin keeps its accent-sensitive filter by decision.
 The selected next engineering task is tool-agnostic, versioned agent role
-instructions with tool-specific integration kept separate. SS-045 (#84) is in
-Build: a shared instruction base, an Orchestrator role, and specialized role
-files under `docs/agents/`, with tool-specific integration kept separate. The
+instructions with tool-specific integration kept separate. SS-045 (#84) is
+complete and merged through PR #85 (squash `54b9afc`, merged 2026-10-16): a
+shared instruction base, an Orchestrator role, and specialized role files under
+`docs/agents/`, with tool-specific integration kept separate. The
 next product capability remains unselected and no identifier is reserved.
 SS-038 remains
 a separate
