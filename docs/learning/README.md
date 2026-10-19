@@ -61,6 +61,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-041-dependency-remediation.md](ss-041-dependency-remediation.md) | Lockfile-only dependency remediation (`undici`, `source-map-js`), minimum patched version versus latest, integrity validation with `npm ci`, and alert-database state versus installed version. |
 | [ss-042-browser-regression-suite.md](ss-042-browser-regression-suite.md) | Real-browser E2E boundaries, isolation against shared process-local state, observing unsubmitted transactions, owned lifecycle and teardown evidence, and Windows termination limits. |
 | [ss-045-agent-role-instructions.md](ss-045-agent-role-instructions.md) | Instruction layering, authority versus permission, evidence provenance, adapter drift detection, and bounded validation of tool integration. |
+| [ss-046-agent-instruction-adoption.md](ss-046-agent-instruction-adoption.md) | Delivery versus adoption, committed-hash scope, bounded hypothetical probes, and keeping validation-only agents separate. |
 
 Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 
