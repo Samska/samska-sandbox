@@ -42,7 +42,7 @@ This pointer carries no authority. Authorization comes from the owner and the ac
 
 - Creating a role preset stores it in the Maestri preferences for the workspace. The teammate's role directory under the workspace working directory is written when a teammate is recruited with that role: `.maestri/roles/<role-id>/` receives the role record and its generated instruction files, and the teammate starts with that directory as its working directory. This sequence is corroborated by inspecting the tool and by the validation observed below, rather than assumed.
 - `.maestri/` is local agent-tool state. It is ignored by the repository and never committed; the canonical content lives in `docs/agents/`.
-- A disposable validation uses a dedicated role and one disposable teammate, observes it, and then removes exactly those resources, leaving existing teammates, their histories, their session pins, and their connections untouched.
+- A disposable validation uses a dedicated role and a temporary teammate. After validation, follow [Temporary agent lifecycle](#temporary-agent-lifecycle) for evidence retention, dismissal, and preservation limits; deletion of role artifacts or other records requires separate owner authorization.
 
 ## Temporary agent lifecycle
 
