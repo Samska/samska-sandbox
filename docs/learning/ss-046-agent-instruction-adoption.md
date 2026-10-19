@@ -18,7 +18,7 @@
 
 Instruction layering separates repository-wide rules, shared agent obligations, role-specific boundaries, and task authorization. A role pointer is only a delivery mechanism: it names the canonical files and the assigned role. It does not copy the role content and it never grants permission.
 
-Adoption is weaker than delivery and stronger than a self-report. An agent has adopted a role instruction only when observable evidence shows that it accessed the content, interpreted the relevant boundary correctly, and behaved consistently with that boundary in a controlled situation. A single probe cannot establish that every instruction will be applied in every future task.
+Delivery alone does not establish adoption. Bounded adoption evidence requires observable content access, correct interpretation, and behavior consistent with the relevant instruction. A single probe cannot establish that every instruction will be applied in every future task.
 
 A committed hash answers a narrow question: was this exact version of the file part of the evidence? It does not show that the agent read the content, understood it, or followed it. The working tree may differ from the committed blob because of line-ending normalization, so the committed form is the version baseline.
 
@@ -30,7 +30,7 @@ A validation-only agent is a test participant kept separate from functional role
 
 The canonical instructions live in [`AGENTS.md`](../../AGENTS.md) and [`docs/agents/`](../agents/README.md). Role pointers and the Maestri wiring are documented separately in [`docs/agents/tool-integration/maestri.md`](../agents/tool-integration/maestri.md). Runtime model and effort choices are recorded in [`PROJECT_HANDOFF.md`](../../PROJECT_HANDOFF.md), not in role content.
 
-[SS-046 (#87)](https://github.com/Samska/samska-sandbox/issues/87) applies this model: it checks the existing functional agents with bounded hypothetical scenarios, creates canonical role presets for future agents, and runs one separate pointer validation, recording the result and any failure rather than assuming success. The Issue records the difference between a passed probe and full compliance, and preserves failures and pending checks instead of retrying or replacing sessions automatically.
+[SS-046 (#87)](https://github.com/Samska/samska-sandbox/issues/87) applies this model: it checks the existing functional agents with bounded hypothetical scenarios, creates canonical role presets for future agents, and runs a pointer validation with an initial failed attempt and a corrected attempt, recording the result and any failure rather than assuming success. The Issue records the difference between a passed probe and full compliance, and preserves failures and pending checks instead of retrying or replacing sessions automatically.
 
 ### Observed launch-path result
 
