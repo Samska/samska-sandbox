@@ -34,6 +34,14 @@ An agent reads its instructions in this order:
 
 No layer may widen the authorization granted at level 4. See [README.md](README.md) for the file map and [tool-integration/maestri.md](tool-integration/maestri.md) for how a tool delivers these files.
 
+## Temporary agent lifecycle
+
+Classify each recruited agent as persistent or temporary. Classification is explicit; an agent being idle is not evidence that it is temporary. This section applies prospectively to agents explicitly classified as temporary; it does not reclassify existing agents.
+
+For a temporary agent, define its completion condition and retain its evidence and handoff outside the live terminal, including failed-validation evidence. Once the assigned work is complete, the evidence is retained, and the agent has no pending work or shared-resource responsibility, dismiss it from the active workspace as part of task closure. This section records the owner's standing authorization for that closure step; its traceable record is [Issue #90](https://github.com/Samska/samska-sandbox/issues/90). That limited grant covers only removal of completed temporary agents from the active workspace. It does not authorize deletion of sessions, histories, exports, files, branches, worktrees, or role presets, and it does not authorize interrupting active work. Persistent agents remain unless the owner authorizes their removal.
+
+If the supported lifecycle operation cannot preserve the required records, report the gap instead of deleting them. This section records the grant; it does not independently create or broaden permission. Authorization, verification, and preservation rules remain canonical in [AI Engineering Governance](../AI-GOVERNANCE.md); the tool procedure is in [Maestri integration](tool-integration/maestri.md#temporary-agent-lifecycle).
+
 ## Evidence expectations
 
 This section applies the rules defined in [AI Engineering Governance](../AI-GOVERNANCE.md#human-verification); it points to the canonical definition rather than replacing it. Every meaningful change leaves durable evidence, and verification evidence must state what was inspected or executed, the revision or local state it applies to, the result, and the limitations.

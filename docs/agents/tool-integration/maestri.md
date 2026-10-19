@@ -42,7 +42,23 @@ This pointer carries no authority. Authorization comes from the owner and the ac
 
 - Creating a role preset stores it in the Maestri preferences for the workspace. The teammate's role directory under the workspace working directory is written when a teammate is recruited with that role: `.maestri/roles/<role-id>/` receives the role record and its generated instruction files, and the teammate starts with that directory as its working directory. This sequence is corroborated by inspecting the tool and by the validation observed below, rather than assumed.
 - `.maestri/` is local agent-tool state. It is ignored by the repository and never committed; the canonical content lives in `docs/agents/`.
-- A disposable validation uses a dedicated role and one disposable teammate, observes it, and then removes exactly those resources, leaving existing teammates, their histories, their session pins, and their connections untouched.
+- A disposable validation uses a dedicated role and a temporary teammate. After validation, follow [Temporary agent lifecycle](#temporary-agent-lifecycle) for evidence retention, dismissal, and preservation limits; deletion of role artifacts or other records requires separate owner authorization.
+
+## Temporary agent lifecycle
+
+Follow the classification and standing-authorization boundary in the [shared instructions](../shared-instructions.md#temporary-agent-lifecycle). This section adds only the Maestri procedure.
+
+No auto-dismiss or scheduled-cleanup setting was found in the inspected Maestri preferences; dismissal is an Orchestrator-executed closure step, not native automatic enforcement.
+
+Before dismissing an explicitly temporary teammate:
+
+1. Confirm its assigned work is complete, it is idle, and it has no pending work or shared-resource responsibility.
+2. Retain evidence and handoff outside the live terminal. Export the OpenCode session with `opencode session export <sessionID> > <path>`, verify the file exists and is non-empty, and record the path, Issue/PR links, and failed-validation evidence where applicable.
+3. Inspect the supported behavior: `maestri dismiss "<Name>"` stops the terminal and removes its node and connections. The observed behavior preserves the OpenCode session and message history, the role preset, and the generated role directory; the session exports created before dismissal remain intact. Stop if a required record would be removed.
+4. Run `maestri dismiss "<Name>"`, then verify the teammate is absent from `maestri list`, the OpenCode session still exists with unchanged history, the role preset and generated role directory remain, and the pre-dismissal exports are still present.
+5. Record the dismissal and evidence location in the task handoff. The standing-authorization and preservation boundary remain in the shared instructions.
+
+Observed on 2026-10-19: dismissing `SS-046 Probe` and `SS-046 Probe 2` removed both teammates from `maestri list`; their OpenCode sessions remained with 10 and 6 messages, the `Adoption Probe` role preset and its generated role directory remained, and the pre-dismissal session exports remained in the evidence folder. The evidence was retained outside the repository under the OpenCode data directory. The canvas node/connection removal rests on the documented `maestri dismiss` behavior and the post-dismiss `maestri list`; the canvas graph itself was not directly inspected. No automatic cleanup setting was present.
 
 ## Freshness and drift
 
