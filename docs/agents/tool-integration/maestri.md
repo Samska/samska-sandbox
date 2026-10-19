@@ -72,7 +72,7 @@ The following remain unverified and must not be described as established behavio
 
 - Whether an instruction file in the installed role directory behaves as ambient content when it changes while the session is running.
 - How instruction freshness interacts with a resumed session.
-- Whether the runtime exposes which instruction sources a session has loaded.
+- Whether the runtime exposes which instruction sources a session has loaded. Instruction-change notices expose source keys such as `core/instructions` and `core/date`; they do not identify which repository files were loaded or expose the assembled prompt.
 - Whether a configured model variant other than the session default is ever applied; the observed session recorded `default`.
 
 Each becomes established only by observation, and the observation and its limits are recorded with the validation evidence.
@@ -101,3 +101,9 @@ Limitations that apply to the table above:
 - One Level 2 response first reported a shell working directory at the repository root and then corrected itself; the shell tool's effective working directory can differ from the session directory for an individual command.
 - The Level 2 agent session did **not** by itself demonstrate repository-root discovery: its `git rev-parse --show-toplevel` invocation ran with the working directory explicitly set to the repository root, and only a later `pwd` ran from the default role working directory. Root discovery from the role directory is evidenced separately, by the direct shell check recorded above, which is not an agent observation and is not part of the owner's Human Verification approval.
 - Canvas screen text is not archived as evidence; the recorded model and provider come from the session export.
+
+### SS-046 pointer-launch observation (2026-10-19)
+
+- A session pre-created in the repository root and attached with `opencode --session` did not receive the generated role-directory prompt; the role directory's `AGENTS.md` was bypassed.
+- A role-enabled recruit started in `.maestri/roles/<id>/` received the Code Review pointer, read the three canonical files, and matched the committed hashes. The model/variant was selected before the first inference and verified in session metadata.
+- This is one bounded observation; it does not establish universal role delivery or full instruction compliance.

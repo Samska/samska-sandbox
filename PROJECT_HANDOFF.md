@@ -25,8 +25,8 @@ Update rule: this snapshot must be updated in the same change when project state
 ## Agent Runtime (provisional)
 
 - OpenCode Go is the exclusive model provider for this project's agent sessions. ChatGPT/OpenAI subscription-backed models are not used in agent sessions, and an OpenAI-pinned historical session must have a Go model selected before it is resumed.
-- Provisionally, the orchestrator and the quality specialist use DeepSeek V4.1 Flash at the `high` variant. Escalation stays within Go and only when a concrete task warrants it; routine pre-merge checks do not trigger escalation. This is a provisional operating choice, not a benchmarked optimum.
-- Configuration does not currently enforce this constraint. Technical provider enforcement is a future evaluation, not an approved implementation requirement.
+- Every execution agent uses `opencode-go/deepseek-v4.1-flash` with variant `max`. Current sessions are pinned to this selection.
+- The normal Maestri specialist-launch path may create the session with an explicit model payload or create it from the selected model at first inference. The launch procedure must set the same model/variant before the first turn and verify the session metadata; the root default does not retain a variant on its own. OpenCode defaults and per-agent configuration select the same model/variant for future sessions but do not by themselves guarantee it on every launch path. Automatic enforcement remains a future evaluation, not an approved implementation requirement.
 
 ## SS-042 — Minimal real-browser First Order regression suite (#77)
 
