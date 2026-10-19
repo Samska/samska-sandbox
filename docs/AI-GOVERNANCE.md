@@ -78,6 +78,8 @@ The repository [pull request template](../.github/pull_request_template.md) prov
 
 [PROJECT_HANDOFF.md](../PROJECT_HANDOFF.md) is one concise project-level resume snapshot, not a per-Issue work log or conversation archive. It records current active work and recent durable completed work, and it is updated in the same change when project state, durable decisions, active work, or the next step changes. It does not contain the full history of every Issue, and transient local branch or working-tree details are not durable project state.
 
+This same-change rule includes completion documentation. Include the necessary project-state, outcome, limitation, and next-step updates in the Issue and the task pull request, updating `README.md`, `docs/ROADMAP.md`, and `PROJECT_HANDOFF.md` only where their content is affected. Facts that exist only after merge — the squash commit, final merged state, Issue closure, and branch outcome — belong in the existing Issue or pull request record, with a link to the merged request where that suffices. A separate reconciliation pull request is not a routine requirement; use one only when a concrete remaining documentation gap requires a repository change.
+
 A resuming session follows the procedure in [AGENTS.md](../AGENTS.md#session-resume).
 
 ## Architecture and Dependencies

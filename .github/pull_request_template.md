@@ -34,4 +34,6 @@ governance for the canonical protocol.
 
 ## PROJECT_HANDOFF update
 
+<!-- State whether PROJECT_HANDOFF.md, README.md, or docs/ROADMAP.md are affected and whether their completion-ready updates are included in this PR, per the same-change rule in docs/AI-GOVERNANCE.md#project_handoffmd. Record merge-only facts in this PR or the Issue after merge; a separate reconciliation PR is not routine. -->
+
 ## Local Environment Changes

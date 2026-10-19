@@ -10,7 +10,7 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; SS-044 Market Product-name search (#81) complete and merged; SS-045 agent role instructions (#84) complete and merged
+- **Current stage:** `v0.1.0` released; SS-044 Market Product-name search (#81) complete and merged; SS-045 agent role instructions (#84) complete and merged; SS-046 agent-instruction adoption and delivery validation (#87) complete and merged
 - **Next planned work:** the next product capability remains unselected and receives its SS identifier when its Issue is created, and the BDD Human Verification pilot remains a separate future evaluation (SS-038)
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
@@ -182,8 +182,10 @@ The selected next engineering task is tool-agnostic, versioned agent role
 instructions with tool-specific integration kept separate. SS-045 (#84) is
 complete and merged through PR #85 (squash `54b9afc`, merged 2026-10-16): a
 shared instruction base, an Orchestrator role, and specialized role files under
-`docs/agents/`, with tool-specific integration kept separate. The
-next product capability remains unselected and no identifier is reserved.
+`docs/agents/`, with tool-specific integration kept separate. SS-046 (#87) —
+versioned instruction adoption and delivery validation — is complete and merged
+through PR #88 (squash `099ed1c`, merged 2026-10-19). The next product
+capability remains unselected and no identifier is reserved.
 SS-038 remains
 a separate
 future evaluation and is not part of SS-042. Authentication and authorization
