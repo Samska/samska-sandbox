@@ -1,6 +1,6 @@
 # Restoration of Official Agent Tooling (2026-10-23)
 
-The owner superseded the previous compatibility adaptations and authorized restoring Ponytail, Graphify, and Agent Skills as published. This record lists what was removed, what was restored, and which project text is superseded. It is a local restoration record, not an Issue or pull request.
+The owner superseded the previous compatibility adaptations and authorized restoring Ponytail, Graphify, and Agent Skills as published. This record lists what was removed, what was restored, and which project text is superseded. It is tracked by [Issue #92 (SS-048)](https://github.com/Samska/samska-sandbox/issues/92); the pull request is opened from `chore/agent-tooling-official-restore`.
 
 ## Recoverable pre-change state
 

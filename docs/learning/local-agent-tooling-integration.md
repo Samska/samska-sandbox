@@ -3,8 +3,8 @@
 - Status: Active
 - Work date: 2026-10-23
 - Last reviewed: 2026-10-23
-- Work item: None. This was an owner-authorized local tooling task; GitHub Issue creation was not authorized, so no `SS-*` identifier was allocated and no identifier is invented.
-- Pull request: None
+- Work item: [SS-048 / Issue #92](https://github.com/Samska/samska-sandbox/issues/92). The Issue was created after the implementation to track the already-completed work; it does not imply earlier authorization or tracking.
+- Pull request: Opened from `chore/agent-tooling-official-restore`; see [Issue #92](https://github.com/Samska/samska-sandbox/issues/92) for the link.
 - ADRs: None
 - Canonical documentation: [Tool integration records](../agents/tool-integration/README.md), [Restoration record](../agents/tool-integration/restoration-2026-10-23.md)
 
@@ -50,8 +50,8 @@ A strong answer distinguishes *vendor fidelity* from *local compatibility*. It c
 
 ## Reference
 
-- Issue: None
-- Pull request: None
+- Issue: [SS-048 / Issue #92](https://github.com/Samska/samska-sandbox/issues/92)
+- Pull request: Opened from `chore/agent-tooling-official-restore`; see Issue #92 for the link.
 - Relevant source files: [`.opencode/opencode.json`](../../.opencode/opencode.json), [`.opencode/plugins/graphify.js`](../../.opencode/plugins/graphify.js), [`.graphifyignore`](../../.graphifyignore), [`.markdownlintignore`](../../.markdownlintignore)
 - ADRs: None
 - Canonical documentation: [Tool integration records](../agents/tool-integration/README.md), [Restoration record](../agents/tool-integration/restoration-2026-10-23.md)
