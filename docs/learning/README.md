@@ -63,7 +63,6 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-045-agent-role-instructions.md](ss-045-agent-role-instructions.md) | Instruction layering, authority versus permission, evidence provenance, adapter drift detection, and bounded validation of tool integration. |
 | [ss-046-agent-instruction-adoption.md](ss-046-agent-instruction-adoption.md) | Delivery versus adoption, committed-hash scope, bounded hypothetical probes, and keeping validation-only agents separate. |
 | [ss-047-temporary-agent-lifecycle.md](ss-047-temporary-agent-lifecycle.md) | Explicit persistent/temporary classification, evidence retention before dismissal, dismissal versus deletion, and procedural versus automatic cleanup. |
-| [local-agent-tooling-integration.md](local-agent-tooling-integration.md) | Upstream fidelity versus local adaptation, restoration provenance, configuration versus modification, and reporting unauthorized paths. Tracked by [SS-048 / Issue #92](https://github.com/Samska/samska-sandbox/issues/92). |
 
 Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 

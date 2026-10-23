@@ -2,7 +2,7 @@
 
 This directory holds the repository's versioned, tool-agnostic agent instructions. It defines how the Orchestrator and specialized agents work in Samska Sandbox: what each role owns, where its boundaries are, how agents collaborate, and what evidence is expected.
 
-The content is deliberately independent of any agent tool, model, provider, or reasoning setting. Tool wiring lives separately under [tool-integration/](tool-integration/README.md) and never changes a role's responsibilities.
+The content is deliberately independent of any agent tool, model, provider, or reasoning setting. Tool wiring lives separately in [tool-integration/maestri.md](tool-integration/maestri.md) and never changes a role's responsibilities.
 
 ## Relation to existing governance
 
