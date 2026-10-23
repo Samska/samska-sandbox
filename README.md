@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; SS-044 Market Product-name search (#81) complete and merged; SS-045 agent role instructions (#84) complete and merged; SS-046 agent-instruction adoption and delivery validation (#87) complete and merged
-- **Next planned work:** the next product capability remains unselected and receives its SS identifier when its Issue is created, and the BDD Human Verification pilot remains a separate future evaluation (SS-038)
+- **Current stage:** `v0.1.0` released; SS-044 Market Product-name search (#81) complete and merged; SS-045 agent role instructions (#84) complete and merged; SS-046 agent-instruction adoption and delivery validation (#87) complete and merged; SS-038 Human Verification pilot agent-executed; owner retained concise scenarios as optional practice; PR pending
+- **Next planned work:** the next product capability remains unselected and receives its SS identifier when its Issue is created
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -185,11 +185,11 @@ shared instruction base, an Orchestrator role, and specialized role files under
 `docs/agents/`, with tool-specific integration kept separate. SS-046 (#87) —
 versioned instruction adoption and delivery validation — is complete and merged
 through PR #88 (squash `099ed1c`, merged 2026-10-19). The next product
-capability remains unselected and no identifier is reserved.
-SS-038 remains
-a separate
-future evaluation and is not part of SS-042. Authentication and authorization
-remain deferred until after the local MVP but are mandatory before any hosted
+capability remains unselected and no identifier is reserved. The SS-038 Human
+Verification pilot retained concise scenarios as an optional practice for
+relevant flows; its documentation-only PR #94 is in review; it is not part of
+SS-042. Authentication and authorization remain deferred until after the
+local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary,
 and the simulated-payment endpoints are unauthenticated and local-only. Future
 capabilities receive an SS identifier only when their GitHub Issue is created;
