@@ -1,0 +1,7 @@
+# Keep vendored third-party agent Markdown out of the repository prose lint.
+# The base Markdown rules remain in .markdownlint.yaml; repository-authored
+# documentation is still linted in full.
+ignores:
+  - ".opencode/skills/**"
+  - ".opencode/references/**"
+  - "graphify-out/**"

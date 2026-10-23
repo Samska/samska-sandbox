@@ -31,7 +31,7 @@ Ponytail and the Agent Skills pack are project-local. Graphify uses the author's
 
 ## Lint and provenance
 
-Vendored third-party Markdown under `.opencode/skills/` and `.opencode/references/` is excluded from the repository prose lint by `.markdownlintignore`; repository-authored documentation remains linted. The installed upstream content is unedited; the Graphify plugin and version stamp have formatting-only normalizations recorded in [graphify.md](graphify.md). Each record records the exact release or revision. Upstream license texts and the Graphify NOTICE are under `.opencode/licenses/`.
+Vendored third-party Markdown under `.opencode/skills/` and `.opencode/references/` is excluded from the repository prose lint by `.markdownlint-cli2.yaml`; repository-authored documentation remains linted. The installed upstream content is unedited; the Graphify plugin and version stamp have formatting-only normalizations recorded in [graphify.md](graphify.md). Each record records the exact release or revision. Upstream license texts and the Graphify NOTICE are under `.opencode/licenses/`.
 
 ## Human Verification
 

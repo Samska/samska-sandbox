@@ -52,6 +52,6 @@ A strong answer distinguishes *vendor fidelity* from *local compatibility*. It c
 
 - Issue: [SS-048 / Issue #92](https://github.com/Samska/samska-sandbox/issues/92)
 - Pull request: Opened from `chore/agent-tooling-official-restore`; see Issue #92 for the link.
-- Relevant source files: [`.opencode/opencode.json`](../../.opencode/opencode.json), [`.opencode/plugins/graphify.js`](../../.opencode/plugins/graphify.js), [`.graphifyignore`](../../.graphifyignore), [`.markdownlintignore`](../../.markdownlintignore)
+- Relevant source files: [`.opencode/opencode.json`](../../.opencode/opencode.json), [`.opencode/plugins/graphify.js`](../../.opencode/plugins/graphify.js), [`.graphifyignore`](../../.graphifyignore), [`.markdownlint-cli2.yaml`](../../.markdownlint-cli2.yaml)
 - ADRs: None
 - Canonical documentation: [Tool integration records](../agents/tool-integration/README.md), [Restoration record](../agents/tool-integration/restoration-2026-10-23.md)

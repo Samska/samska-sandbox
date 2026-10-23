@@ -1,8 +1,0 @@
-# Vendored third-party agent content is installed from pinned upstream releases.
-# Its content is not edited; the Graphify plugin and version stamp have formatting-only
-# normalizations recorded in docs/agents/tool-integration/graphify.md. These files are
-# not repository-authored prose and are not edited to satisfy repository prose style.
-# Repository-authored Markdown remains linted in full.
-.opencode/skills/
-.opencode/references/
-graphify-out/

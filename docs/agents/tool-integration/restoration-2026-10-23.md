@@ -35,7 +35,7 @@ No standalone wrapper script existed. The previous custom behavior was embedded 
 | `.opencode/skills/idea-refine/SKILL.md` | Installed script path and owner-confirmation note added | Restored to upstream content |
 | `AGENTS.md` | Custom `## Local Agent Tooling` section and a replacement graphify block | Custom section removed; official `## graphify` block installed |
 | `docs/agents/tool-integration/*.md` | Compatibility precedence tables, patch lists, and “local patch” provenance claims | Rewritten to describe the official installation and its dependencies |
-| `.markdownlintignore` | Comment said selected files carried local patches | Comment now says content is not edited and names the formatting normalizations |
+| `.markdownlintignore` | Legacy ignore file; unsupported by markdownlint-cli2 and ineffective in CI | Replaced with `.markdownlint-cli2.yaml`; vendored Markdown remains excluded from prose lint |
 | `docs/learning/local-agent-tooling-integration.md` | Taught the local-patch approach as the current design | Updated to record the restoration and the superseded approach |
 | `docs/learning/README.md` | Index description of the local-patch record | Updated to describe official restoration |
 
@@ -47,7 +47,7 @@ The following project statements remain:
 
 - Owner and Issue authority, verification distinctions, and approval gates remain in [AI Engineering Governance](../../AI-GOVERNANCE.md) and the [agent instructions](../README.md). The owner did not replace those documents.
 - The no-commit, no-push, no-GitHub-record, no-new-provider, and Go-only execution decisions remain in force for this task.
-- The project keeps version pins, upstream license texts, the project plugin entry, `.graphifyignore`, `.markdownlintignore`, and `graphify-out/` ignored as project configuration and VCS policy. These are not edits to upstream content.
+- The project keeps version pins, upstream license texts, the project plugin entry, `.graphifyignore`, `.markdownlint-cli2.yaml`, and `graphify-out/` ignored as project configuration and VCS policy. These are not edits to upstream content.
 
 ## Official content restored
 
