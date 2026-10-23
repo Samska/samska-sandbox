@@ -13,7 +13,7 @@ Install the following tools before using the matching part of the repository:
 | Tool | Current repository expectation | Used for |
 | --- | --- | --- |
 | Git | Required; no minimum version is specified. | Clone and contribute. |
-| Bash | Version 4.3 or later on a Unix-like system. Windows is not supported by the launcher. | `scripts/dev.sh` process supervision. |
+| Bash | Version 4.3 or later on a Unix-like system or in Git Bash on Windows (verified on Windows 11). Native Windows cmd/PowerShell launcher use is not supported. | `scripts/dev.sh` process supervision. |
 | Java JDK | Compatible Java 25 JDK. CI uses Eclipse Temurin 25. | Backend build and runtime. |
 | Maven | No separate installation. `backend/mvnw` provisions Maven 3.9.16. | Backend build and runtime. |
 | Node.js | `24.20.0` selected by `web/.nvmrc`; supported range is `>=24.20.0 <25`. | Frontend install, checks, and runtime. |
@@ -231,7 +231,7 @@ What the runner does and expects:
 
 Windows and Git Bash notes:
 
-- Playwright supports Windows 11 natively and manages its own child processes; this is separate from `scripts/dev.sh`, whose Windows limitation still applies to that launcher only.
+- Playwright supports Windows 11 natively and manages its own child processes; this is separate from `scripts/dev.sh`, whose native cmd/PowerShell limitation remains. The launcher's Git Bash path on Windows was verified on Windows 11 in PR #51.
 - Chromium binaries are installed by `npx playwright install chromium` under `%LOCALAPPDATA%\ms-playwright` (on Linux, `~/.cache/ms-playwright`); on Linux use `npx playwright install --with-deps chromium` for required system libraries.
 - `Ctrl+C` in the launcher terminal stops the run and cleans up the processes this run owns. Verified Agent evidence on Windows: after a normal exit and after controlled test failures, both ports were released within a second and no owned descendant processes remained.
 - Documented limitation: closing the terminal window or force-killing the runner before it can clean up can leave the owned backend and Vite processes running. Recover from Git Bash with three identity-checked steps: confirm the listener, verify that the owning process references this repository, then terminate only the verified tree. Never terminate by image name or port alone.
@@ -271,7 +271,7 @@ docker compose down -v
 | Java tool mismatch | Inspect `JAVA_HOME`. When set, the launcher uses it and prepends it for child processes; point it at a compatible Java 25 JDK or unset it to select Java from `PATH`. A different `java` earlier on `PATH`, such as a legacy Oracle `java8path` shim, is reported but does not block the launcher while `JAVA_HOME` selects Java 25. |
 | Maven Wrapper cannot run or download | Run `./mvnw --version` from `backend/`; verify Unix execute permission and network access to Maven Central. |
 | Node or npm missing/wrong | Run `node --version` and `npm --version`; select Node 24.20.0 and its intended npm 11.19.0. |
-| Launcher rejects Bash | Use Bash 4.3 or later on a Unix-like system. Windows launcher support is out of scope. |
+| Launcher rejects Bash | Use Bash 4.3 or later on a Unix-like system or in Git Bash on Windows. Native Windows cmd/PowerShell launcher support is out of scope. |
 | Launcher cannot select Node | Ensure compatible Node/npm are on `PATH`, or make NVM available through `NVM_DIR` or its conventional `$HOME/.nvm` location and install the repository version manually before retrying. |
 | Launcher says frontend dependencies are missing | Run `cd web && npm ci --ignore-scripts`; the launcher intentionally does not install them. |
 | Launcher reports a required port is already in use | Another Samska development instance or another service owns port 8080 or 5173. Stop that process (for example, Ctrl+C in its terminal) or free the port, then retry; the launcher never stops other processes. |
