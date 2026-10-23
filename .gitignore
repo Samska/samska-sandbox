@@ -20,6 +20,10 @@ secrets/
 .DS_Store
 Thumbs.db
 
+# Local agent tool dependencies and generated analysis output.
+.opencode/tools/
+graphify-out/
+
 # Future generated dependency and build outputs.
 node_modules/
 target/
