@@ -190,6 +190,10 @@ Payment simulation is local-only: no real payment is processed, no credentials o
 
 These checks demonstrate current runtime behavior. A healthy PostgreSQL container does not prove Spring Boot connectivity, schemas, migrations, or Product persistence.
 
+### Optional Scenario-Based Evidence
+
+For a relevant flow, concise Given/When/Then scenarios may be used to structure agent execution and owner review of the evidence. This is an optional practical aid after the [SS-038 pilot](https://github.com/Samska/samska-sandbox/issues/64), not a replacement for the checks above and not a mandatory template, framework, automation requirement, or expectation for every Issue. See the [SS-038 Learning Record](learning/ss-038-bdd-human-verification-pilot.md) for the retained practice and its limits.
+
 ## Automated Repository Verification
 
 Run the applicable checks from the indicated directories:

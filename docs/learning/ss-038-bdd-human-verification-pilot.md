@@ -1,14 +1,14 @@
 # SS-038: BDD-style Scenarios for Agent Evidence
 
-- Status: Draft
+- Status: Active
 - Work date: 2026-10-23
 - Last reviewed: 2026-10-23
 - Work item: [SS-038, Issue #64](https://github.com/Samska/samska-sandbox/issues/64)
-- Pull request: None
+- Pull request: Pending; see Issue #64
 - ADRs: None
 - Canonical documentation: [AI Engineering Governance](../AI-GOVERNANCE.md), [Testing Strategy](../TESTING.md), [Local Development](../LOCAL-DEVELOPMENT.md), and [Learning Journal](README.md)
 
-The owner reviewed the evidence report on 2026-10-23 and said it appears okay. This record remains **Draft** because the retain/revise/abandon decision was not supplied; the review did not include personal execution or detailed retrospective answers.
+The owner reviewed the evidence report on 2026-10-23 and retained the scenario format as an optional practice for relevant flows. The record is Active. This is a bounded practical choice, not a measured improvement claim or proof of superiority over the baseline; agent execution and owner review of evidence remain distinct.
 
 ## What you should learn
 
@@ -17,6 +17,7 @@ The owner reviewed the evidence report on 2026-10-23 and said it appears okay. T
 - A harness or environment failure is not a product failure; preserve it as a blocked attempt.
 - Same-revision payment sequencing matters: decline can be followed by approval on the same revision, but not the reverse.
 - Owner review of agent evidence is not the same as the owner executing the flow.
+- Retaining a practice as optional guidance is different from adopting a framework or a mandatory process.
 
 ### Core — Know this for interviews
 
@@ -38,9 +39,9 @@ Payment attempts are revision-aware. A declined attempt does not mark the Cart r
 
 Issue #64 records the owner's decision that the agent executes S2 -> S1 -> S3 and the owner reviews the results and evidence. The execution comment records the browser observations, screenshots, trace, and structured result; the Issue body indexes the results without duplicating the evidence.
 
-The observed flow was: decline an unapproved Cart, return through `Try again with the current Cart`, approve the same revision, create the Order explicitly, change the live Cart to quantity 3, and recover the frozen Order through the saved attempt URL in a full-page load. All three scenarios passed as Agent Verification. The owner reviewed the evidence report and said it appears okay; the format decision remains pending.
+The observed flow was: decline an unapproved Cart, return through `Try again with the current Cart`, approve the same revision, create the Order explicitly, change the live Cart to quantity 3, and recover the frozen Order through the saved attempt URL in a full-page load. All three scenarios passed as Agent Verification. The owner reviewed the evidence report and retained the format as an optional practice for relevant flows.
 
-The pilot does not evaluate whether the scenarios help the owner perform the flow manually. That was the earlier approach and is now superseded context.
+The retained practice is bounded: concise scenarios, agent execution, observed results, and supporting evidence may be used when relevant. No mandatory template, framework, new automation, or every-Issue requirement follows from the pilot. The pilot does not evaluate whether the scenarios help the owner perform the flow manually; that was the earlier approach and is now superseded context.
 
 ## Interview perspective
 
@@ -50,11 +51,11 @@ A second theme is verification ownership: an agent can execute and report, but t
 
 ## What not to worry about yet
 
-No BDD framework, runner, CI integration, or mandatory scenario template is adopted. The pilot also does not establish that scenario wording improves manual execution for the owner; that question is outside the current approach.
+No BDD framework, runner, CI integration, or mandatory scenario template is adopted. The format is optional for relevant flows, not an every-Issue requirement. The pilot also does not establish that scenario wording improves manual execution for the owner; that question is outside the current approach.
 
 ## Why this design
 
-The owner changed the approach to agent execution with owner review. This uses the existing browser capability and avoids asking the owner to reproduce a runtime flow that the agent can execute and document. The trade-off is that the pilot evaluates evidence clarity and reviewability, not owner-performed ease of use.
+The owner changed the approach to agent execution with owner review. This uses the existing browser capability and avoids asking the owner to reproduce a runtime flow that the agent can execute and document. The trade-off is that the pilot evaluates evidence clarity and reviewability, not owner-performed ease of use. After the pilot, the owner retained the format as optional practice; this is a practical choice, not a measured improvement or a mandatory process.
 
 ## Common mistakes
 
@@ -66,8 +67,8 @@ The owner changed the approach to agent execution with owner review. This uses t
 
 ## Reference
 
-- Issue: [SS-038, Issue #64](https://github.com/Samska/samska-sandbox/issues/64); [execution evidence comment 6367487152](https://github.com/Samska/samska-sandbox/issues/64#issuecomment-6367487152); [owner review comment 6370941385](https://github.com/Samska/samska-sandbox/issues/64#issuecomment-6370941385)
-- Pull request: None
+- Issue: [SS-038, Issue #64](https://github.com/Samska/samska-sandbox/issues/64); [execution evidence comment 6367487152](https://github.com/Samska/samska-sandbox/issues/64#issuecomment-6367487152); [owner review comment 6370941385](https://github.com/Samska/samska-sandbox/issues/64#issuecomment-6370941385); [final retain decision comment 6373235366](https://github.com/Samska/samska-sandbox/issues/64#issuecomment-6373235366)
+- Pull request: Pending; see Issue #64
 - Relevant source files: `web/src/payment/PaymentResult.tsx`, `web/src/order/OrderResult.tsx`, `web/src/catalog/Catalog.tsx`, `backend/src/main/java/io/github/samska/sandbox/payment/storage/InMemoryPaymentStore.java`
 - ADRs: None
 - Canonical documentation: [AI Engineering Governance](../AI-GOVERNANCE.md), [Testing Strategy](../TESTING.md), [Local Development](../LOCAL-DEVELOPMENT.md)
