@@ -14,7 +14,7 @@ Update rule: this snapshot must be updated in the same change when project state
 - Learning Record: [SS-038](docs/learning/ss-038-bdd-human-verification-pilot.md) is Active and records the optional retained practice, reusable evidence, and sequencing lessons.
 - Agent Verification: browser execution plus sequence and label inspection; `git diff --check` clean; relative links resolved across the changed Markdown files; local markdownlint/lychee were unavailable without installation; no CI run without a PR. Human Verification is not claimed.
 - Engineering review: independent review of the owner-review and optional-retain documentation returned **APPROVE — no blocking findings** on 2026-10-23 (Agent Verification); non-blocking nits were addressed where applicable.
-- Next step: PR creation is authorized and pending; CI and owner review follow. Merge and Issue closure require separate owner authorization.
+- Next step: PR #94 is open for owner review; merge and Issue closure require separate owner authorization.
 
 ## SS-044 — Market Product-name search (#81)
 

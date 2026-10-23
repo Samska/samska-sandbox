@@ -187,8 +187,8 @@ versioned instruction adoption and delivery validation — is complete and merge
 through PR #88 (squash `099ed1c`, merged 2026-10-19). The next product
 capability remains unselected and no identifier is reserved. The SS-038 Human
 Verification pilot retained concise scenarios as an optional practice for
-relevant flows; its documentation-only PR is authorized and pending creation,
-with CI and owner review to follow; it is not part of SS-042. Authentication and authorization remain deferred until after the
+relevant flows; its documentation-only PR #94 is in review; it is not part of
+SS-042. Authentication and authorization remain deferred until after the
 local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary,
 and the simulated-payment endpoints are unauthenticated and local-only. Future

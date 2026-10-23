@@ -4,7 +4,7 @@
 - Work date: 2026-10-23
 - Last reviewed: 2026-10-23
 - Work item: [SS-038, Issue #64](https://github.com/Samska/samska-sandbox/issues/64)
-- Pull request: Pending; see Issue #64
+- Pull request: [#94](https://github.com/Samska/samska-sandbox/pull/94)
 - ADRs: None
 - Canonical documentation: [AI Engineering Governance](../AI-GOVERNANCE.md), [Testing Strategy](../TESTING.md), [Local Development](../LOCAL-DEVELOPMENT.md), and [Learning Journal](README.md)
 
@@ -68,7 +68,7 @@ The owner changed the approach to agent execution with owner review. This uses t
 ## Reference
 
 - Issue: [SS-038, Issue #64](https://github.com/Samska/samska-sandbox/issues/64); [execution evidence comment 6367487152](https://github.com/Samska/samska-sandbox/issues/64#issuecomment-6367487152); [owner review comment 6370941385](https://github.com/Samska/samska-sandbox/issues/64#issuecomment-6370941385); [final retain decision comment 6373235366](https://github.com/Samska/samska-sandbox/issues/64#issuecomment-6373235366)
-- Pull request: Pending; see Issue #64
+- Pull request: [#94](https://github.com/Samska/samska-sandbox/pull/94)
 - Relevant source files: `web/src/payment/PaymentResult.tsx`, `web/src/order/OrderResult.tsx`, `web/src/catalog/Catalog.tsx`, `backend/src/main/java/io/github/samska/sandbox/payment/storage/InMemoryPaymentStore.java`
 - ADRs: None
 - Canonical documentation: [AI Engineering Governance](../AI-GOVERNANCE.md), [Testing Strategy](../TESTING.md), [Local Development](../LOCAL-DEVELOPMENT.md)
