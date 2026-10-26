@@ -1,6 +1,6 @@
 # ADR 0006: Adopt an Order-Owned In-Memory Store from Approved Payment Attempts
 
-- Status: Accepted
+- Status: Accepted; persistence, capacity, and restart-loss consequences superseded by [ADR 0008](0008-adopt-postgresql-order-persistence.md)
 - Date: 2026-09-28
 - Decision makers: Samska (human owner) with AI implementation support
 - Related: [SS-037](https://github.com/Samska/samska-sandbox/issues/63), [ADR 0005](0005-adopt-payment-attempt-store-with-cart-revision.md), [Architecture](../ARCHITECTURE.md)

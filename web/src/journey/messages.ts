@@ -3,8 +3,8 @@ export const checkingJourneyMessage = "Checking this journey...";
 export const unavailableReferenceMessage = "We couldn't confirm a result for this reference.";
 
 export const unavailableReferenceNote =
-  "Results are held in backend process memory and can be lost on restart. A missing result does not " +
-  "tell us why it is unavailable.";
+  "Orders persist across backend restarts. Simulated payment attempts may not. A failed lookup does " +
+  "not prove an Order was deleted or never created.";
 
 export const lookupFailedMessage = "We couldn't check this reference. Try again.";
 

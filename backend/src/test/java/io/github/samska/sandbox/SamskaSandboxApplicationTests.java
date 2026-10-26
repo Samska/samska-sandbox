@@ -9,9 +9,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
+import io.github.samska.sandbox.support.NoDatabaseTest;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@NoDatabaseTest
 class SamskaSandboxApplicationTests {
 
     @LocalServerPort

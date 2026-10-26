@@ -175,16 +175,6 @@ describe("Order creation from a confirmed approved payment", () => {
     expect(screen.getByRole("button", { name: "Create Order" })).toBeDisabled();
   });
 
-  it("shows a definitive capacity refusal without issuing a second POST", async () => {
-    const fetchMock = setup({ post: () => Promise.resolve(response(503, { code: "order-capacity-exceeded" })) });
-    await approve();
-    fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("local Order store is full");
-    expect(screen.getByRole("button", { name: "Create Order" })).toBeDisabled();
-    expect(screen.queryByRole("button", { name: "Check Order result" })).not.toBeInTheDocument();
-    expect(fetchMock.mock.calls.filter(([path]) => path === "/api/orders")).toHaveLength(1);
-  });
-
   it("blocks a new payment while an approved attempt awaits its Order and unblocks after the Order", async () => {
     const fetchMock = setup();
     await approve();

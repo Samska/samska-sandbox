@@ -28,10 +28,10 @@ describe("Order API adapter", () => {
     expect(await getOrderByPaymentAttempt(attemptId)).toEqual(order);
   });
 
-  it("distinguishes capacity and ineligible attempts from uncertain responses", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(response(503, { code: "order-capacity-exceeded" }));
+  it("distinguishes ineligible attempts and database unavailability from uncertain responses", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(response(503, { code: "order-store-unavailable" }));
     vi.stubGlobal("fetch", fetchMock);
-    await expect(createOrder(attemptId)).rejects.toMatchObject({ kind: "capacity" });
+    await expect(createOrder(attemptId)).rejects.toMatchObject({ kind: "server" });
     fetchMock.mockResolvedValue(response(409, { code: "payment-not-approved" }));
     await expect(createOrder(attemptId)).rejects.toMatchObject({ kind: "not-approved" });
     fetchMock.mockResolvedValue(response(200, { ...order, items: "not-lines" }));

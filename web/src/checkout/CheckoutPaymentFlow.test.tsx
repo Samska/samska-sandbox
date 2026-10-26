@@ -260,7 +260,9 @@ describe("Checkout simulated payment flow", () => {
         level: 1
       })
     ).toBeInTheDocument();
-    expect(screen.getByText(/does not tell us why it is unavailable/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/does not prove an Order was deleted or never created/i)
+    ).toBeInTheDocument();
 
     const attemptId = paymentRequestBody(fetchMock).attemptId;
 
