@@ -18,7 +18,6 @@ export type OrderApiErrorKind =
   | "bad-request"
   | "not-found"
   | "not-approved"
-  | "capacity"
   | "network"
   | "server"
   | "invalid-response";
@@ -61,9 +60,6 @@ async function request(path: string, expected: number[], options?: RequestInit):
     if (response.status === 404) throw new OrderApiError("not-found");
     if (response.status === 409 && (await errorCode(response)) === "payment-not-approved") {
       throw new OrderApiError("not-approved");
-    }
-    if (response.status === 503 && (await errorCode(response)) === "order-capacity-exceeded") {
-      throw new OrderApiError("capacity");
     }
     throw new OrderApiError("server");
   }

@@ -15,6 +15,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.web.context.WebApplicationContext;
 
+import io.github.samska.sandbox.support.NoDatabaseTest;
+
 import io.github.samska.sandbox.catalog.JpegTestImages;
 import io.github.samska.sandbox.catalog.application.MediaLimits;
 
@@ -34,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@NoDatabaseTest
 class ProductApiTest {
 
     private MockMvc mockMvc;

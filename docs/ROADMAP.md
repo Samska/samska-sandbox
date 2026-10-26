@@ -67,24 +67,26 @@ issue is closed as not
 planned and its pull request closed without merging, so it delivers nothing and
 is not part of the product sequence.
 
-Order creation is a separate explicit step from simulated approval. It copies the frozen approved attempt into an immutable process-local record, with same-attempt replay and lookup; no full-page UI recovery or Cart clearing is introduced by that capability alone. Order creation (SS-037) is complete and merged through PR #67; the owner verified the main browser flow, while API replay, uncertain-response recovery, and accessibility remain unobserved real-browser checks for SS-037 itself. The First Order end-to-end journey (SS-039) is complete and merged through PR #70: `/checkout` and `/checkout/attempts/{attemptId}` recover the simulated result or frozen Order through read-only lookups after reload, direct entry, and history, keep the live Cart editable, and require explicit abandonment before a new journey replaces an unresolved reference.
+Order creation is a separate explicit step from simulated approval. It copies the frozen approved attempt into an immutable record, with same-attempt replay and lookup; SS-049 later made that record durable in PostgreSQL. No full-page UI recovery or Cart clearing is introduced by that capability alone. Order creation (SS-037) is complete and merged through PR #67; the owner verified the main browser flow, while API replay, uncertain-response recovery, and accessibility remain unobserved real-browser checks for SS-037 itself. The First Order end-to-end journey (SS-039) is complete and merged through PR #70: `/checkout` and `/checkout/attempts/{attemptId}` recover the simulated result or frozen Order through read-only lookups after reload, direct entry, and history, keep the live Cart editable, and require explicit abandonment before a new journey replaces an unresolved reference.
 
-Market Product-name search (SS-044, #81) is complete and merged via PR #82 (squash `8b32000`, merged 2026-10-15). It adds a local, case- and accent-insensitive substring filter on `Product.name` to the Market: the term lives in `Catalog` state while mounted so it survives Product details and Market → Checkout → Back to Market and resets only on a full-page reload; the term is never written to the URL, history, sessionStorage, localStorage, or logs, and never sent to the API — `GET /api/products` is unchanged and filtering runs entirely in the browser over the already-loaded list. Admin Catalog Management keeps its accent-sensitive filter (`String.prototype.toLowerCase` only) by decision; the documented difference is that Market is accent-insensitive and Admin is accent-sensitive. The existing focus-return mechanism is reused, with a fallback to the search input when the originating View details control is no longer in the map. No new dependency, server endpoint, persistence, accessibility test, ADR, or learning record is introduced. SS-045 (#84) — versioned, tool-agnostic agent role instructions under `docs/agents/` — is complete and merged via PR #85 (squash `54b9afc`, merged 2026-10-16): a shared instruction base, an Orchestrator role, and specialized role files, with tool-specific integration kept separate. SS-046 (#87) — versioned agent-instruction adoption and delivery validation — is complete and merged via PR #88 (squash `099ed1c`, merged 2026-10-19). The next product capability remains unselected.
+Market Product-name search (SS-044, #81) is complete and merged via PR #82 (squash `8b32000`, merged 2026-10-15). It adds a local, case- and accent-insensitive substring filter on `Product.name` to the Market: the term lives in `Catalog` state while mounted so it survives Product details and Market → Checkout → Back to Market and resets only on a full-page reload; the term is never written to the URL, history, sessionStorage, localStorage, or logs, and never sent to the API — `GET /api/products` is unchanged and filtering runs entirely in the browser over the already-loaded list. Admin Catalog Management keeps its accent-sensitive filter (`String.prototype.toLowerCase` only) by decision; the documented difference is that Market is accent-insensitive and Admin is accent-sensitive. The existing focus-return mechanism is reused, with a fallback to the search input when the originating View details control is no longer in the map. No new dependency, server endpoint, persistence, accessibility test, ADR, or learning record is introduced. SS-045 (#84) — versioned, tool-agnostic agent role instructions under `docs/agents/` — is complete and merged via PR #85 (squash `54b9afc`, merged 2026-10-16): a shared instruction base, an Orchestrator role, and specialized role files, with tool-specific integration kept separate. SS-046 (#87) — versioned agent-instruction adoption and delivery validation — is complete and merged via PR #88 (squash `099ed1c`, merged 2026-10-19). SS-049 (#95) is in Build: it makes Orders and their items durable in PostgreSQL through the existing OrderStore, removes the process-local 32-order guard, requires PostgreSQL at startup, and leaves Products, media, Cart, and Payment attempts in memory. The next product capability remains unselected.
 
 ### MVP Boundaries
 
 The local MVP deliberately defers authentication and authorization. They are
 deferred until after the local First Order MVP but are a mandatory prerequisite
-for any hosted environment, and no hosting work begins before the MVP. The MVP
-also remains process-local: Cart state is lost when the backend restarts,
-uploaded Product media is lost together with its Product, and simulated payment
-attempts, including their captured snapshots and duplicate protection, and
-Orders are lost on restart. The attempt-addressed URL and one browser-session
-reference are lookup hints for recovery and do not add persistence or
-cross-process guarantees. Payment Simulator captures the revision-checked Cart
-snapshot inside a bounded process-local store, and its unauthenticated scenario
-selector and endpoints are a local-only use constraint, not access control or a
-hosting posture. The application has no persistence or deployed environment.
+for any hosted environment, and no hosting work begins before the MVP. Orders
+and their items are persisted in PostgreSQL and survive a backend restart. The
+rest of the application remains process-local: Cart state is lost when the
+backend restarts, uploaded Product media is lost together with its Product, and
+simulated payment attempts, including their captured snapshots and duplicate
+protection, are lost on restart. The attempt-addressed URL and one browser-session
+reference remain lookup hints for recovery and add no cross-process guarantee.
+Payment Simulator captures the revision-checked Cart snapshot inside a bounded
+process-local store, and its unauthenticated scenario selector and endpoints are
+a local-only use constraint, not access control or a hosting posture. Orders are
+unauthenticated synthetic records in a loopback-only local database; the
+application has no deployment environment.
 
 ## Versioning And Releases
 

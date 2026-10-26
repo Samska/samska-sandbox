@@ -143,7 +143,9 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
         level: 1
       })
     ).toBeInTheDocument();
-    expect(screen.getByText(/does not tell us why it is unavailable/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/does not prove an order was deleted or never created/i)
+    ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Stop following this reference" })).toBeInTheDocument();
 

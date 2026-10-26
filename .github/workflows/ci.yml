@@ -268,9 +268,22 @@ jobs:
         working-directory: web
         run: npx playwright install --with-deps chromium
 
+      - name: Start PostgreSQL
+        env:
+          POSTGRES_PASSWORD: ${{ github.run_id }}
+        run: docker compose up -d --wait
+
       - name: Run browser E2E tests
         working-directory: web
+        env:
+          POSTGRES_PASSWORD: ${{ github.run_id }}
         run: npm run test:e2e
+
+      - name: Stop PostgreSQL
+        if: ${{ always() }}
+        env:
+          POSTGRES_PASSWORD: ${{ github.run_id }}
+        run: docker compose down -v
 
       - name: Upload Playwright diagnostics on failure
         if: ${{ failure() }}

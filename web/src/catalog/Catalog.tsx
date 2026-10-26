@@ -782,7 +782,7 @@ export default function Catalog() {
 
       if (
         caught instanceof OrderApiError &&
-        ["bad-request", "not-found", "not-approved", "capacity"].includes(caught.kind)
+        ["bad-request", "not-found", "not-approved"].includes(caught.kind)
       ) {
         patchOrderOp(attemptId, {
           error: orderErrorMessage(caught),

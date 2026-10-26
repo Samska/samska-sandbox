@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; SS-044 Market Product-name search (#81) complete and merged; SS-045 agent role instructions (#84) complete and merged; SS-046 agent-instruction adoption and delivery validation (#87) complete and merged; SS-038 Human Verification pilot agent-executed; owner retained concise scenarios as optional practice; PR pending
-- **Next planned work:** the next product capability remains unselected and receives its SS identifier when its Issue is created
+- **Current stage:** `v0.1.0` released; SS-044 Market Product-name search (#81), SS-045 agent role instructions (#84), SS-046 agent-instruction adoption (#87), and SS-038 Human Verification pilot (#64) complete and merged; SS-049 PostgreSQL Order persistence (#95) in Build
+- **Next planned work:** SS-049 is the active capability; the next product capability remains unselected and receives its SS identifier when its Issue is created
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -29,12 +29,14 @@ evidence-driven engineering. The current application contains a Java/Spring
 Boot backend, a React/TypeScript frontend, a Catalog boundary for Products with
 bounded local media upload, a process-local Cart boundary, an editable Checkout
 view over the current Cart with a simulated payment flow, and a separate Admin
-Product-management surface. Order is a separate process-local boundary that copies
-approved simulated-payment data on an explicit action; it does not change the Cart.
-The journey is attempt-addressed: `/checkout` hosts the editable Cart and
-`/checkout/attempts/{attemptId}` recovers the simulated payment result or Order
-confirmation through lookup APIs after a full-page reload, direct entry, or
-history navigation, without persistence or a router dependency.
+Product-management surface. Order is a separate boundary that copies approved
+simulated-payment data on an explicit action and persists the immutable Order in
+PostgreSQL; it does not change the Cart. The journey is attempt-addressed:
+`/checkout` hosts the editable Cart and `/checkout/attempts/{attemptId}` recovers
+the simulated payment result or Order confirmation through lookup APIs after a
+full-page reload, direct entry, or history navigation, without a router
+dependency. Orders survive a backend restart; Products, media, Cart, and Payment
+attempts remain process-local.
 
 AI agents are implementation tools operating under repository-defined
 governance. Humans own requirements, architecture, decisions, review,
@@ -54,14 +56,14 @@ validation, learning, and risk.
 | Market Product-name search | Implemented | Case- and accent-insensitive substring filter on `Product.name` in the Market; term is held in `Catalog` while mounted, never written to the URL/history/storage/logs, and never sent to the API (`GET /api/products` is unchanged); Admin keeps its accent-sensitive filter by decision. |
 | Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource or identity exists; payment initiation captures the immutable revision-checked snapshot. |
 | Payment Simulator | Implemented | An explicit local-demo outcome over a revision-checked immutable Cart snapshot; Payment owns identified attempts with UUID replay, GET reconciliation, one approval per unchanged Cart revision, and a 32-attempt process-local limit without eviction. Approval alone creates no Order or real payment; attempts are lost on restart. |
-| Order creation | Implemented | Explicit creation from an approved attempt, immutable copied lines and total, same-attempt replay and GET reconciliation, and a defensive 32-Order process-local cap. |
+| Order creation | Implemented | Explicit creation from an approved attempt; immutable copied lines and total persisted with the Order in PostgreSQL; same-attempt replay and GET reconciliation survive restart; the former 32-Order process-local cap is removed. |
 | First Order journey | Implemented | Attempt-addressed `/checkout` and `/checkout/attempts/{attemptId}` surfaces recover the simulated payment result or Order confirmation through lookup APIs after reload, direct entry, and history; route reads are GET-only with pending-operation and stale-response guards; a recovered result does not require the live Cart, the live Cart is never cleared, and one `sessionStorage` reference is only a discovery hint. |
 | Admin Catalog Management | Implemented | Compact management list at `/admin/products` with case-insensitive name search, thumbnails, Edit links, and delete confirmation; dedicated `/admin/products/new` and `/admin/products/{id}/edit` forms with staged image selection; Admin paths are navigation only, not access control. |
 | Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in bounded backend process memory; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | Automated browser E2E | Implemented | Two Chromium Playwright tests against the real frontend, Vite proxy, and a fresh exclusively owned backend: First Order success with reload/direct-entry recovery, frozen data, explicit Order creation, and keyboard/focus checks, plus a declined outcome without an Order path; serialized execution, synthetic fixtures through existing APIs, diagnostics on failure. |
-| PostgreSQL | Infrastructure only | Optional local Compose runtime; not connected to the application. |
+| PostgreSQL | Implemented for Orders | Required local Compose runtime with JDBC, Flyway migration, and database health; persists Orders and items only. |
 | Deployment | Planned | No deployment exists; interactive browser checks and real-browser accessibility remain Human Verification concerns. |
 
 ## Architecture
@@ -82,8 +84,8 @@ flowchart LR
     Payment --> Cart
     App --> Order[Order application<br/>immutable records and<br/>attempt replay]
     Order --> Payment
-
-    Postgres[(PostgreSQL<br/>optional local Compose infrastructure<br/>not connected to application)]
+    Order --> Jdbc[JdbcOrderStore<br/>transactional write and replay]
+    Jdbc --> Postgres[(PostgreSQL<br/>Flyway-managed orders and items)]
 ```
 
 The Vite proxy is for local development only. Product and Cart data, including
@@ -96,18 +98,19 @@ review of the current Cart; payment initiation captures an immutable,
 revision-checked Cart snapshot owned by the bounded process-local Payment attempt
 store, which keeps at most 32 attempts and replays identical submissions by
 attempt ID. Approval alone creates no Order; an explicit action copies the
-approved frozen attempt into a bounded process-local Order. The First Order
-journey is attempt-addressed: after a reload or direct entry, the attempt URL
-resolves the Payment result or Order through read-only lookups, never by
-resending a request, and a result cannot be confirmed by only a missing record.
-No real payment,
-credentials, or provider is involved. The Admin surface is a separate frontend
-route over the same Catalog API, and
-`/admin/products` provides no access control. Product deletion is refused with
-`409` while the Product is in the current Cart through a process-local
-coordination lock that covers the HTTP add-to-Cart and delete-Product paths.
-PostgreSQL is deliberately shown separately because the application has no
-database connection or persistence.
+approved frozen attempt into an immutable Order persisted with its items in
+PostgreSQL. The First Order journey is attempt-addressed: after a reload or
+direct entry, the attempt URL resolves the Payment result or Order through
+read-only lookups, never by resending a request, and a result cannot be
+confirmed by only a missing record. A saved attempt URL still recovers a stored
+Order after the backend restarts, even though the source Payment attempt is
+gone. No real payment, credentials, or provider is involved. The Admin surface
+is a separate frontend route over the same Catalog API, and `/admin/products`
+provides no access control. Product deletion is refused with `409` while the
+Product is in the current Cart through a process-local coordination lock that
+covers the HTTP add-to-Cart and delete-Product paths. PostgreSQL is required for
+backend startup and stores Orders and items only; the rest of the application
+remains process-local.
 
 ## Engineering Practices
 
@@ -144,15 +147,14 @@ protection are repository controls documented in [GitHub controls](docs/GITHUB.m
 | --- | --- |
 | Backend | Java 25, Spring Boot 4.1.1, Maven Wrapper |
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS v4 |
-| Testing | JUnit/Surefire, Spring MockMvc, Vitest, React Testing Library, Playwright (Chromium) |
-| Local infrastructure | PostgreSQL 18 via Docker Compose, not application-integrated |
+| Testing | JUnit/Surefire, Spring MockMvc, Testcontainers PostgreSQL, Vitest, React Testing Library, Playwright (Chromium) |
+| Local infrastructure | PostgreSQL 18 via Docker Compose, required for the backend and Order persistence |
 | CI/CD | GitHub Actions, structured JUnit reporting, immutable Action pins |
 | Security | CodeQL, GitGuardian, GitHub secret protection controls |
 | AI-assisted engineering | Repository-governed coding agents with human ownership |
 
-Future technologies such as Redis, RabbitMQ, Testcontainers,
-OpenTelemetry, Terraform, and deployment platforms are not current stack
-components.
+Future technologies such as Redis, RabbitMQ, OpenTelemetry, Terraform, and
+deployment platforms are not current stack components.
 
 ## Roadmap And Next Work
 
@@ -187,8 +189,10 @@ versioned instruction adoption and delivery validation — is complete and merge
 through PR #88 (squash `099ed1c`, merged 2026-10-19). The next product
 capability remains unselected and no identifier is reserved. The SS-038 Human
 Verification pilot retained concise scenarios as an optional practice for
-relevant flows; its documentation-only PR #94 is in review; it is not part of
-SS-042. Authentication and authorization remain deferred until after the
+relevant flows; its documentation-only PR #94 is merged and Issue #64 is closed;
+it is not part of SS-042. SS-049 (#95) is in Build: PostgreSQL persistence for
+Orders and items, with JDBC and Flyway, the Order capacity guard removed, and
+Products, media, Cart, and Payment attempts still process-local. Authentication and authorization remain deferred until after the
 local MVP but are mandatory before any hosted
 environment; `/admin/products` is navigation and not an access-control boundary,
 and the simulated-payment endpoints are unauthenticated and local-only. Future
@@ -200,18 +204,23 @@ for execution state.
 
 ## Local Development
 
-Install the repository's Java 25 and Node 24.20.0 prerequisites, then install
-frontend dependencies and start the current Catalog application:
+Install the repository's Java 25 and Node 24.20.0 prerequisites, start local
+PostgreSQL, and export its password, then install frontend dependencies and
+start the application:
 
 ```bash
+cp .env.example .env
+# set POSTGRES_PASSWORD in .env
+export POSTGRES_PASSWORD='the-same-disposable-value'
+docker compose up -d --wait
 cd web
 npm ci --ignore-scripts
 cd ..
 ./scripts/dev.sh
 ```
 
-The launcher starts Spring Boot and Vite. PostgreSQL is optional and is not
-required for the current application. See [Local Development](docs/LOCAL-DEVELOPMENT.md)
+The launcher starts Spring Boot and Vite; PostgreSQL is required for backend
+startup and Order persistence. See [Local Development](docs/LOCAL-DEVELOPMENT.md)
 for setup, verification, troubleshooting, and shutdown.
 
 ## Documentation
