@@ -47,6 +47,18 @@ The Maestri procedure formerly used to carry out a dismissal is historical. A fu
 - Explain meaningful engineering decisions in terms the human can review and learn from: what changed, why it was chosen, tradeoffs, and relevant alternatives.
 - For user-facing changes, accessibility semantics, keyboard reachability, focus visibility, and announcement behavior are acceptance criteria. Do not trade them away for visual convenience without an owner decision.
 
+## Frontend Design Review
+
+New or materially changed frontend screens, flows, and components require relevant visual review before application implementation. This is a design gate, not implementation authorization. The policy is tool-agnostic and does not require a specific design tool.
+
+- Use approved foundations and components, and show desktop and mobile behavior plus relevant states.
+- Small visual changes require reviewing only the affected portion. Refactoring without visual changes requires no new design.
+- Record the exact candidate and a traceable owner approval. An AI review is Agent Verification, not owner approval.
+- Material visual decisions discovered during implementation return for review before they are treated as approved design.
+- Design approval does not authorize application implementation, pull request creation, or merge.
+- Later implementation is compared with the approved design in the browser, including responsive behavior and accessibility verification.
+- This workflow grants no authorization for automated enforcement, new tooling, services, or dependencies. Any such addition requires separately scoped owner authorization.
+
 ## Independent Review
 
 A change that materially affects code, tests, governance, CI, or security requires independent review before the next gate. The reviewer must not have authored the change.

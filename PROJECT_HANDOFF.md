@@ -6,9 +6,20 @@ Update rule: this snapshot must be updated in the same change when project state
 
 ## SS-051 — Portable agent-instruction base (#98)
 
-- In Build under owner authorization recorded on 2026-10-27; current execution, review, and authorization state are recorded in [Issue #98](https://github.com/Samska/samska-sandbox/issues/98).
+- Completed and merged via PR #99 (squash `db9047b2bfa4fa210b289c72597c4ce79c647aa1`, merged 2026-10-27); Issue #98 is closed and Project status is Done. CI passed 11/11 on the reviewed head `dc442aa`, with no pending check at merge.
 - Durable outcome: `AGENTS.md` is the common entry point; the mandatory Orchestrator, role hierarchy, specialist catalogue, and Maestri adapter are removed from the active tree; durable authorization, independent-review, Build-execution, evidence, and work-preservation rules live in `docs/AI-GOVERNANCE.md`; the tool-agnostic SS-047 authorization is preserved; the former role layer is historical at commit `4ec11f8`.
-- Boundaries: documentation only; no application, dependency, CI, runtime, provider/model/effort, permission, or tooling change. Human Verification is Not applicable; the required owner human engineering review gate is tracked in Issue #98.
+- Boundaries: documentation only; no application, dependency, CI, runtime, provider/model/effort, permission, or tooling change. Human Verification is Not applicable.
+
+## SS-052 — First Samska Store design candidate (#100)
+
+- In Build under owner authorization recorded on 2026-10-27; current execution, review, and authorization state are recorded in [Issue #100](https://github.com/Samska/samska-sandbox/issues/100).
+- Durable decisions: Penpot Cloud Professional ($0) with the hosted remote MCP; Samska Store is the confirmed commercial name; the visual identity remains proposed; the [design record](docs/design/samska-store/README.md) and token JSON are versioned in Git; native `.penpot` and PNG evidence remain outside the repository.
+- Review state: the owner reviewed `SS-052 Candidate 03` (`revn 32`) in Penpot on 2026-10-27 and approved it: “Eu conferi no penpot e aprovo o candidate 03.” The accepted candidate contains provisional illustrations. This is design approval only; it does not approve future photographic assets, application implementation, PR creation, or production adoption.
+- Governance: [Frontend Design Review](docs/AI-GOVERNANCE.md#frontend-design-review) is canonical, with a minimal `AGENTS.md` pointer. P2 and P3 were resolved; the independent AI documentation re-review found no new blocking documentation findings and token JSON validation passed. That review did not verify the native file, local execution history, browser accessibility, or owner approval. Owner visual approval is recorded separately.
+- Documentation approval: the owner approved the documentation changes and authorized scoped commit/push to `feat/ss-052-samska-store-design` on 2026-10-27. PR creation, merge, Issue closure, deletion, and cleanup remain unauthorized.
+- Native backup: not exported; optional; non-blocking for SS-052 per owner decision. No file, hash, archive validation, or restoration result is claimed. This exception is specific to SS-052.
+- Next step: commit and push the approved scoped documentation, record the commit SHA and push/CI facts in Issue #100, and stop for a separate PR creation decision. No pull request, merge, Issue closure, deletion, or cleanup is authorized.
+- SS-051 completion, SS-050, and `rebuild/maestri` remain preserved and untouched.
 
 ## SS-050 — Abandoned design prototype (#97)
 

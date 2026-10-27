@@ -22,7 +22,7 @@ Follow these rules:
 - Human review, understanding, and validation remain mandatory; never accept AI output blindly.
 - Maintain the Issue Handoff items and Pull Request Handoff sections defined in [the handoff protocol](docs/AI-GOVERNANCE.md#issue-and-project-handoff-protocol), and keep [PROJECT_HANDOFF.md](PROJECT_HANDOFF.md) a concise project snapshot.
 
-Read the relevant detailed guidance in [docs/AI-GOVERNANCE.md](docs/AI-GOVERNANCE.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/architecture/principles.md](docs/architecture/principles.md), [docs/TESTING.md](docs/TESTING.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/learning/README.md](docs/learning/README.md), and [docs/adr/README.md](docs/adr/README.md).
+Read the relevant detailed guidance in [docs/AI-GOVERNANCE.md](docs/AI-GOVERNANCE.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/architecture/principles.md](docs/architecture/principles.md), [docs/TESTING.md](docs/TESTING.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/learning/README.md](docs/learning/README.md), and [docs/adr/README.md](docs/adr/README.md). Frontend design work also follows the [Frontend Design Review](docs/AI-GOVERNANCE.md#frontend-design-review) rule.
 
 ## Portable Instruction Base
 

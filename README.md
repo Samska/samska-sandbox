@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; SS-038, SS-044, SS-045, SS-046, and SS-049 are complete and merged. SS-051 is in Build as the portable agent-instruction base that removes mandatory orchestration and tool-specific operating requirements.
-- **Next planned work:** complete SS-051 and its documentation; the next product capability remains unselected and receives its SS identifier when its Issue is created
+- **Current stage:** `v0.1.0` released; SS-038, SS-044, SS-045, SS-046, SS-049, and SS-051 are complete and merged. SS-052 Candidate 03 was owner-approved in Penpot; the production UI is not rebranded, and the accepted candidate contains provisional illustrations.
+- **Next planned work:** owner approved the SS-052 documentation and authorized scoped commit/push; the next gate is a separate PR creation decision. Production adoption remains a separate future decision, and the next product capability remains unselected
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -188,10 +188,15 @@ historical files remain at commit `4ec11f8`, and the portable rules now live in
 adoption evidence. SS-049 (#95) is complete and merged through PR #96:
 PostgreSQL persistence for Orders and items, with JDBC and Flyway, the Order
 capacity guard removed, and Products, media, Cart, and Payment attempts still
-process-local. SS-051 (#98) is in Build: it removes the mandatory Orchestrator,
-role hierarchy, specialist catalogue, and Maestri adapter, and establishes a
-bounded engineering loop without changing application behavior. The next
-product capability remains unselected and no identifier is reserved. The SS-038
+process-local. SS-051 (#98) is complete and merged through PR #99 (squash
+`db9047b`, merged 2026-10-27): it removes the mandatory Orchestrator, role
+hierarchy, specialist catalogue, and Maestri adapter, and establishes a bounded
+engineering loop without changing application behavior. SS-052 (#100) is in
+Build as the first Samska Store design candidate in Penpot: a native editable
+storefront catalog at 1440 and 390, proposed tokens and components, synthetic
+placeholder imagery, and documentation pending owner visual review. The
+production UI is not rebranded. The next product capability remains unselected
+and no identifier is reserved. The SS-038
 Human Verification pilot retained concise scenarios as an optional practice for
 relevant flows; its documentation-only PR #94 is merged and Issue #64 is closed;
 it is not part of SS-042. Authentication and authorization remain deferred until
