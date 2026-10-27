@@ -1,5 +1,7 @@
 # SS-046 — Agent instruction adoption
 
+> **Superseded 2026-10-27.** The mandatory Orchestrator, role hierarchy, specialist catalogue, and Maestri adapter described here were removed as active requirements. This record remains historical evidence and learning material; the links below point to the preserved revision at `4ec11f8`. Current rules are in [AGENTS.md](../../AGENTS.md) and [AI Engineering Governance](../AI-GOVERNANCE.md#superseded-agent-role-instructions-2026-10-27). This note does not alter any Human Verification recorded in this or linked records; its original scope remains.
+
 ## What you should learn
 
 - Why delivering an instruction file is not the same as an agent adopting it.
@@ -28,7 +30,7 @@ A validation-only agent is a test participant kept separate from functional role
 
 ## How Samska uses it
 
-The canonical instructions live in [`AGENTS.md`](../../AGENTS.md) and [`docs/agents/`](../agents/README.md). Role pointers and the Maestri wiring are documented separately in [`docs/agents/tool-integration/maestri.md`](../agents/tool-integration/maestri.md). Runtime model and effort choices are recorded in [`PROJECT_HANDOFF.md`](../../PROJECT_HANDOFF.md), not in role content.
+The canonical instructions were in [`AGENTS.md`](../../AGENTS.md) and [`docs/agents/`](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/README.md). Role pointers and the Maestri wiring were documented separately in [`docs/agents/tool-integration/maestri.md`](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/tool-integration/maestri.md). The runtime model and effort record is historical and is kept in [`PROJECT_HANDOFF.md`](../../PROJECT_HANDOFF.md#agent-runtime-historical-record-superseded-2026-10-27).
 
 [SS-046 (#87)](https://github.com/Samska/samska-sandbox/issues/87) applies this model: it checks the existing functional agents with bounded hypothetical scenarios, creates canonical role presets for future agents, and runs a pointer validation with an initial failed attempt and a corrected attempt, recording the result and any failure rather than assuming success. The Issue records the difference between a passed probe and full compliance, and preserves failures and pending checks instead of retrying or replacing sessions automatically.
 
@@ -49,7 +51,7 @@ Automatic instruction enforcement, an installer, and complete prompt observabili
 ## Reference
 
 - Issue: [SS-046 (#87)](https://github.com/Samska/samska-sandbox/issues/87)
-- Shared instructions: [`docs/agents/shared-instructions.md`](../agents/shared-instructions.md)
-- Role catalogue: [`docs/agents/README.md`](../agents/README.md)
-- Maestri adapter: [`docs/agents/tool-integration/maestri.md`](../agents/tool-integration/maestri.md)
-- Runtime record: [`PROJECT_HANDOFF.md`](../../PROJECT_HANDOFF.md#agent-runtime-provisional)
+- Shared instructions: [`docs/agents/shared-instructions.md`](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/shared-instructions.md)
+- Role catalogue: [`docs/agents/README.md`](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/README.md)
+- Maestri adapter: [`docs/agents/tool-integration/maestri.md`](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/tool-integration/maestri.md)
+- Runtime record: [`PROJECT_HANDOFF.md`](../../PROJECT_HANDOFF.md#agent-runtime-historical-record-superseded-2026-10-27)

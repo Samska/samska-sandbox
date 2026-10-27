@@ -1,5 +1,7 @@
 # SS-047 — Temporary-agent lifecycle
 
+> **Maestri procedure superseded 2026-10-27; authorization preserved.** The Maestri-specific export/dismiss/verification procedure described here is historical. The owner's standing authorization recorded in [Issue #90](https://github.com/Samska/samska-sandbox/issues/90) remains in force as a tool-agnostic dismissal authorization; its source, conditions, and limits are preserved in [AI Engineering Governance](../AI-GOVERNANCE.md#temporary-agent-lifecycle). The 2026-10-19 owner-reported Human Verification of the final wording at `c2efdca` remains a historical record with its original scope. No cleanup is authorized by this supersession.
+
 ## What you should learn
 
 - Why persistent versus temporary agent status must be an explicit classification, not an inference from idleness.
@@ -26,7 +28,7 @@ Automatic enforcement and procedural closure are different claims. A documented 
 
 ## How Samska uses it
 
-The tool-agnostic conditions and the limited standing authorization are in the [shared instructions](../agents/shared-instructions.md#temporary-agent-lifecycle); the supported Maestri export/dismiss/verification procedure and observed limitations are in the [Maestri adapter](../agents/tool-integration/maestri.md#temporary-agent-lifecycle). The traceable owner authorization is [Issue #90](https://github.com/Samska/samska-sandbox/issues/90).
+The tool-agnostic conditions and the limited standing authorization remain in [AI Engineering Governance](../AI-GOVERNANCE.md#temporary-agent-lifecycle). The historical Maestri export/dismiss/verification procedure and observed limitations remain in the [preserved adapter](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/tool-integration/maestri.md#temporary-agent-lifecycle). The traceable owner authorization is [Issue #90](https://github.com/Samska/samska-sandbox/issues/90).
 
 The SS-046 cleanup is the dated example: `SS-046 Probe` and `SS-046 Probe 2` were dismissed after their work completed; their OpenCode sessions remained with 10 and 6 messages, the `Adoption Probe` role preset and generated role directory remained, and the session exports were retained outside the repository. That observation supports the procedure but does not establish native automatic cleanup.
 
@@ -36,12 +38,12 @@ Expect questions about how to retire temporary workers without losing evidence o
 
 ## What not to worry about yet
 
-Automatic lifecycle enforcement, background cleanup jobs, and a session/export retention service are deferred. The current approach is an explicit Orchestrator procedure with retained evidence and a narrow owner grant.
+Automatic lifecycle enforcement, background cleanup jobs, and a session/export retention service are deferred. The historical approach was an explicit Orchestrator procedure with retained evidence and a narrow owner grant; the tool-agnostic authorization remains in AI Engineering Governance.
 
 ## Reference
 
 - Issue: [SS-047 (#90)](https://github.com/Samska/samska-sandbox/issues/90)
-- Shared policy: [`docs/agents/shared-instructions.md`](../agents/shared-instructions.md#temporary-agent-lifecycle)
-- Maestri adapter: [`docs/agents/tool-integration/maestri.md`](../agents/tool-integration/maestri.md#temporary-agent-lifecycle)
+- Shared policy: [Temporary agent lifecycle](../AI-GOVERNANCE.md#temporary-agent-lifecycle)
+- Historical Maestri adapter: [`docs/agents/tool-integration/maestri.md`](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/tool-integration/maestri.md#temporary-agent-lifecycle)
 - Historical cleanup: [Issue #87](https://github.com/Samska/samska-sandbox/issues/87), [PR #88](https://github.com/Samska/samska-sandbox/pull/88)
 - Governance: [`docs/AI-GOVERNANCE.md`](../AI-GOVERNANCE.md)

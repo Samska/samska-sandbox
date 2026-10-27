@@ -24,9 +24,15 @@ Follow these rules:
 
 Read the relevant detailed guidance in [docs/AI-GOVERNANCE.md](docs/AI-GOVERNANCE.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/architecture/principles.md](docs/architecture/principles.md), [docs/TESTING.md](docs/TESTING.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/learning/README.md](docs/learning/README.md), and [docs/adr/README.md](docs/adr/README.md).
 
-## Agent Role Instructions
+## Portable Instruction Base
 
-This repository version-controls the tool-agnostic instructions for orchestrating agents and specialized roles under [docs/agents/](docs/agents/README.md). Every agent follows the [shared instructions](docs/agents/shared-instructions.md), then its assigned [role](docs/agents/README.md#role-catalogue), then the active Issue, in that order. Roles add responsibilities and boundaries; they never grant authorization.
+This file is the common entry point for any coding agent, regardless of tool, model, or provider. Repository instructions are tool-independent; local agent-tool configuration is not a repository requirement. The repository does not require a specific provider, model, effort, permission, or agent tool.
+
+No orchestrator, assigned-role hierarchy, or specialist catalogue is required. Delegation is optional and does not grant authorization or replace independent review. Automatic loading of this file is tool-dependent and is not claimed by the repository. A tool that does not read `AGENTS.md` natively needs an operator-provided pointer; the repository does not add one.
+
+## Build Execution
+
+After explicit Build authorization, follow the [Build Authorization and Execution Loop](docs/AI-GOVERNANCE.md#build-authorization-and-execution-loop). That policy defines what the authorization covers, when to stop, and how to record progress. Do not request renewed permission for actions already covered; pull request creation and merge require separate explicit authorization.
 
 ## Session Resume
 
