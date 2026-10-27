@@ -1,5 +1,7 @@
 # SS-045 — Versioned, tool-agnostic agent role instructions
 
+> **Superseded 2026-10-27.** The mandatory Orchestrator, role hierarchy, specialist catalogue, and Maestri adapter described here were removed as active requirements. This record remains historical evidence and learning material; the links below point to the preserved revision at `4ec11f8`. Current rules are in [AGENTS.md](../../AGENTS.md) and [AI Engineering Governance](../AI-GOVERNANCE.md#superseded-agent-role-instructions-2026-10-27). This note does not alter any Human Verification recorded in this or linked records; its original scope remains.
+
 ## What you should learn
 
 - Why instructions should describe obligations and boundaries rather than permissions, and why a role file must never be able to grant authorization.
@@ -30,11 +32,11 @@ Evidence provenance distinguishes access from delivery. A response that quotes u
 
 ## How Samska uses it
 
-The shared base lives in [docs/agents/shared-instructions.md](../agents/shared-instructions.md), the role files in [docs/agents/roles/](../agents/README.md#role-catalogue), and the orchestrator responsibilities in [docs/agents/orchestrator.md](../agents/orchestrator.md). The tool wiring stays in [docs/agents/tool-integration/maestri.md](../agents/tool-integration/maestri.md) so that no role responsibility depends on a tool.
+The shared base was in [docs/agents/shared-instructions.md](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/shared-instructions.md), the role files and catalogue in [docs/agents/README.md](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/README.md#role-catalogue), and the orchestrator responsibilities in [docs/agents/orchestrator.md](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/orchestrator.md). The tool wiring was in [docs/agents/tool-integration/maestri.md](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/tool-integration/maestri.md) so that no role responsibility depended on a tool.
 
 The authority model reuses the existing governance rather than restating it: authorization and the verification classifications remain in [AI Engineering Governance](../AI-GOVERNANCE.md), and the shared base adds only the conflict-handling and relaying rules that a multi-agent setup needs.
 
-Disposable validation of the first integration observed the distinction this record describes: the workspace-level pointer was already present to the session, while the canonical shared base and role file had to be read explicitly, and hypothetical probes distinguished an untraceable peer claim from a claim pointing at a traceable record. The observations, their method, and their limits are recorded in [the adapter document](../agents/tool-integration/maestri.md#observed-validation-evidence).
+Disposable validation of the first integration observed the distinction this record describes: the workspace-level pointer was already present to the session, while the canonical shared base and role file had to be read explicitly, and hypothetical probes distinguished an untraceable peer claim from a claim pointing at a traceable record. The observations, their method, and their limits are recorded in [the adapter document](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/tool-integration/maestri.md#observed-validation-evidence).
 
 ## Interview perspective
 
@@ -47,6 +49,6 @@ Nothing here requires an installer, a generator, or a runtime enforcement layer.
 ## Reference
 
 - Issue: [SS-045 (#84)](https://github.com/Samska/samska-sandbox/issues/84)
-- Shared base: [docs/agents/shared-instructions.md](../agents/shared-instructions.md)
-- Role catalogue: [docs/agents/README.md](../agents/README.md)
-- Adapter contract: [docs/agents/tool-integration/maestri.md](../agents/tool-integration/maestri.md)
+- Shared base: [docs/agents/shared-instructions.md](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/shared-instructions.md)
+- Role catalogue: [docs/agents/README.md](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/README.md)
+- Adapter contract: [docs/agents/tool-integration/maestri.md](https://github.com/Samska/samska-sandbox/blob/4ec11f8f7397806b7920e99f707693babb989467/docs/agents/tool-integration/maestri.md)

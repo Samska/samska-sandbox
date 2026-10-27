@@ -15,7 +15,7 @@ secrets/
 .idea/
 *.iml
 .vscode/
-# Local agent-workspace tool state (installed role presets) inside the working directory.
+# Local agent-tool workspace state. Retained for existing local artifacts.
 .maestri/
 .DS_Store
 Thumbs.db

@@ -14,6 +14,8 @@ Engineering work follows this workflow:
 Issue -> Plan -> human review -> Build -> engineering review -> Human Verification when required -> commit -> PR -> CI/review -> merge -> Done
 ```
 
+Within Build, the agent follows the [Build Authorization and Execution Loop](../AI-GOVERNANCE.md#build-authorization-and-execution-loop). Learning never interrupts that sequence.
+
 Learning Records may be created or updated during relevant work, but learning never blocks engineering progression:
 
 - No learning question may block Build.
@@ -64,7 +66,10 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-042-browser-regression-suite.md](ss-042-browser-regression-suite.md) | Real-browser E2E boundaries, isolation against shared process-local state, observing unsubmitted transactions, owned lifecycle and teardown evidence, and Windows termination limits. |
 | [ss-045-agent-role-instructions.md](ss-045-agent-role-instructions.md) | Instruction layering, authority versus permission, evidence provenance, adapter drift detection, and bounded validation of tool integration. |
 | [ss-046-agent-instruction-adoption.md](ss-046-agent-instruction-adoption.md) | Delivery versus adoption, committed-hash scope, bounded hypothetical probes, and keeping validation-only agents separate. |
-| [ss-047-temporary-agent-lifecycle.md](ss-047-temporary-agent-lifecycle.md) | Explicit persistent/temporary classification, evidence retention before dismissal, dismissal versus deletion, and procedural versus automatic cleanup. |
+| [ss-047-temporary-agent-lifecycle.md](ss-047-temporary-agent-lifecycle.md) | Explicit persistent/temporary classification, evidence retention before dismissal, dismissal versus deletion, and procedural versus automatic cleanup. Historical Maestri procedure; the SS-047 authorization remains in force. |
+| [ss-051-portable-agent-instructions.md](ss-051-portable-agent-instructions.md) | Portable instruction entry points, bounded Build execution, covered versus separately authorized actions, review classification, historical supersession, and content-level work preservation. |
+
+The SS-045, SS-046, and SS-047 records describe the agent role layer that was superseded as active requirements on 2026-10-27. They remain historical learning records; their operational instructions are not current.
 
 Use the work-item identifier in new record names, for example `ss-009-product-domain.md`. One record covers one coherent work item; link earlier records when their lessons remain relevant.
 

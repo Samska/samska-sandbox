@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; SS-044 Market Product-name search (#81), SS-045 agent role instructions (#84), SS-046 agent-instruction adoption (#87), and SS-038 Human Verification pilot (#64) complete and merged; SS-049 PostgreSQL Order persistence (#95) in Build
-- **Next planned work:** SS-049 is the active capability; the next product capability remains unselected and receives its SS identifier when its Issue is created
+- **Current stage:** `v0.1.0` released; SS-038, SS-044, SS-045, SS-046, and SS-049 are complete and merged. SS-051 is in Build as the portable agent-instruction base that removes mandatory orchestration and tool-specific operating requirements.
+- **Next planned work:** complete SS-051 and its documentation; the next product capability remains unselected and receives its SS identifier when its Issue is created
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -180,22 +180,24 @@ is complete and merged through PR #82 (squash `8b32000`, merged 2026-10-15):
 a local, case- and accent-insensitive substring filter on `Product.name`;
 term lives in `Catalog` while mounted, never reaches the URL, history,
 storage, logs, or API; Admin keeps its accent-sensitive filter by decision.
-The selected next engineering task is tool-agnostic, versioned agent role
-instructions with tool-specific integration kept separate. SS-045 (#84) is
-complete and merged through PR #85 (squash `54b9afc`, merged 2026-10-16): a
-shared instruction base, an Orchestrator role, and specialized role files under
-`docs/agents/`, with tool-specific integration kept separate. SS-046 (#87) —
-versioned instruction adoption and delivery validation — is complete and merged
-through PR #88 (squash `099ed1c`, merged 2026-10-19). The next product
-capability remains unselected and no identifier is reserved. The SS-038 Human
-Verification pilot retained concise scenarios as an optional practice for
+SS-045 (#84) introduced versioned agent role instructions under `docs/agents/`
+and merged through PR #85 (squash `54b9afc`, merged 2026-10-16). Those mandatory
+role requirements were superseded as active requirements on 2026-10-27; the
+historical files remain at commit `4ec11f8`, and the portable rules now live in
+`AGENTS.md` and AI Engineering Governance. SS-046 (#87) remains historical
+adoption evidence. SS-049 (#95) is complete and merged through PR #96:
+PostgreSQL persistence for Orders and items, with JDBC and Flyway, the Order
+capacity guard removed, and Products, media, Cart, and Payment attempts still
+process-local. SS-051 (#98) is in Build: it removes the mandatory Orchestrator,
+role hierarchy, specialist catalogue, and Maestri adapter, and establishes a
+bounded engineering loop without changing application behavior. The next
+product capability remains unselected and no identifier is reserved. The SS-038
+Human Verification pilot retained concise scenarios as an optional practice for
 relevant flows; its documentation-only PR #94 is merged and Issue #64 is closed;
-it is not part of SS-042. SS-049 (#95) is in Build: PostgreSQL persistence for
-Orders and items, with JDBC and Flyway, the Order capacity guard removed, and
-Products, media, Cart, and Payment attempts still process-local. Authentication and authorization remain deferred until after the
-local MVP but are mandatory before any hosted
-environment; `/admin/products` is navigation and not an access-control boundary,
-and the simulated-payment endpoints are unauthenticated and local-only. Future
+it is not part of SS-042. Authentication and authorization remain deferred until
+after the local MVP but are mandatory before any hosted environment;
+`/admin/products` is navigation and not an access-control boundary, and the
+simulated-payment endpoints are unauthenticated and local-only. Future
 capabilities receive an SS identifier only when their GitHub Issue is created;
 the roadmap does not reserve future identifiers.
 
