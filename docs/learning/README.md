@@ -69,6 +69,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-047-temporary-agent-lifecycle.md](ss-047-temporary-agent-lifecycle.md) | Explicit persistent/temporary classification, evidence retention before dismissal, dismissal versus deletion, and procedural versus automatic cleanup. Historical Maestri procedure; the SS-047 authorization remains in force. |
 | [ss-051-portable-agent-instructions.md](ss-051-portable-agent-instructions.md) | Portable instruction entry points, bounded Build execution, covered versus separately authorized actions, review classification, historical supersession, and content-level work preservation. |
 | [ss-052-penpot-design-workflow.md](ss-052-penpot-design-workflow.md) | Hosted MCP with an active browser tab, tokens versus component instances, canvas organization and editor-label spacing versus isolated exports, candidate identity through exports and hashes, free-plan evidence durability, design review versus browser verification, and credential handling. |
+| [ss-053-headless-penpot-market-design.md](ss-053-headless-penpot-market-design.md) | Authenticated headless runtime boundaries, team-context routing, diagnosing an empty Penpot app, bounded MCP validation versus design approval, and preserving an approved design baseline while adding current-interface layers. |
 
 The SS-045, SS-046, and SS-047 records describe the agent role layer that was superseded as active requirements on 2026-10-27. They remain historical learning records; their operational instructions are not current.
 
