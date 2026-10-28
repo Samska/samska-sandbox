@@ -9,6 +9,102 @@ Status: **Owner-approved Candidate 03 — design approval only. Provisional illu
 - Candidate: `Samska Store — Catalog Candidate 03`
 - Token source: [tokens.json](tokens.json)
 
+## SS-053 — Current-interface Batch 1 (owner-approved, revn 52)
+
+Status: **Owner-approved design delivery (Batch 1) at `revn 52`. The owner approved the reviewed documentation and authorized a scoped commit/push on `feat/ss-053-storefront-market-design`; implementation, PR creation, merge, and later deliveries remain unauthorized.**
+
+- Issue: [SS-053 / #102](https://github.com/Samska/samska-sandbox/issues/102)
+- Baseline: `main` `2f0470517d455bd0f6040daaa974d68416dc8cac`; Candidate 03 `revn 32` preserved.
+- Current file: `Samska Store — Storefront Catalog`, file ID `bfddaaba-4180-81d4-8008-dacc2b056247`, `revn 52`.
+- Named review version: `SS-053 Batch 1 — Storefront shell and functional Market — review-ready` (created 2026-10-28T00:21:15.716Z).
+- Owner visual approval: 2026-10-28, reviewing `revn 52`: “Entendi, eu aprovo a revisão 52, qual os próximos passos?” This approves the named design version only. It does not imply execution of every review checklist item, browser accessibility verification, documentation approval, commit/push, pull request, merge, or later deliveries.
+- Documentation approval and commit/push: 2026-10-28, owner answered “Sim” to the reviewed five-file documentation and authorized a normal scoped commit/push to `feat/ss-053-storefront-market-design`. PR creation, merge, Issue closure, deletion, and cleanup remain unauthorized.
+- Pages: `11 Current Components` (index) and `21 Market — Current Interface`.
+- Page 21 boards: `market/desktop-1440` (1440×2360), `market/mobile-390` (390×3230), `market/states-desktop-1440` (1440×2120), `market/states-mobile-390` (390×4100), `market/narrow-320` (320×960), and `review/notes-batch-1` (1000×2000).
+- Native review locations: `11 Current Components` page `ede7c354-fdd1-8021-8008-db2800b21f07`; `21 Market — Current Interface` page `ede7c354-fdd1-8021-8008-db2800b410d1`; desktop `ede7c354-fdd1-8021-8008-db2ab62c3ca9`; mobile `ede7c354-fdd1-8021-8008-db2ab75b0e72`; desktop states `ede7c354-fdd1-8021-8008-db2b8eabc94d`; mobile states `ede7c354-fdd1-8021-8008-db2bed45c9da`; 320 `ede7c354-fdd1-8021-8008-db2c25be0571`; review notes `662c6bd9-a007-800a-8008-db3b96fbaeb2`; component index `662c6bd9-a007-800a-8008-db3b96bec9ed`.
+- Additive masters live on `10 Components` → Current interface components: storefront header/footer desktop and mobile; Product Card Market desktop/mobile/narrow; Search Market desktop/narrow; primary/secondary buttons; action link.
+- Additive semantic tokens: `color.success`, `color.successSurface`, `color.danger`, `color.dangerSurface`, `color.pending`, `color.pendingSurface`, `color.onDarkMuted`, `color.focus`.
+- Functional mapping: brand/Market → `/`; Admin → `/admin/products`; Cart → existing drawer, storefront only; hero CTA → Products anchor; search/Clear search → existing local filter and focus return; Retry → reload; empty-state link → `/admin/products/new`; View details → existing in-place view; Add to Cart → existing add with pending/success/failure feedback.
+- Static editorial copy is separate from dynamic product/search/Cart counts. No editorial copy generates a count.
+- Design verification: page 21 top-level overlaps `0`; containment violations `0`; 320 horizontal overflow `0`; 97 desktop and 96 mobile component instances; 14 new additive components; Candidate 03 desktop and mobile exports match the approved hashes exactly.
+- Contrast measurements: ink/canvas 14.91; muted/canvas 5.28; ink/surface 16.68; muted/surface 5.91; onPrimary/primary 6.63; success/successSurface 5.55; danger/dangerSurface 5.74; pending/pendingSurface 5.58; onDarkMuted/ink 8.16; canvas/ink 14.91; legal/ink 4.92.
+- Review evidence: `C:\Users\Samuel\AppData\Local\SamskaSandbox\penpot-mcp\evidence\ss-053-review-ready-20261028-002011`.
+- Runtime verification: bounded headless MCP validation passed for 631.3 seconds, including a six-minute interval with no external MCP/CDP calls. The verified route includes `team-id=122350ae-89ad-8027-8008-dacbedb3c9d3`. The debug listener `127.0.0.1:9229` was verified active for at least 3,125.5 seconds (runtime started 2026-10-27T20:58:55 local; last confirmed 21:51:01). The dedicated process later exited with profile `exit_type: SessionEnded`; no crash dump was found and port `9229` is free. No CDP client was attached during validation or design work. This is Agent Verification, not design approval, Human Verification, indefinite reliability, or CI.
+- Limitations: Penpot editor labels are not directly inspectable through the plugin API; the search-field boundary remains a browser-verification item; browser DOM, keyboard, screen-reader, rendered contrast, zoom, and cross-browser behavior are not verified. Owner approval does not imply those checks.
+- Next: documentation is approved and scoped commit/push is authorized. The next gate is a separate PR creation decision. No frontend implementation, merge, Issue closure, deletion, or cleanup is authorized.
+
+### Review access and dedicated runtime
+
+- Verified route: `https://design.penpot.app/#/workspace?team-id=122350ae-89ad-8027-8008-dacbedb3c9d3&file-id=bfddaaba-4180-81d4-8008-dacc2b056247`. The `team-id` is required; without it the app can land on the homepage with an empty `#app`.
+- Chrome executable: `C:\Program Files\Google\Chrome\Application\chrome.exe`. Dedicated profile, helpers, and evidence remain outside Git under `C:\Users\Samuel\AppData\Local\SamskaSandbox\penpot-mcp\`. No personal Chrome profile, cookies, credentials, MCP key, or token-bearing URL is part of the repository.
+
+#### Startup used for the passing trial
+
+The passing trial used the diagnostic helper so CDP listeners could attach before navigation:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Samuel\AppData\Local\SamskaSandbox\penpot-mcp\helpers\start-headless-cdp-diagnostic.ps1"
+node "C:\Users\Samuel\AppData\Local\SamskaSandbox\penpot-mcp\helpers\cdp-route-test.js"
+```
+
+`start-headless-cdp-diagnostic.ps1` takes no parameters. It starts installed Chrome with the dedicated profile at `about:blank`, headless mode, the reviewed background-execution mitigations, and a loopback debugging listener on port `9229`; it writes the PID to `helpers\headless-diagnostic3-pid.txt`. `cdp-route-test.js` takes no arguments; it navigates the dedicated page to the verified route and prints the persisted file title and readiness. This navigation is diagnostic CDP, not design inspection.
+
+A corrected direct-start helper exists but was not executed in the passing trial:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Samuel\AppData\Local\SamskaSandbox\penpot-mcp\helpers\start-headless-verified.ps1"
+```
+
+It takes no parameters, starts directly at the verified route, checks that port `9229` is free and that the dedicated profile is unused, and writes `helpers\headless-verified-pid.txt`. Its equivalence to the diagnostic startup remains unverified.
+
+#### Runtime identity and listener check
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Samuel\AppData\Local\SamskaSandbox\penpot-mcp\helpers\runtime-check.ps1" -PenpotPidFile "C:\Users\Samuel\AppData\Local\SamskaSandbox\penpot-mcp\helpers\headless-diagnostic3-pid.txt" -PenpotPort 9229
+```
+
+The helper verifies process ID, executable, dedicated profile, `--headless`, process ancestry, visible windows, listener presence, listener local address, and loopback-only binding. Use the PID file that matches the startup helper (`headless-verified-pid.txt` for the direct-start helper).
+
+#### MCP read
+
+```powershell
+node "C:\Users\Samuel\AppData\Local\Temp\opencode\ss-052-evidence\mcp_exec_file.js" "C:\Users\Samuel\AppData\Local\Temp\opencode\ss-053-resume-inspect.js"
+```
+
+`mcp_exec_file.js` takes the read-only JavaScript file path as its argument and reads the existing hosted MCP URL file. It does not print or commit the token-bearing URL.
+
+#### Bounded validation
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File "C:\Users\Samuel\AppData\Local\SamskaSandbox\penpot-mcp\helpers\validate-runtime.ps1" -PenpotPidFile "C:\Users\Samuel\AppData\Local\SamskaSandbox\penpot-mcp\helpers\headless-diagnostic3-pid.txt" -PenpotPort 9229
+```
+
+This helper takes the PID file and port arguments. It performs scheduled read-only MCP reads, a six-minute no-call interval, an existing-board MCP export, and initial/final runtime checks. The actual passing run lasted 631.3 seconds. It is not an indefinite reliability test.
+
+#### Plugin connection
+
+In the passing trial, the file opened with the Penpot MCP control available and the plugin connected without additional CDP bootstrap. The approved fallback helper is:
+
+```powershell
+node "C:\Users\Samuel\AppData\Local\SamskaSandbox\penpot-mcp\helpers\cdp-connect.js"
+```
+
+It takes no arguments and attempts the Penpot `File` → `MCP Server` → `Connect` UI path. It was not required for the passing trial, so its current selectors and headless behavior remain unverified. Design inspection, export, and authoring remain MCP-only.
+
+#### Graceful shutdown
+
+```powershell
+node "C:\Users\Samuel\AppData\Local\SamskaSandbox\penpot-mcp\helpers\cdp-close.js"
+```
+
+It takes no arguments, connects to the loopback browser listener, and sends CDP `Browser.close`. It was used successfully for earlier dedicated runtimes. The passing runtime later exited with profile `exit_type: SessionEnded`; it was not closed by this helper, so graceful shutdown of that exact run is unobserved. `taskkill /F` is not the normal procedure and must not stop unrelated Chrome processes.
+
+#### Boundaries
+
+The runtime was verified active for at least 3,125.5 seconds and later exited with no crash dump; the listener port is free. This is bounded Agent Verification, not indefinite reliability, design approval, Human Verification, or CI. The authenticated profile, helpers, and evidence are preserved.
+
+> **Historical SS-052 pre-merge snapshot.** The material below records Candidate 03 before PR #101. Statements that no PR existed and that commit/push was the next action are historical. SS-052 is completed by [Issue #100](https://github.com/Samska/samska-sandbox/issues/100) and [merged PR #101](https://github.com/Samska/samska-sandbox/pull/101) (squash `2f0470517d455bd0f6040daaa974d68416dc8cac`). Historical approvals and evidence are preserved; they are not reclassified as newly executed checks.
+
 ## Candidate identity
 
 | Item | Reference |
@@ -100,7 +196,7 @@ Candidate 03 contains the new Components canvas image, copies of the unchanged C
 
 ### CI Verification
 
-Not run. No pull request exists, and no CI result is claimed.
+Historical pre-merge: not run. No pull request existed before PR #101, and no CI result is claimed. See [Issue #100](https://github.com/Samska/samska-sandbox/issues/100) and [PR #101](https://github.com/Samska/samska-sandbox/pull/101) for completion.
 
 ### Native backup status
 
@@ -137,6 +233,8 @@ This approval/status update is mechanical; it does not restart or alter the revi
 - Named Penpot versions and an eventual `.penpot` export preserve approved milestones. No automated evidence tooling is introduced.
 - The canonical review gate is [Frontend Design Review](../../AI-GOVERNANCE.md#frontend-design-review): relevant visual review before implementation, exact candidate and traceable owner approval, and later browser comparison for responsiveness and accessibility.
 
-## Next step
+## Next step (historical SS-052 pre-merge)
+
+Historical pre-merge instruction; completed by [Issue #100](https://github.com/Samska/samska-sandbox/issues/100) and [PR #101](https://github.com/Samska/samska-sandbox/pull/101).
 
 Owner visual approval and owner human engineering approval of the documentation are recorded. Scoped commit/push to `feat/ss-052-samska-store-design` is authorized. Native backup is not exported; it is optional and non-blocking for SS-052. Commit and push the approved documentation, then stop for a separate PR creation decision. Do not create another candidate, open a pull request, merge, close the Issue, delete, or clean up.
