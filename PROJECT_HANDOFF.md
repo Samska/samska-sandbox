@@ -4,6 +4,15 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-054 — Product detail and Cart drawer design (#104)
+
+- Design Batch 2 is review-ready at `revn 78` under the design-only authorization recorded in [Issue #104](https://github.com/Samska/samska-sandbox/issues/104). The owner reported qualified first-version visual acceptance of the corrected final named version: “Parece ok para uma primeira versão”. This is not unconditional final approval, execution of every checklist item, browser verification, documentation approval, or commit/push authorization. Delivered pages `22 Product Detail — Current Interface`, `23 Cart Drawer — Current Interface`, and `24 Review — Batch 2`, with 1440/390 populated boards, desktop/mobile state boards, 320 specimens, seven additive masters, six additive tokens, and review notes.
+- Documentation approval and commit/push: 2026-10-28, the owner answered “Sim” to the reviewed documentation and authorized commit/push of its eight files on `feat/ss-054-product-detail-cart-design`. This is separate from the qualified visual acceptance. PR creation, merge, Issue closure, Project-field changes, cleanup, later design batches, and application implementation remain unauthorized.
+- The owner-approved decisions are recorded: quantity-input Escape cancels its draft without closing the drawer; Add pending reads “Adding…”, disabled; the 704px drawer breakpoint is preserved. These are design specifications where the current implementation differs; no application change was made.
+- Candidate 03 `revn 32` and SS-053 `revn 52` are preserved. Candidate 03 and SS-053 desktop/mobile re-exports match their approved SHA-256 values exactly. Design checks report zero top-level overlaps, zero containment violations, and zero 320 horizontal overflow.
+- Corrected final named version: `SS-054 Batch 2 — Product detail and Cart drawer — review-ready — corrected final` (2026-10-28T16:17:46.653Z). Earlier review-ready snapshots at `revn 76` and `revn 77` remain preserved. Evidence: `C:\Users\Samuel\AppData\Local\SamskaSandbox\penpot-mcp\evidence\ss-054-review-ready-20261028-131746-corrected-final`. Dedicated headless runtime sessions were used and closed gracefully; detailed runtime history is in Issue #104 and the design record. The historical SS-053 631.3-second trial was not repeated or claimed.
+- Next: separate PR creation decision. PR creation, merge, Issue closure, Project-field changes, cleanup, later design batches, and application implementation remain unauthorized.
+
 ## SS-051 — Portable agent-instruction base (#98)
 
 - Completed and merged via PR #99 (squash `db9047b2bfa4fa210b289c72597c4ce79c647aa1`, merged 2026-10-27); Issue #98 is closed and Project status is Done. CI passed 11/11 on the reviewed head `dc442aa`, with no pending check at merge.
@@ -12,17 +21,17 @@ Update rule: this snapshot must be updated in the same change when project state
 
 ## SS-053 — Storefront shell and functional Market design (#102)
 
-- Design Batch 1 is completed and owner-approved at `revn 52` under the design-only authorization recorded in [Issue #102](https://github.com/Samska/samska-sandbox/issues/102). The owner approved the named version in the exact statement “Entendi, eu aprovo a revisão 52, qual os próximos passos?” This records design approval only; documentation approval, browser accessibility verification, commit/push, PR, merge, and later deliveries are separate.
-- Delivered: current-interface storefront shell and functional Market on pages `11 Current Components` and `21 Market — Current Interface`; additive masters and semantic tokens; 1440/390 populated boards, essential state examples, 320 specimen, and review notes. Product detail, Not found, Cart drawer, Checkout, Payment, Order, recovery, and Admin screens remain out of scope.
-- Candidate 03 `revn 32` and approved masters are preserved; desktop and mobile exports match approved hashes. Bounded headless MCP validation passed. Detailed design checks, runtime/session evidence, and limitations are in Issue #102 and the design record.
-- Next: documentation is approved and scoped commit/push is authorized. The next gate is a separate PR creation decision. No implementation, merge, Issue closure, deletion, or cleanup is authorized.
+- Completed via [Issue #102](https://github.com/Samska/samska-sandbox/issues/102) and [merged PR #103](https://github.com/Samska/samska-sandbox/pull/103) (squash `b8b92d3cf24daa143941f84c7bbde10788b448e3`, merged 2026-10-28); Project status is Done. Design Batch 1 remains owner-approved at `revn 52` in the exact statement “Entendi, eu aprovo a revisão 52, qual os próximos passos?” That approval covers the named design version only, not browser accessibility verification or application implementation.
+- Delivered: current-interface storefront shell and functional Market on pages `11 Current Components` and `21 Market — Current Interface`; additive masters and semantic tokens; 1440/390 populated boards, essential state examples, 320 specimen, and review notes. Product detail, Not found, Cart drawer, Checkout, Payment, Order, recovery, and Admin screens were out of scope for Batch 1.
+- Candidate 03 `revn 32` and approved masters are preserved; desktop and mobile exports match approved hashes. Detailed design checks, runtime/session evidence, and limitations are in Issue #102 and the design record.
+- Next: none. SS-054 Batch 2 is the active design delivery and is review-ready.
 
 ## SS-052 — First Samska Store design candidate (#100)
 
 - Completed and merged via PR #101 (squash `2f0470517d455bd0f6040daaa974d68416dc8cac`, merged 2026-10-27); Issue #100 is closed and Project status is Done.
 - Durable decisions: Penpot Cloud Professional ($0) with the hosted remote MCP; Samska Store is the confirmed commercial name; Candidate 03 (`revn 32`) is owner-approved for the reviewed catalog, foundations, components, and provisional illustrations; future photographic assets and other screens require separate review. The [design record](docs/design/samska-store/README.md) and token JSON are versioned; native `.penpot` and PNG evidence remain outside the repository.
 - The native backup was not exported; this was optional and non-blocking for SS-052 only.
-- Next: none. SS-053 is the active design delivery; SS-051 completion and SS-050 remain preserved.
+- Next: none. SS-053 is completed; SS-054 is the active design delivery. SS-051 completion and SS-050 remain preserved.
 
 ## SS-050 — Abandoned design prototype (#97)
 
