@@ -10,8 +10,8 @@ licensed under the [Apache License 2.0](LICENSE).
 ## Current Milestone
 
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; SS-038, SS-044, SS-045, SS-046, SS-049, SS-051, SS-052, and SS-053 are complete and merged. Candidate 03 and SS-053 Batch 1 were owner-approved in Penpot for the reviewed catalog, current-interface shell, and Market; SS-054 Batch 2 (Product detail and Cart drawer) received qualified first-version visual acceptance, and its reviewed documentation was separately approved with scoped commit/push authorized. PR creation remains separate. The accepted designs contain provisional illustrations, and the production UI is not rebranded.
-- **Next planned work:** separate PR creation decision for SS-054 Batch 2. Production adoption remains a separate future decision, and the next product capability remains unselected.
+- **Current stage:** `v0.1.0` released; SS-038, SS-044, SS-045, SS-046, SS-049, SS-051, SS-052, SS-053, and SS-054 are complete and merged. Candidate 03 and SS-053 Batch 1 were owner-approved in Penpot for the reviewed catalog, current-interface shell, and Market; SS-054 Batch 2 (Product detail and Cart drawer) received qualified first-version visual acceptance and was completed through Issue #104 and PR #105; SS-055 Batch 3 (Checkout and simulated Payment) is review-ready at `revn 96` and received owner-reported visual acceptance: “Parece ok”. This is visual acceptance only; the reviewed documentation is approved and commit/push is authorized. After successful push, the separate PR creation decision is the next gate. The accepted designs contain provisional illustrations, and the production UI is not rebranded.
+- **Next planned work:** separate PR creation decision for SS-055 Batch 3 after the authorized commit/push. Production adoption remains a separate future decision, and the next product capability remains unselected.
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -197,10 +197,14 @@ through PR #103. Candidate 03 (`revn 32`) is owner-approved for the reviewed
 catalog at 1440 and 390, foundations, and components, with provisional
 illustrations. SS-053 Batch 1 extends that direction to the current-interface
 shell and functional Market and is owner-approved at `revn 52`. SS-054 Batch 2
-adds the Product detail and Cart drawer designs at `revn 78` and received
-qualified first-version visual acceptance; its reviewed documentation was
-separately approved and scoped commit/push authorized, with PR creation remaining
-separate. Future photographic assets and later screens remain subject to review. The production UI is not rebranded; application
+adds the Product detail and Cart drawer designs at `revn 78`, received qualified
+first-version visual acceptance, and was completed through Issue #104 and merged
+PR #105. SS-055 Batch 3 adds the Checkout and simulated Payment designs at
+`revn 96`, including the approved minimal payment-attempt recovery surface; it is
+review-ready and received owner-reported visual acceptance “Parece ok”.
+The reviewed documentation is approved and commit/push is authorized; after
+successful push, the separate PR creation decision is the next gate. Future photographic assets and later
+screens remain subject to review. The production UI is not rebranded; application
 implementation and production adoption require separate authorization. The next
 product capability remains unselected and no identifier is reserved. The SS-038
 Human Verification pilot retained concise scenarios as an optional practice for
