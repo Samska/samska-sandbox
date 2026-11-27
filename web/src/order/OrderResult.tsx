@@ -31,6 +31,12 @@ export default function OrderResult({ order, onBackToMarket, onBackToCheckout }:
       <div className="flex flex-wrap gap-3">
         <Button onClick={onBackToMarket}>Back to Market</Button>
         <Button variant="quiet" onClick={onBackToCheckout}>Back to Checkout</Button>
+        <a
+          className="inline-flex min-h-11 items-center px-3 font-mono text-[0.8rem] font-semibold uppercase tracking-[0.06em] underline"
+          href={`/orders/${encodeURIComponent(order.orderId)}`}
+        >
+          Track this order
+        </a>
       </div>
     </section>
   );

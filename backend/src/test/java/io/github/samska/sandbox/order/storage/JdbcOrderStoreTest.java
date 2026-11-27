@@ -198,6 +198,16 @@ class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
             public Optional<Order> findByPaymentAttemptId(UUID paymentAttemptId) {
                 return store.findByPaymentAttemptId(paymentAttemptId);
             }
+
+            @Override
+            public java.util.List<io.github.samska.sandbox.order.OrderSummary> listForCurrentAccount() {
+                return store.listForCurrentAccount();
+            }
+
+            @Override
+            public Optional<java.time.Instant> findCreatedAt(UUID orderId) {
+                return store.findCreatedAt(orderId);
+            }
         };
 
         assertThatThrownBy(() -> losingResponse.create(FIRST))

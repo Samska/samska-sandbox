@@ -48,3 +48,5 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 [ADR 0012: Adopt a Release Plan From v0.2.0 To v1.0.0](0012-adopt-release-plan-to-v1.md) records the six releases to v1.0.0, why caching, messaging and React Native move beyond 1.0, and that accounts precede per-person data.
 
 [ADR 0013: Adopt Server-Side Sessions And Per-Account Ownership](0013-adopt-account-sessions-and-ownership.md) records the account module, in-memory sessions, cookie-to-header CSRF, the `CurrentAccount` ownership port, role rules, and the administrator bootstrap.
+
+[ADR 0014: Derive Simulated Shipments From The Order And The Clock](0014-derive-simulated-shipments.md) records the `shipping` module, derived rather than stored shipment state, the injected clock, and deterministic delays.

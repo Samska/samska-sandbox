@@ -123,3 +123,27 @@ export function trackTransactionalRequests(page: Page): TransactionalRequestCoun
     orderPosts: () => orderPosts.length
   };
 }
+
+// Creates an approved simulated payment and its Order for the signed-in account through the existing
+// APIs, so tests about Order history do not repeat the whole browser journey.
+export async function createOrderViaApi(
+  request: APIRequestContext,
+  productId: string,
+  quantity: number
+): Promise<OrderDto> {
+  const headers = await xsrfHeaders(request);
+  const added = await request.post("/api/cart/items", { data: { productId, quantity }, headers });
+  expect(added.status(), "add to cart").toBe(200);
+  const cart = (await added.json()) as CartDto;
+
+  const attemptId = crypto.randomUUID();
+  const attempt = await request.post("/api/payment-attempts", {
+    data: { attemptId, cartRevision: cart.revision, scenario: "approve" },
+    headers
+  });
+  expect(attempt.status(), "approve payment").toBe(201);
+
+  const order = await request.post("/api/orders", { data: { paymentAttemptId: attemptId }, headers });
+  expect(order.status(), "create order").toBe(201);
+  return (await order.json()) as OrderDto;
+}
