@@ -6,6 +6,7 @@ import AccountPage, { accountPath } from "./auth/AccountPage";
 import { useAuth, type AuthState } from "./auth/AuthContext";
 import Button from "./ui/Button";
 import StatusMessage from "./ui/StatusMessage";
+import DemoBanner from "./demo/DemoBanner";
 import OperationsPage, { operationsPath } from "./operations/OperationsPage";
 import OrdersPage, { ordersPath } from "./orders/OrdersPage";
 import TrackingPage from "./orders/TrackingPage";
@@ -38,6 +39,7 @@ export default function App() {
       >
         Skip to main content
       </a>
+      <DemoBanner />
       <header className="sticky top-0 z-20 border-b-2 border-ink bg-canvas/95 backdrop-blur-sm">
         <div className="mx-auto flex min-h-[3.75rem] w-[min(100%-2.5rem,76rem)] flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1 sm:gap-x-6">
           <a

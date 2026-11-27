@@ -67,6 +67,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-071-inventory-reservations.md](ss-071-inventory-reservations.md) | Reserving then consuming stock in one transaction, ordered row locks, and expiry without a scheduler. |
 | [ss-072-observability.md](ss-072-observability.md) | Correlation IDs, MDC, structured request logs, Micrometer meters, and reporting honest "no data" figures. |
 | [ss-073-rate-limiting-and-hardening.md](ss-073-rate-limiting-and-hardening.md) | Fixed-window rate limiting, why lockout can backfire, fail-closed production configuration, and a threat model. |
+| [ss-074-demo-mode-and-containers.md](ss-074-demo-mode-and-containers.md) | Multi-stage images, trusting a reverse proxy, and a safe synthetic-data reset. |
 | [ss-065-cart-persistence.md](ss-065-cart-persistence.md) | Transactional update contract for a mutable aggregate, row-lock serialization of a business revision, domain rules kept out of the store, and snapshot rows without a foreign key. |
 | [ss-049-order-persistence.md](ss-049-order-persistence.md) | Port-first PostgreSQL persistence, unique-key idempotency, transaction rollback versus lost responses, restart evidence, and bounded database-failure behavior. |
 | [ss-040-release-preparation.md](ss-040-release-preparation.md) | Release preparation versus publication, annotated immutable tags, source-only releases, build metadata versus product version, and exposure-based dependency triage. |

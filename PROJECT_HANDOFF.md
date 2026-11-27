@@ -4,6 +4,11 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-074 — Demo mode and containers (#144, v1.0.0 part 2)
+
+- Build: `GET /api/config`, administrator-only demo reset (optional cron), demo banner, backend and web images, `compose.demo.yaml`, [Deployment](docs/DEPLOYMENT.md), [v1.0.0 release notes](docs/releases/v1.0.0.md) ([ADR 0018](docs/adr/0018-add-demo-mode-and-containers.md)).
+- State: v1.0.0 is prepared on `release/1.0`; nothing is merged into `main` and no tag exists. Next step: the owner validates `release/1.0` locally and authorizes one merge into `main` plus the `v1.0.0` tag.
+
 ## SS-073 — Security hardening (#142, v1.0.0 part 1)
 
 - Build: per-client rate limiting, API security headers, `prod` profile with secure cookies and a startup guard, [Threat Model](docs/THREAT-MODEL.md) ([ADR 0017](docs/adr/0017-harden-the-public-demo.md)).

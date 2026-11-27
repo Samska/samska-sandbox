@@ -121,6 +121,8 @@ Design baseline for every release is the owner-approved [Bench prototype](design
 
 Limits that remain true at v1.0.0 and are never presented as resolved: synthetic data and simulated payments only, a single application process, no email or real couriers, no real identity provider. The mobile phone layout in Bench stays a responsive-web design; a native app is not part of 1.0.
 
+Delivery state (2026-11-27): v0.2.0 to v1.0.0 are built on `release/1.0` and await the owner's validation; see the [v1.0.0 release notes](releases/v1.0.0.md).
+
 ## Beyond v1.0.0
 
 The earlier directional themes are kept as candidates after 1.0. None has measured evidence yet, so none is scheduled. A technology is evaluated only when an identified engineering problem justifies it.
