@@ -71,6 +71,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-075-admin-area-and-vps.md](ss-075-admin-area-and-vps.md) | Interface versus server authorization, TLS termination with a reverse proxy, and tested backups. |
 | [ss-076-railway-deployment.md](ss-076-railway-deployment.md) | Configuring one image by environment, failing closed, and what a platform's proxy changes about client addresses. |
 | [ss-077-empty-state-design-fix.md](ss-077-empty-state-design-fix.md) | Prototype fidelity in the running app and one shared component for a repeated pattern. |
+| [ss-078-theme-switch.md](ss-078-theme-switch.md) | Layering a user theme override over the system preference, flash-free loading under a strict CSP, and failure-tolerant storage. |
 | [ss-065-cart-persistence.md](ss-065-cart-persistence.md) | Transactional update contract for a mutable aggregate, row-lock serialization of a business revision, domain rules kept out of the store, and snapshot rows without a foreign key. |
 | [ss-049-order-persistence.md](ss-049-order-persistence.md) | Port-first PostgreSQL persistence, unique-key idempotency, transaction rollback versus lost responses, restart evidence, and bounded database-failure behavior. |
 | [ss-040-release-preparation.md](ss-040-release-preparation.md) | Release preparation versus publication, annotated immutable tags, source-only releases, build metadata versus product version, and exposure-based dependency triage. |

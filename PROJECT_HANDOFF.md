@@ -4,6 +4,10 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-078 — Theme switch (#151, v1.0.0)
+
+- Build: Auto, Light and Dark control in both headers; the choice pins `data-theme`, is remembered in the browser and applied before first paint by `web/public/theme-init.js`. The Bench prototype header carries the same control. Requested by the owner while validating `release/1.0`.
+
 ## SS-077 — Empty-state design fix (#149, v1.0.0)
 
 - Build: shared `EmptyState` (Bench dashed outline, centred, icon, action) used by the Admin list, Cart and Checkout; the outdated "no access control" sentence is gone from the Admin header and README. Found by the owner while validating `release/1.0`.
