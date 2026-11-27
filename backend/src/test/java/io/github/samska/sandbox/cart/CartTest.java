@@ -136,4 +136,33 @@ class CartTest {
         assertThat(snapshot.total()).isEqualByComparingTo(BigDecimal.ZERO);
         assertThat(snapshot.revision()).isZero();
     }
+
+    @Test
+    void restoresStoredItemsInOrderWithTheStoredRevision() {
+        var first = new CartItem(PRODUCT, "Canvas Tote", new BigDecimal("12.50"), new Quantity(2));
+        var second = new CartItem(
+                new ProductReference(OTHER_PRODUCT_ID), "Enamel Mug", new BigDecimal("8.25"), new Quantity(3));
+
+        var cart = Cart.restore(java.util.List.of(first, second), 7);
+
+        assertThat(cart.items()).containsExactly(first, second);
+        assertThat(cart.snapshot().revision()).isEqualTo(7);
+        assertThat(cart.total()).isEqualByComparingTo("49.75");
+
+        cart.addItem(PRODUCT, "ignored", new BigDecimal("1.00"), new Quantity(1));
+
+        assertThat(cart.items().getFirst().quantity().value()).isEqualTo(3);
+        assertThat(cart.items()).extracting(CartItem::product).containsExactly(PRODUCT, second.product());
+        assertThat(cart.snapshot().revision()).isEqualTo(8);
+    }
+
+    @Test
+    void restoreRejectsANegativeRevisionAndARepeatedProduct() {
+        var item = new CartItem(PRODUCT, "Canvas Tote", new BigDecimal("12.50"), new Quantity(1));
+
+        assertThatExceptionOfType(InvalidCartException.class)
+                .isThrownBy(() -> Cart.restore(java.util.List.of(item), -1));
+        assertThatExceptionOfType(InvalidCartException.class)
+                .isThrownBy(() -> Cart.restore(java.util.List.of(item, item), 1));
+    }
 }

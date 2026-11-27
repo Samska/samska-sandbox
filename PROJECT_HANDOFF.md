@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-065 — Persist the Cart in PostgreSQL (#125)
+
+- Build (no separate approval needed): the single current Cart and its revision are stored in PostgreSQL (`V2__create_cart.sql`, `JdbcCartStore`, [ADR 0009](docs/adr/0009-adopt-postgresql-cart-persistence.md)). `CartStore` now exposes `current()` and a transactional, row-locked `update(...)`; API shapes and the frontend are unchanged. New `503 cart-store-unavailable` for database outages on Cart, Payment initiation and Product deletion.
+- Boundary change: Orders and the Cart survive a restart; Products, media and Payment attempts remain process-local. A Cart line may outlive a Product lost on restart (it keeps its own name and price). Payment attempt persistence is the next slice and depends on this one.
+- Next step: owner review and merge authorization.
+
 ## SS-062 — Require an approved design before building a feature (#120)
 
 - Owner decision (2026-11-27): before a feature is built, its design must be ready as an owner-approved HTML prototype under `docs/design/`. `docs/AI-GOVERNANCE.md` (Frontend Design Review), `AGENTS.md`, the Issue Form description, and the design record now say so; the prior wording is linked at commit `d70fddd`. A feature without user-facing change records `Design: Not applicable`.
