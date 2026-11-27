@@ -17,7 +17,7 @@ import StatusMessage from "../ui/StatusMessage";
 import { adminMediaErrorMessage, adminSaveErrorMessage, isNetworkError } from "./messages";
 
 const backLinkClassName =
-  "inline-flex min-h-11 items-center justify-center justify-self-start rounded-sm border border-border-strong bg-surface px-4 py-2.5 font-bold text-brand-dark no-underline hover:border-brand hover:bg-brand hover:text-white";
+  "inline-flex min-h-11 items-center justify-center justify-self-start rounded-full border border-border-strong bg-surface px-4 py-2.5 font-bold text-brand-dark no-underline hover:border-brand hover:bg-brand hover:text-on-brand";
 
 type PostCreateImageState =
   | { kind: "none" }

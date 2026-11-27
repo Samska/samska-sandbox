@@ -2,25 +2,25 @@ import { useState } from "react";
 import type { ProductResponse } from "./catalogApi";
 import { productMediaSource } from "./mediaCatalog";
 
-const mediaAccentClassName = [
-  "border-media-teal/35 text-media-teal",
-  "border-media-olive/35 text-media-olive",
-  "border-media-rose/35 text-media-rose",
-  "border-media-slate/35 text-media-slate"
+const mediaTileClassName = [
+  "bg-media-teal",
+  "bg-media-olive",
+  "bg-media-rose",
+  "bg-media-slate"
 ] as const;
 
 type ProductMediaVariant = "card" | "detail" | "thumbnail" | "square";
 
 const mediaVariantClassName: Record<ProductMediaVariant, string> = {
-  card: "aspect-[16/10] rounded-md",
-  detail: "aspect-[4/3] rounded-lg",
+  card: "aspect-square rounded-lg",
+  detail: "aspect-square w-full max-w-md rounded-lg",
   thumbnail: "h-12 w-12 rounded-sm",
   square: "aspect-square rounded-md"
 };
 
 const monogramVariantClassName: Record<ProductMediaVariant, string> = {
-  card: "h-14 w-14 text-xl",
-  detail: "h-20 w-20 text-3xl",
+  card: "h-24 w-24 text-4xl",
+  detail: "h-28 w-28 text-5xl",
   thumbnail: "h-8 w-8 text-sm",
   square: "h-16 w-16 text-2xl"
 };
@@ -43,7 +43,7 @@ export default function ProductMedia({
   if (source !== undefined && failedSource !== source) {
     return (
       <div
-        className={`relative overflow-hidden border border-border bg-surface-muted ${mediaVariantClassName[variant]}`}
+        className={`relative overflow-hidden bg-surface-muted ${mediaVariantClassName[variant]}`}
         aria-hidden="true"
       >
         <img
@@ -61,11 +61,11 @@ export default function ProductMedia({
 
   return (
     <div
-      className={`grid place-items-center border border-border bg-linear-to-br from-surface to-surface-muted ${mediaVariantClassName[variant]}`}
+      className={`grid place-items-center ${mediaTileClassName[productMediaTone(product.name)]} ${mediaVariantClassName[variant]}`}
       aria-hidden="true"
     >
       <span
-        className={`grid place-items-center rounded-full border bg-surface/80 font-extrabold tracking-[0.04em] ${monogramVariantClassName[variant]} ${mediaAccentClassName[productMediaTone(product.name)]}`}
+        className={`grid place-items-center rounded-full bg-media-ink font-display font-extrabold tracking-[0.04em] text-white ${monogramVariantClassName[variant]}`}
       >
         {productInitial(product.name)}
       </span>
@@ -78,5 +78,5 @@ function productInitial(name: string): string {
 }
 
 function productMediaTone(name: string): number {
-  return [...name].reduce((total, character) => total + character.charCodeAt(0), 0) % 4;
+  return (name.trim().charCodeAt(0) || 0) % 4;
 }

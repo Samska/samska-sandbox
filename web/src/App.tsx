@@ -19,7 +19,7 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col">
       <a
-        className="absolute left-3 top-3 z-[2] -translate-y-[200%] rounded-sm bg-ink px-3.5 py-2.5 text-white focus:translate-y-0"
+        className="absolute left-3 top-3 z-[2] -translate-y-[200%] rounded-sm bg-ink px-3.5 py-2.5 text-canvas focus:translate-y-0"
         href="#main-content"
       >
         Skip to main content
@@ -31,13 +31,10 @@ export default function App() {
             href="/"
             aria-label="Samska Sandbox home"
           >
-            <span
-              aria-hidden="true"
-              className="grid h-8 w-8 place-items-center rounded-md bg-brand text-sm font-extrabold text-white"
-            >
-              S
+            <span aria-hidden="true" className="relative mr-2 h-3.5 w-3.5 rounded-full bg-brand">
+              <span className="absolute left-2.5 top-0 h-3.5 w-3.5 rounded-full bg-pop mix-blend-normal" />
             </span>
-            <span className="text-[1.05rem] tracking-[-0.02em]">Samska</span>
+            <span className="font-display text-[1.45rem] font-extrabold tracking-[-0.04em]">samska</span>
           </a>
           <nav aria-label="Primary" className="flex items-center gap-1">
             <a
@@ -109,7 +106,9 @@ function decodePathSegment(segment: string): string | null {
 }
 
 function navLinkClassName(isCurrent: boolean): string {
-  return `rounded-sm px-3 py-2 text-sm font-extrabold no-underline ${
-    isCurrent ? "bg-count-surface text-brand-dark" : "text-muted hover:bg-surface-muted hover:text-ink"
+  return `rounded-full border px-4 py-2.5 text-sm font-bold no-underline ${
+    isCurrent
+      ? "border-ink bg-ink text-canvas"
+      : "border-border bg-surface text-ink hover:border-border-strong"
   }`;
 }

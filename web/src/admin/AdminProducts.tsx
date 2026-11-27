@@ -134,7 +134,7 @@ export default function AdminProducts() {
           </p>
         </div>
         <a
-          className="inline-flex min-h-11 items-center justify-center rounded-sm border border-brand bg-brand px-4 py-2.5 font-bold text-white no-underline hover:border-brand-dark hover:bg-brand-dark"
+          className="inline-flex min-h-11 items-center justify-center rounded-full border border-brand bg-brand px-4 py-2.5 font-bold text-on-brand no-underline hover:border-brand-dark hover:bg-brand-dark"
           href="/admin/products/new"
         >
           Create Product
@@ -224,7 +224,7 @@ export default function AdminProducts() {
                   <div className="flex flex-wrap items-center gap-2">
                     <a
                       id={`admin-edit-${product.id}`}
-                      className="inline-flex min-h-10 items-center justify-center rounded-sm border border-border-strong bg-surface px-3 text-sm font-bold text-brand-dark no-underline hover:border-brand hover:bg-brand hover:text-white"
+                      className="inline-flex min-h-10 items-center justify-center rounded-full border border-border-strong bg-surface px-3 text-sm font-bold text-brand-dark no-underline hover:border-brand hover:bg-brand hover:text-on-brand"
                       href={`/admin/products/${encodeURIComponent(product.id)}/edit`}
                       aria-label={`Edit ${product.name}`}
                     >

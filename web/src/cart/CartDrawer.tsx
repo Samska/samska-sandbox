@@ -119,7 +119,7 @@ export default function CartDrawer({
         role="dialog"
         aria-modal="true"
         aria-labelledby="cart-heading"
-        className="relative flex h-full w-full max-w-sm flex-col border-l border-border-strong bg-cart-surface shadow-card max-[44rem]:h-auto max-[44rem]:max-h-[88dvh] max-[44rem]:max-w-none max-[44rem]:rounded-t-2xl max-[44rem]:border-l-0 max-[44rem]:border-t max-[44rem]:pb-[env(safe-area-inset-bottom)]"
+        className="relative flex h-full w-full max-w-sm flex-col rounded-l-lg bg-cart-surface shadow-card max-[44rem]:h-auto max-[44rem]:max-h-[88dvh] max-[44rem]:max-w-none max-[44rem]:rounded-t-2xl max-[44rem]:border-l-0 max-[44rem]:border-t max-[44rem]:pb-[env(safe-area-inset-bottom)]"
       >
         <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-5">
           <CartPanel

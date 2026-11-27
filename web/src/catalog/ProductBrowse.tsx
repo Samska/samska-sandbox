@@ -76,7 +76,7 @@ export default function ProductBrowse({
         </p>
         <h1
           id="product-browse-heading"
-          className="text-[clamp(1.75rem,3.5vw,2.5rem)] leading-[1.1] tracking-[-0.03em] text-ink"
+          className="text-[clamp(2rem,4.5vw,3.25rem)] font-extrabold leading-[1.05] tracking-[-0.035em] text-ink"
         >
           Products
         </h1>
@@ -88,6 +88,8 @@ export default function ProductBrowse({
             {(control) => (
               <input
                 {...control}
+                className={`${control.className} rounded-full px-5`}
+                placeholder="Search products by name"
                 type="search"
                 value={searchTerm}
                 onChange={(event) => onSearchTermChange(event.target.value)}
@@ -138,14 +140,14 @@ export default function ProductBrowse({
         </div>
       ) : null}
       {!isPending && error === null && visibleProducts.length > 0 ? (
-        <ul className="grid list-none gap-4 p-0 m-0 min-[32rem]:grid-cols-2 min-[47rem]:grid-cols-3 min-[62rem]:grid-cols-4">
+        <ul className="m-0 grid list-none gap-x-5 gap-y-8 p-0 min-[32rem]:grid-cols-2 min-[47rem]:grid-cols-3 min-[62rem]:grid-cols-4">
           {visibleProducts.map((product) => (
             <li
               key={product.id}
-              className="grid grid-rows-[auto_minmax(0,1fr)_auto_auto] gap-4 rounded-lg border border-border bg-surface p-4 hover:border-border-strong hover:shadow-product focus-within:border-border-strong focus-within:shadow-product"
+              className="grid grid-rows-[auto_minmax(0,1fr)_auto_auto] gap-3 transition-transform hover:-translate-y-0.5 focus-within:-translate-y-0.5"
             >
               <ProductMedia product={product} variant="card" />
-              <div className="grid min-w-0 content-start gap-1">
+              <div className="grid min-w-0 content-start gap-1 px-1">
                 <h3 className="text-base font-extrabold leading-snug tracking-[-0.01em] text-ink">
                   {product.name}
                 </h3>
@@ -153,7 +155,7 @@ export default function ProductBrowse({
                   {product.description}
                 </p>
               </div>
-              <p className="text-xl font-extrabold tracking-[-0.01em] text-ink">
+              <p className="px-1 font-display text-xl font-extrabold tracking-[-0.01em] text-ink">
                 {formatAmount(product.price)}
               </p>
               <div className="flex items-center gap-2">

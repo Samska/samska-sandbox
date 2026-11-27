@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-060 — Vitrine applied to the web application (#115)
+
+- Owner Build authorization (2026-11-27): "Eu autorizo", for the scope in [Issue #115](https://github.com/Samska/samska-sandbox/issues/115): move the Vitrine tokens into the Tailwind theme and restyle shared components, with no behavior, route, backend, or test-contract change. Work is on `feat/ss-060-vitrine-web`.
+- Agent Verification: typecheck and the 196 unit tests pass; screenshots of Market, Product detail, Cart drawer, Checkout, and Admin at 1280 and 390 px in light and dark were reviewed against a local mock API. The browser E2E journey could not run locally (backend needs Java 25 and PostgreSQL) and is left to CI. Human Verification is pending.
+- Next: owner Human Verification of the running app before commit.
+
 ## SS-058 — Adopt Claude as the agent harness (#111)
 
 - The owner moved from ChatGPT and OpenCode to Claude (Claude Desktop and Claude Code). `AGENTS.md` remains the shared, tool-independent source; a thin root `CLAUDE.md` imports it so Claude Code loads the same rules. No rule, provider, model, permission, or tooling configuration was added.

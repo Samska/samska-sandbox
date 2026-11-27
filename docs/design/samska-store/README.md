@@ -9,6 +9,16 @@ Status: **Owner-approved Candidate 03 — design approval only. Provisional illu
 - Candidate: `Samska Store — Catalog Candidate 03`
 - Token source: [tokens.json](tokens.json)
 
+## SS-060 — Vitrine applied to the web application (in build)
+
+Status: **Owner Build authorization 2026-11-27 ("Eu autorizo"). Human Verification pending.**
+
+- Issue: [SS-060 / #115](https://github.com/Samska/samska-sandbox/issues/115)
+- The Vitrine tokens now live in the Tailwind theme in `web/src/index.css`, with a dark palette that follows the operating-system setting. Buttons and links are pills, panels use larger radii, headings use Bricolage Grotesque and text uses Inter (loaded from Google Fonts in `web/index.html`, with system fallbacks).
+- Product media is a large square tile. Products without an image get a colored tile with a dark monogram circle; curated and uploaded images keep the existing media pipeline.
+- Markup, routes, accessible names, focus rules, and messages are unchanged, so the existing unit tests and the browser journey are unchanged.
+- Deviations from the prototype, kept to avoid changing behavior: search and Cart trigger stay in the page instead of the header, there is no hero banner, and Checkout keeps its current single-surface layout instead of the three-step rail.
+
 ## SS-057 — HTML prototypes replace Penpot as the design source (owner-verified)
 
 Status: **Owner-approved approach and Vitrine direction (2026-11-27). Design approval only. Not production adoption.**
