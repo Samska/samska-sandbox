@@ -131,7 +131,7 @@ export default function CheckoutReview({
     <section
       id="checkout"
       ref={sectionRef}
-      className="grid min-w-0 gap-5 overflow-hidden rounded-lg border border-border bg-surface shadow-card"
+      className="grid min-w-0 gap-5 overflow-hidden rounded-sm border-[1.5px] border-ink bg-surface shadow-card"
       aria-labelledby="checkout-heading"
       aria-busy={controlsDisabled}
     >
@@ -142,7 +142,7 @@ export default function CheckoutReview({
       </div>
       <div className="grid gap-5 px-5 pb-6">
         <div className="grid gap-1.5">
-          <p className="text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted">
+          <p className="font-mono text-[0.75rem] font-medium uppercase tracking-[0.14em] text-muted">
             Checkout
           </p>
           <h1
@@ -181,7 +181,7 @@ export default function CheckoutReview({
           </div>
         ) : null}
         {cart.items.length === 0 ? (
-          <div className="grid gap-2 rounded-lg bg-surface-muted px-4 py-5">
+          <div className="grid gap-2 rounded-sm bg-surface-muted px-4 py-5">
             <h2
               id="checkout-empty-heading"
               ref={emptyStateRef}
@@ -214,13 +214,13 @@ export default function CheckoutReview({
                 />
               ))}
             </ul>
-            <dl className="flex items-baseline justify-between gap-4 rounded-lg bg-surface-muted px-4 py-3.5">
+            <dl className="flex items-baseline justify-between gap-4 rounded-sm bg-surface-muted px-4 py-3.5">
               <dt className="text-sm font-bold uppercase tracking-[0.12em] text-muted">Total</dt>
               <dd className="m-0 text-2xl font-extrabold tracking-[-0.02em] text-ink">
                 {formatAmount(cart.total)}
               </dd>
             </dl>
-            <div className="grid gap-3 rounded-lg border border-border px-4 py-4">
+            <div className="grid gap-3 rounded-sm border-[1.5px] border-ink px-4 py-4">
               <h2 id="checkout-payment-heading" className="text-lg leading-[1.15] text-ink">
                 Simulated payment
               </h2>
@@ -237,7 +237,7 @@ export default function CheckoutReview({
                   value={scenario}
                   onChange={(event) => setScenario(event.target.value as PaymentScenario)}
                   disabled={controlsDisabled}
-                  className="h-11 rounded-md border border-border-strong bg-surface px-3 font-bold text-ink"
+                  className="h-11 rounded-sm border-[1.5px] border-ink bg-surface px-3 font-bold text-ink"
                 >
                   <option value="approve">Approve</option>
                   <option value="decline">Decline</option>

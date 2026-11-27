@@ -10,6 +10,12 @@ Update rule: this snapshot must be updated in the same change when project state
 - Boundary change: no application state is process-local any more outside the `no-database` test profile; the earlier "Products and media are lost on restart" statements are superseded.
 - Next step: owner review and merge authorization.
 
+## SS-064 — Bench applied to the web application (#124)
+
+- Owner approved the Bench identity and asked for implementation while away (2026-11-27). `web/` now uses the Bench tokens, fonts and components on every existing screen; "Next · design only" screens are not built. Backend and routes are unchanged. The branch is based on the SS-063 branch, so [PR #123](https://github.com/Samska/samska-sandbox/pull/123) merges first.
+- Agent Verification: typecheck, 262 unit and component tests, production build, and 11 Playwright tests against the real backend (the 2 existing journey tests plus 9 new identity tests), all run locally. Human Verification is pending: the owner runs the app locally.
+- Next step: owner local validation, then merge authorization for #123 and the SS-064 pull request in that order.
+
 ## SS-066 — Persist Payment attempts in PostgreSQL (#127)
 
 - Build (stacked on SS-065, merge after it): simulated Payment attempts, their frozen Cart snapshots and the one-approval-per-Cart-revision rule are stored in PostgreSQL (`V3__create_payment_attempts.sql`, `JdbcPaymentStore`, [ADR 0010](docs/adr/0010-adopt-postgresql-payment-attempt-persistence.md)). The 32-attempt cap is removed for the database-backed store; the in-memory store keeps it for the `no-database` test profile. New `503 payment-store-unavailable`. API shapes and `web/` are unchanged.
@@ -21,6 +27,13 @@ Update rule: this snapshot must be updated in the same change when project state
 - Build (no separate approval needed): the single current Cart and its revision are stored in PostgreSQL (`V2__create_cart.sql`, `JdbcCartStore`, [ADR 0009](docs/adr/0009-adopt-postgresql-cart-persistence.md)). `CartStore` now exposes `current()` and a transactional, row-locked `update(...)`; API shapes and the frontend are unchanged. New `503 cart-store-unavailable` for database outages on Cart, Payment initiation and Product deletion.
 - Boundary change: Orders and the Cart survive a restart; Products, media and Payment attempts remain process-local. A Cart line may outlive a Product lost on restart (it keeps its own name and price). Payment attempt persistence is the next slice and depends on this one.
 - Next step: owner review and merge authorization.
+
+## SS-063 — Bench brand and all-screen design (#121)
+
+- Owner request (2026-11-27): Vitrine felt generic, so redesign everything that exists and the upcoming features before building them. PR #118 (SS-060, Vitrine in `web/`) was closed by the owner; its branch is kept.
+- Deliverable: [prototypes/bench.html](docs/design/samska-store/prototypes/bench.html) and its tokens, plus the SS-063 section of the [design record](docs/design/samska-store/README.md). An instrument-maker's catalog identity; every current screen and state, and design-only previews of upcoming features marked as not approved scope.
+- Agent Verification: Chromium at 1280 and 390 px, light and dark, all routes, no console errors or overflow. Human Verification: the owner reviews the open pull request and the rendered file.
+- Human Verification (owner-reported, 2026-11-27): "Gostei da identidade visual, podemos seguir por esse caminho." Applying it to `web/` is SS-064.
 
 ## SS-062 — Require an approved design before building a feature (#120)
 

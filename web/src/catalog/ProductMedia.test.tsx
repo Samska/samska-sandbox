@@ -40,7 +40,7 @@ describe("ProductMedia", () => {
     const { container } = render(<ProductMedia product={product} variant="card" />);
 
     expect(container.querySelector("img")).toBeNull();
-    expect(container.textContent).toBe("C");
+    expect(container.textContent).toMatch(/^No\. \d{4}C$/);
   });
 
   it("renders the fallback for a well-formed key without a local asset", () => {
@@ -49,7 +49,7 @@ describe("ProductMedia", () => {
     );
 
     expect(container.querySelector("img")).toBeNull();
-    expect(container.textContent).toBe("C");
+    expect(container.textContent).toMatch(/^No\. \d{4}C$/);
   });
 
   it("switches to the fallback when the image fails to load", () => {
@@ -60,7 +60,7 @@ describe("ProductMedia", () => {
     fireEvent.error(container.querySelector("img") as HTMLImageElement);
 
     expect(container.querySelector("img")).toBeNull();
-    expect(container.textContent).toBe("C");
+    expect(container.textContent).toMatch(/^No\. \d{4}C$/);
   });
 
   it("shows a replacement image after an earlier source failed", () => {
@@ -120,5 +120,38 @@ describe("ProductMedia", () => {
 
     expect(container.querySelector("img")).toBeNull();
     expect(container.textContent).toBe("C");
+  });
+
+  it("derives a stable four-digit catalog number from the Product id", () => {
+    const first = render(<ProductMedia product={product} variant="card" />);
+    const second = render(<ProductMedia product={product} variant="detail" />);
+    const other = render(
+      <ProductMedia product={{ ...product, id: "99999999-8888-7777-6666-555555555555" }} variant="card" />
+    );
+    const numberOf = (text: string | null) => /No\. (\d{4})/.exec(text ?? "")?.[1];
+
+    expect(numberOf(first.container.textContent)).toBeDefined();
+    expect(numberOf(first.container.textContent)).toBe(numberOf(second.container.textContent));
+    expect(numberOf(other.container.textContent)).not.toBe(numberOf(first.container.textContent));
+  });
+
+  it("omits the catalog number on small variants", () => {
+    const square = render(<ProductMedia product={product} variant="square" />);
+
+    expect(square.container.textContent).toBe("C");
+  });
+
+  it("keeps the whole stage hidden from assistive technology", () => {
+    const { container } = render(<ProductMedia product={product} variant="card" />);
+
+    expect(container.firstElementChild).toHaveAttribute("aria-hidden", "true");
+  });
+
+  it("gives the fallback stage one of four tones by name", () => {
+    const { container } = render(<ProductMedia product={product} variant="card" />);
+
+    expect(container.firstElementChild?.className).toMatch(
+      /bg-media-(teal|olive|rose|slate)/
+    );
   });
 });

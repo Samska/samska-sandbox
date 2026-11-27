@@ -46,12 +46,12 @@ export default function PaymentResult({
   return (
     <section
       id="payment-result"
-      className="grid min-w-0 gap-5 overflow-hidden rounded-lg border border-border bg-surface shadow-card"
+      className="grid min-w-0 gap-5 overflow-hidden rounded-sm border-[1.5px] border-ink bg-surface shadow-card"
       aria-labelledby="payment-result-heading"
     >
       <div className="grid gap-5 px-5 py-6">
         <div className="grid gap-1.5">
-          <p className="text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted">
+          <p className="font-mono text-[0.75rem] font-medium uppercase tracking-[0.14em] text-muted">
             Payment result
           </p>
           <h1
@@ -85,7 +85,7 @@ export default function PaymentResult({
           {attempt.items.map((item) => (
             <li
               key={item.productId}
-              className="flex items-center justify-between gap-4 rounded-lg border border-border bg-surface-muted px-4 py-3"
+              className="flex items-center justify-between gap-4 rounded-sm border-[1.5px] border-ink bg-surface-muted px-4 py-3"
             >
               <div className="grid gap-0.5">
                 <span className="font-bold text-ink">
@@ -99,7 +99,7 @@ export default function PaymentResult({
             </li>
           ))}
         </ul>
-        <dl className="flex items-baseline justify-between gap-4 rounded-lg bg-surface-muted px-4 py-3.5">
+        <dl className="flex items-baseline justify-between gap-4 rounded-sm bg-surface-muted px-4 py-3.5">
           <dt className="text-sm font-bold uppercase tracking-[0.12em] text-muted">Captured total</dt>
           <dd className="m-0 text-2xl font-extrabold tracking-[-0.02em] text-ink">
             {formatAmount(attempt.total)}
@@ -107,7 +107,7 @@ export default function PaymentResult({
         </dl>
         {isApproved && onViewOrder ? <Button onClick={onViewOrder}>View saved Order</Button> : null}
         {isApproved && onCreateOrder && !onViewOrder ? (
-          <div className="grid gap-3 rounded-lg border border-border px-4 py-4" aria-busy={orderPending}>
+          <div className="grid gap-3 rounded-sm border-[1.5px] border-ink px-4 py-4" aria-busy={orderPending}>
             <h2 className="text-lg text-ink">Create an Order</h2>
             <p className="text-sm text-muted">This action records the frozen simulated payment items and total. It does not clear your live Cart.</p>
             {orderPending ? <StatusMessage tone="pending">Checking Order...</StatusMessage> : null}

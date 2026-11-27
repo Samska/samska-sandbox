@@ -79,7 +79,7 @@ export default function ProductImageSection({
   }
 
   return (
-    <section className="grid gap-4 rounded-lg border border-border bg-surface p-5" aria-labelledby={`${idPrefix}-image`}>
+    <section className="grid gap-4 rounded-sm border-[1.5px] border-ink bg-surface p-5" aria-labelledby={`${idPrefix}-image`}>
       <h2 id={`${idPrefix}-image`} className="text-lg leading-[1.15] text-ink">
         Product image
       </h2>
@@ -127,7 +127,7 @@ export default function ProductImageSection({
           </div>
           {isConfirmingRemoval && product !== null ? (
             <div
-              className="grid gap-3 rounded-md border border-danger bg-surface-muted p-3"
+              className="grid gap-3 rounded-sm border border-danger bg-surface-muted p-3"
               role="group"
               aria-labelledby={`${idPrefix}-remove-heading`}
             >

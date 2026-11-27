@@ -12,7 +12,7 @@ export default function OrderResult({ order, onBackToMarket, onBackToCheckout }:
   useEffect(() => { headingRef.current?.focus(); }, []);
 
   return (
-    <section aria-labelledby="order-result-heading" className="grid gap-5 rounded-lg border border-border bg-surface px-5 py-6 shadow-card">
+    <section aria-labelledby="order-result-heading" className="grid gap-5 rounded-sm border-[1.5px] border-ink bg-surface px-5 py-6 shadow-card">
       <h1 id="order-result-heading" ref={headingRef} tabIndex={-1} className="text-2xl font-bold text-ink">
         Order created
       </h1>
@@ -21,7 +21,7 @@ export default function OrderResult({ order, onBackToMarket, onBackToCheckout }:
       <h2 className="text-lg text-ink">Ordered items</h2>
       <ul className="grid gap-3">
         {order.items.map((item) => (
-          <li key={item.productId} className="flex min-w-0 flex-wrap justify-between gap-4 rounded-lg bg-surface-muted px-4 py-3">
+          <li key={item.productId} className="flex min-w-0 flex-wrap justify-between gap-4 rounded-sm bg-surface-muted px-4 py-3">
             <span>{item.name} × {item.quantity} · {formatAmount(item.unitPrice)} each</span>
             <strong>{formatAmount(item.lineSubtotal)}</strong>
           </li>

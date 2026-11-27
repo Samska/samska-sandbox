@@ -46,14 +46,14 @@ export default function CartPanel({
         </h2>
         <div className="flex items-center gap-2">
           {cart !== null ? (
-            <span className="rounded-full bg-count-surface px-3 py-1 text-sm font-extrabold text-brand-dark">
+            <span className="rounded-[3px] border-[1.5px] border-ink bg-count-surface px-2.5 py-0.5 font-mono text-xs font-semibold text-ink">
               {itemCount} {itemCount === 1 ? "item" : "items"}
             </span>
           ) : null}
           {onClose === undefined ? null : (
             <button
               type="button"
-              className="grid h-9 w-9 place-items-center rounded-full border border-border-strong bg-surface text-lg font-extrabold text-ink hover:bg-surface-muted"
+              className="grid h-9 w-9 place-items-center rounded-full border-[1.5px] border-ink bg-surface text-lg font-extrabold text-ink hover:bg-surface-muted"
               onClick={onClose}
               aria-label="Close Cart"
             >
@@ -77,7 +77,7 @@ export default function CartPanel({
         </div>
       ) : null}
       {cart !== null && cart.items.length === 0 ? (
-        <div className="grid gap-2 rounded-lg bg-surface-muted px-4 py-5">
+        <div className="grid gap-2 rounded-sm bg-surface-muted px-4 py-5">
           <p className="font-bold text-ink">Your Cart is empty.</p>
           <p className="text-sm text-muted">Products you add from the storefront appear here.</p>
         </div>
@@ -95,7 +95,7 @@ export default function CartPanel({
               />
             ))}
           </ul>
-          <dl className="flex items-baseline justify-between gap-4 rounded-lg bg-surface-muted px-4 py-3.5">
+          <dl className="flex items-baseline justify-between gap-4 rounded-sm bg-surface-muted px-4 py-3.5">
             <dt className="text-sm font-bold uppercase tracking-[0.12em] text-muted">Total</dt>
             <dd className="m-0 text-2xl font-extrabold tracking-[-0.02em] text-ink">
               {formatAmount(cart.total)}

@@ -1,78 +1,126 @@
 @import "tailwindcss";
 
 @theme {
-  --color-canvas: #f5f2ec;
-  --color-surface: #ffffff;
-  --color-surface-muted: #ede9e1;
-  --color-ink: #1f2933;
-  --color-muted: #5d6872;
-  --color-brand: #175e75;
-  --color-brand-dark: #10485a;
-  --color-focus: #c87500;
-  --color-success: #14532d;
-  --color-danger: #9f1239;
-  --color-border: #d7d0c5;
-  --color-border-strong: #b6aa9b;
-  --color-media-teal: #175e75;
-  --color-media-olive: #76634b;
-  --color-media-rose: #7a4f5d;
-  --color-media-slate: #4c6575;
-  --color-success-surface: #e8f3eb;
-  --color-success-border: #b9d9c0;
-  --color-success-text: #14532d;
-  --color-pending-surface: #f5f0df;
-  --color-cart-surface: #fffdf9;
-  --color-count-surface: #e6f0f2;
+  --color-canvas: #e4e7e4;
+  --color-surface: #f7f8f5;
+  --color-surface-muted: #d9ddd9;
+  --color-ink: #111518;
+  --color-muted: #4f5a55;
+  --color-brand: #ff4a1c;
+  --color-brand-dark: #111518;
+  --color-on-brand: #111518;
+  --color-on-danger: #ffffff;
+  --color-focus: #0a58ff;
+  --color-success: #0b6b37;
+  --color-danger: #b3112f;
+  --color-border: #b9c0bb;
+  --color-border-strong: #111518;
+  --color-media-teal: #c3d6c9;
+  --color-media-olive: #f0d9a0;
+  --color-media-rose: #d9c6e4;
+  --color-media-slate: #bcd0e4;
+  --color-success-surface: #d3eddc;
+  --color-success-border: #8fcaa4;
+  --color-success-text: #0b6b37;
+  --color-pending-surface: #f6e6b4;
+  --color-cart-surface: #f7f8f5;
+  --color-count-surface: #ffd9cf;
 
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: "Archivo", "Arial Narrow", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
   --radius-sm: 0.375rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.375rem;
 
-  --shadow-card: 0 0.75rem 2rem rgb(31 41 51 / 8%);
-  --shadow-product: 0 0.5rem 1.25rem rgb(31 41 51 / 7%);
-  --shadow-product-hover: 0 0.75rem 1.75rem rgb(31 41 51 / 11%);
+  --shadow-card: 0 0.25rem 0 var(--color-ink);
+  --shadow-product: 0 0.2rem 0 var(--color-ink);
+  --shadow-product-hover: 0 0.3rem 0 var(--color-ink);
 }
 
-* {
-  box-sizing: border-box;
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --color-canvas: #0e1114;
+    --color-surface: #171b1f;
+    --color-surface-muted: #232930;
+    --color-ink: #eef0ec;
+    --color-muted: #98a39d;
+    --color-brand: #ff5a2e;
+    --color-brand-dark: #eef0ec;
+    --color-on-brand: #111518;
+    --color-on-danger: #111518;
+    --color-focus: #7aa6ff;
+    --color-success: #6fe0a0;
+    --color-danger: #ff8fa5;
+    --color-border: #343c43;
+    --color-border-strong: #eef0ec;
+    --color-media-teal: #3a4d41;
+    --color-media-olive: #5a4c26;
+    --color-media-rose: #4a3d57;
+    --color-media-slate: #34475a;
+    --color-success-surface: #12301f;
+    --color-success-border: #1f5a38;
+    --color-success-text: #6fe0a0;
+    --color-pending-surface: #382b0a;
+    --color-cart-surface: #171b1f;
+    --color-count-surface: #4a2216;
+  }
 }
 
-html {
-  scroll-behavior: smooth;
-}
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
 
-body {
-  min-width: 20rem;
-  margin: 0;
-  background: var(--color-canvas);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
-  font-synthesis: none;
-  line-height: 1.5;
-}
+  html {
+    scroll-behavior: smooth;
+  }
 
-button,
-input {
-  font: inherit;
-}
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 900;
+    font-stretch: 75%;
+    letter-spacing: -0.01em;
+    line-height: 0.98;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
 
-button:disabled,
-input:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
+  body {
+    min-width: 20rem;
+    margin: 0;
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-stretch: 100%;
+    font-synthesis: none;
+    line-height: 1.5;
+  }
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-summary:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 3px;
-}
+  button,
+  input {
+    font: inherit;
+  }
 
-[role="alert"] {
-  color: var(--color-danger);
-  font-weight: 700;
+  button:disabled,
+  input:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  button:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  summary:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  [role="alert"] {
+    color: var(--color-danger);
+    font-weight: 700;
+  }
 }

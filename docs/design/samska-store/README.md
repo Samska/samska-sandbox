@@ -24,6 +24,31 @@ Status: **Owner-approved approach and Vitrine direction (2026-11-27). Design app
 - Assumptions to confirm: amounts keep the en-US two-decimal format without a currency symbol; illustrations stay provisional and geometric; product names and prices come from the earlier design examples; the prototype has no stock concept because the application has none.
 - Not changed: `web/` code, backend behavior, and the Penpot-era token file [tokens.json](tokens.json). Applying the redesign to the application is separate, explicitly authorized work.
 
+## SS-063 — Bench: a distinctive brand and every screen, current and upcoming (first version for owner review)
+
+Status: **First version for owner review (2026-11-27). Design only. Not approved until the owner approves it, and not production adoption.**
+
+- Issue: [SS-063 / #121](https://github.com/Samska/samska-sandbox/issues/121)
+- Why: the owner liked Vitrine but found it generic, "not a real product", and asked to see every existing screen and the upcoming features designed before they are built. Closing [PR #118](https://github.com/Samska/samska-sandbox/pull/118) (Vitrine applied to `web/`) was the owner's decision.
+- Source of truth: [prototypes/bench.html](prototypes/bench.html), a single self-contained file that opens in a browser with no build step, and [prototypes/bench.tokens.json](prototypes/bench.tokens.json). Fonts load from Google Fonts with system fallbacks. A review bar at the bottom switches screen, state, inventory display and theme; every screen is also addressable by hash (for example `bench.html#checkout`).
+- Brand idea: an instrument-maker's workshop catalog. Products are "objects" with a catalog number, material and dimensions; the cart is the "slip". Signature elements: hang-tag prices, registration marks and grid lines on product stages, a perforated order slip, dimension lines, mono data type, a stamp for outcomes. One signal orange-red on a cool grey ground and ink black; Archivo (wide and condensed widths) with IBM Plex Mono.
+- Current screens and states: Catalog (loaded, loading, empty, error), Object detail (loaded, adding, sold out), Slip drawer and cart (filled, empty, updating, error), Checkout (review, empty, changed), simulated Payment (approved, declined, temporary failure, cart changed, checking, could not check), Order (created, creating, error), Admin (list, empty, error, confirm delete; create with validation, image upload and unsupported file; edit and missing object), Not found. Light and dark; checked at 1280 and 390 px.
+- Upcoming features, design only and **not approved scope** (marked "Next · design only" in the file; they come from [ROADMAP.md](../../ROADMAP.md) and [PRODUCT.md](../../PRODUCT.md) and are directional): account sign-in and creation, order history, delivery tracking (in transit, delivered, delayed), inventory states on the catalog and detail, an operations dashboard with synthetic figures, and a phone app layout. A public demo banner is part of the shell design; it shows on the account screen and whenever the inventory display is switched on.
+- Agent Verification: opened in Chromium at 1280 and 390 px in light and dark; every route loaded with no console errors and no horizontal overflow.
+- Supersedes: the Vitrine direction for future work (Vitrine files stay as history). The design-before-build rule itself is SS-062.
+- Open questions for the owner: whether the workshop-catalog personality fits; the name vocabulary (objects, slip); the signal color; whether any previewed upcoming screen should be dropped or reordered.
+- Not changed: `web/` code, backend behavior, and earlier tokens files. Applying the design is separate work that needs its own Issue.
+
+## SS-064 — Bench applied to the web application
+
+Status: **Implemented for owner local validation (2026-11-27). The owner approved the Bench identity; this applies it to the screens that exist.**
+
+- Issue: [SS-064 / #124](https://github.com/Samska/samska-sandbox/issues/124). Based on the SS-063 branch because [PR #123](https://github.com/Samska/samska-sandbox/pull/123) was not merged when this was built.
+- Applied: Bench tokens (light and dark) in the Tailwind theme in `web/src/index.css`, Archivo and IBM Plex Mono, the wordmark and STORE tag, inverted current-page navigation, mono uppercase buttons with a hard offset shadow, object stages with catalog numbers and hang-tag prices on the Market, Product detail, Cart drawer, Checkout, simulated Payment, Order, Admin and Not found.
+- Not applied: screens marked "Next · design only" in the prototype. The cart keeps its "Cart" wording in the app; "Slip" stays a prototype idea until the owner decides.
+- Deviations from the prototype: the catalog number is derived from the Product id because Products have no catalog number yet; the fallback stage uses a monogram because there are no illustrations; the success text color was darkened from `#0d7a3f` to `#0b6b37` in the app, the prototype and the tokens to reach 4.5:1 on its surface (found by the new contrast test).
+- Verification: unit and component tests, a contrast test over the token pairs, and Playwright checks at 1280 and 390 px in light and dark, as described in [TESTING.md](../../TESTING.md).
+
 ## SS-053 — Current-interface Batch 1 (owner-approved, revn 52)
 
 Status: **Owner-approved design delivery (Batch 1) at `revn 52`; completed via Issue #102 and merged PR #103. Design approval only; not production adoption.**

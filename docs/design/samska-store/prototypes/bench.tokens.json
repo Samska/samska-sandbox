@@ -1,0 +1,53 @@
+{
+  "$description": "Samska Store Bench prototype tokens (SS-063). Extracted from prototypes/bench.html; the HTML is the source of truth. First version for owner review, not production adoption.",
+  "color": {
+    "light": {
+      "ground": "#e4e7e4",
+      "paper": "#f7f8f5",
+      "ink": "#111518",
+      "signal": "#ff4a1c",
+      "signalInk": "#111518",
+      "ok": "#0b6b37",
+      "okBg": "#d3eddc",
+      "bad": "#b3112f",
+      "badBg": "#f8d9df",
+      "wait": "#7a5200",
+      "waitBg": "#f6e6b4",
+      "focus": "#0a58ff"
+    },
+    "dark": {
+      "ground": "#0e1114",
+      "paper": "#171b1f",
+      "paper2": "#232930",
+      "ink": "#eef0ec",
+      "muted": "#98a39d",
+      "hair": "#343c43",
+      "signal": "#ff5a2e",
+      "signalInk": "#111518",
+      "ok": "#6fe0a0",
+      "okBg": "#12301f",
+      "bad": "#ff8fa5",
+      "badBg": "#3a1420",
+      "wait": "#ffd36b",
+      "waitBg": "#382b0a",
+      "focus": "#7aa6ff"
+    }
+  },
+  "stage": {
+    "light": ["#c3d6c9", "#f0d9a0", "#bcd0e4", "#d9c6e4"],
+    "dark": ["#3a4d41", "#5a4c26", "#34475a", "#4a3d57"]
+  },
+  "font": {
+    "display": "Archivo (variable width axis, 75 to 125)",
+    "mono": "IBM Plex Mono"
+  },
+  "radius": {
+    "control": "6px"
+  },
+  "brand": {
+    "name": "Samska Store",
+    "idea": "An instrument-maker's workshop catalog: objects are specimens with a number, material and dimensions.",
+    "signature": ["object numbers (No. 0101)", "hang-tag prices", "registration marks on product stages", "perforated order slip", "dimension lines", "mono data type"],
+    "voice": "Plain, concrete, short. The cart is the Slip; the catalog is Objects."
+  }
+}
