@@ -1,10 +1,13 @@
 package io.github.samska.sandbox.order.application;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
 import io.github.samska.sandbox.order.Order;
+import io.github.samska.sandbox.order.OrderSummary;
 
 @Service
 public class OrderApplicationService {
@@ -28,5 +31,13 @@ public class OrderApplicationService {
 
     public Order getByPaymentAttemptId(UUID attemptId) {
         return store.findByPaymentAttemptId(attemptId).orElseThrow(OrderNotFoundException::new);
+    }
+
+    public List<OrderSummary> history() {
+        return store.listForCurrentAccount();
+    }
+
+    public Instant createdAt(UUID orderId) {
+        return store.findCreatedAt(orderId).orElseThrow(OrderNotFoundException::new);
     }
 }

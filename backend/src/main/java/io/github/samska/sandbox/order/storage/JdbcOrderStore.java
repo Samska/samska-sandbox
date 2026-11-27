@@ -1,6 +1,7 @@
 package io.github.samska.sandbox.order.storage;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import io.github.samska.sandbox.account.CurrentAccount;
 import io.github.samska.sandbox.order.Order;
 import io.github.samska.sandbox.order.OrderItem;
+import io.github.samska.sandbox.order.OrderSummary;
 import io.github.samska.sandbox.order.application.OrderPaymentNotApprovedException;
 import io.github.samska.sandbox.order.application.OrderResult;
 import io.github.samska.sandbox.order.application.OrderStore;
@@ -109,6 +111,40 @@ public class JdbcOrderStore implements OrderStore {
     @Transactional(readOnly = true)
     public Optional<Order> findByPaymentAttemptId(UUID attemptId) {
         return findOrder("payment_attempt_id", attemptId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<OrderSummary> listForCurrentAccount() {
+        return jdbc.sql("""
+                        SELECT o.order_id, o.created_at, o.total,
+                               (SELECT COUNT(*) FROM order_items i WHERE i.order_id = o.order_id) AS item_count
+                        FROM orders o
+                        WHERE o.account_id = :accountId
+                        ORDER BY o.created_at DESC, o.order_id
+                        """)
+                .param("accountId", currentAccount.id())
+                .query((resultSet, rowNumber) -> new OrderSummary(
+                        resultSet.getObject("order_id", UUID.class),
+                        resultSet.getObject("created_at", java.time.OffsetDateTime.class).toInstant(),
+                        resultSet.getInt("item_count"),
+                        resultSet.getBigDecimal("total")))
+                .list();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Instant> findCreatedAt(UUID orderId) {
+        if (orderId == null) {
+            return Optional.empty();
+        }
+
+        return jdbc.sql("SELECT created_at FROM orders WHERE order_id = :orderId AND account_id = :accountId")
+                .param("orderId", orderId)
+                .param("accountId", currentAccount.id())
+                .query((resultSet, rowNumber) -> resultSet.getObject("created_at", java.time.OffsetDateTime.class)
+                        .toInstant())
+                .optional();
     }
 
     private Optional<Order> findOrder(String column, UUID value) {
