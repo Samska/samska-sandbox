@@ -6,6 +6,15 @@ This guide runs the hosted demo: a synthetic-data store that anyone may use, so 
 
 `compose.demo.yaml` starts four containers: Caddy (the only one that publishes ports, 80 and 443, and that obtains and renews the TLS certificate), the web server (nginx serving the single-page application with a restrictive Content-Security-Policy and proxying `/api`), the backend with the `prod` profile and demo mode on, and PostgreSQL (no published port).
 
+## Private first, public later
+
+The stack supports two access modes, chosen only by configuration:
+
+- **Private (default).** `DEMO_ACCESS=private`: Caddy puts the whole site, API included, behind a username and password. Nobody sees the store without it. Use this until the owner has validated the release on the server.
+- **Public demo.** `DEMO_ACCESS=public` and `SAMSKA_DEMO_ENABLED=true`: the site opens to everyone with the demo banner and the Reset button, and `SAMSKA_DEMO_RESET_CRON="0 0 4 * * *"` resets the data every day at 04:00.
+
+To switch, edit `.env.demo` and run `deploy/deploy.sh`. The administrator account and the application's own sign-in work the same in both modes; the private password is an extra gate in front, not a replacement.
+
 ## What you need to provide
 
 - A Linux VPS: Ubuntu 24.04 LTS, at least 2 vCPU, 4 GB RAM and 40 GB disk.
@@ -18,7 +27,7 @@ This guide runs the hosted demo: a synthetic-data store that anyone may use, so 
 
 1. Install Docker Engine and the Compose plugin from Docker's official instructions for Ubuntu, add your user to the `docker` group, and enable a firewall that allows only 22, 80 and 443 (for example `ufw allow OpenSSH && ufw allow 80 && ufw allow 443 && ufw enable`).
 2. Clone the repository and check out the release: `git clone https://github.com/Samska/samska-sandbox.git && cd samska-sandbox`.
-3. Copy `.env.demo.example` to `.env.demo`, set `DEMO_DOMAIN`, `POSTGRES_PASSWORD`, `SAMSKA_ADMIN_EMAIL` and `SAMSKA_ADMIN_PASSWORD`, and run `chmod 600 .env.demo`.
+3. Copy `.env.demo.example` to `.env.demo`, set `DEMO_DOMAIN`, `POSTGRES_PASSWORD`, `SAMSKA_ADMIN_EMAIL` and `SAMSKA_ADMIN_PASSWORD`, and for the private mode also `DEMO_ACCESS_USER` and `DEMO_ACCESS_HASH` (make the hash with `docker run --rm caddy:2-alpine caddy hash-password --plaintext '<password>'` and keep it in single quotes). Then run `chmod 600 .env.demo`.
 4. Run `deploy/deploy.sh`. It pulls, builds, starts the stack and waits for the backend to be healthy. Open `https://<your domain>`, sign in as the administrator, and create a few synthetic Products.
 
 ## Updating, backups and recovery
@@ -43,4 +52,4 @@ This guide runs the hosted demo: a synthetic-data store that anyone may use, so 
 
 ## Verification
 
-The backend and web images were exercised locally with the Compose file: the backend became healthy under the `prod` profile, the web server delivered the single-page application with its policy headers, `/api/config` reported demo mode, API responses carried a request ID, and the eleventh credential attempt was refused with `429`. The Caddy service, the TLS certificate and the deploy, backup and restore scripts depend on a real domain and server and are exercised on the first deployment. The Docker builds run `./mvnw` and `npm ci` inside the build; a build host with TLS interception needs its certificate authority trusted in the build.
+The stack was run locally with the Compose file, a prebuilt backend jar and web build in the same base images, and `DEMO_DOMAIN=localhost` (Caddy's internal certificate): the backend became healthy under the `prod` profile; in private mode the site and API answered `401` without the password and `200` with it, and a wrong password was refused; switching to public mode opened the site, `/api/config` reported demo mode and HTTP redirected to HTTPS; a spoofed `X-Forwarded-For` did not bypass the rate limiter (the eleventh credential attempt was refused with `429`); `deploy/backup.sh` captured a created Product and `deploy/restore.sh` brought it back after deletion. Not exercised here: a real domain with a Let's Encrypt certificate, `deploy/deploy.sh` (it needs a Git remote on the server), and the Docker build stages that run `./mvnw` and `npm ci` inside the build, because the sandbox's network proxy intercepts TLS; a build host with TLS interception needs its certificate authority trusted in the build.

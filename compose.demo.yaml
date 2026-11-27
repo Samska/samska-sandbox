@@ -1,3 +1,5 @@
+name: samska-demo
+
 # Hosted-demo stack: Caddy (TLS), web, backend (prod profile) and PostgreSQL. Only Caddy publishes ports.
 # Copy .env.demo.example to .env.demo, fill the values, then:
 #   docker compose --env-file .env.demo -f compose.demo.yaml up --build -d
@@ -28,7 +30,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
       SAMSKA_ADMIN_EMAIL: ${SAMSKA_ADMIN_EMAIL:?}
       SAMSKA_ADMIN_PASSWORD: ${SAMSKA_ADMIN_PASSWORD:?}
-      SAMSKA_DEMO_ENABLED: "true"
+      SAMSKA_DEMO_ENABLED: ${SAMSKA_DEMO_ENABLED:-false}
       SAMSKA_DEMO_RESET_CRON: ${SAMSKA_DEMO_RESET_CRON:--}
     depends_on:
       postgres:
@@ -53,11 +55,13 @@ services:
     image: caddy:2-alpine
     environment:
       DEMO_DOMAIN: ${DEMO_DOMAIN:?}
+      DEMO_ACCESS_USER: ${DEMO_ACCESS_USER:-visitor}
+      DEMO_ACCESS_HASH: ${DEMO_ACCESS_HASH:-}
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./deploy/Caddyfile.${DEMO_ACCESS:-private}:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
     depends_on:
