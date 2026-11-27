@@ -121,7 +121,7 @@ export default function AdminProducts() {
     <div className="grid gap-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="grid gap-1.5">
-          <p className="text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted">Admin</p>
+          <p className="font-mono text-[0.75rem] font-medium uppercase tracking-[0.14em] text-muted">Admin</p>
           <h1
             id="admin-heading"
             className="text-[clamp(1.75rem,3.5vw,2.5rem)] leading-[1.1] tracking-[-0.03em] text-ink"
@@ -134,7 +134,7 @@ export default function AdminProducts() {
           </p>
         </div>
         <a
-          className="inline-flex min-h-11 items-center justify-center rounded-sm border border-brand bg-brand px-4 py-2.5 font-bold text-white no-underline hover:border-brand-dark hover:bg-brand-dark"
+          className="inline-flex min-h-11 items-center justify-center rounded-sm border-[1.5px] border-ink bg-brand px-4 py-2.5 font-mono text-[0.8rem] font-semibold uppercase tracking-[0.06em] text-on-brand no-underline shadow-[0_3px_0_var(--color-ink)] hover:bg-ink hover:text-canvas"
           href="/admin/products/new"
         >
           Create Product
@@ -150,7 +150,7 @@ export default function AdminProducts() {
             Products
           </h2>
           {!isLoading && loadError === null && products.length > 0 ? (
-            <p className="rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm font-bold text-muted">
+            <p className="rounded-full border-[1.5px] border-ink bg-surface px-3.5 py-1.5 text-sm font-bold text-muted">
               {normalizedSearch.length === 0
                 ? `${products.length} ${products.length === 1 ? "product" : "products"}`
                 : `${visibleProducts.length} of ${products.length} products match`}
@@ -191,7 +191,7 @@ export default function AdminProducts() {
           </div>
         ) : null}
         {!isLoading && loadError === null && products.length === 0 ? (
-          <div className="grid gap-2 rounded-lg bg-surface-muted px-4 py-5">
+          <div className="grid gap-2 rounded-sm bg-surface-muted px-4 py-5">
             <p className="font-bold text-ink">No Products exist yet.</p>
             <p className="text-sm text-muted">
               Use Create Product to add the first Product to the Catalog.
@@ -199,7 +199,7 @@ export default function AdminProducts() {
           </div>
         ) : null}
         {!isLoading && loadError === null && products.length > 0 && visibleProducts.length === 0 ? (
-          <div className="grid gap-2 rounded-lg bg-surface-muted px-4 py-5">
+          <div className="grid gap-2 rounded-sm bg-surface-muted px-4 py-5">
             <p className="font-bold text-ink">
               No Products match &ldquo;{searchTerm.trim()}&rdquo;.
             </p>
@@ -209,7 +209,7 @@ export default function AdminProducts() {
         {!isLoading && loadError === null && visibleProducts.length > 0 ? (
           <ul className="grid list-none gap-2 p-0 m-0">
             {visibleProducts.map((product) => (
-              <li key={product.id} className="rounded-md border border-border bg-surface">
+              <li key={product.id} className="rounded-sm border-[1.5px] border-ink bg-surface">
                 <div className="grid gap-3 p-3 min-[40rem]:min-h-16 min-[40rem]:grid-cols-[auto_minmax(0,1fr)_auto_auto] min-[40rem]:items-center min-[40rem]:gap-4">
                   <ProductMedia product={product} variant="thumbnail" />
                   <div className="grid min-w-0 gap-0.5">
@@ -224,7 +224,7 @@ export default function AdminProducts() {
                   <div className="flex flex-wrap items-center gap-2">
                     <a
                       id={`admin-edit-${product.id}`}
-                      className="inline-flex min-h-10 items-center justify-center rounded-sm border border-border-strong bg-surface px-3 text-sm font-bold text-brand-dark no-underline hover:border-brand hover:bg-brand hover:text-white"
+                      className="inline-flex min-h-10 items-center justify-center rounded-sm border-[1.5px] border-ink bg-surface px-3 font-mono text-[0.75rem] font-semibold uppercase tracking-[0.06em] text-ink no-underline hover:bg-ink hover:text-canvas"
                       href={`/admin/products/${encodeURIComponent(product.id)}/edit`}
                       aria-label={`Edit ${product.name}`}
                     >
@@ -301,7 +301,7 @@ function DeleteConfirmation({
 
   return (
     <div
-      className="grid gap-3 rounded-md border border-danger bg-surface-muted p-3"
+      className="grid gap-3 rounded-sm border border-danger bg-surface-muted p-3"
       role="group"
       aria-labelledby={headingId}
     >
@@ -338,7 +338,7 @@ function DeleteConfirmation({
           {isConflict ? (
             <>
               {" "}
-              <a className="text-brand-dark" href="/">
+              <a className="text-brand-dark underline decoration-brand decoration-2 underline-offset-4" href="/">
                 Go to Market
               </a>
             </>

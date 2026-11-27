@@ -2,27 +2,33 @@ import { useState } from "react";
 import type { ProductResponse } from "./catalogApi";
 import { productMediaSource } from "./mediaCatalog";
 
-const mediaAccentClassName = [
-  "border-media-teal/35 text-media-teal",
-  "border-media-olive/35 text-media-olive",
-  "border-media-rose/35 text-media-rose",
-  "border-media-slate/35 text-media-slate"
+const stageClassName = [
+  "bg-media-teal",
+  "bg-media-olive",
+  "bg-media-rose",
+  "bg-media-slate"
 ] as const;
+
+const stageGridStyle = {
+  backgroundImage:
+    "linear-gradient(to right, color-mix(in srgb, var(--color-ink) 14%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--color-ink) 14%, transparent) 1px, transparent 1px)",
+  backgroundSize: "25% 25%"
+} as const;
 
 type ProductMediaVariant = "card" | "detail" | "thumbnail" | "square";
 
 const mediaVariantClassName: Record<ProductMediaVariant, string> = {
-  card: "aspect-[16/10] rounded-md",
+  card: "aspect-square rounded-sm",
   detail: "aspect-[4/3] rounded-lg",
-  thumbnail: "h-12 w-12 rounded-sm",
+  thumbnail: "h-12 w-12 shrink-0 rounded-sm",
   square: "aspect-square rounded-md"
 };
 
 const monogramVariantClassName: Record<ProductMediaVariant, string> = {
-  card: "h-14 w-14 text-xl",
-  detail: "h-20 w-20 text-3xl",
+  card: "h-28 w-28 text-6xl",
+  detail: "h-32 w-32 text-7xl",
   thumbnail: "h-8 w-8 text-sm",
-  square: "h-16 w-16 text-2xl"
+  square: "h-20 w-20 text-4xl"
 };
 
 type ProductMediaProduct = Pick<ProductResponse, "id" | "name" | "mediaKey" | "uploadedMediaId">;
@@ -43,7 +49,7 @@ export default function ProductMedia({
   if (source !== undefined && failedSource !== source) {
     return (
       <div
-        className={`relative overflow-hidden border border-border bg-surface-muted ${mediaVariantClassName[variant]}`}
+        className={`relative overflow-hidden border-[1.5px] border-ink bg-surface-muted ${mediaVariantClassName[variant]}`}
         aria-hidden="true"
       >
         <img
@@ -59,18 +65,31 @@ export default function ProductMedia({
     );
   }
 
+  const showMarks = variant === "card" || variant === "detail";
+
   return (
     <div
-      className={`grid place-items-center border border-border bg-linear-to-br from-surface to-surface-muted ${mediaVariantClassName[variant]}`}
+      className={`relative grid place-items-center overflow-hidden border-[1.5px] border-ink ${stageClassName[productMediaTone(product.name)]} ${mediaVariantClassName[variant]}`}
+      style={showMarks ? stageGridStyle : undefined}
       aria-hidden="true"
     >
+      {showMarks ? (
+        <span className="absolute left-3 top-3 rounded-[3px] border-[1.5px] border-ink bg-surface px-1.5 font-mono text-[0.7rem] text-ink">
+          No. {catalogNumber(product.id)}
+        </span>
+      ) : null}
       <span
-        className={`grid place-items-center rounded-full border bg-surface/80 font-extrabold tracking-[0.04em] ${monogramVariantClassName[variant]} ${mediaAccentClassName[productMediaTone(product.name)]}`}
+        className={`grid place-items-center rounded-full border-[1.5px] border-ink bg-surface font-black text-ink [font-stretch:125%] ${monogramVariantClassName[variant]}`}
       >
         {productInitial(product.name)}
       </span>
     </div>
   );
+}
+
+function catalogNumber(id: string): string {
+  const total = [...id].reduce((sum, character) => (sum * 31 + character.charCodeAt(0)) % 9000, 0);
+  return String(1000 + total).padStart(4, "0");
 }
 
 function productInitial(name: string): string {

@@ -55,7 +55,7 @@ export default function CartItemRow({
     <li
       data-cart-item={item.productId}
       tabIndex={-1}
-      className="grid gap-3 rounded-lg border border-border bg-surface p-3.5"
+      className="grid gap-3 rounded-sm border-[1.5px] border-ink bg-surface p-3.5"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="grid gap-0.5">
@@ -77,10 +77,10 @@ export default function CartItemRow({
           <label className="sr-only" htmlFor={quantityInputId}>
             Quantity for {item.name}
           </label>
-          <div className="inline-flex items-center overflow-hidden rounded-md border border-border-strong">
+          <div className="inline-flex items-center overflow-hidden rounded-sm border-[1.5px] border-ink">
             <button
               type="button"
-              className="grid h-10 w-10 place-items-center text-lg font-bold text-brand-dark hover:bg-count-surface"
+              className="grid h-10 w-10 place-items-center text-lg font-bold text-ink hover:bg-count-surface"
               onClick={() => commitQuantity(item.quantity - 1)}
               disabled={isPending || item.quantity <= 1}
               aria-label={`Decrease quantity for ${item.name}`}
@@ -93,7 +93,7 @@ export default function CartItemRow({
               min="1"
               step="1"
               inputMode="numeric"
-              className="h-10 w-12 border-x border-border-strong bg-surface text-center font-bold"
+              className="h-10 w-12 border-x-[1.5px] border-ink font-mono bg-surface text-center font-bold"
               value={quantity}
               onChange={(event) => setQuantity(event.target.value)}
               onBlur={() => commitQuantity(Number(quantity))}
@@ -104,7 +104,7 @@ export default function CartItemRow({
             />
             <button
               type="button"
-              className="grid h-10 w-10 place-items-center text-lg font-bold text-brand-dark hover:bg-count-surface"
+              className="grid h-10 w-10 place-items-center text-lg font-bold text-ink hover:bg-count-surface"
               onClick={() => commitQuantity(item.quantity + 1)}
               disabled={isPending}
               aria-label={`Increase quantity for ${item.name}`}
@@ -114,7 +114,7 @@ export default function CartItemRow({
           </div>
         </div>
         <div className="grid justify-items-end gap-0.5">
-          <span className="text-[0.6875rem] font-bold uppercase tracking-[0.12em] text-muted">
+          <span className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.12em] text-muted">
             Subtotal
           </span>
           <span className="text-base font-extrabold text-ink">

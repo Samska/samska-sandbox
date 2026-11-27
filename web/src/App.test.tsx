@@ -37,6 +37,28 @@ describe("App", () => {
     expect(adminLink).not.toHaveAttribute("aria-current");
   });
 
+  it("renders the Bench wordmark with a decorative mark and the STORE tag", async () => {
+    stubFetch();
+    render(<App />);
+    await screen.findByRole("heading", { name: "Products", level: 1 });
+
+    const home = screen.getByRole("link", { name: "Samska Sandbox home" });
+    expect(home.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
+    expect(home).toHaveTextContent("Samska");
+    expect(home.textContent).toContain("STORE");
+    expect(home.querySelector('[aria-hidden="true"]:not(svg)')).toHaveTextContent("STORE");
+  });
+
+  it("marks the current navigation link with the inverted Bench style", async () => {
+    stubFetch();
+    render(<App />);
+    await screen.findByRole("heading", { name: "Products", level: 1 });
+
+    const navigation = screen.getByRole("navigation", { name: "Primary" });
+    expect(within(navigation).getByRole("link", { name: "Market" }).className).toContain("bg-ink");
+    expect(within(navigation).getByRole("link", { name: "Admin" }).className).not.toContain("bg-ink");
+  });
+
   it("renders the Admin Product surface at /admin/products", async () => {
     window.history.replaceState({}, "", "/admin/products");
     stubFetch();

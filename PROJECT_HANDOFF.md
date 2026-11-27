@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-064 — Bench applied to the web application (#124)
+
+- Owner approved the Bench identity and asked for implementation while away (2026-11-27). `web/` now uses the Bench tokens, fonts and components on every existing screen; "Next · design only" screens are not built. Backend and routes are unchanged. The branch is based on the SS-063 branch, so [PR #123](https://github.com/Samska/samska-sandbox/pull/123) merges first.
+- Agent Verification: typecheck, 262 unit and component tests, production build, and 11 Playwright tests against the real backend (the 2 existing journey tests plus 9 new identity tests), all run locally. Human Verification is pending: the owner runs the app locally.
+- Next step: owner local validation, then merge authorization for #123 and the SS-064 pull request in that order.
+
 ## SS-063 — Bench brand and all-screen design (#121)
 
 - Owner request (2026-11-27): Vitrine felt generic, so redesign everything that exists and the upcoming features before building them. PR #118 (SS-060, Vitrine in `web/`) was closed by the owner; its branch is kept.

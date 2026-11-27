@@ -20,13 +20,13 @@ export default function FormField({
 }) {
   return (
     <div className="grid gap-1.5">
-      <label className="text-[0.9375rem] font-bold text-ink" htmlFor={id}>
+      <label className="font-mono text-[0.75rem] font-semibold uppercase tracking-[0.08em] text-muted" htmlFor={id}>
         {label}
       </label>
       {children({
         id,
         className:
-          "min-h-11 w-full rounded-sm border border-border-strong bg-surface px-3 py-2.5",
+          "min-h-11 w-full rounded-sm border-[1.5px] border-ink bg-surface px-3 py-2.5",
         "aria-invalid": error !== null,
         "aria-describedby": error !== null ? `${id}-error` : undefined
       })}
