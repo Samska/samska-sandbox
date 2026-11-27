@@ -16,6 +16,13 @@ Update rule: this snapshot must be updated in the same change when project state
 - Boundary change: Orders and the Cart survive a restart; Products, media and Payment attempts remain process-local. A Cart line may outlive a Product lost on restart (it keeps its own name and price). Payment attempt persistence is the next slice and depends on this one.
 - Next step: owner review and merge authorization.
 
+## SS-063 — Bench brand and all-screen design (#121)
+
+- Owner request (2026-11-27): Vitrine felt generic, so redesign everything that exists and the upcoming features before building them. PR #118 (SS-060, Vitrine in `web/`) was closed by the owner; its branch is kept.
+- Deliverable: [prototypes/bench.html](docs/design/samska-store/prototypes/bench.html) and its tokens, plus the SS-063 section of the [design record](docs/design/samska-store/README.md). An instrument-maker's catalog identity; every current screen and state, and design-only previews of upcoming features marked as not approved scope.
+- Agent Verification: Chromium at 1280 and 390 px, light and dark, all routes, no console errors or overflow. Human Verification: the owner reviews the open pull request and the rendered file.
+- Human Verification (owner-reported, 2026-11-27): "Gostei da identidade visual, podemos seguir por esse caminho." Applying it to `web/` is SS-064.
+
 ## SS-062 — Require an approved design before building a feature (#120)
 
 - Owner decision (2026-11-27): before a feature is built, its design must be ready as an owner-approved HTML prototype under `docs/design/`. `docs/AI-GOVERNANCE.md` (Frontend Design Review), `AGENTS.md`, the Issue Form description, and the design record now say so; the prior wording is linked at commit `d70fddd`. A feature without user-facing change records `Design: Not applicable`.
