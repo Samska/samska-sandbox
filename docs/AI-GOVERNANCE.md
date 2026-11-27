@@ -49,15 +49,19 @@ The Maestri procedure formerly used to carry out a dismissal is historical. A fu
 
 ## Frontend Design Review
 
-New or materially changed frontend screens, flows, and components require relevant visual review before application implementation. This is a design gate, not implementation authorization. The policy is tool-agnostic and does not require a specific design tool.
+Since 2026-11-27, the design of a feature must be ready before the feature is built. Any new or materially changed user-facing screen, flow, or component needs an owner-approved HTML prototype versioned under [docs/design/](design/samska-store/README.md) before application implementation begins. The design source is the self-contained HTML prototype and its tokens, not an external design tool, and the policy requires no specific tool.
 
-- Use approved foundations and components, and show desktop and mobile behavior plus relevant states.
-- Small visual changes require reviewing only the affected portion. Refactoring without visual changes requires no new design.
-- Record the exact candidate and a traceable owner approval. An AI review is Agent Verification, not owner approval.
-- Material visual decisions discovered during implementation return for review before they are treated as approved design.
-- Design approval does not authorize application implementation or merge.
-- Later implementation is compared with the approved design in the browser, including responsive behavior and accessibility verification.
+- A feature without a user-facing change records `Design: Not applicable` and the reason in its Issue. Small visual changes require reviewing only the affected portion, and refactoring without visual changes requires no new design.
+- The Issue lists the approved prototype under Relevant files and documentation, with its repository path and revision, so a later session can find it.
+- The prototype shows desktop and mobile behavior and the relevant states, uses approved foundations and tokens, and is approved by the owner on the open pull request that adds or revises it. An AI review is Agent Verification, not owner approval.
+- Material visual decisions discovered during implementation return to the prototype for review before they are treated as approved design.
+- Design approval does not authorize merge of application changes.
+- Later implementation is compared with the approved prototype in the browser, including responsive behavior and accessibility verification, and deviations are recorded in the pull request.
 - This workflow grants no authorization for automated enforcement, new tooling, services, or dependencies. Any such addition requires separately scoped owner authorization.
+
+### Superseded design gate (2026-11-27)
+
+The previous wording required only a relevant visual review before implementation and did not require a prototype to be ready first. It is preserved at commit `d70fddd51e350b521fcf46df367f07e7f4abd40f`.
 
 ## Independent Review
 

@@ -10,6 +10,20 @@ public final class Cart {
     private final Map<ProductReference, CartItem> items = new LinkedHashMap<>();
     private long revision;
 
+    public static Cart restore(List<CartItem> storedItems, long storedRevision) {
+        if (storedRevision < 0) {
+            throw new InvalidCartException("Cart revision must not be negative");
+        }
+        var cart = new Cart();
+        for (var item : storedItems) {
+            if (cart.items.put(item.product(), item) != null) {
+                throw new InvalidCartException("Stored Cart repeats a Product");
+            }
+        }
+        cart.revision = storedRevision;
+        return cart;
+    }
+
     public synchronized void addItem(
             ProductReference product,
             String name,

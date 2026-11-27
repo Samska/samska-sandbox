@@ -1,7 +1,9 @@
 package io.github.samska.sandbox.payment.api;
 
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.transaction.TransactionException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -48,5 +50,10 @@ public class PaymentApiExceptionHandler {
     @ExceptionHandler(PaymentCapacityExceededException.class)
     public ResponseEntity<PaymentErrorResponse> handleCapacityExceeded() {
         return ResponseEntity.status(503).body(PaymentErrorResponse.capacityExceeded());
+    }
+
+    @ExceptionHandler({DataAccessResourceFailureException.class, TransactionException.class})
+    public ResponseEntity<PaymentErrorResponse> handleStoreUnavailable() {
+        return ResponseEntity.status(503).body(PaymentErrorResponse.storeUnavailable());
     }
 }

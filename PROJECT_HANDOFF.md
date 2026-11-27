@@ -10,12 +10,30 @@ Update rule: this snapshot must be updated in the same change when project state
 - Agent Verification: typecheck, 262 unit and component tests, production build, and 11 Playwright tests against the real backend (the 2 existing journey tests plus 9 new identity tests), all run locally. Human Verification is pending: the owner runs the app locally.
 - Next step: owner local validation, then merge authorization for #123 and the SS-064 pull request in that order.
 
+## SS-066 — Persist Payment attempts in PostgreSQL (#127)
+
+- Build (stacked on SS-065, merge after it): simulated Payment attempts, their frozen Cart snapshots and the one-approval-per-Cart-revision rule are stored in PostgreSQL (`V3__create_payment_attempts.sql`, `JdbcPaymentStore`, [ADR 0010](docs/adr/0010-adopt-postgresql-payment-attempt-persistence.md)). The 32-attempt cap is removed for the database-backed store; the in-memory store keeps it for the `no-database` test profile. New `503 payment-store-unavailable`. API shapes and `web/` are unchanged.
+- Boundary change: Orders, the Cart and Payment attempts survive a restart; only Products and media remain process-local. An approved attempt can now still be ordered after a restart.
+- Next step: owner review and merge authorization after #126; Catalog and media persistence is the remaining in-memory slice.
+
+## SS-065 — Persist the Cart in PostgreSQL (#125)
+
+- Build (no separate approval needed): the single current Cart and its revision are stored in PostgreSQL (`V2__create_cart.sql`, `JdbcCartStore`, [ADR 0009](docs/adr/0009-adopt-postgresql-cart-persistence.md)). `CartStore` now exposes `current()` and a transactional, row-locked `update(...)`; API shapes and the frontend are unchanged. New `503 cart-store-unavailable` for database outages on Cart, Payment initiation and Product deletion.
+- Boundary change: Orders and the Cart survive a restart; Products, media and Payment attempts remain process-local. A Cart line may outlive a Product lost on restart (it keeps its own name and price). Payment attempt persistence is the next slice and depends on this one.
+- Next step: owner review and merge authorization.
+
 ## SS-063 — Bench brand and all-screen design (#121)
 
 - Owner request (2026-11-27): Vitrine felt generic, so redesign everything that exists and the upcoming features before building them. PR #118 (SS-060, Vitrine in `web/`) was closed by the owner; its branch is kept.
 - Deliverable: [prototypes/bench.html](docs/design/samska-store/prototypes/bench.html) and its tokens, plus the SS-063 section of the [design record](docs/design/samska-store/README.md). An instrument-maker's catalog identity; every current screen and state, and design-only previews of upcoming features marked as not approved scope.
 - Agent Verification: Chromium at 1280 and 390 px, light and dark, all routes, no console errors or overflow. Human Verification: the owner reviews the open pull request and the rendered file.
-- Next step: owner review of the direction; applying it to `web/` needs its own Issue.
+- Human Verification (owner-reported, 2026-11-27): "Gostei da identidade visual, podemos seguir por esse caminho." Applying it to `web/` is SS-064.
+
+## SS-062 — Require an approved design before building a feature (#120)
+
+- Owner decision (2026-11-27): before a feature is built, its design must be ready as an owner-approved HTML prototype under `docs/design/`. `docs/AI-GOVERNANCE.md` (Frontend Design Review), `AGENTS.md`, the Issue Form description, and the design record now say so; the prior wording is linked at commit `d70fddd`. A feature without user-facing change records `Design: Not applicable`.
+- Unchanged: merge authorization, Human Verification, the stop conditions, and historical records. Producing prototypes for existing screens and upcoming features is separate design work.
+- Next step: owner review and merge authorization.
 
 ## SS-061 — Build and pull request creation no longer need separate approval (#117)
 
