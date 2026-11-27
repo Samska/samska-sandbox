@@ -82,7 +82,7 @@ class CartApiUnavailableTest {
 
         mvc.perform(delete("/api/products/{id}", productId))
                 .andExpect(status().isServiceUnavailable())
-                .andExpect(jsonPath("$.code").value("cart-store-unavailable"));
+                .andExpect(jsonPath("$.code").value("catalog-store-unavailable"));
 
         mvc.perform(get("/api/products/{id}", productId)).andExpect(status().isOk());
     }

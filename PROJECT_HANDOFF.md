@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-067 — Persist the Catalog in PostgreSQL (#130)
+
+- Build: Products and uploaded media are stored in PostgreSQL (`V4__create_catalog.sql`, `JdbcProductStore`, [ADR 0011](docs/adr/0011-adopt-postgresql-catalog-persistence.md)), completing the persistence sequence of ADRs 0008 to 0010. Listings keep insertion order and carry media IDs without image bytes; the aggregate media budget is enforced transactionally. New `503 catalog-store-unavailable`. API shapes and `web/` are unchanged.
+- Boundary change: no application state is process-local any more outside the `no-database` test profile; the earlier "Products and media are lost on restart" statements are superseded.
+- Next step: owner review and merge authorization.
+
 ## SS-064 — Bench applied to the web application (#124)
 
 - Owner approved the Bench identity and asked for implementation while away (2026-11-27). `web/` now uses the Bench tokens, fonts and components on every existing screen; "Next · design only" screens are not built. Backend and routes are unchanged. The branch is based on the SS-063 branch, so [PR #123](https://github.com/Samska/samska-sandbox/pull/123) merges first.

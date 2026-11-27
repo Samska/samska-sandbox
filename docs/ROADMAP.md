@@ -52,7 +52,7 @@ capabilities receive their SS identifier when their Issues are created.
 
 Admin Catalog Management (SS-033) is complete and merged through PR #56. Product
 Media Upload (SS-034) is complete and merged through PR #58: one validated,
-re-encoded JPEG per Product stored in bounded backend process memory, uploaded
+re-encoded JPEG per Product (stored in bounded backend process memory until SS-067 moved it to PostgreSQL), uploaded
 media display precedence on Market cards and Product detail, the curated
 `mediaKey` selection and the monogram fallback retained, and the no-upload
 decision of ADR 0003 superseded by ADR 0004. Its endpoints are unauthenticated
@@ -61,7 +61,7 @@ not an access-control boundary. Payment Simulator (SS-036) is complete and
 merged through PR #62: it captures a revision-checked immutable Cart snapshot,
 applies one of three explicit simulated outcomes, owns identified attempts with
 UUID replay and GET reconciliation, and records at most one approval per
-unchanged Cart revision in a bounded 32-attempt process-local store. CI test result
+unchanged Cart revision in a bounded 32-attempt process-local store (persisted without the cap by SS-066). CI test result
 visibility (SS-035) was investigated separately and cancelled on 2026-09-28; its
 issue is closed as not
 planned and its pull request closed without merging, so it delivers nothing and
@@ -76,18 +76,14 @@ Market Product-name search (SS-044, #81) is complete and merged via PR #82 (squa
 The local MVP deliberately defers authentication and authorization. They are
 deferred until after the local First Order MVP but are a mandatory prerequisite
 for any hosted environment, and no hosting work begins before the MVP. Orders
-and their items are persisted in PostgreSQL and survive a backend restart. The
-rest of the application remains process-local, except the single current Cart,
-which SS-065 (#125) persists in PostgreSQL with its revision, and simulated
-payment attempts, which SS-066 (#127) persists with their frozen snapshots and the
-one-approval-per-revision rule: uploaded Product
-media is lost together with its Product, a Cart line may outlive a Product lost
-on restart because it keeps its own name and price snapshot, and
-simulated payment attempts, including their captured snapshots and duplicate
-protection, are lost on restart. The attempt-addressed URL and one browser-session
-reference remain lookup hints for recovery and add no cross-process guarantee.
-Payment Simulator captures the revision-checked Cart snapshot inside a bounded
-process-local store, and its unauthenticated scenario selector and endpoints are
+and their items are persisted in PostgreSQL and survive a backend restart. Since
+SS-065 (#125), SS-066 (#127) and SS-067 (#130), the single current Cart with its
+revision, simulated payment attempts with their frozen snapshots and the
+one-approval-per-revision rule, and Catalog Products with their uploaded media
+are persisted too, so no application state is process-local any more. A Cart line
+keeps its own name and price snapshot and has no foreign key to Catalog. The
+attempt-addressed URL and one browser-session reference remain lookup hints for
+recovery. Payment Simulator captures the revision-checked Cart snapshot, and its unauthenticated scenario selector and endpoints are
 a local-only use constraint, not access control or a hosting posture. Orders are
 unauthenticated synthetic records in a loopback-only local database; the
 application has no deployment environment.

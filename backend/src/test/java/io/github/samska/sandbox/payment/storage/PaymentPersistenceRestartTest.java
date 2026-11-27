@@ -43,6 +43,7 @@ class PaymentPersistenceRestartTest {
             jdbc.execute("TRUNCATE TABLE order_items, orders");
             jdbc.execute("TRUNCATE TABLE payment_attempt_items, payment_attempts");
             jdbc.execute("TRUNCATE TABLE cart_items, cart CASCADE");
+            jdbc.execute("TRUNCATE TABLE product_media, products CASCADE");
             var base = baseUri(first);
 
             toteId = JsonPath.read(send(base, "POST", "/api/products", productBody("Canvas Tote", "12.50"), 201), "$.id");
@@ -58,8 +59,8 @@ class PaymentPersistenceRestartTest {
         try (var second = startApplication()) {
             var base = baseUri(second);
 
-            // Cart and attempts are durable; Products are not, and the frozen snapshot does not need them.
-            send(base, "GET", "/api/products/" + toteId, null, 404);
+            // Products, the Cart and attempts are all durable.
+            send(base, "GET", "/api/products/" + toteId, null, 200);
             var reloaded = send(base, "GET", "/api/payment-attempts/" + APPROVED, null, 200);
             assertThat(reloaded).isEqualTo(approved);
             assertAttempt(send(base, "GET", "/api/payment-attempts/" + DECLINED, null, 200), "declined", toteId, mugId);

@@ -42,3 +42,5 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 [ADR 0009: Adopt PostgreSQL Persistence for the Cart](0009-adopt-postgresql-cart-persistence.md) records the second persistence slice: the single current Cart and its revision, the row-locked transactional `update`, the missing Product reference, and why Payment attempts follow.
 
 [ADR 0010: Adopt PostgreSQL Persistence for Payment Attempts](0010-adopt-postgresql-payment-attempt-persistence.md) records the third persistence slice: durable attempts and frozen snapshots, the partial unique index for one approval per Cart revision, race handling without aborted transactions, and removal of the 32-attempt cap for the database-backed store.
+
+[ADR 0011: Adopt PostgreSQL Persistence for the Catalog](0011-adopt-postgresql-catalog-persistence.md) records the final persistence slice: Products and uploaded media in PostgreSQL, insertion-ordered listings, media IDs without bytes in lists, and the transactional aggregate media budget. It supersedes the in-memory storage consequences of ADR 0004.
