@@ -59,5 +59,18 @@ PORT=9090 start_web -e WEB_ACCESS=none -e PORT=9090
 check "open mode on a custom PORT: site" 200 "$(code "localhost:$PORT_ON_HOST/")"
 check "open mode: API proxied" 404 "$(code "localhost:$PORT_ON_HOST/api/x")"
 
+# The resolver must be the container's own DNS server, not Docker's 127.0.0.11 fallback (Railway has no
+# 127.0.0.11: that was the 502 on the first deployment). The image sets NGINX_ENTRYPOINT_LOCAL_RESOLVERS.
+grep -q '^ENV NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1$' "$ROOT/web/Dockerfile" && dockerfile_env=set || dockerfile_env=missing
+check "web/Dockerfile sets NGINX_ENTRYPOINT_LOCAL_RESOLVERS" set "$dockerfile_env"
+docker rm -f samska-verify-web >/dev/null 2>&1 || true
+rendered="$(docker run --rm --network bridge --dns 203.0.113.53 \
+  -e NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1 -e WEB_ACCESS=none \
+  -e NGINX_ENVSUBST_FILTER='^(PORT|API_UPSTREAM|API_RESOLVER|LISTEN_IPV6)$' \
+  -v "$ROOT/web/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro" \
+  -v "$ROOT/web/docker-entrypoint.d/15-samska-env.envsh:/docker-entrypoint.d/15-samska-env.envsh:ro" \
+  --entrypoint sh "$IMAGE" -c '/docker-entrypoint.sh nginx -t >/dev/null 2>&1; grep -m1 resolver /etc/nginx/conf.d/default.conf')"
+check "upstream resolver is the container's DNS server" "resolver 203.0.113.53 valid=10s ipv6=on;" "$(echo "$rendered" | sed 's/^ *//')"
+
 if [[ "$failures" -ne 0 ]]; then echo "$failures check(s) failed" >&2; exit 1; fi
 echo "All web configuration checks passed."

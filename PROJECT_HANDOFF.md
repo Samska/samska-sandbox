@@ -4,6 +4,11 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-080 — Web resolver fix for Railway (#156, v1.0.0)
+
+- Build: the first Railway deployment answered `502` on `/api` because nginx used Docker's `127.0.0.11` resolver; the web image now sets `NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1` so it uses the container's DNS server; `deploy/verify-web-config.sh` checks it.
+- State: takes effect when `web` redeploys from `release/1.0`.
+
 ## SS-079 — Backend image fix and image builds in CI (#154, v1.0.0)
 
 - Build: the backend image installs `unzip` (the Maven wrapper failed its checksum without it) and sets `mvnw` executable; CI builds both images; first-deployment notes added to [Deployment](docs/DEPLOYMENT.md).
