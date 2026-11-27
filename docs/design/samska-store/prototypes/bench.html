@@ -350,9 +350,23 @@ function render() {
   $("#demobar").hidden = !S.inv && r.name !== "account";
   ["market", "orders", "admin"].forEach(k => $("#n-" + k).setAttribute("aria-current", (k === "market" && ["market", "product", "checkout", "payment", "order", "cart"].includes(r.name)) || (k === "orders" && ["orders", "track"].includes(r.name)) || (k === "admin" && r.name.startsWith("admin")) ? "page" : "false"));
   $("#slipcount").textContent = count();
-  const views = { market: vMarket, product: vProduct, cart: vMarket, checkout: vCheckout, payment: vPayment, order: vOrder, admin: vAdmin, "admin-new": vForm, "admin-edit": vForm, notfound: vNotFound, account: vAccount, orders: vOrders, track: vTrack, ops: vOps, mobile: vMobile };
-  const v = Object.prototype.hasOwnProperty.call(views, r.name) ? views[r.name] : vNotFound;
-  app.innerHTML = v(r);
+  let html;
+  switch (r.name) {
+    case "market": case "cart": html = vMarket(r); break;
+    case "product": html = vProduct(r); break;
+    case "checkout": html = vCheckout(r); break;
+    case "payment": html = vPayment(r); break;
+    case "order": html = vOrder(r); break;
+    case "admin": html = vAdmin(r); break;
+    case "admin-new": case "admin-edit": html = vForm(r); break;
+    case "account": html = vAccount(r); break;
+    case "orders": html = vOrders(r); break;
+    case "track": html = vTrack(r); break;
+    case "ops": html = vOps(r); break;
+    case "mobile": html = vMobile(r); break;
+    default: html = vNotFound(r);
+  }
+  app.innerHTML = html;
   if (r.name === "market" || r.name === "cart") paintGrid();
   if (r.name === "admin-new" || r.name === "admin-edit") bindForm(r);
   openSlip(r.name === "cart");
