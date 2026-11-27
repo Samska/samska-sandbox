@@ -43,6 +43,7 @@ class OrderPersistenceRestartTest {
         try (var first = startApplication()) {
             first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE order_items, orders");
             first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE cart_items, cart CASCADE");
+            first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE payment_attempt_items, payment_attempts");
             var base = baseUri(first);
 
             firstProductId = id(post(base, "/api/products", productBody("Canvas Tote", "12.50"), 201));
@@ -65,7 +66,7 @@ class OrderPersistenceRestartTest {
         try (var second = startApplication()) {
             var base = baseUri(second);
 
-            // Products and Payments are process-local and now gone; only the stored Order can answer.
+            // Products are process-local and now gone; the Order must not depend on the stored Payment attempt.
             var byId = get(base, "/api/orders/" + orderId, 200);
             var byAttempt = get(base, "/api/orders/payment-attempts/" + ATTEMPT, 200);
             assertThat(byAttempt).isEqualTo(byId);
@@ -76,13 +77,16 @@ class OrderPersistenceRestartTest {
             assertThat(read(replay, "$.orderId")).isEqualTo(orderId);
             assertOrder(replay, orderId, firstProductId, secondProductId);
 
-            // This attempt was approved before restart but never ordered: it must stay unknown.
-            post(base, "/api/orders", orderBody(UNORDERED_ATTEMPT), 404);
+            // This attempt was approved before restart but never ordered: it has no Order yet. Payment
+            // attempts are durable, so it can still be ordered after the restart.
             get(base, "/api/orders/payment-attempts/" + UNORDERED_ATTEMPT, 404);
+            var late = post(base, "/api/orders", orderBody(UNORDERED_ATTEMPT), 201);
+            assertThat(read(late, "$.paymentAttemptId")).isEqualTo(UNORDERED_ATTEMPT.toString());
+            assertThat(read(late, "$.orderId")).isNotEqualTo(orderId);
 
             var jdbc = second.getBean(JdbcTemplate.class);
-            assertThat(jdbc.queryForObject("SELECT count(*) FROM orders", Long.class)).isEqualTo(1);
-            assertThat(jdbc.queryForObject("SELECT count(*) FROM order_items", Long.class)).isEqualTo(2);
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM orders", Long.class)).isEqualTo(2);
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM order_items", Long.class)).isEqualTo(4);
         }
     }
 

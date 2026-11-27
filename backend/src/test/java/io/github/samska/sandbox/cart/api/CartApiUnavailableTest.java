@@ -73,7 +73,7 @@ class CartApiUnavailableTest {
                         .content("{\"attemptId\":\"" + UUID.randomUUID()
                                 + "\",\"cartRevision\":0,\"scenario\":\"approve\"}"))
                 .andExpect(status().isServiceUnavailable())
-                .andExpect(jsonPath("$.code").value("cart-store-unavailable"));
+                .andExpect(jsonPath("$.code").value("payment-store-unavailable"));
     }
 
     @Test

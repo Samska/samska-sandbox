@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import io.github.samska.sandbox.cart.CartRevisionMismatchException;
-import io.github.samska.sandbox.cart.api.CartErrorResponse;
 import io.github.samska.sandbox.payment.InvalidPaymentAttemptException;
 import io.github.samska.sandbox.payment.application.PaymentAlreadyApprovedException;
 import io.github.samska.sandbox.payment.application.PaymentAttemptConflictException;
@@ -54,7 +53,7 @@ public class PaymentApiExceptionHandler {
     }
 
     @ExceptionHandler({DataAccessResourceFailureException.class, TransactionException.class})
-    public ResponseEntity<CartErrorResponse> handleCartStoreUnavailable() {
-        return ResponseEntity.status(503).body(CartErrorResponse.storeUnavailable());
+    public ResponseEntity<PaymentErrorResponse> handleStoreUnavailable() {
+        return ResponseEntity.status(503).body(PaymentErrorResponse.storeUnavailable());
     }
 }

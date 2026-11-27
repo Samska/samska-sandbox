@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-066 — Persist Payment attempts in PostgreSQL (#127)
+
+- Build (stacked on SS-065, merge after it): simulated Payment attempts, their frozen Cart snapshots and the one-approval-per-Cart-revision rule are stored in PostgreSQL (`V3__create_payment_attempts.sql`, `JdbcPaymentStore`, [ADR 0010](docs/adr/0010-adopt-postgresql-payment-attempt-persistence.md)). The 32-attempt cap is removed for the database-backed store; the in-memory store keeps it for the `no-database` test profile. New `503 payment-store-unavailable`. API shapes and `web/` are unchanged.
+- Boundary change: Orders, the Cart and Payment attempts survive a restart; only Products and media remain process-local. An approved attempt can now still be ordered after a restart.
+- Next step: owner review and merge authorization after #126; Catalog and media persistence is the remaining in-memory slice.
+
 ## SS-065 — Persist the Cart in PostgreSQL (#125)
 
 - Build (no separate approval needed): the single current Cart and its revision are stored in PostgreSQL (`V2__create_cart.sql`, `JdbcCartStore`, [ADR 0009](docs/adr/0009-adopt-postgresql-cart-persistence.md)). `CartStore` now exposes `current()` and a transactional, row-locked `update(...)`; API shapes and the frontend are unchanged. New `503 cart-store-unavailable` for database outages on Cart, Payment initiation and Product deletion.

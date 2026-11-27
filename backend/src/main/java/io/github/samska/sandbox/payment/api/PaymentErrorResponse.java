@@ -12,6 +12,12 @@ public record PaymentErrorResponse(String code, UUID attemptId) {
     public static final String ATTEMPT_ID_CONFLICT = "attempt-id-conflict";
     public static final String CAPACITY_EXCEEDED = "attempt-capacity-exceeded";
 
+    public static final String STORE_UNAVAILABLE = "payment-store-unavailable";
+
+    public static PaymentErrorResponse storeUnavailable() {
+        return new PaymentErrorResponse(STORE_UNAVAILABLE, null);
+    }
+
     public static PaymentErrorResponse cartChanged() {
         return new PaymentErrorResponse(CART_CHANGED, null);
     }
