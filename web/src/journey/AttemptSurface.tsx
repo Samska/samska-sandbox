@@ -127,11 +127,11 @@ function AttemptPendingCard({
 
   return (
     <section
-      className="grid min-w-0 gap-4 rounded-lg border border-border bg-surface px-5 py-6 shadow-card"
+      className="grid min-w-0 gap-4 rounded-sm border-[1.5px] border-ink bg-surface px-5 py-6 shadow-card"
       aria-labelledby="attempt-pending-heading"
       aria-busy="true"
     >
-      <p className="text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted">
+      <p className="font-mono text-[0.75rem] font-medium uppercase tracking-[0.14em] text-muted">
         Payment attempt
       </p>
       <h1
@@ -191,11 +191,11 @@ function RecoveryCard({
 
   return (
     <section
-      className="grid min-w-0 gap-4 rounded-lg border border-border bg-surface px-5 py-6 shadow-card"
+      className="grid min-w-0 gap-4 rounded-sm border-[1.5px] border-ink bg-surface px-5 py-6 shadow-card"
       aria-labelledby="attempt-recovery-heading"
       aria-busy={isChecking}
     >
-      <p className="text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted">
+      <p className="font-mono text-[0.75rem] font-medium uppercase tracking-[0.14em] text-muted">
         Payment attempt
       </p>
       <h1
@@ -281,7 +281,7 @@ function AbandonControl({
   }
 
   return (
-    <div className="grid gap-3 rounded-lg border border-border px-4 py-4">
+    <div className="grid gap-3 rounded-sm border-[1.5px] border-ink px-4 py-4">
       <p className="max-w-prose text-sm text-muted">{abandonWarning}</p>
       <div className="flex flex-wrap gap-3">
         <Button variant="quiet" onClick={onAbandon} disabled={pending}>

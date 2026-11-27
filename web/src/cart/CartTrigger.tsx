@@ -22,7 +22,7 @@ export default function CartTrigger({
     <button
       ref={buttonRef}
       type="button"
-      className="inline-flex min-h-11 items-center gap-2 rounded-full border border-brand bg-brand px-4 text-sm font-extrabold text-white hover:border-brand-dark hover:bg-brand-dark"
+      className="inline-flex min-h-11 items-center gap-2 rounded-sm border-[1.5px] border-ink bg-brand px-4 font-mono text-[0.8rem] font-semibold uppercase tracking-[0.06em] text-on-brand shadow-[0_3px_0_var(--color-ink)] hover:bg-ink hover:text-canvas active:translate-y-[2px] active:shadow-[0_1px_0_var(--color-ink)]"
       aria-haspopup="dialog"
       aria-expanded={isOpen}
       aria-label={accessibleName}
@@ -30,7 +30,7 @@ export default function CartTrigger({
     >
       <span>Cart</span>
       {total === null ? null : (
-        <span className="font-bold text-white/80">
+        <span className="font-medium opacity-80">
           {itemCount} {itemLabel} &middot; {formatAmount(total)}
         </span>
       )}

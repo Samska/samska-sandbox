@@ -53,7 +53,7 @@ export default function ProductBrowse({
     !isPending && error === null && productCount > 0 ? (
       <p
         aria-live="polite"
-        className="rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm font-bold text-muted"
+        className="font-mono text-xs font-medium uppercase tracking-[0.12em] text-muted"
       >
         {trimmedTerm.length === 0
           ? `${productCount} ${productCount === 1 ? "product" : "products"}`
@@ -71,12 +71,12 @@ export default function ProductBrowse({
       aria-busy={isPending}
     >
       <div className="grid gap-1.5">
-        <p className="text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted">
+        <p className="font-mono text-[0.75rem] font-medium uppercase tracking-[0.14em] text-muted">
           Catalog
         </p>
         <h1
           id="product-browse-heading"
-          className="text-[clamp(1.75rem,3.5vw,2.5rem)] leading-[1.1] tracking-[-0.03em] text-ink"
+          className="text-[clamp(2.5rem,7vw,5rem)] text-ink"
         >
           Products
         </h1>
@@ -120,42 +120,45 @@ export default function ProductBrowse({
         </div>
       ) : null}
       {!isPending && error === null && productCount === 0 ? (
-        <div className="grid gap-2 rounded-lg border border-border bg-surface p-6">
+        <div className="grid gap-2 rounded-sm border-[1.5px] border-dashed border-ink bg-surface p-6">
           <p className="font-bold text-ink">No Products are available yet.</p>
           <p className="text-muted">
             Create a synthetic Product in Admin to start a First Order journey. New Products will
             appear here once they exist.
           </p>
-          <a className="w-fit font-bold text-brand-dark" href="/admin/products/new">
+          <a className="w-fit font-bold text-brand-dark underline decoration-brand decoration-2 underline-offset-4" href="/admin/products/new">
             Create a synthetic Product
           </a>
         </div>
       ) : null}
       {!isPending && error === null && productCount > 0 && visibleProducts.length === 0 ? (
-        <div className="grid gap-2 rounded-lg border border-border bg-surface p-6">
+        <div className="grid gap-2 rounded-sm border-[1.5px] border-dashed border-ink bg-surface p-6">
           <p className="font-bold text-ink">No Products match &quot;{trimmedTerm}&quot;.</p>
           <p className="text-muted">Clear the search to see the full Product list.</p>
         </div>
       ) : null}
       {!isPending && error === null && visibleProducts.length > 0 ? (
-        <ul className="grid list-none gap-4 p-0 m-0 min-[32rem]:grid-cols-2 min-[47rem]:grid-cols-3 min-[62rem]:grid-cols-4">
+        <ul className="grid list-none gap-6 p-0 m-0 min-[32rem]:grid-cols-2 min-[47rem]:grid-cols-3 min-[62rem]:grid-cols-4">
           {visibleProducts.map((product) => (
             <li
               key={product.id}
-              className="grid grid-rows-[auto_minmax(0,1fr)_auto_auto] gap-4 rounded-lg border border-border bg-surface p-4 hover:border-border-strong hover:shadow-product focus-within:border-border-strong focus-within:shadow-product"
+              className="grid grid-rows-[auto_minmax(0,1fr)_auto] gap-3"
             >
-              <ProductMedia product={product} variant="card" />
+              <div className="relative">
+                <ProductMedia product={product} variant="card" />
+                <p className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full border-[1.5px] border-ink bg-surface px-3 py-1 font-mono text-sm font-semibold text-ink">
+                  <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full border-[1.5px] border-ink" />
+                  {formatAmount(product.price)}
+                </p>
+              </div>
               <div className="grid min-w-0 content-start gap-1">
-                <h3 className="text-base font-extrabold leading-snug tracking-[-0.01em] text-ink">
+                <h3 className="text-xl text-ink">
                   {product.name}
                 </h3>
                 <p className="line-clamp-2 text-sm leading-relaxed text-muted">
                   {product.description}
                 </p>
               </div>
-              <p className="text-xl font-extrabold tracking-[-0.01em] text-ink">
-                {formatAmount(product.price)}
-              </p>
               <div className="flex items-center gap-2">
                 <Button
                   variant="secondary"

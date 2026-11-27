@@ -81,6 +81,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-061-approval-gate-change.md](ss-061-approval-gate-change.md) | Recording a change of owner approval gates, what stays gated (merge, Human Verification, stop conditions), and superseding policy text with a dated note and an immutable link. |
 | [ss-062-design-before-build.md](ss-062-design-before-build.md) | Design-first delivery, using an approved HTML prototype as the contract for a feature, linking it from the Issue, and handling work with no user-facing change. |
 | [ss-063-brand-and-prototype-first-design.md](ss-063-brand-and-prototype-first-design.md) | Giving a product a distinctive identity from a concept, expressing it as tokens, and prototyping all states and future features in one reviewable HTML file. |
+| [ss-064-applying-a-design-system-to-react.md](ss-064-applying-a-design-system-to-react.md) | Re-theming a React and Tailwind app through semantic tokens, why base styles belong in a cascade layer, and testing a visual identity with contrast math, component tests and computed-style browser checks. |
 
 The SS-045, SS-046, and SS-047 records describe the agent role layer that was superseded as active requirements on 2026-10-27. They remain historical learning records; their operational instructions are not current.
 

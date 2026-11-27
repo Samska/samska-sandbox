@@ -19,25 +19,32 @@ export default function App() {
   return (
     <div className="flex min-h-screen flex-col">
       <a
-        className="absolute left-3 top-3 z-[2] -translate-y-[200%] rounded-sm bg-ink px-3.5 py-2.5 text-white focus:translate-y-0"
+        className="absolute left-3 top-3 z-[2] -translate-y-[200%] rounded-sm bg-ink px-3.5 py-2.5 text-canvas focus:translate-y-0"
         href="#main-content"
       >
         Skip to main content
       </a>
-      <header className="sticky top-0 z-20 border-b border-border bg-canvas/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-20 border-b-2 border-ink bg-canvas/95 backdrop-blur-sm">
         <div className="mx-auto flex min-h-[3.75rem] w-[min(100%-2.5rem,76rem)] items-center justify-between gap-6">
           <a
-            className="inline-flex items-center gap-2.5 font-extrabold text-ink no-underline"
+            className="inline-flex items-center gap-2.5 text-ink no-underline"
             href="/"
             aria-label="Samska Sandbox home"
           >
+            <svg aria-hidden="true" viewBox="0 0 34 34" className="h-8 w-8 flex-none">
+              <circle cx="17" cy="17" r="15" fill="none" stroke="currentColor" strokeWidth="2.5" />
+              <circle cx="17" cy="17" r="7" className="fill-brand" stroke="currentColor" strokeWidth="2" />
+              <path d="M17 0v6M17 28v6M0 17h6M28 17h6" stroke="currentColor" strokeWidth="2" />
+            </svg>
+            <span className="text-[1.3rem] font-black uppercase tracking-[0.02em] [font-stretch:125%]">
+              Samska
+            </span>
             <span
               aria-hidden="true"
-              className="grid h-8 w-8 place-items-center rounded-md bg-brand text-sm font-extrabold text-white"
+              className="self-start rounded-[3px] border-[1.5px] border-ink px-1.5 font-mono text-[0.6rem] font-medium tracking-[0.14em] max-[34rem]:hidden"
             >
-              S
+              STORE
             </span>
-            <span className="text-[1.05rem] tracking-[-0.02em]">Samska</span>
           </a>
           <nav aria-label="Primary" className="flex items-center gap-1">
             <a
@@ -64,9 +71,9 @@ export default function App() {
       >
         {renderSurface(path)}
       </main>
-      <footer className="border-t border-border bg-surface">
+      <footer className="border-t-2 border-ink bg-surface">
         <div className="mx-auto flex w-[min(100%-2.5rem,76rem)] flex-wrap items-center justify-between gap-2 py-6 text-sm text-muted">
-          <p className="font-bold text-ink">Samska Sandbox</p>
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.12em] text-ink">Samska Sandbox</p>
           <p>A fictional storefront for engineering practice. Product and Cart data reset when the server restarts.</p>
         </div>
       </footer>
@@ -109,7 +116,9 @@ function decodePathSegment(segment: string): string | null {
 }
 
 function navLinkClassName(isCurrent: boolean): string {
-  return `rounded-sm px-3 py-2 text-sm font-extrabold no-underline ${
-    isCurrent ? "bg-count-surface text-brand-dark" : "text-muted hover:bg-surface-muted hover:text-ink"
+  return `rounded-sm border-[1.5px] px-3 py-2.5 font-mono text-[0.8rem] font-medium uppercase tracking-[0.06em] no-underline ${
+    isCurrent
+      ? "border-ink bg-ink text-canvas"
+      : "border-transparent text-ink hover:border-ink"
   }`;
 }

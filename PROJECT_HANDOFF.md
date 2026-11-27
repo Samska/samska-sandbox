@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-064 — Bench applied to the web application (#124)
+
+- Owner approved the Bench identity and asked for implementation while away (2026-11-27). `web/` now uses the Bench tokens, fonts and components on every existing screen; "Next · design only" screens are not built. Backend and routes are unchanged. The branch is based on the SS-063 branch, so [PR #123](https://github.com/Samska/samska-sandbox/pull/123) merges first.
+- Agent Verification: typecheck, 262 unit and component tests, production build, and 11 Playwright tests against the real backend (the 2 existing journey tests plus 9 new identity tests), all run locally. Human Verification is pending: the owner runs the app locally.
+- Next step: owner local validation, then merge authorization for #123 and the SS-064 pull request in that order.
+
 ## SS-066 — Persist Payment attempts in PostgreSQL (#127)
 
 - Build (stacked on SS-065, merge after it): simulated Payment attempts, their frozen Cart snapshots and the one-approval-per-Cart-revision rule are stored in PostgreSQL (`V3__create_payment_attempts.sql`, `JdbcPaymentStore`, [ADR 0010](docs/adr/0010-adopt-postgresql-payment-attempt-persistence.md)). The 32-attempt cap is removed for the database-backed store; the in-memory store keeps it for the `no-database` test profile. New `503 payment-store-unavailable`. API shapes and `web/` are unchanged.

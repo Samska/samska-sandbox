@@ -26,10 +26,10 @@ export default function ProductDetail({
   return (
     <section
       id="products"
-      className="grid min-w-0 gap-5 overflow-hidden rounded-lg border border-border bg-surface shadow-card"
+      className="grid min-w-0 gap-5 overflow-hidden rounded-sm border-[1.5px] border-ink bg-surface shadow-card"
       aria-labelledby="product-detail-heading"
     >
-      <div className="flex items-center justify-between gap-4 border-b border-border px-5 py-3">
+      <div className="flex items-center justify-between gap-4 border-b-[1.5px] border-ink px-5 py-3">
         <Button variant="quiet" size="sm" onClick={onBack}>
           <span aria-hidden="true">&#8592;</span> Back to Products
         </Button>
@@ -37,17 +37,17 @@ export default function ProductDetail({
       </div>
       <div className="grid items-start gap-6 px-5 pb-6 min-[52rem]:grid-cols-[minmax(0,1.35fr)_minmax(16rem,1fr)]">
         <div className="grid gap-4">
-          <div className="flex items-center gap-3">
+          <div className="grid gap-4">
             <ProductMedia product={product} variant="detail" />
             <div className="grid gap-1.5">
-              <p className="text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted">
+              <p className="font-mono text-[0.75rem] font-medium uppercase tracking-[0.14em] text-muted">
                 Product
               </p>
               <h1
                 id="product-detail-heading"
                 ref={headingRef}
                 tabIndex={-1}
-                className="text-[clamp(1.5rem,3vw,2.125rem)] leading-[1.15] tracking-[-0.025em] text-ink"
+                className="text-[clamp(2rem,5vw,3.5rem)] text-ink"
               >
                 {product.name}
               </h1>
@@ -55,12 +55,12 @@ export default function ProductDetail({
           </div>
           <p className="max-w-prose leading-relaxed text-muted">{product.description}</p>
         </div>
-        <div className="grid gap-4 rounded-lg border border-border bg-surface-muted/50 p-4">
+        <div className="grid gap-4 rounded-sm border-[1.5px] border-ink bg-surface-muted/60 p-4">
           <div className="grid gap-1">
-            <span className="text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-muted">
+            <span className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-muted">
               Price
             </span>
-            <span className="text-3xl font-extrabold tracking-[-0.02em] text-ink">
+            <span className="font-mono text-3xl font-semibold text-ink">
               {formatAmount(product.price)}
             </span>
           </div>

@@ -348,7 +348,7 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
           <Button onClick={() => void loadProduct()} disabled={isLoading}>
             Retry Product
           </Button>
-          <a className="self-center text-sm font-bold text-brand-dark" href="/admin/products">
+          <a className="self-center text-sm font-bold text-brand-dark underline decoration-brand decoration-2 underline-offset-4" href="/admin/products">
             Back to Product list
           </a>
         </div>
@@ -366,7 +366,7 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
   return (
     <section className="mx-auto grid w-full max-w-3xl gap-6" aria-labelledby="admin-edit-heading">
       <div className="grid gap-1.5">
-        <p className="text-[0.75rem] font-bold uppercase tracking-[0.14em] text-muted">Admin</p>
+        <p className="font-mono text-[0.75rem] font-medium uppercase tracking-[0.14em] text-muted">Admin</p>
         <h1
           id="admin-edit-heading"
           className="text-[clamp(1.75rem,3.5vw,2.5rem)] leading-[1.1] tracking-[-0.03em] text-ink"
@@ -378,7 +378,7 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
         </p>
       </div>
       <a
-        className="inline-flex min-h-11 items-center justify-center justify-self-start rounded-sm border border-border-strong bg-surface px-4 py-2.5 font-bold text-brand-dark no-underline hover:border-brand hover:bg-brand hover:text-white"
+        className="inline-flex min-h-11 items-center justify-center justify-self-start rounded-sm border-[1.5px] border-ink bg-surface px-4 py-2.5 font-mono text-[0.8rem] font-semibold uppercase tracking-[0.06em] text-ink no-underline hover:bg-ink hover:text-canvas"
         href="/admin/products"
       >
         <span aria-hidden="true">&#8592;</span> Back to Product list
@@ -391,7 +391,7 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
       ) : null}
 
       <form className="grid gap-6" onSubmit={handleSave} aria-busy={isSaving} noValidate>
-        <div className="grid gap-4 rounded-lg border border-border bg-surface p-5">
+        <div className="grid gap-4 rounded-sm border-[1.5px] border-ink bg-surface p-5">
           <h2 className="text-lg leading-[1.15] text-ink">Product details</h2>
           <ProductFields
             idPrefix="admin-edit"
@@ -435,7 +435,7 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
           <Button ref={submitRef} type="submit" disabled={isSaving}>
             {isSaving ? "Saving changes..." : submitLabel}
           </Button>
-          <a className="text-sm font-bold text-brand-dark" href="/admin/products">
+          <a className="text-sm font-bold text-brand-dark underline decoration-brand decoration-2 underline-offset-4" href="/admin/products">
             Cancel
           </a>
         </div>

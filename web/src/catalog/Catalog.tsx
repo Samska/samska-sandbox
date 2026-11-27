@@ -1069,7 +1069,7 @@ function CheckoutLoadingCard({
 
   return (
     <section
-      className="grid min-w-0 gap-4 rounded-lg border border-border bg-surface px-5 py-6 shadow-card"
+      className="grid min-w-0 gap-4 rounded-sm border-[1.5px] border-ink bg-surface px-5 py-6 shadow-card"
       aria-labelledby="checkout-loading-heading"
       aria-busy={isPending}
     >

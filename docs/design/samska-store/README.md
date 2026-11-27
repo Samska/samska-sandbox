@@ -39,6 +39,16 @@ Status: **First version for owner review (2026-11-27). Design only. Not approved
 - Open questions for the owner: whether the workshop-catalog personality fits; the name vocabulary (objects, slip); the signal color; whether any previewed upcoming screen should be dropped or reordered.
 - Not changed: `web/` code, backend behavior, and earlier tokens files. Applying the design is separate work that needs its own Issue.
 
+## SS-064 — Bench applied to the web application
+
+Status: **Implemented for owner local validation (2026-11-27). The owner approved the Bench identity; this applies it to the screens that exist.**
+
+- Issue: [SS-064 / #124](https://github.com/Samska/samska-sandbox/issues/124). Based on the SS-063 branch because [PR #123](https://github.com/Samska/samska-sandbox/pull/123) was not merged when this was built.
+- Applied: Bench tokens (light and dark) in the Tailwind theme in `web/src/index.css`, Archivo and IBM Plex Mono, the wordmark and STORE tag, inverted current-page navigation, mono uppercase buttons with a hard offset shadow, object stages with catalog numbers and hang-tag prices on the Market, Product detail, Cart drawer, Checkout, simulated Payment, Order, Admin and Not found.
+- Not applied: screens marked "Next · design only" in the prototype. The cart keeps its "Cart" wording in the app; "Slip" stays a prototype idea until the owner decides.
+- Deviations from the prototype: the catalog number is derived from the Product id because Products have no catalog number yet; the fallback stage uses a monogram because there are no illustrations; the success text color was darkened from `#0d7a3f` to `#0b6b37` in the app, the prototype and the tokens to reach 4.5:1 on its surface (found by the new contrast test).
+- Verification: unit and component tests, a contrast test over the token pairs, and Playwright checks at 1280 and 390 px in light and dark, as described in [TESTING.md](../../TESTING.md).
+
 ## SS-053 — Current-interface Batch 1 (owner-approved, revn 52)
 
 Status: **Owner-approved design delivery (Batch 1) at `revn 52`; completed via Issue #102 and merged PR #103. Design approval only; not production adoption.**
