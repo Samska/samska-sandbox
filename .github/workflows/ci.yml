@@ -9,6 +9,7 @@ on:
       - edited
     branches:
       - main
+      - release/1.0
 
 jobs:
   repository-validation:
