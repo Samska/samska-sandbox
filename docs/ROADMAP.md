@@ -104,31 +104,38 @@ complete, and the [release notes](releases/v0.1.0.md) are reconciled to the
 published state. See [Releasing](RELEASING.md) for the publication sequence and
 the post-publication reconciliation.
 
-## Directional Evolution
+## Release Plan To v1.0.0
 
-Long-term versions are directional learning themes, not fixed commitments or a
-technology checklist. A future technology is evaluated only when an identified
-engineering problem justifies it.
+Decided on 2026-11-27 (SS-068, [ADR 0012](adr/0012-adopt-release-plan-to-v1.md)). Each release is a milestone with a name, scope and exit criteria. A release is **delivered** when its scope is merged on `main` and its exit criteria hold; it is **published** (tag and GitHub Release) only under [Releasing](RELEASING.md) and the owner's authorization. Work-item identifiers are allocated when Issues are created, and the owner validates the product at v1.0.0.
 
-| Version | Directional Theme | Evidence That May Trigger Evaluation |
-| --- | --- | --- |
-| v0.2 | Quality maturity | Identified testing gaps or unreliable delivery feedback |
-| v0.3 | Caching / Redis | Measured catalog read pressure or unacceptable latency |
-| v0.4 | Event-driven processing / RabbitMQ | Synchronous workflows become slow, fragile, or operationally coupled |
-| v0.5 | Inventory concurrency | Concurrent stock updates expose consistency or contention problems |
-| v0.6 | React Native | A justified mobile learning or product need exists |
-| v0.7 | Observability | Insufficient visibility into behavior, failures, or dependencies |
-| v0.8 | Operational dashboards | Defined operational questions require actionable views |
-| v0.9 | Infrastructure as Code | Repeated environment setup requires reproducibility and reviewability |
-| v1.0 | Secured public demo | A bounded, disposable demo can meet defined security controls |
-| v1.1 | Performance engineering | Performance risks or service objectives require measurement and tuning |
-| v1.2 | Security engineering expansion | Threat-model or assessment findings justify additional controls |
-| v1.3 | Data engineering | Analytics or simulation needs require governed data pipelines |
-| v1.4 | Simulation engine | Product learning goals justify a dedicated simulation capability |
-| v1.5 | Resilience engineering | Failure-mode analysis identifies resilience gaps |
-| v1.6 | SRE / SLI / SLO / error budgets | Reliable operational signals and service objectives are needed |
-| v1.7 | Chaos engineering | Mature observability and resilience controls support safe experiments |
-| v2.0 | Evaluate service extraction / microservices | Clear independently evolving boundaries and operational evidence justify it |
+Design baseline for every release is the owner-approved [Bench prototype](design/samska-store/README.md). Its "Next · design only" screens were approved as an identity direction, not as scope; each release below names the screens it builds and the gaps the prototype does not cover. A gap is designed in the same visual language before it is built, and recorded in the design record.
+
+| Release | Name | Scope | Exit criteria | Design status |
+| --- | --- | --- | --- | --- |
+| v0.2.0 | Durable Store | Orders, Cart, Payment attempts, Catalog and uploaded media in PostgreSQL (SS-049, SS-065 to SS-067); Bench identity applied to `web/` (SS-063, SS-064) | No state is lost on restart; browser journey passes against the real database | Bench approved |
+| v0.3.0 | Accounts | Registration, sign-in and sign-out with synthetic accounts; server-side sessions; per-account Cart, Payment attempts and Orders; an administrator role that guards Admin and media endpoints; CSRF protection | Anonymous visitors browse only; a customer cannot read another account's data; Admin is refused to customers; E2E journey runs signed in | Account screen in Bench. Gap: sign-out and signed-in header state |
+| v0.4.0 | Order History and Tracking | Order history for the signed-in account; a simulated shipment lifecycle (packed, left warehouse, out for delivery, delivered, or delayed) derived from a controllable clock; tracking screen | History shows only own Orders; shipment status is deterministic under a fixed clock; tracking reachable from history and Order result | Orders and Tracking screens in Bench (states: empty, list, in transit, delayed, delivered). Gap: none |
+| v0.5.0 | Inventory | Stock quantity per Product; a stock reservation taken when a Payment attempt is approved and consumed when the Order is created; concurrency-safe decrement; inventory states on catalog and detail; stock field in Admin | No oversell under concurrent Orders; out-of-stock Products cannot be added or paid; reservations expire | Inventory states and public demo banner in Bench. Gap: Admin stock field and reservation-expired message, designed in the existing form and notice patterns |
+| v0.6.0 | Operations | An administrator Operations screen with figures from real data (Orders per hour, approval rate, checkout latency, error rate, service health) from Actuator and Micrometer; structured request logging with correlation IDs | Every figure is traceable to a stated query or metric; screen is admin-only | Operations screen in Bench. Gap: loading and empty states |
+| v1.0.0 | Secured Public Demo | Security hardening (headers, rate limiting, production configuration without default credentials, secure cookies), containerized runtime and hosted-demo configuration, threat model, demo banner and synthetic-data reset, release documentation | Security checklist and threat model reviewed; all suites and E2E green on the release candidate; documentation matches behavior | Demo banner in Bench |
+
+Limits that remain true at v1.0.0 and are never presented as resolved: synthetic data and simulated payments only, a single application process, no email or real couriers, no real identity provider. The mobile phone layout in Bench stays a responsive-web design; a native app is not part of 1.0.
+
+## Beyond v1.0.0
+
+The earlier directional themes are kept as candidates after 1.0. None has measured evidence yet, so none is scheduled. A technology is evaluated only when an identified engineering problem justifies it.
+
+| Candidate | Evidence That May Trigger Evaluation |
+| --- | --- |
+| Caching / Redis | Measured catalog read pressure or unacceptable latency |
+| Event-driven processing / RabbitMQ | Synchronous workflows become slow, fragile, or operationally coupled |
+| React Native | A justified mobile learning or product need exists |
+| Infrastructure as Code | Repeated environment setup requires reproducibility and reviewability |
+| Performance engineering | Performance risks or service objectives require measurement and tuning |
+| Security engineering expansion | Threat-model or assessment findings justify additional controls |
+| Data engineering and simulation engine | Analytics or simulation needs require governed data pipelines |
+| Resilience, SRE and chaos engineering | Failure-mode analysis and reliable operational signals support them |
+| v2.0: evaluate service extraction | Clear independently evolving boundaries and operational evidence justify it |
 
 Any significant change to this direction requires the relevant documentation
 and, when architectural, an ADR update. See [ARCHITECTURE.md](ARCHITECTURE.md)
