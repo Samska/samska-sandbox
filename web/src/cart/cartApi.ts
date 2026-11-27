@@ -1,3 +1,4 @@
+import { apiFetch } from "../http";
 export interface CartItemResponse {
   productId: string;
   name: string;
@@ -53,7 +54,7 @@ async function requestCart(path: string, expectedStatus: number, options?: Reque
   let response: Response;
 
   try {
-    response = await fetch(path, options);
+    response = await apiFetch(path, options);
   } catch {
     throw new CartApiError("network");
   }

@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-069 — Accounts and sessions (#133, v0.3.0)
+
+- Build on `release/1.0`: `account` module, Spring Security sessions with cookie-to-header CSRF, per-account Cart, Payment attempts and Orders (`V5`, `V6`), `ADMIN` role for Product writes, administrator from `samska.admin.*`, web account screen and shell gating ([ADR 0013](docs/adr/0013-adopt-account-sessions-and-ownership.md)).
+- Agent Verification: backend `verify` green including `AccountSecurityApiTest` (8 tests), 273 web tests, typecheck, 13 Playwright tests signed in and signed out.
+- Next step: v0.4.0 Order History and Tracking.
+
 ## SS-068 — Release plan to v1.0.0 (#132)
 
 - Owner request (2026-11-27): define releases in the Roadmap and deliver everything up to v1.0.0, contacting him only when 1.0 is ready. Plan in [Roadmap](docs/ROADMAP.md) and [ADR 0012](docs/adr/0012-adopt-release-plan-to-v1.md): v0.2.0 Durable Store, v0.3.0 Accounts, v0.4.0 Order History and Tracking, v0.5.0 Inventory, v0.6.0 Operations, v1.0.0 Secured Public Demo. Caching, messaging, React Native and IaC move beyond 1.0.

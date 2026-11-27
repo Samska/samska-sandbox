@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.github.samska.sandbox.account.CurrentAccount;
 import io.github.samska.sandbox.cart.CartSnapshot;
 import io.github.samska.sandbox.cart.ProductReference;
 import io.github.samska.sandbox.cart.Quantity;
@@ -24,9 +25,11 @@ import io.github.samska.sandbox.payment.application.PaymentStore;
 public class JdbcPaymentStore implements PaymentStore {
 
     private final JdbcClient jdbc;
+    private final CurrentAccount currentAccount;
 
-    public JdbcPaymentStore(JdbcClient jdbc) {
+    public JdbcPaymentStore(JdbcClient jdbc, CurrentAccount currentAccount) {
         this.jdbc = jdbc;
+        this.currentAccount = currentAccount;
     }
 
     @Override
@@ -58,11 +61,12 @@ public class JdbcPaymentStore implements PaymentStore {
         // No conflict target: both the attempt-ID primary key and the one-approval-per-revision
         // partial index resolve to "no row inserted" instead of aborting the transaction.
         int inserted = jdbc.sql("""
-                        INSERT INTO payment_attempts (attempt_id, cart_revision, scenario, status, total)
-                        VALUES (:attemptId, :cartRevision, :scenario, :status, :total)
+                        INSERT INTO payment_attempts (attempt_id, account_id, cart_revision, scenario, status, total)
+                        VALUES (:attemptId, :accountId, :cartRevision, :scenario, :status, :total)
                         ON CONFLICT DO NOTHING
                         """)
                 .param("attemptId", attemptId)
+                .param("accountId", currentAccount.id())
                 .param("cartRevision", cartRevision)
                 .param("scenario", scenario.name())
                 .param("status", attempt.status().name())
@@ -75,8 +79,12 @@ public class JdbcPaymentStore implements PaymentStore {
             if (winner.isPresent()) {
                 return replay(winner.get(), cartRevision, scenario);
             }
-            throw new PaymentAlreadyApprovedException(approvedAttemptId(cartRevision)
-                    .orElseThrow(() -> new IllegalStateException("Concurrent Payment insert was not visible")));
+            var approved = approvedAttemptId(cartRevision);
+            if (approved.isPresent()) {
+                throw new PaymentAlreadyApprovedException(approved.get());
+            }
+            // The attempt ID already belongs to another account; it is neither revealed nor reused.
+            throw new PaymentAttemptConflictException(attemptId);
         }
 
         int lineNumber = 1;
@@ -108,7 +116,8 @@ public class JdbcPaymentStore implements PaymentStore {
     }
 
     private Optional<UUID> approvedAttemptId(long cartRevision) {
-        return jdbc.sql("SELECT attempt_id FROM payment_attempts WHERE cart_revision = :revision AND status = :status")
+        return jdbc.sql("SELECT attempt_id FROM payment_attempts WHERE account_id = :accountId AND cart_revision = :revision AND status = :status")
+                .param("accountId", currentAccount.id())
                 .param("revision", cartRevision)
                 .param("status", PaymentStatus.APPROVED.name())
                 .query((resultSet, rowNumber) -> resultSet.getObject("attempt_id", UUID.class))
@@ -120,8 +129,9 @@ public class JdbcPaymentStore implements PaymentStore {
             return Optional.empty();
         }
 
-        return jdbc.sql("SELECT attempt_id, cart_revision, scenario, total FROM payment_attempts WHERE attempt_id = :id")
+        return jdbc.sql("SELECT attempt_id, cart_revision, scenario, total FROM payment_attempts WHERE attempt_id = :id AND account_id = :accountId")
                 .param("id", attemptId)
+                .param("accountId", currentAccount.id())
                 .query((resultSet, rowNumber) -> new AttemptRow(
                         resultSet.getObject("attempt_id", UUID.class),
                         resultSet.getLong("cart_revision"),

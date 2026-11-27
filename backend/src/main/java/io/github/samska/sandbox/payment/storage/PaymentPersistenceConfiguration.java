@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
+import io.github.samska.sandbox.account.CurrentAccount;
 import io.github.samska.sandbox.payment.application.PaymentStore;
 
 @Configuration(proxyBeanMethods = false)
@@ -14,7 +15,7 @@ import io.github.samska.sandbox.payment.application.PaymentStore;
 public class PaymentPersistenceConfiguration {
 
     @Bean
-    PaymentStore paymentStore(DataSource dataSource) {
-        return new JdbcPaymentStore(JdbcClient.create(dataSource));
+    PaymentStore paymentStore(DataSource dataSource, CurrentAccount currentAccount) {
+        return new JdbcPaymentStore(JdbcClient.create(dataSource), currentAccount);
     }
 }

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { authStatePath } from "./session";
 import {
   clearCart,
   createProduct,
@@ -113,7 +114,7 @@ test.describe("First Order journey in a real browser", () => {
     expect(recoveredAttempt).toEqual(capturedAttempt);
 
     // Direct entry with empty browser storage recovers the same attempt.
-    const coldAttemptContext = await browser.newContext();
+    const coldAttemptContext = await browser.newContext({ storageState: authStatePath });
     try {
       const coldAttemptPage = await coldAttemptContext.newPage();
       const coldTracker = trackTransactionalRequests(coldAttemptPage);
@@ -211,7 +212,7 @@ test.describe("First Order journey in a real browser", () => {
     await expect(page.getByText("Order total: 37.50")).toBeVisible();
     expect((await (await fetchOrderByAttempt(request, attemptId)).json()) as OrderDto).toEqual(capturedOrder);
 
-    const coldOrderContext = await browser.newContext();
+    const coldOrderContext = await browser.newContext({ storageState: authStatePath });
     try {
       const coldOrderPage = await coldOrderContext.newPage();
       const coldOrderTracker = trackTransactionalRequests(coldOrderPage);
@@ -292,7 +293,7 @@ test.describe("First Order journey in a real browser", () => {
     expect(tracker.orderPosts()).toBe(0);
 
     // Direct entry with empty browser storage behaves identically.
-    const coldContext = await browser.newContext();
+    const coldContext = await browser.newContext({ storageState: authStatePath });
     try {
       const coldPage = await coldContext.newPage();
       const coldTracker = trackTransactionalRequests(coldPage);

@@ -8,6 +8,7 @@ import java.util.UUID;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.github.samska.sandbox.account.CurrentAccount;
 import io.github.samska.sandbox.order.Order;
 import io.github.samska.sandbox.order.OrderItem;
 import io.github.samska.sandbox.order.application.OrderPaymentNotApprovedException;
@@ -22,10 +23,12 @@ public class JdbcOrderStore implements OrderStore {
 
     private final JdbcClient jdbc;
     private final PaymentAttempts attempts;
+    private final CurrentAccount currentAccount;
 
-    public JdbcOrderStore(JdbcClient jdbc, PaymentAttempts attempts) {
+    public JdbcOrderStore(JdbcClient jdbc, PaymentAttempts attempts, CurrentAccount currentAccount) {
         this.jdbc = jdbc;
         this.attempts = attempts;
+        this.currentAccount = currentAccount;
     }
 
     @Override
@@ -48,12 +51,13 @@ public class JdbcOrderStore implements OrderStore {
 
         var orderId = UUID.randomUUID();
         var inserted = jdbc.sql("""
-                        INSERT INTO orders (order_id, payment_attempt_id, cart_revision, total)
-                        VALUES (:orderId, :attemptId, :cartRevision, :total)
+                        INSERT INTO orders (order_id, account_id, payment_attempt_id, cart_revision, total)
+                        VALUES (:orderId, :accountId, :attemptId, :cartRevision, :total)
                         ON CONFLICT (payment_attempt_id) DO NOTHING
                         RETURNING order_id
                         """)
                 .param("orderId", orderId)
+                .param("accountId", currentAccount.id())
                 .param("attemptId", attemptId)
                 .param("cartRevision", attempt.cartRevision())
                 .param("total", attempt.total())
@@ -112,8 +116,9 @@ public class JdbcOrderStore implements OrderStore {
             return Optional.empty();
         }
 
-        return jdbc.sql("SELECT " + ORDER_COLUMNS + " FROM orders WHERE " + column + " = :value")
+        return jdbc.sql("SELECT " + ORDER_COLUMNS + " FROM orders WHERE " + column + " = :value AND account_id = :accountId")
                 .param("value", value)
+                .param("accountId", currentAccount.id())
                 .query((resultSet, rowNumber) -> new OrderRow(
                         resultSet.getObject("order_id", UUID.class),
                         resultSet.getObject("payment_attempt_id", UUID.class),

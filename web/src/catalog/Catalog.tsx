@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../auth/AuthContext";
 import { listProducts, type ProductResponse } from "./catalogApi";
 import {
   addCartItem,
@@ -51,6 +52,8 @@ type OrderAttemptOp = {
 };
 
 export default function Catalog() {
+  const auth = useAuth();
+  const anonymous = auth.state.status === "anonymous";
   const path = usePath();
   const routeAttemptId = attemptIdForPath(path);
   const isMarketPath = path === marketPath;
@@ -144,6 +147,15 @@ export default function Catalog() {
 
   async function refreshCart() {
     const sequence = ++cartSeqRef.current;
+
+    if (anonymous) {
+      // A visitor has no Cart until signing in; the Market stays browsable.
+      setCart({ items: [], total: 0, revision: 0 });
+      setCartError(null);
+      setCartPending(false);
+      return;
+    }
+
     setCartPending(true);
     setCartError(null);
 
@@ -166,8 +178,13 @@ export default function Catalog() {
 
   useEffect(() => {
     void refreshProducts();
-    void refreshCart();
   }, []);
+
+  useEffect(() => {
+    if (auth.state.status !== "loading") {
+      void refreshCart();
+    }
+  }, [auth.state.status]);
 
   useEffect(() => {
     const previousPath = previousPathRef.current;
@@ -558,6 +575,11 @@ export default function Catalog() {
   }
 
   async function handleAddToCart(product: ProductResponse) {
+    if (anonymous) {
+      navigateTo("/account");
+      return;
+    }
+
     cartSeqRef.current += 1;
     setCartPending(true);
     setCartError(null);

@@ -1,3 +1,4 @@
+import { apiFetch } from "../http";
 export interface OrderItemResponse {
   productId: string;
   name: string;
@@ -50,7 +51,7 @@ export function getOrderByPaymentAttempt(paymentAttemptId: string): Promise<Orde
 async function request(path: string, expected: number[], options?: RequestInit): Promise<OrderResponse> {
   let response: Response;
   try {
-    response = await fetch(path, options);
+    response = await apiFetch(path, options);
   } catch {
     throw new OrderApiError("network");
   }

@@ -327,3 +327,7 @@ PostgreSQL is published only to loopback. Its bootstrap user has elevated local 
 When a change affects local prerequisites, Java/Node/npm versions, environment variables, Docker services, ports, volumes, migrations, startup commands, or local runtime/configuration, update this guide in the same change. Meaningful implementation reports must include the required `## Local Environment Changes` section defined in [AI Engineering Governance](AI-GOVERNANCE.md).
 
 This guide is the canonical human-facing local setup reference; [`scripts/dev.sh`](../scripts/dev.sh) is the convenience executable representation of the supported backend/frontend startup workflow. Changes affecting local startup or launcher assumptions must review both for consistency. Update the launcher only when affected, and rerun relevant launcher verification whenever it changes.
+
+## Administrator Account (SS-069)
+
+The backend creates no account by default. To use Admin locally, set synthetic values before starting it, for example in PowerShell `$env:SAMSKA_ADMIN_EMAIL = "admin@samska.test"; $env:SAMSKA_ADMIN_PASSWORD = "<a synthetic password of 8 or more characters>"`, then sign in at `/account`. Visitors register their own customer accounts there. Sessions are in memory, so restarting the backend signs everyone out.

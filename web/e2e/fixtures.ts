@@ -1,4 +1,5 @@
 import { expect, type APIRequestContext, type Page } from "@playwright/test";
+import { xsrfHeaders } from "./session";
 
 export interface ProductFixture {
   id: string;
@@ -50,7 +51,8 @@ export async function createProduct(
   price: number
 ): Promise<ProductFixture> {
   const response = await request.post("/api/products", {
-    data: { name, description: `Synthetic E2E fixture for ${name}`, price }
+    data: { name, description: `Synthetic E2E fixture for ${name}`, price },
+    headers: await xsrfHeaders(request)
   });
 
   expect(response.status(), `create product ${name}`).toBe(201);
@@ -65,13 +67,15 @@ export async function getCart(request: APIRequestContext): Promise<CartDto> {
   return (await response.json()) as CartDto;
 }
 
-// The backend keeps one shared process-local Cart, so tests start from an empty
+// The signed-in account keeps one Cart across tests, so they start from an empty
 // Cart using the existing Cart API. No application reset endpoint is added.
 export async function clearCart(request: APIRequestContext): Promise<CartDto> {
   const initial = await getCart(request);
 
   for (const item of initial.items) {
-    const response = await request.delete(`/api/cart/items/${encodeURIComponent(item.productId)}`);
+    const response = await request.delete(`/api/cart/items/${encodeURIComponent(item.productId)}`, {
+      headers: await xsrfHeaders(request)
+    });
     expect(response.status(), `remove ${item.productId} from cart`).toBe(200);
   }
 

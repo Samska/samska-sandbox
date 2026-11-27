@@ -1,3 +1,4 @@
+import { apiFetch } from "../http";
 export interface CreateProductRequest {
   name: string;
   description: string;
@@ -79,7 +80,7 @@ export async function listProducts(): Promise<ProductResponse[]> {
   let response: Response;
 
   try {
-    response = await fetch("/api/products");
+    response = await apiFetch("/api/products");
   } catch {
     throw new CatalogApiError("network");
   }
@@ -107,7 +108,7 @@ async function requestWithoutBody(path: string, method: string): Promise<void> {
   let response: Response;
 
   try {
-    response = await fetch(path, { method });
+    response = await apiFetch(path, { method });
   } catch {
     throw new CatalogApiError("network");
   }
@@ -125,7 +126,7 @@ async function requestProduct(
   let response: Response;
 
   try {
-    response = await fetch(path, options);
+    response = await apiFetch(path, options);
   } catch {
     throw new CatalogApiError("network");
   }
