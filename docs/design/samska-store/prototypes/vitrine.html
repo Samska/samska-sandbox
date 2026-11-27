@@ -357,7 +357,7 @@ function render() {
   $("#searchbox").classList.toggle("off", !showSearch);
   $("#nav-market").setAttribute("aria-current", ["market", "product", "checkout", "order"].includes(r.name) ? "page" : "false");
   $("#nav-admin").setAttribute("aria-current", r.name.startsWith("admin") ? "page" : "false");
-  const V = { market: vMarket, product: vProduct, checkout: vCheckout, order: vOrder, admin: vAdmin, "admin-new": vForm, "admin-edit": vForm }[r.name];
+  const V = new Map(Object.entries({ market: vMarket, product: vProduct, checkout: vCheckout, order: vOrder, admin: vAdmin, "admin-new": vForm, "admin-edit": vForm })).get(r.name);
   app.innerHTML = V ? V(r) : `<div class="empty"><h2>Page not found</h2><a class="btn" href="#market">Back to market</a></div>`;
   if (r.name === "market") paintGrid();
   if (r.name === "admin-new" || r.name === "admin-edit") bindForm(r);
