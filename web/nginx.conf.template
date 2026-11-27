@@ -1,10 +1,17 @@
-# Serves the single-page application and proxies /api to the backend.
-# Only the private Compose network may supply the client address (Caddy sets X-Forwarded-For); anyone else
-# connecting directly is identified by the connecting address. The backend then receives one trusted
-# X-Forwarded-For, so its rate limiter sees the visitor and not a header a client chose.
+# Serves the single-page application and proxies /api to the backend. The image renders this template at
+# start-up (nginx's envsubst), so the same image runs under Docker Compose (Caddy in front) and on Railway:
+#   PORT          port nginx listens on (Railway sets it; Compose uses 8080)
+#   API_UPSTREAM  host:port of the backend (Compose: backend:8080; Railway: <service>.railway.internal:8080)
+#   API_RESOLVER  DNS server used to resolve the upstream, taken from /etc/resolv.conf at start-up
+#   LISTEN_IPV6   an IPv6 listen directive, set at start-up only when the container has IPv6
+# Only private networks may supply the client address (Caddy or the platform edge sets X-Forwarded-For);
+# anyone else connecting directly is identified by the connecting address. The backend then receives one
+# trusted X-Forwarded-For, so its rate limiter sees the visitor and not a header a client chose.
 set_real_ip_from 10.0.0.0/8;
+set_real_ip_from 100.64.0.0/10;
 set_real_ip_from 172.16.0.0/12;
 set_real_ip_from 192.168.0.0/16;
+set_real_ip_from fc00::/7;
 real_ip_header X-Forwarded-For;
 real_ip_recursive off;
 
@@ -14,12 +21,24 @@ map $http_x_forwarded_proto $forwarded_proto {
 }
 
 server {
-    listen 8080;
+    listen ${PORT};
+    ${LISTEN_IPV6}
     server_name _;
     server_tokens off;
     root /usr/share/nginx/html;
     index index.html;
     client_max_body_size 4m;
+
+    # WEB_ACCESS=private adds HTTP basic authentication to everything below; see docker-entrypoint.d/15-samska-env.envsh.
+    include /tmp/samska-access.conf;
+
+    # Open on purpose: the platform health check cannot send a password.
+    location = /healthz {
+        auth_basic off;
+        access_log off;
+        default_type text/plain;
+        return 200 "ok";
+    }
 
     add_header Content-Security-Policy "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
     add_header X-Content-Type-Options "nosniff" always;
@@ -28,7 +47,10 @@ server {
     add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
 
     location /api/ {
-        proxy_pass http://backend:8080;
+        # A variable makes nginx resolve the name at request time, so a redeployed backend is found again.
+        resolver ${API_RESOLVER} valid=10s ipv6=on;
+        set $api_upstream http://${API_UPSTREAM};
+        proxy_pass $api_upstream;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $forwarded_proto;

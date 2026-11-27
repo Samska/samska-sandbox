@@ -1,0 +1,41 @@
+# Start-up configuration for the web image. The nginx entrypoint sources executable *.envsh files, so the
+# variables exported here reach the template rendering that runs right after (20-envsubst-on-templates.sh).
+# POSIX sh; the file must stay executable.
+
+: "${PORT:=8080}"
+: "${API_UPSTREAM:=backend:8080}"
+export PORT API_UPSTREAM
+
+# Resolve the upstream at request time with the DNS server the platform gave this container
+# (NGINX_LOCAL_RESOLVERS comes from the image's own 15-local-resolvers.envsh, IPv6 already bracketed).
+: "${API_RESOLVER:=${NGINX_LOCAL_RESOLVERS:-127.0.0.11}}"
+export API_RESOLVER
+
+if [ -e /proc/net/if_inet6 ]; then
+  LISTEN_IPV6="listen [::]:${PORT};"
+else
+  LISTEN_IPV6=""
+fi
+export LISTEN_IPV6
+
+# WEB_ACCESS=private (the default) puts the whole site behind HTTP basic authentication and refuses to start
+# without a credential, so a missing variable can never open the site. WEB_ACCESS=none leaves it to a proxy
+# in front (the Compose stack's Caddy) or opens the public demo.
+umask 077
+case "${WEB_ACCESS:-private}" in
+  none)
+    : > /tmp/samska-access.conf
+    ;;
+  private)
+    if [ -z "${DEMO_ACCESS_USER:-}" ] || [ -z "${DEMO_ACCESS_HASH:-}" ]; then
+      echo "samska-access: WEB_ACCESS=private needs DEMO_ACCESS_USER and DEMO_ACCESS_HASH (a bcrypt hash)." >&2
+      exit 1
+    fi
+    printf '%s:%s\n' "$DEMO_ACCESS_USER" "$DEMO_ACCESS_HASH" > /tmp/samska-htpasswd
+    printf 'auth_basic "Samska Store";\nauth_basic_user_file /tmp/samska-htpasswd;\n' > /tmp/samska-access.conf
+    ;;
+  *)
+    echo "samska-access: WEB_ACCESS must be private or none." >&2
+    exit 1
+    ;;
+esac
