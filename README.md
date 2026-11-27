@@ -11,7 +11,7 @@ licensed under the [Apache License 2.0](LICENSE).
 
 - **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
 - **Current stage:** `v0.1.0` released; SS-038, SS-044, SS-045, SS-046, SS-049, SS-051, SS-052, SS-053, SS-054, and SS-055 are complete and merged. Candidate 03 and SS-053 Batch 1 were owner-approved in Penpot for the reviewed catalog, current-interface shell, and Market; SS-054 Batch 2 received qualified first-version visual acceptance and was completed through Issue #104 and PR #105; SS-055 Batch 3 received owner-reported visual acceptance “Parece ok” and was completed through Issue #106 and PR #107. SS-056 Batch 4 (Order, Admin, and fallbacks) is owner-reported visually approved at its named version with the exact answer “Eu aprovo” (2026-10-29); the seven-file documentation is approved and commit/push is authorized. After successful push, the separate PR creation decision is the next gate. The accepted designs contain provisional illustrations, and the production UI is not rebranded.
-- **Next planned work:** separate PR creation decision after the authorized SS-056 commit/push. Merge, application/browser Human Verification, and production adoption remain separate future decisions; the next product capability remains unselected.
+- **Next planned work:** the release plan to `v1.0.0` in the [Roadmap](docs/ROADMAP.md), built on the `release/1.0` integration branch; `main` changes only after the owner validates it.
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
