@@ -34,7 +34,7 @@ export default function ThemeToggle({ inverted = false }: { inverted?: boolean }
           type="button"
           aria-pressed={preference === option}
           onClick={() => choose(option)}
-          className={`min-h-9 px-2.5 font-mono text-[0.7rem] font-semibold uppercase tracking-[0.06em] ${preference === option ? pressed : idle}`}
+          className={`min-h-9 px-2.5 max-[34rem]:px-1.5 font-mono text-[0.7rem] font-semibold uppercase tracking-[0.06em] ${preference === option ? pressed : idle}`}
         >
           {labels[option]}
         </button>

@@ -73,7 +73,7 @@ export default function App() {
               STORE
             </span>
           </a>
-          <nav aria-label="Primary" className="flex items-center gap-0.5 sm:gap-1">
+          <nav aria-label="Primary" className="flex flex-wrap items-center justify-end gap-0.5 sm:gap-1">
             <a
               className={navLinkClassName(isStorefront)}
               href="/"
