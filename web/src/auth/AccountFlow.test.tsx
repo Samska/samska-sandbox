@@ -99,6 +99,31 @@ describe("accounts in the application shell", () => {
     expect(within(navigation).queryByRole("link", { name: "Admin" })).not.toBeInTheDocument();
   });
 
+  it("sends an administrator to the Admin area after sign-in and a customer to the Market", async () => {
+    const admin = { ...customer, id: "9", email: "admin@example.test", displayName: "Admin", role: "ADMIN" };
+    stubApi(null, (path, init) =>
+      path === "/api/auth/login" && init?.method === "POST" ? json(200, admin) : undefined
+    );
+    window.history.replaceState({}, "", "/account");
+    renderApp();
+
+    fireEvent.change(await screen.findByLabelText("Email"), { target: { value: "admin@example.test" } });
+    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "correct-horse-battery" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+
+    await waitFor(() => expect(window.location.pathname).toBe("/admin/products"));
+    expect(await screen.findByRole("navigation", { name: "Admin" })).toBeInTheDocument();
+  });
+
+  it("offers the Admin link only to administrators in the storefront", async () => {
+    stubApi(customer);
+    renderApp();
+
+    const navigation = await screen.findByRole("navigation", { name: "Primary" });
+    expect(within(navigation).queryByRole("link", { name: "Admin" })).not.toBeInTheDocument();
+    expect(within(navigation).queryByRole("link", { name: "Operations" })).not.toBeInTheDocument();
+  });
+
   it("signs in from the account page and returns to the Market", async () => {
     const calls = stubApi(null, (path, init) =>
       path === "/api/auth/login" && init?.method === "POST" ? json(200, customer) : undefined

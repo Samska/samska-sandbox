@@ -31,3 +31,4 @@ coverage/
 web/test-results/
 web/playwright-report/
 web/.auth/
+backups/

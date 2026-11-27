@@ -121,7 +121,7 @@ Design baseline for every release is the owner-approved [Bench prototype](design
 
 Limits that remain true at v1.0.0 and are never presented as resolved: synthetic data and simulated payments only, a single application process, no email or real couriers, no real identity provider. The mobile phone layout in Bench stays a responsive-web design; a native app is not part of 1.0.
 
-Delivery state (2026-11-27): v0.2.0 to v1.0.0 are built on `release/1.0` and await the owner's validation; see the [v1.0.0 release notes](releases/v1.0.0.md).
+Delivery state (2026-11-27): v0.2.0 to v1.0.0 are built on `release/1.0` and await the owner's validation; see the [v1.0.0 release notes](releases/v1.0.0.md). The owner added to v1.0.0 on 2026-11-27: signup and sign-in and two roles (buyer and administrator, delivered in v0.3.0), a manageable area separate from the customer area, and hosting on a VPS (SS-075, [Deployment](DEPLOYMENT.md)).
 
 ## Beyond v1.0.0
 

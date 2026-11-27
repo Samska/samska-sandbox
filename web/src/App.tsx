@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import AdminProductCreate from "./admin/AdminProductCreate";
 import AdminProductEdit from "./admin/AdminProductEdit";
 import AdminProducts from "./admin/AdminProducts";
@@ -30,6 +31,15 @@ export default function App() {
   const isAdmin =
     path === adminProductsPath || path.startsWith(`${adminProductsPath}/`);
   const isOperations = path === operationsPath;
+  const inAdminArea = isAdmin || isOperations || path.startsWith("/admin/");
+
+  if (inAdminArea && canAdminister) {
+    return (
+      <AdminShell path={path} auth={auth.state} onSignOut={auth.signOut}>
+        {renderSurface(path, auth.state)}
+      </AdminShell>
+    );
+  }
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -79,15 +89,6 @@ export default function App() {
                 Admin
               </a>
             ) : null}
-            {canAdminister ? (
-              <a
-                className={navLinkClassName(isOperations)}
-                href={operationsPath}
-                aria-current={isOperations ? "page" : undefined}
-              >
-                Operations
-              </a>
-            ) : null}
             {auth.state.status === "signed-in" ? (
               <a
                 className={navLinkClassName(isOrders)}
@@ -116,6 +117,78 @@ export default function App() {
       </footer>
     </div>
   );
+}
+
+/** The manageable area: its own header and navigation, with no storefront or Cart links. */
+function AdminShell({
+  path,
+  auth,
+  onSignOut,
+  children
+}: {
+  path: string;
+  auth: AuthState;
+  onSignOut: () => Promise<void>;
+  children: ReactNode;
+}) {
+  const inOperations = path === operationsPath;
+  const inProducts = !inOperations;
+
+  return (
+    <div className="flex min-h-screen flex-col">
+      <a
+        className="absolute left-3 top-3 z-[2] -translate-y-[200%] rounded-sm bg-ink px-3.5 py-2.5 text-canvas focus:translate-y-0"
+        href="#main-content"
+      >
+        Skip to main content
+      </a>
+      <DemoBanner />
+      <header className="sticky top-0 z-20 border-b-2 border-ink bg-ink text-canvas">
+        <div className="mx-auto flex min-h-[3.75rem] w-[min(100%-2.5rem,76rem)] flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1 sm:gap-x-6">
+          <a className="inline-flex items-center gap-2.5 text-canvas no-underline" href={adminProductsPath} aria-label="Samska Admin home">
+            <span className="text-[1.3rem] font-black uppercase tracking-[0.02em] [font-stretch:125%]">Samska</span>
+            <span className="self-start rounded-[3px] border-[1.5px] border-canvas px-1.5 font-mono text-[0.6rem] font-medium tracking-[0.14em]">
+              ADMIN
+            </span>
+          </a>
+          <nav aria-label="Admin" className="flex flex-wrap items-center gap-0.5 sm:gap-1">
+            <a className={adminNavClassName(inProducts)} href={adminProductsPath} aria-current={inProducts ? "page" : undefined}>
+              Products
+            </a>
+            <a className={adminNavClassName(inOperations)} href={operationsPath} aria-current={inOperations ? "page" : undefined}>
+              Operations
+            </a>
+            <a className={adminNavClassName(false)} href="/">
+              View store
+            </a>
+            {auth.status === "signed-in" ? (
+              <Button
+                className="max-[34rem]:px-2"
+                variant="secondary"
+                size="sm"
+                onClick={() => void onSignOut().then(() => window.location.assign("/"))}
+              >
+                Sign out
+              </Button>
+            ) : null}
+          </nav>
+        </div>
+      </header>
+      <main
+        className="mx-auto w-[min(100%-2.5rem,76rem)] flex-1 py-[clamp(1.25rem,3vw,2.25rem)]"
+        id="main-content"
+        tabIndex={-1}
+      >
+        {children}
+      </main>
+    </div>
+  );
+}
+
+function adminNavClassName(isCurrent: boolean): string {
+  return `rounded-sm border-[1.5px] px-2 py-2.5 font-mono text-[0.8rem] font-medium uppercase tracking-[0.06em] no-underline sm:px-3 ${
+    isCurrent ? "border-canvas bg-canvas text-ink" : "border-transparent text-canvas hover:border-canvas"
+  }`;
 }
 
 function AccountControls({

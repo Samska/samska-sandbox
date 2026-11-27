@@ -37,7 +37,7 @@ export default function AccountPage({ notice }: { notice?: string }) {
     try {
       const account = creating ? await register(email, name, password) : await signIn(email, password);
       setAccount(account);
-      navigateTo("/");
+      navigateTo(account.role === "ADMIN" ? "/admin/products" : "/");
     } catch (caught) {
       setError(errorMessages[caught instanceof AuthApiError ? caught.kind : "server"]);
     } finally {
