@@ -4,6 +4,11 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-077 — Empty-state design fix (#149, v1.0.0)
+
+- Build: shared `EmptyState` (Bench dashed outline, centred, icon, action) used by the Admin list, Cart and Checkout; the outdated "no access control" sentence is gone from the Admin header and README. Found by the owner while validating `release/1.0`.
+- Gap: Market and orders empty states stay left-aligned; recorded in the learning note.
+
 ## SS-075 — Admin area and VPS setup (#146, v1.0.0)
 
 - Build: separate Admin shell for `/admin/*`, administrator sign-in lands in Admin, Caddy TLS service, trusted client-address chain, `deploy/` scripts (deploy, backup, restore), VPS guide ([ADR 0019](docs/adr/0019-separate-admin-area-and-terminate-tls-with-caddy.md)).

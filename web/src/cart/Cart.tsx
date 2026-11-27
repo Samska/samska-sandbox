@@ -4,6 +4,7 @@ import CartItemRow from "./CartItemRow";
 import { formatAmount } from "../formatAmount";
 import Button from "../ui/Button";
 import StatusMessage from "../ui/StatusMessage";
+import EmptyState, { EmptyNote, EmptyTitle } from "../ui/EmptyState";
 
 export default function CartPanel({
   cart,
@@ -77,10 +78,10 @@ export default function CartPanel({
         </div>
       ) : null}
       {cart !== null && cart.items.length === 0 ? (
-        <div className="grid gap-2 rounded-sm bg-surface-muted px-4 py-5">
-          <p className="font-bold text-ink">Your Cart is empty.</p>
-          <p className="text-sm text-muted">Products you add from the storefront appear here.</p>
-        </div>
+        <EmptyState>
+          <EmptyTitle>Your Cart is empty.</EmptyTitle>
+          <EmptyNote>Products you add from the storefront appear here.</EmptyNote>
+        </EmptyState>
       ) : null}
       {cart !== null && cart.items.length > 0 ? (
         <>
