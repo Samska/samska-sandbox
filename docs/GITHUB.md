@@ -17,7 +17,7 @@ not necessarily change on the same date.
 | Conversation resolution | Enabled | Pull request review threads must be resolved before merge. | API-verified 2026-09-19 |
 | Force-push protection | Enabled | Non-fast-forward updates to `main` are blocked. | API-verified 2026-09-19 |
 | Branch-deletion protection | Enabled | Deletion of `main` is blocked. | API-verified 2026-09-19 |
-| Automatic merged-head branch deletion | Enabled | Merged pull request head branches are deleted automatically. | Owner/external verified 2026-09-19; not exposed by the OpenCode GitHub read surface |
+| Automatic merged-head branch deletion | Enabled | Merged pull request head branches are deleted automatically. | Owner/external verified 2026-09-19; not exposed by the agent GitHub read surface |
 | Bypass policy | Enabled | No bypass actors are permitted. | Owner-verified, API-unverified; recorded 2026-08-30 |
 | Squash merge | Enabled | Squash is the only allowed merge method for pull requests to `main`. | API-verified 2026-09-19 |
 | Merge commits | Enabled | Merge commits are not allowed for pull requests to `main`. | API-verified 2026-09-19 |
