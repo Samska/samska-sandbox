@@ -12,6 +12,7 @@ import Button from "../ui/Button";
 import FormField from "../ui/FormField";
 import StatusMessage from "../ui/StatusMessage";
 import { adminDeleteErrorMessage, adminLoadErrorMessage, adminRefreshErrorMessage } from "./messages";
+import EmptyState, { EmptyNote, EmptyTitle, emptyActionClassName } from "../ui/EmptyState";
 
 type FocusTarget =
   | { kind: "delete-button"; productId: string }
@@ -129,8 +130,7 @@ export default function AdminProducts() {
             Product management
           </h1>
           <p className="max-w-prose text-muted">
-            Find, edit, and delete Products. This local surface is navigation only and has no access
-            control; the Market and Admin share the same Catalog.
+            Find, edit, and delete Products. The Market and Admin share the same Catalog.
           </p>
         </div>
         <a
@@ -191,20 +191,19 @@ export default function AdminProducts() {
           </div>
         ) : null}
         {!isLoading && loadError === null && products.length === 0 ? (
-          <div className="grid gap-2 rounded-sm bg-surface-muted px-4 py-5">
-            <p className="font-bold text-ink">No Products exist yet.</p>
-            <p className="text-sm text-muted">
-              Use Create Product to add the first Product to the Catalog.
-            </p>
-          </div>
+          <EmptyState>
+            <EmptyTitle>No Products exist yet.</EmptyTitle>
+            <EmptyNote>Use Create Product to add the first Product to the Catalog.</EmptyNote>
+            <a className={emptyActionClassName} href="/admin/products/new">
+              Create the first Product
+            </a>
+          </EmptyState>
         ) : null}
         {!isLoading && loadError === null && products.length > 0 && visibleProducts.length === 0 ? (
-          <div className="grid gap-2 rounded-sm bg-surface-muted px-4 py-5">
-            <p className="font-bold text-ink">
-              No Products match &ldquo;{searchTerm.trim()}&rdquo;.
-            </p>
-            <p className="text-sm text-muted">Clear the search to see the full Product list.</p>
-          </div>
+          <EmptyState>
+            <EmptyTitle>No Products match &ldquo;{searchTerm.trim()}&rdquo;.</EmptyTitle>
+            <EmptyNote>Clear the search to see the full Product list.</EmptyNote>
+          </EmptyState>
         ) : null}
         {!isLoading && loadError === null && visibleProducts.length > 0 ? (
           <ul className="grid list-none gap-2 p-0 m-0">

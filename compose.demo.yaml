@@ -46,6 +46,9 @@ services:
   web:
     build:
       context: web
+    environment:
+      # Caddy is the gate here (private mode lives in the Caddyfile), so nginx does not ask for a password.
+      WEB_ACCESS: none
     depends_on:
       backend:
         condition: service_healthy

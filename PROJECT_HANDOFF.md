@@ -8,6 +8,16 @@ Update rule: this snapshot must be updated in the same change when project state
 
 - Build: Auto, Light and Dark control in both headers; the choice pins `data-theme`, is remembered in the browser and applied before first paint by `web/public/theme-init.js`. The Bench prototype header carries the same control. Requested by the owner while validating `release/1.0`.
 
+## SS-077 — Empty-state design fix (#149, v1.0.0)
+
+- Build: shared `EmptyState` (Bench dashed outline, centred, icon, action) used by the Admin list, Cart and Checkout; the outdated "no access control" sentence is gone from the Admin header and README. Found by the owner while validating `release/1.0`.
+- Gap: Market and orders empty states stay left-aligned; recorded in the learning note.
+
+## SS-076 — Railway deployment (#148, v1.0.0)
+
+- Build: the web image renders nginx at start-up from `PORT`, `API_UPSTREAM` and the container's DNS server, applies private mode itself (`WEB_ACCESS`, fails closed) and exposes `/healthz`; the backend honours `PORT`; `railway.json` per service; Railway guide in [Deployment](docs/DEPLOYMENT.md) ([ADR 0020](docs/adr/0020-run-on-railway-with-environment-driven-web-image.md)). The VPS guide stays as an alternative.
+- Not verified until the first deployment: the Railway builds, the private-network name and the client-address ranges.
+
 ## SS-075 — Admin area and VPS setup (#146, v1.0.0)
 
 - Build: separate Admin shell for `/admin/*`, administrator sign-in lands in Admin, Caddy TLS service, trusted client-address chain, `deploy/` scripts (deploy, backup, restore), VPS guide ([ADR 0019](docs/adr/0019-separate-admin-area-and-terminate-tls-with-caddy.md)).
