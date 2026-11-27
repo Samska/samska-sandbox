@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
-import io.github.samska.sandbox.cart.api.CartErrorResponse;
 import io.github.samska.sandbox.catalog.InvalidProductException;
 import io.github.samska.sandbox.catalog.application.InvalidMediaException;
 import io.github.samska.sandbox.catalog.application.MediaCapacityExceededException;
@@ -64,7 +63,7 @@ public class ProductApiExceptionHandler {
     }
 
     @ExceptionHandler({ DataAccessResourceFailureException.class, TransactionException.class })
-    public ResponseEntity<CartErrorResponse> handleCartStoreUnavailable() {
-        return ResponseEntity.status(503).body(CartErrorResponse.storeUnavailable());
+    public ResponseEntity<CatalogErrorResponse> handleStoreUnavailable() {
+        return ResponseEntity.status(503).body(CatalogErrorResponse.storeUnavailable());
     }
 }

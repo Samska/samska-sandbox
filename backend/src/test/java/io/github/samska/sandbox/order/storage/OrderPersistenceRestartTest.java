@@ -44,6 +44,7 @@ class OrderPersistenceRestartTest {
             first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE order_items, orders");
             first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE cart_items, cart CASCADE");
             first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE payment_attempt_items, payment_attempts");
+            first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE product_media, products CASCADE");
             var base = baseUri(first);
 
             firstProductId = id(post(base, "/api/products", productBody("Canvas Tote", "12.50"), 201));
@@ -66,7 +67,7 @@ class OrderPersistenceRestartTest {
         try (var second = startApplication()) {
             var base = baseUri(second);
 
-            // Products are process-local and now gone; the Order must not depend on the stored Payment attempt.
+            // The Order must not depend on the stored Payment attempt or on live Product data.
             var byId = get(base, "/api/orders/" + orderId, 200);
             var byAttempt = get(base, "/api/orders/payment-attempts/" + ATTEMPT, 200);
             assertThat(byAttempt).isEqualTo(byId);

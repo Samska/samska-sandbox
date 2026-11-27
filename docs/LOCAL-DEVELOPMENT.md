@@ -4,7 +4,7 @@
 
 This is the canonical guide for configuring, running, verifying, stopping, and troubleshooting Samska Sandbox locally. It describes the repository's current state; it is not deployment guidance.
 
-The core Catalog, Cart, Payment, and Order application uses a Java/Spring Boot backend and a React/Vite frontend. Product and Cart data, uploaded Product media, and simulated payment attempts are held in backend process memory and disappear whenever the backend restarts. Orders and their items are persisted in PostgreSQL and survive a backend restart. PostgreSQL is required for backend startup; Docker Compose provides the local runtime.
+The core Catalog, Cart, Payment, and Order application uses a Java/Spring Boot backend and a React/Vite frontend. Products, uploaded Product media, the current Cart, simulated payment attempts, Orders and their items are all persisted in PostgreSQL and survive a backend restart; `docker compose down -v` removes them. PostgreSQL is required for backend startup; Docker Compose provides the local runtime.
 
 ## Prerequisites
 
@@ -77,7 +77,7 @@ When `curl` is available, the launcher waits up to 90 seconds for <http://localh
 
 The launcher creates separate owned process groups for Maven/Spring Boot and npm/Vite. `Ctrl+C` sends the launcher `SIGINT`; it terminates both owned groups with `SIGTERM`, waits briefly, then uses `SIGKILL` only for its still-running groups. `SIGTERM` uses the same cleanup path. The launcher exits `130` after `Ctrl+C`, `143` after `SIGTERM`, and non-zero when either child exits unexpectedly. It never uses broad process-name termination such as `pkill` or `killall`.
 
-Use `Ctrl+C` in the launcher terminal to stop both processes. Stopping Spring Boot still loses all in-memory Product data.
+Use `Ctrl+C` in the launcher terminal to stop both processes. Stopping Spring Boot keeps all data in PostgreSQL.
 
 ## PostgreSQL Setup
 
@@ -113,9 +113,9 @@ Browser
   -> Vite development server (default 5173 when available)
     -> /api proxy
       -> Spring Boot (default 8080)
-        -> InMemoryProductStore (Products and uploaded media)
-        -> InMemoryCartStore
-        -> InMemoryPaymentStore (up to 32 simulated attempts)
+        -> JdbcProductStore (Products and uploaded media, PostgreSQL)
+        -> JdbcCartStore (PostgreSQL)
+        -> JdbcPaymentStore (simulated attempts, PostgreSQL)
         -> JdbcOrderStore (Orders and items copied from approved attempts)
              -> Flyway-managed PostgreSQL schema
 
@@ -145,7 +145,7 @@ curl -i -X POST http://localhost:8080/api/products \
 curl -i http://localhost:8080/api/products/<returned-id>
 ```
 
-Use only synthetic Product data. Save the returned ID only for the current backend process: after restarting the backend, retrieving that ID returns `404 Not Found` because the `InMemoryProductStore` starts empty.
+Use only synthetic Product data. Products are stored in PostgreSQL: after restarting the backend, retrieving that ID still returns the Product until it is deleted or the database volume is reset.
 
 ## Manual / Troubleshooting: Start the Frontend
 
@@ -163,7 +163,7 @@ The proxy does not define production routing or establish a Spring Boot CORS pol
 
 The Admin surface accepts one JPEG image per Product. The limits are a 3 MiB multipart request, a 2 MiB input file, 2048 pixels per side, and 4 million pixels total; the server validates and re-encodes the image to a JPEG of at most 2 MiB, and the backend retains at most 32 MiB of stored media bytes in process memory. A rejected upload leaves the Product and its current image unchanged. Re-encoding discards EXIF metadata and orientation, so a phone photo that depends on EXIF rotation may appear sideways by design.
 
-Uploaded images are runtime data: they are not committed to the repository, are not curated assets under `web/public/media/`, and are lost together with Products when the backend restarts. Do not add uploaded images to the repository or to `ATTRIBUTION.md`.
+Uploaded images are runtime data: they are not committed to the repository, are not curated assets under `web/public/media/`, and are stored with their Product in PostgreSQL and are removed with it. Do not add uploaded images to the repository or to `ATTRIBUTION.md`.
 
 ## Simulated Payment
 
@@ -186,7 +186,7 @@ Payment simulation is local-only: no real payment is processed, no credentials o
 1. Start the backend and confirm the health response reports `UP`.
 2. Start the frontend, open its reported URL, create a synthetic Product from `/admin/products/new` (optionally selecting a JPEG before Create), edit it from `/admin/products`, browse it in the Market, add it to the Cart, update its quantity, remove it, and then delete the Product from the Admin list. Adding a Product to the Cart and then attempting to delete it must report the `409` Cart conflict until it is removed from the Cart.
 3. On `/admin/products/{id}/edit`, select a replacement JPEG or stage removal, then Save. The Market card and the Product detail view must reflect the change; replacing must serve the new image and stop serving the previous one, and removing must reveal the curated image or the monogram fallback. A rejected file (non-JPEG, over-limit, or malformed) must report that the details were saved while the image was not, and the current image must be unchanged.
-4. Stop and restart the backend, then try the same Product ID again. It must no longer be found, and its uploaded image must no longer be served. Any earlier simulated payment attempt must still be returned by `GET /api/payment-attempts/{attemptId}` with the same decision and frozen items. The current Cart, with its items and revision, must still be returned by `GET /api/cart`. A previously created Order must remain retrievable by its Order ID and by its original payment-attempt ID.
+4. Stop and restart the backend, then try the same Product ID again. It must still be found, and its uploaded image must still be served. Any earlier simulated payment attempt must still be returned by `GET /api/payment-attempts/{attemptId}` with the same decision and frozen items. The current Cart, with its items and revision, must still be returned by `GET /api/cart`. A previously created Order must remain retrievable by its Order ID and by its original payment-attempt ID.
 5. In Checkout, initiate a simulated payment. Selecting Decline or Temporary failure must state that no payment was made and offer another attempt; approving must state that no real payment was made and no Order was created. Editing the Cart, then attempting payment again after a Cart change, must refresh the displayed Cart instead of deciding on stale values. Stopping and restarting the backend must clear the Cart and attempts.
 6. After an approval, reload the `/checkout/attempts/{attemptId}` page: the approved captured snapshot must be recovered from the API, not resent. Create the Order explicitly, reload again, and the frozen Order must remain retrievable. Save the attempt URL, stop and restart only the backend, and load that URL again: the frozen Order must still render even though the Payment attempt is gone. An unknown attempt URL must show that the result cannot be confirmed; a missing record must never be presented as proof that the backend restarted. The live Cart must remain editable after Order creation.
 7. Use `docker compose ps` and the migration log to verify PostgreSQL and Flyway startup independently. While PostgreSQL is stopped, Order requests must return `503` with `order-store-unavailable` rather than hanging; record whether they recover after PostgreSQL restarts without restarting the backend. The roughly five-second observation is the Hikari connection-acquisition bound; `socketTimeout` is ten seconds, so a mid-query failure can take longer.
@@ -206,7 +206,7 @@ R1 and R2 are automated in `OrderPersistenceRestartTest`. The owner checks below
 - **R3 — saved URL.** Open the saved `/checkout/attempts/{attemptId}` URL after the restart. The frozen Order must render while Market and Checkout show empty state; reload and Back/Forward must remain stable, and no request may mutate state.
 - **R4 — outage and revised copy.** Stop PostgreSQL. Health must be `503`/down; Order GET and POST must return `503 order-store-unavailable` within the connection-acquisition bound; the UI must show the existing unconfirmed/check-result state, not claim no Order exists. Database counts must be unchanged. Confirm the revised helper copy (“Orders persist across backend restarts. Simulated payment attempts may not. A failed lookup does not prove an Order was deleted or never created.”) is visible and accurate in this state.
 - **R5 — recovery.** Start PostgreSQL without restarting the backend. Health and Order reads/replay must succeed; record the observation, or record that a backend restart was required.
-- **R6 — scope.** Confirm Products, uploaded media, Cart, and Payment attempts are still empty after the backend restart, while the Order remains.
+- **R6 — scope.** Confirm Products, uploaded media, the Cart, Payment attempts, and the Order are all still present after the backend restart.
 
 Optional coverage, not required for acceptance: browser E2E for the saved URL and outage message; an automated real-PostgreSQL outage stop/start; an explicit data-integrity `500` test; and a Flyway history assertion. The HTTP multi-item restart, replay, row-count, and unordered-attempt checks are automated; R1 and R2 are their owner spot-checks.
 
@@ -253,7 +253,7 @@ What the runner does and expects:
 
 - `playwright.config.ts` starts its own backend (`mvnw.cmd`/`./mvnw` `spring-boot:run` from `backend/`) and its own Vite server on `127.0.0.1:5173` with `--strictPort`. `JAVA_HOME` remains the authoritative JDK selection on Windows.
 - If `8080` or `5173` is already in use, the run refuses to start with an explicit `already used` error and never stops the existing owner. Stop the other process yourself and retry.
-- Each invocation owns a fresh backend process: Products are empty at start and are lost when the run ends. Orders, Payment attempts and the single current Cart persist in PostgreSQL across runs; the tests use unique attempt IDs, do not require an empty Orders table, and clear the Cart through the existing Cart API before each test.
+- Each invocation owns a fresh backend process: Products, Orders, Payment attempts and the single current Cart persist in PostgreSQL across runs; the tests use unique attempt IDs, do not require an empty Orders table, and clear the Cart through the existing Cart API before each test.
 - Tests run serially (one worker, no retries) and clear the shared Cart through the existing Cart API before each test; no application reset endpoint exists or is added.
 - On failure, traces and screenshots are written under `web/test-results/`, and the HTML report under `web/playwright-report/` (`npx playwright show-report`); open a recorded trace with `npx playwright show-trace test-results/<test-directory>/trace.zip`. Both directories are ignored by Git, so local failure artifacts are review material and CI uploads them only when the run fails. Owned-server output is printed to the terminal and appears in the CI job log; it is not written into those artifact directories. Inspect failure artifacts before rerunning the suite: every new run cleans `web/test-results/` and overwrites `web/playwright-report/`, so a preserved copy of any diagnostics you want to keep must live outside those directories.
 - Run a subset with `npm run test:e2e -- e2e/first-order.spec.ts` and watch locally with `npx playwright test --headed`.
@@ -280,7 +280,7 @@ taskkill //PID <verified-pid> //T //F
 
 ## Shutdown and Reset
 
-Use `Ctrl+C` in the launcher terminal to stop both application processes, or use `Ctrl+C` in each manual backend/frontend terminal to stop that process. Stopping the backend immediately loses its in-memory Product data; persisted Orders, Payment attempts and the current Cart remain in PostgreSQL (a Cart line for a Product that no longer exists can be removed from the Cart).
+Use `Ctrl+C` in the launcher terminal to stop both application processes, or use `Ctrl+C` in each manual backend/frontend terminal to stop that process. Stopping the backend keeps Products, uploaded media, Orders, Payment attempts and the current Cart in PostgreSQL.
 
 Run these from the repository root to manage PostgreSQL:
 

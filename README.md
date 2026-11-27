@@ -35,8 +35,8 @@ PostgreSQL; it does not change the Cart. The journey is attempt-addressed:
 `/checkout` hosts the editable Cart and `/checkout/attempts/{attemptId}` recovers
 the simulated payment result or Order confirmation through lookup APIs after a
 full-page reload, direct entry, or history navigation, without a router
-dependency. Orders, the Cart, and Payment attempts survive a backend restart; Products and
-media remain process-local.
+dependency. Orders, the Cart, Payment attempts, and the Catalog with its uploaded media
+survive a backend restart.
 
 AI agents are implementation tools operating under repository-defined
 governance. Humans own requirements, architecture, decisions, review,
@@ -59,7 +59,7 @@ validation, learning, and risk.
 | Order creation | Implemented | Explicit creation from an approved attempt; immutable copied lines and total persisted with the Order in PostgreSQL; same-attempt replay and GET reconciliation survive restart; the former 32-Order process-local cap is removed. |
 | First Order journey | Implemented | Attempt-addressed `/checkout` and `/checkout/attempts/{attemptId}` surfaces recover the simulated payment result or Order confirmation through lookup APIs after reload, direct entry, and history; route reads are GET-only with pending-operation and stale-response guards; a recovered result does not require the live Cart, the live Cart is never cleared, and one `sessionStorage` reference is only a discovery hint. |
 | Admin Catalog Management | Implemented | Compact management list at `/admin/products` with case-insensitive name search, thumbnails, Edit links, and delete confirmation; dedicated `/admin/products/new` and `/admin/products/{id}/edit` forms with staged image selection; Admin paths are navigation only, not access control. |
-| Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in bounded backend process memory; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
+| Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in PostgreSQL under a bounded total size; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | Automated browser E2E | Implemented | Two Chromium Playwright tests against the real frontend, Vite proxy, and a fresh exclusively owned backend: First Order success with reload/direct-entry recovery, frozen data, explicit Order creation, and keyboard/focus checks, plus a declined outcome without an Order path; serialized execution, synthetic fixtures through existing APIs, diagnostics on failure. |
@@ -77,9 +77,9 @@ flowchart LR
     HTTP --> App[Catalog, Cart, Payment, and Order<br/>applications plus Product/Cart<br/>deletion coordination]
     App --> Domain[Product domain]
     App --> Store[ProductStore boundary]
-    Store --> Memory[InMemoryProductStore<br/>process-local<br/>Product + uploaded media]
+    Store --> Memory[JdbcProductStore<br/>PostgreSQL<br/>Product + uploaded media]
     App --> Cart[Cart aggregate]
-    Cart --> CartMemory[InMemoryCartStore<br/>single current Cart]
+    Cart --> CartMemory[JdbcCartStore<br/>PostgreSQL<br/>single current Cart]
     App --> Payment[Payment application<br/>revision-checked snapshots,<br/>replay, and approvals]
     Payment --> Cart
     App --> Order[Order application<br/>immutable records and<br/>attempt replay]
@@ -89,9 +89,8 @@ flowchart LR
 ```
 
 The Vite proxy is for local development only. Product data, including
-uploaded Product media, is held in process memory and is lost when the backend
-restarts. The current Cart is stored in PostgreSQL; a Cart line keeps its own
-name and price snapshot, so it outlives a Product that was lost on restart. Uploaded media is validated, dimension-checked, and re-encoded as JPEG
+uploaded Product media, and the current Cart are stored in PostgreSQL and survive
+a backend restart; a Cart line keeps its own name and price snapshot. Uploaded media is validated, dimension-checked, and re-encoded as JPEG
 before storage, is limited to one image per Product, and is served only for the
 Product's current media ID; rejection leaves the Product and its current image
 unchanged. Checkout is a frontend
@@ -109,8 +108,8 @@ is a separate frontend route over the same Catalog API, and `/admin/products`
 provides no access control. Product deletion is refused with `409` while the
 Product is in the current Cart through a process-local coordination lock that
 covers the HTTP add-to-Cart and delete-Product paths. PostgreSQL is required for
-backend startup and stores Orders, items, the current Cart, and Payment attempts; Products and media
-remain process-local.
+backend startup and stores Orders, items, the current Cart, Payment attempts, Products, and uploaded
+media.
 
 ## Engineering Practices
 
@@ -163,8 +162,8 @@ PR #52. Checkout (SS-032) is implemented as an editable live view of the current
 Cart. Admin Catalog Management (SS-033) is complete and merged through PR #56.
 Product Media Upload (SS-034) is complete and merged through PR #58. Payment
 Simulator (SS-036) provides explicit simulated payment outcomes over a
-revision-checked immutable Cart snapshot owned by a bounded process-local attempt
-store. Order creation (SS-037) is implemented and merged through PR #67; the
+revision-checked immutable Cart snapshot owned by the Payment attempt store,
+persisted in PostgreSQL. Order creation (SS-037) is implemented and merged through PR #67; the
 owner observed the main browser flow, while API replay, uncertain-response
 recovery, and accessibility checks remain unobserved for SS-037 itself. The
 First Order journey (SS-039) is complete and merged through PR #70: `/checkout`

@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-067 — Persist the Catalog in PostgreSQL (#130)
+
+- Build: Products and uploaded media are stored in PostgreSQL (`V4__create_catalog.sql`, `JdbcProductStore`, [ADR 0011](docs/adr/0011-adopt-postgresql-catalog-persistence.md)), completing the persistence sequence of ADRs 0008 to 0010. Listings keep insertion order and carry media IDs without image bytes; the aggregate media budget is enforced transactionally. New `503 catalog-store-unavailable`. API shapes and `web/` are unchanged.
+- Boundary change: no application state is process-local any more outside the `no-database` test profile; the earlier "Products and media are lost on restart" statements are superseded.
+- Next step: owner review and merge authorization.
+
 ## SS-066 — Persist Payment attempts in PostgreSQL (#127)
 
 - Build (stacked on SS-065, merge after it): simulated Payment attempts, their frozen Cart snapshots and the one-approval-per-Cart-revision rule are stored in PostgreSQL (`V3__create_payment_attempts.sql`, `JdbcPaymentStore`, [ADR 0010](docs/adr/0010-adopt-postgresql-payment-attempt-persistence.md)). The 32-attempt cap is removed for the database-backed store; the in-memory store keeps it for the `no-database` test profile. New `503 payment-store-unavailable`. API shapes and `web/` are unchanged.
