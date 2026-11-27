@@ -11,7 +11,7 @@ Status: **Owner-approved Candidate 03 — design approval only. Provisional illu
 
 ## SS-060 — Vitrine applied to the web application (in build)
 
-Status: **Owner Build authorization 2026-11-27 ("Eu autorizo"). Human Verification pending.**
+Status: **Owner Build authorization 2026-11-27 ("Eu autorizo"). Owner review of the open pull request pending.**
 
 - Issue: [SS-060 / #115](https://github.com/Samska/samska-sandbox/issues/115)
 - The Vitrine tokens now live in the Tailwind theme in `web/src/index.css`, with a dark palette that follows the operating-system setting. Buttons and links are pills, panels use larger radii, headings use Bricolage Grotesque and text uses Inter (loaded from Google Fonts in `web/index.html`, with system fallbacks).

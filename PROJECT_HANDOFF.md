@@ -7,8 +7,8 @@ Update rule: this snapshot must be updated in the same change when project state
 ## SS-060 — Vitrine applied to the web application (#115)
 
 - Owner Build authorization (2026-11-27): "Eu autorizo", for the scope in [Issue #115](https://github.com/Samska/samska-sandbox/issues/115): move the Vitrine tokens into the Tailwind theme and restyle shared components, with no behavior, route, backend, or test-contract change. Work is on `feat/ss-060-vitrine-web`.
-- Agent Verification: typecheck and the 196 unit tests pass; screenshots of Market, Product detail, Cart drawer, Checkout, and Admin at 1280 and 390 px in light and dark were reviewed against a local mock API. The browser E2E journey could not run locally (backend needs Java 25 and PostgreSQL) and is left to CI. Human Verification is pending.
-- Next: owner Human Verification of the running app before commit.
+- Agent Verification: typecheck and the 196 unit tests pass; screenshots of Market, Product detail, Cart drawer, Checkout, and Admin at 1280 and 390 px in light and dark were reviewed against a local mock API. The browser E2E journey could not run locally (backend needs Java 25 and PostgreSQL) and is left to CI. The owner's review of the open pull request serves as Human Verification (owner instruction 2026-11-27: builds and pull requests need no separate approval; only merge needs explicit authorization).
+- Next: owner reviews the pull request and decides on merge.
 
 ## SS-058 — Adopt Claude as the agent harness (#111)
 
