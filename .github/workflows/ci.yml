@@ -78,6 +78,23 @@ jobs:
         with:
           version: v3.11.2
 
+  container-images:
+    name: Container images
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build backend image
+        run: docker build --tag samska-backend:ci backend
+
+      - name: Build web image
+        run: docker build --tag samska-web:ci web
+
   backend:
     name: Backend
     runs-on: ubuntu-24.04

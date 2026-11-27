@@ -53,8 +53,9 @@ Generate the hash on your own machine, never put the plain password in a variabl
 ### Setup (Railway CLI)
 
 1. Install the CLI (`npm install -g @railway/cli`) and sign in once with `railway login`; the sign-in happens in your browser, so no token is shared.
-2. Create the project and add the PostgreSQL service, then add the `backend` and `web` services from this repository (branch `release/1.0`, root directories and config files as in the table), set the variables above, and generate a public domain for `web` only.
-3. Deploy. Railway builds both Dockerfiles; open the `web` address, enter the private-mode password, and sign in as the administrator.
+2. Create the project and add the PostgreSQL service, then add the `backend` and `web` services by connecting this GitHub repository (branch `release/1.0`, root directories as in the table), set the variables above, and generate a public domain for `web` only. Connect the repository instead of uploading with `railway up` from Windows: the upload drops the executable bit and the Maven wrapper then fails with `Permission denied`.
+3. If a service does not pick up its `railway.json` (it is found only when the service's config file path is `/backend/railway.json` or `/web/railway.json`), set the health check path and the restart policy in the service settings with the values from that file.
+4. Deploy. Railway builds both Dockerfiles; open the `web` address, enter the private-mode password, and sign in as the administrator.
 
 ### Public demo later
 
@@ -62,6 +63,8 @@ Switching modes is configuration only: set `WEB_ACCESS=none` on `web` and `SAMSK
 
 ### Notes
 
+- With the repository connected, every push to the chosen branch deploys automatically. Use a branch you control, and expect the trial plan's credits to be consumed from the first deployment.
+- Setting variables from PowerShell through standard input can add an invisible byte-order mark to the value; pass the value as an argument or check it after setting.
 - Railway PostgreSQL keeps its own volume and backups policy; `deploy/backup.sh` is for the Compose stack. Take a dump with `pg_dump` against the Railway connection string before risky changes.
 - `web` trusts the client address header only from private and Railway address ranges (`10.0.0.0/8`, `100.64.0.0/10`, `172.16.0.0/12`, `192.168.0.0/16`, `fc00::/7`), so the rate limiter sees each visitor; check after the first deployment that repeated sign-in failures from one address are limited and a second address is not.
 - `web` finds `backend` again after a redeploy because nginx resolves the name per request with the container's own DNS server.
@@ -106,4 +109,4 @@ Switching modes is configuration only: set `WEB_ACCESS=none` on `web` and `SAMSK
 
 The stack was run locally with the Compose file, a prebuilt backend jar and web build in the same base images, and `DEMO_DOMAIN=localhost` (Caddy's internal certificate): the backend became healthy under the `prod` profile; in private mode the site and API answered `401` without the password and `200` with it, and a wrong password was refused; switching to public mode opened the site, `/api/config` reported demo mode and HTTP redirected to HTTPS; a spoofed `X-Forwarded-For` did not bypass the rate limiter (the eleventh credential attempt was refused with `429`); `deploy/backup.sh` captured a created Product and `deploy/restore.sh` brought it back after deletion. Not exercised here: a real domain with a Let's Encrypt certificate, `deploy/deploy.sh` (it needs a Git remote on the server), and the Docker build stages that run `./mvnw` and `npm ci` inside the build, because the sandbox's network proxy intercepts TLS; a build host with TLS interception needs its certificate authority trusted in the build.
 
-The Railway setup was verified here only in part: the web image's start-up configuration (private password, open mode, custom `PORT`, API proxying and the open health path) with `deploy/verify-web-config.sh`, the backend listening on `PORT` and answering the health check, and the Compose file still rendering. Not verified until the first real deployment: the Railway build of both Dockerfiles, the private-network name `RAILWAY_PRIVATE_DOMAIN`, the client-address ranges listed above, and the result recorded in the Issue.
+The Railway setup was verified here only in part: the web image's start-up configuration (private password, open mode, custom `PORT`, API proxying and the open health path) with `deploy/verify-web-config.sh`, the backend listening on `PORT` and answering the health check, and the Compose file still rendering. Found on the first real deployment: the backend image did not build (the Maven wrapper needs `unzip`, fixed in SS-079, and both images are now built in CI); `RAILWAY_PRIVATE_DOMAIN` resolved as expected. Still to confirm there: the client-address ranges listed above.
