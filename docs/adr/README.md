@@ -40,3 +40,5 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 [ADR 0008: Adopt PostgreSQL Persistence for Orders](0008-adopt-postgresql-order-persistence.md) records the first application persistence slice, the JDBC and Flyway stack, the Order-owned schema, transaction and idempotency model, removal of the process-local Order cap, and the bounded database-unavailability behavior. It supersedes ADR 0006's persistence deferral and its capacity and restart-loss consequences.
 
 [ADR 0009: Adopt PostgreSQL Persistence for the Cart](0009-adopt-postgresql-cart-persistence.md) records the second persistence slice: the single current Cart and its revision, the row-locked transactional `update`, the missing Product reference, and why Payment attempts follow.
+
+[ADR 0010: Adopt PostgreSQL Persistence for Payment Attempts](0010-adopt-postgresql-payment-attempt-persistence.md) records the third persistence slice: durable attempts and frozen snapshots, the partial unique index for one approval per Cart revision, race handling without aborted transactions, and removal of the 32-attempt cap for the database-backed store.

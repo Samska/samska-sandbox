@@ -37,6 +37,7 @@ class CartPersistenceRestartTest {
             var jdbc = first.getBean(JdbcTemplate.class);
             jdbc.execute("TRUNCATE TABLE order_items, orders");
             jdbc.execute("TRUNCATE TABLE cart_items, cart CASCADE");
+            jdbc.execute("TRUNCATE TABLE payment_attempt_items, payment_attempts");
             var base = baseUri(first);
 
             toteId = JsonPath.read(send(base, "POST", "/api/products", productBody("Canvas Tote", "12.50"), 201), "$.id");

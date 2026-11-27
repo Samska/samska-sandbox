@@ -35,8 +35,8 @@ PostgreSQL; it does not change the Cart. The journey is attempt-addressed:
 `/checkout` hosts the editable Cart and `/checkout/attempts/{attemptId}` recovers
 the simulated payment result or Order confirmation through lookup APIs after a
 full-page reload, direct entry, or history navigation, without a router
-dependency. Orders and the Cart survive a backend restart; Products, media, and
-Payment attempts remain process-local.
+dependency. Orders, the Cart, and Payment attempts survive a backend restart; Products and
+media remain process-local.
 
 AI agents are implementation tools operating under repository-defined
 governance. Humans own requirements, architecture, decisions, review,
@@ -55,7 +55,7 @@ validation, learning, and risk.
 | Product Storefront UX/UI | Implemented | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged. |
 | Market Product-name search | Implemented | Case- and accent-insensitive substring filter on `Product.name` in the Market; term is held in `Catalog` while mounted, never written to the URL/history/storage/logs, and never sent to the API (`GET /api/products` is unchanged); Admin keeps its accent-sensitive filter by decision. |
 | Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource or identity exists; payment initiation captures the immutable revision-checked snapshot. |
-| Payment Simulator | Implemented | An explicit local-demo outcome over a revision-checked immutable Cart snapshot; Payment owns identified attempts with UUID replay, GET reconciliation, one approval per unchanged Cart revision, and a 32-attempt process-local limit without eviction. Approval alone creates no Order or real payment; attempts are lost on restart. |
+| Payment Simulator | Implemented | An explicit local-demo outcome over a revision-checked immutable Cart snapshot; Payment owns identified attempts with UUID replay, GET reconciliation, one approval per unchanged Cart revision, persisted in PostgreSQL with no attempt cap. Approval alone creates no Order or real payment; attempts are lost on restart. |
 | Order creation | Implemented | Explicit creation from an approved attempt; immutable copied lines and total persisted with the Order in PostgreSQL; same-attempt replay and GET reconciliation survive restart; the former 32-Order process-local cap is removed. |
 | First Order journey | Implemented | Attempt-addressed `/checkout` and `/checkout/attempts/{attemptId}` surfaces recover the simulated payment result or Order confirmation through lookup APIs after reload, direct entry, and history; route reads are GET-only with pending-operation and stale-response guards; a recovered result does not require the live Cart, the live Cart is never cleared, and one `sessionStorage` reference is only a discovery hint. |
 | Admin Catalog Management | Implemented | Compact management list at `/admin/products` with case-insensitive name search, thumbnails, Edit links, and delete confirmation; dedicated `/admin/products/new` and `/admin/products/{id}/edit` forms with staged image selection; Admin paths are navigation only, not access control. |
@@ -96,9 +96,8 @@ before storage, is limited to one image per Product, and is served only for the
 Product's current media ID; rejection leaves the Product and its current image
 unchanged. Checkout is a frontend
 review of the current Cart; payment initiation captures an immutable,
-revision-checked Cart snapshot owned by the bounded process-local Payment attempt
-store, which keeps at most 32 attempts and replays identical submissions by
-attempt ID. Approval alone creates no Order; an explicit action copies the
+revision-checked Cart snapshot owned by the Payment attempt store, persisted in
+PostgreSQL, which replays identical submissions by attempt ID. Approval alone creates no Order; an explicit action copies the
 approved frozen attempt into an immutable Order persisted with its items in
 PostgreSQL. The First Order journey is attempt-addressed: after a reload or
 direct entry, the attempt URL resolves the Payment result or Order through
@@ -110,8 +109,8 @@ is a separate frontend route over the same Catalog API, and `/admin/products`
 provides no access control. Product deletion is refused with `409` while the
 Product is in the current Cart through a process-local coordination lock that
 covers the HTTP add-to-Cart and delete-Product paths. PostgreSQL is required for
-backend startup and stores Orders, items, and the current Cart; the rest of the
-application remains process-local.
+backend startup and stores Orders, items, the current Cart, and Payment attempts; Products and media
+remain process-local.
 
 ## Engineering Practices
 

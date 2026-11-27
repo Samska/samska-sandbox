@@ -78,7 +78,9 @@ deferred until after the local First Order MVP but are a mandatory prerequisite
 for any hosted environment, and no hosting work begins before the MVP. Orders
 and their items are persisted in PostgreSQL and survive a backend restart. The
 rest of the application remains process-local, except the single current Cart,
-which SS-065 (#125) persists in PostgreSQL with its revision: uploaded Product
+which SS-065 (#125) persists in PostgreSQL with its revision, and simulated
+payment attempts, which SS-066 (#127) persists with their frozen snapshots and the
+one-approval-per-revision rule: uploaded Product
 media is lost together with its Product, a Cart line may outlive a Product lost
 on restart because it keeps its own name and price snapshot, and
 simulated payment attempts, including their captured snapshots and duplicate

@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import io.github.samska.sandbox.cart.CartSnapshot;
@@ -23,7 +24,9 @@ import io.github.samska.sandbox.payment.application.PaymentAttemptResult;
 import io.github.samska.sandbox.payment.application.PaymentCapacityExceededException;
 import io.github.samska.sandbox.payment.application.PaymentStore;
 
+/** Process-local store used by the {@code no-database} test profile and pure unit tests. */
 @Component
+@Profile("no-database")
 public class InMemoryPaymentStore implements PaymentStore {
 
     private final ReentrantLock lock = new ReentrantLock();
