@@ -7,7 +7,7 @@ Before meaningful work, an agent must:
 1. Read this file, documentation relevant to the task, and the existing implementation.
 2. Confirm requested scope, acceptance criteria, affected modules, documentation, security implications, and risk-based verification.
 3. Produce a concise plan before substantial changes and stop for a human decision when material uncertainty exists.
-4. Implement only approved scope; do not pull roadmap work forward.
+4. Implement only the scope defined by the owner's request and the Issue; do not pull roadmap work forward.
 5. Update affected documentation, create or update required learning records under [docs/learning/](docs/learning/README.md), and create an ADR for significant, durable architecture decisions.
 6. Run appropriate verification.
 7. Report what changed, why, verification, decisions, tradeoffs, alternatives when relevant, risks, remaining concerns, and `## Local Environment Changes` as required by [AI Engineering Governance](docs/AI-GOVERNANCE.md).
@@ -32,7 +32,7 @@ No orchestrator, assigned-role hierarchy, or specialist catalogue is required. D
 
 ## Build Execution
 
-After explicit Build authorization, follow the [Build Authorization and Execution Loop](docs/AI-GOVERNANCE.md#build-authorization-and-execution-loop). That policy defines what the authorization covers, when to stop, and how to record progress. Do not request renewed permission for actions already covered; pull request creation and merge require separate explicit authorization.
+Follow the [Build Authorization and Execution Loop](docs/AI-GOVERNANCE.md#build-authorization-and-execution-loop). Since 2026-11-27 the owner does not approve each Build or pull request creation; the owner reviews the open pull request and authorizes merge. That policy defines what a Build covers, when to stop, and how to record progress. Do not request renewed permission for actions already covered; merge requires separate explicit owner authorization.
 
 ## Session Resume
 
