@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.samska.sandbox.support.UnlimitedInventory;
 import io.github.samska.sandbox.cart.ProductReference;
 import io.github.samska.sandbox.cart.application.CartApplicationService;
 import io.github.samska.sandbox.cart.application.ProductUnavailableException;
@@ -37,7 +38,7 @@ class CatalogCartCoordinatorTest {
     private final ProductApplicationService productApplicationService =
             new ProductApplicationService(productStore, MEDIA_NORMALIZER);
     private final CartApplicationService cartApplicationService =
-            new CartApplicationService(cartStore, productApplicationService);
+            new CartApplicationService(cartStore, productApplicationService, new UnlimitedInventory());
     private final CatalogCartCoordinator coordinator =
             new CatalogCartCoordinator(cartApplicationService, productApplicationService);
 
@@ -91,7 +92,7 @@ class CatalogCartCoordinatorTest {
             return productApplicationService.findById(productId);
         };
         var coordinatorWithBlockingAdd = new CatalogCartCoordinator(
-                new CartApplicationService(cartStore, blockingCatalog), productApplicationService);
+                new CartApplicationService(cartStore, blockingCatalog, new UnlimitedInventory()), productApplicationService);
 
         var additionResult = new AtomicReference<Throwable>();
         var deletionResult = new AtomicReference<Throwable>();
@@ -144,7 +145,7 @@ class CatalogCartCoordinatorTest {
             }
         };
         var coordinatorWithBlockingDelete = new CatalogCartCoordinator(
-                new CartApplicationService(cartStore, blockingProductService), blockingProductService);
+                new CartApplicationService(cartStore, blockingProductService, new UnlimitedInventory()), blockingProductService);
 
         var additionResult = new AtomicReference<Throwable>();
         var deletionResult = new AtomicReference<Throwable>();

@@ -10,9 +10,13 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.transaction.annotation.Transactional;
 
 import io.github.samska.sandbox.account.CurrentAccount;
+import io.github.samska.sandbox.inventory.StockLine;
+import io.github.samska.sandbox.inventory.application.InsufficientStockException;
+import io.github.samska.sandbox.inventory.application.Inventory;
 import io.github.samska.sandbox.order.Order;
 import io.github.samska.sandbox.order.OrderItem;
 import io.github.samska.sandbox.order.OrderSummary;
+import io.github.samska.sandbox.order.application.OrderOutOfStockException;
 import io.github.samska.sandbox.order.application.OrderPaymentNotApprovedException;
 import io.github.samska.sandbox.order.application.OrderResult;
 import io.github.samska.sandbox.order.application.OrderStore;
@@ -26,11 +30,14 @@ public class JdbcOrderStore implements OrderStore {
     private final JdbcClient jdbc;
     private final PaymentAttempts attempts;
     private final CurrentAccount currentAccount;
+    private final Inventory inventory;
 
-    public JdbcOrderStore(JdbcClient jdbc, PaymentAttempts attempts, CurrentAccount currentAccount) {
+    public JdbcOrderStore(
+            JdbcClient jdbc, PaymentAttempts attempts, CurrentAccount currentAccount, Inventory inventory) {
         this.jdbc = jdbc;
         this.attempts = attempts;
         this.currentAccount = currentAccount;
+        this.inventory = inventory;
     }
 
     @Override
@@ -95,6 +102,15 @@ public class JdbcOrderStore implements OrderStore {
                     .param("lineSubtotal", item.lineSubtotal())
                     .update();
             lineNumber++;
+        }
+
+        // Same transaction as the Order: when the units are gone, no Order is recorded.
+        try {
+            inventory.consume(attemptId, items.stream()
+                    .map(item -> new StockLine(item.productId(), item.quantity()))
+                    .toList());
+        } catch (InsufficientStockException exception) {
+            throw new OrderOutOfStockException(exception.productId());
         }
 
         return new OrderResult(

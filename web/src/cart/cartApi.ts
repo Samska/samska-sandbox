@@ -13,14 +13,22 @@ export interface CartResponse {
   revision: number;
 }
 
-export type CartApiErrorKind = "bad-request" | "not-found" | "network" | "server" | "invalid-response";
+export type CartApiErrorKind =
+  | "bad-request"
+  | "not-found"
+  | "out-of-stock"
+  | "network"
+  | "server"
+  | "invalid-response";
 
 export class CartApiError extends Error {
   readonly kind: CartApiErrorKind;
+  readonly available: number | null;
 
-  constructor(kind: CartApiErrorKind) {
+  constructor(kind: CartApiErrorKind, available: number | null = null) {
     super(kind);
     this.kind = kind;
+    this.available = available;
   }
 }
 
@@ -60,7 +68,7 @@ async function requestCart(path: string, expectedStatus: number, options?: Reque
   }
 
   if (response.status !== expectedStatus) {
-    throw new CartApiError(errorKindFor(response.status));
+    throw await errorFor(response);
   }
 
   let payload: unknown;
@@ -76,6 +84,23 @@ async function requestCart(path: string, expectedStatus: number, options?: Reque
   }
 
   return payload;
+}
+
+async function errorFor(response: Response): Promise<CartApiError> {
+  if (response.status === 409) {
+    const body: unknown = await response.json().catch(() => null);
+
+    if (
+      typeof body === "object" &&
+      body !== null &&
+      (body as Record<string, unknown>).code === "out-of-stock" &&
+      isInteger((body as Record<string, unknown>).available)
+    ) {
+      return new CartApiError("out-of-stock", (body as { available: number }).available);
+    }
+  }
+
+  return new CartApiError(errorKindFor(response.status));
 }
 
 function errorKindFor(status: number): CartApiErrorKind {

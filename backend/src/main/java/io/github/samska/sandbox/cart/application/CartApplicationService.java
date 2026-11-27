@@ -10,16 +10,19 @@ import io.github.samska.sandbox.cart.InvalidCartException;
 import io.github.samska.sandbox.cart.ProductReference;
 import io.github.samska.sandbox.cart.Quantity;
 import io.github.samska.sandbox.catalog.application.ProductCatalog;
+import io.github.samska.sandbox.inventory.application.Inventory;
 
 @Service
 public class CartApplicationService {
 
     private final CartStore cartStore;
     private final ProductCatalog productCatalog;
+    private final Inventory inventory;
 
-    public CartApplicationService(CartStore cartStore, ProductCatalog productCatalog) {
+    public CartApplicationService(CartStore cartStore, ProductCatalog productCatalog, Inventory inventory) {
         this.cartStore = cartStore;
         this.productCatalog = productCatalog;
+        this.inventory = inventory;
     }
 
     public Cart currentCart() {
@@ -38,8 +41,11 @@ public class CartApplicationService {
         var validatedQuantity = quantity(quantity);
         var product = productCatalog.findById(productId)
                 .orElseThrow(() -> new ProductUnavailableException(productId));
-        return cartStore.update(cart -> cart.addItem(
-                new ProductReference(product.id()), product.name(), product.price(), validatedQuantity));
+        var reference = new ProductReference(product.id());
+        return cartStore.update(cart -> {
+            cart.addItem(reference, product.name(), product.price(), validatedQuantity);
+            requireStock(cart, reference);
+        });
     }
 
     public Cart updateQuantity(UUID productId, Integer quantity) {
@@ -50,6 +56,7 @@ public class CartApplicationService {
                 throw new CartItemNotFoundException(productId);
             }
             cart.updateQuantity(productReference, validatedQuantity);
+            requireStock(cart, productReference);
         });
     }
 
@@ -61,6 +68,18 @@ public class CartApplicationService {
             }
             cart.removeItem(productReference);
         });
+    }
+
+    /** Runs inside the Cart update, so a refusal stores nothing. */
+    private void requireStock(Cart cart, ProductReference product) {
+        var wanted = cart.snapshot().items().stream()
+                .filter(item -> item.product().equals(product))
+                .mapToInt(item -> item.quantity().value())
+                .sum();
+        var available = inventory.available(product.value());
+        if (wanted > available) {
+            throw new OutOfStockException(product.value(), available);
+        }
     }
 
     private static Quantity quantity(Integer value) {

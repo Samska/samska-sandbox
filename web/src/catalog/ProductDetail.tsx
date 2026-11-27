@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
+import StockBadge, { isSoldOut } from "./StockBadge";
 import type { ProductResponse } from "./catalogApi";
 import ProductMedia from "./ProductMedia";
 import Button from "../ui/Button";
@@ -64,13 +65,16 @@ export default function ProductDetail({
               {formatAmount(product.price)}
             </span>
           </div>
+          <div>
+            <StockBadge product={product} />
+          </div>
           <Button
             className="w-full"
             onClick={() => void onAdd(product)}
-            disabled={isCartPending}
+            disabled={isCartPending || isSoldOut(product)}
             aria-label={`Add ${product.name} to Cart`}
           >
-            Add to Cart
+            {isSoldOut(product) ? "Sold out" : "Add to Cart"}
           </Button>
         </div>
       </div>

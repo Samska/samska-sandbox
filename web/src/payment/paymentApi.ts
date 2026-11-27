@@ -25,6 +25,7 @@ export type PaymentApiErrorKind =
   | "cart-changed"
   | "already-approved"
   | "attempt-id-conflict"
+  | "out-of-stock"
   | "capacity"
   | "network"
   | "server"
@@ -100,6 +101,10 @@ async function errorForResponse(response: Response): Promise<PaymentApiError> {
 
     if (code === "attempt-id-conflict") {
       return new PaymentApiError("attempt-id-conflict");
+    }
+
+    if (code === "out-of-stock") {
+      return new PaymentApiError("out-of-stock");
     }
 
     if (code === "already-approved") {

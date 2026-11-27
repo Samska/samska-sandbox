@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import io.github.samska.sandbox.order.application.OrderNotFoundException;
+import io.github.samska.sandbox.order.application.OrderOutOfStockException;
 import io.github.samska.sandbox.order.application.OrderPaymentNotApprovedException;
 import io.github.samska.sandbox.payment.application.PaymentAttemptNotFoundException;
 
@@ -29,6 +30,11 @@ public class OrderApiExceptionHandler {
     @ExceptionHandler(OrderPaymentNotApprovedException.class)
     public ResponseEntity<ErrorResponse> notApproved() {
         return ResponseEntity.status(409).body(new ErrorResponse("payment-not-approved"));
+    }
+
+    @ExceptionHandler(OrderOutOfStockException.class)
+    public ResponseEntity<ErrorResponse> outOfStock() {
+        return ResponseEntity.status(409).body(new ErrorResponse("out-of-stock"));
     }
 
     @ExceptionHandler({DataAccessResourceFailureException.class, TransactionException.class})

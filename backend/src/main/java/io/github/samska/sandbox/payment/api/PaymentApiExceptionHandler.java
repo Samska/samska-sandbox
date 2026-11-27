@@ -14,6 +14,7 @@ import io.github.samska.sandbox.payment.application.PaymentAlreadyApprovedExcept
 import io.github.samska.sandbox.payment.application.PaymentAttemptConflictException;
 import io.github.samska.sandbox.payment.application.PaymentAttemptNotFoundException;
 import io.github.samska.sandbox.payment.application.PaymentCapacityExceededException;
+import io.github.samska.sandbox.payment.application.PaymentOutOfStockException;
 
 @RestControllerAdvice(assignableTypes = PaymentController.class)
 public class PaymentApiExceptionHandler {
@@ -45,6 +46,11 @@ public class PaymentApiExceptionHandler {
     @ExceptionHandler(PaymentAlreadyApprovedException.class)
     public ResponseEntity<PaymentErrorResponse> handleAlreadyApproved(PaymentAlreadyApprovedException exception) {
         return ResponseEntity.status(409).body(PaymentErrorResponse.alreadyApproved(exception.existingAttemptId()));
+    }
+
+    @ExceptionHandler(PaymentOutOfStockException.class)
+    public ResponseEntity<PaymentErrorResponse> handleOutOfStock() {
+        return ResponseEntity.status(409).body(PaymentErrorResponse.outOfStock());
     }
 
     @ExceptionHandler(PaymentCapacityExceededException.class)

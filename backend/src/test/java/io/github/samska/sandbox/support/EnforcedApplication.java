@@ -103,6 +103,10 @@ public final class EnforcedApplication implements AutoCloseable {
             return send("DELETE", path, null, true);
         }
 
+        public Reply send(String method, String path, String json) throws Exception {
+            return send(method, path, json, true);
+        }
+
         /** A state-changing request without the XSRF header, as a forged cross-site request would be. */
         public Reply postWithoutCsrf(String path, String json) throws Exception {
             return send("POST", path, json, false);

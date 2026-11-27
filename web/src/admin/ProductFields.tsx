@@ -5,9 +5,11 @@ export interface ProductFieldValues {
   name: string;
   description: string;
   price: string;
+  /** Units on hand; empty or absent leaves the server's value alone. */
+  stock?: string;
 }
 
-export type ProductFieldName = "name" | "description" | "price";
+export type ProductFieldName = "name" | "description" | "price" | "stock";
 
 export interface ProductFieldError {
   field: ProductFieldName;
@@ -16,6 +18,7 @@ export interface ProductFieldError {
 
 const NAME_ERROR = "Enter a Product name.";
 const DESCRIPTION_ERROR = "Enter a Product description.";
+const STOCK_ERROR = "Enter a whole number of units, zero or more.";
 const PRICE_ERROR = "Enter a price that is zero or greater.";
 
 export function validateProductFields(values: ProductFieldValues): ProductFieldError | null {
@@ -33,7 +36,19 @@ export function validateProductFields(values: ProductFieldValues): ProductFieldE
     return { field: "price", message: PRICE_ERROR };
   }
 
+  const stock = values.stock?.trim() ?? "";
+
+  if (stock.length > 0 && !/^\d{1,6}$/.test(stock)) {
+    return { field: "stock", message: STOCK_ERROR };
+  }
+
   return null;
+}
+
+/** The stock to send: a number, or undefined to leave it alone. */
+export function stockToSend(values: ProductFieldValues): number | undefined {
+  const stock = values.stock?.trim() ?? "";
+  return stock.length === 0 ? undefined : Number(stock);
 }
 
 export default function ProductFields({
@@ -104,6 +119,25 @@ export default function ProductFields({
             onChange={(event) => onChange({ ...values, price: event.target.value })}
             disabled={disabled}
             required
+          />
+        )}
+      </FormField>
+      <FormField
+        id={`${idPrefix}-stock`}
+        label="Stock"
+        error={error?.field === "stock" ? error.message : null}
+      >
+        {(control) => (
+          <input
+            {...control}
+            name="stock"
+            type="number"
+            min="0"
+            step="1"
+            inputMode="numeric"
+            value={values.stock ?? ""}
+            onChange={(event) => onChange({ ...values, stock: event.target.value })}
+            disabled={disabled}
           />
         )}
       </FormField>

@@ -19,30 +19,40 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.github.samska.sandbox.catalog.InvalidProductException;
 import io.github.samska.sandbox.catalog.ProductId;
 import io.github.samska.sandbox.catalog.application.InvalidMediaException;
 import io.github.samska.sandbox.catalog.application.ProductApplicationService;
+import io.github.samska.sandbox.catalog.application.ProductSnapshot;
 import io.github.samska.sandbox.coordination.CatalogCartCoordinator;
+import io.github.samska.sandbox.inventory.application.Inventory;
 
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
 
+    static final int DEFAULT_STOCK = 25;
+
     private final ProductApplicationService productApplicationService;
     private final CatalogCartCoordinator catalogCartCoordinator;
+    private final Inventory inventory;
 
     public ProductController(
             ProductApplicationService productApplicationService,
-            CatalogCartCoordinator catalogCartCoordinator) {
+            CatalogCartCoordinator catalogCartCoordinator,
+            Inventory inventory) {
         this.productApplicationService = productApplicationService;
         this.catalogCartCoordinator = catalogCartCoordinator;
+        this.inventory = inventory;
     }
 
     @PostMapping
     public ResponseEntity<ProductResponse> createProduct(@RequestBody CreateProductRequest request) {
         var product = productApplicationService.createProduct(
                 request.name(), request.description(), request.price(), request.mediaKey());
-        var response = ProductResponse.from(product, null);
+        var stock = request.stock() == null ? DEFAULT_STOCK : validStock(request.stock());
+        inventory.setOnHand(product.id().value(), stock);
+        var response = ProductResponse.from(product, null, stock);
         var location = URI.create("/api/products/" + response.id());
 
         return ResponseEntity.created(location).body(response);
@@ -54,13 +64,17 @@ public class ProductController {
             @RequestBody UpdateProductRequest request) {
         var snapshot = productApplicationService.updateProduct(
                 new ProductId(id), request.name(), request.description(), request.price(), request.mediaKey());
+        if (request.stock() != null) {
+            inventory.setOnHand(id, validStock(request.stock()));
+        }
 
-        return ProductResponse.from(snapshot.product(), snapshot.uploadedMediaId());
+        return response(snapshot);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") UUID id) {
         catalogCartCoordinator.deleteProduct(id);
+        inventory.remove(id);
 
         return ResponseEntity.noContent().build();
     }
@@ -71,7 +85,7 @@ public class ProductController {
             @RequestParam("file") MultipartFile file) {
         var snapshot = productApplicationService.uploadMedia(new ProductId(id), readBytes(file));
 
-        return ProductResponse.from(snapshot.product(), snapshot.uploadedMediaId());
+        return response(snapshot);
     }
 
     @DeleteMapping("/{id}/media")
@@ -98,14 +112,32 @@ public class ProductController {
     public ProductResponse getProduct(@PathVariable("id") UUID id) {
         var snapshot = productApplicationService.getSnapshot(new ProductId(id));
 
-        return ProductResponse.from(snapshot.product(), snapshot.uploadedMediaId());
+        return response(snapshot);
     }
 
     @GetMapping
     public List<ProductResponse> listProducts() {
-        return productApplicationService.listProducts().stream()
-                .map(snapshot -> ProductResponse.from(snapshot.product(), snapshot.uploadedMediaId()))
+        var snapshots = productApplicationService.listProducts();
+        var available = inventory.available(snapshots.stream().map(snapshot -> snapshot.product().id().value()).toList());
+
+        return snapshots.stream()
+                .map(snapshot -> ProductResponse.from(
+                        snapshot.product(),
+                        snapshot.uploadedMediaId(),
+                        available.getOrDefault(snapshot.product().id().value(), 0)))
                 .toList();
+    }
+
+    private static int validStock(int stock) {
+        if (stock < 0 || stock > Inventory.MAX_ON_HAND) {
+            throw new InvalidProductException("Stock must be between 0 and " + Inventory.MAX_ON_HAND);
+        }
+        return stock;
+    }
+
+    private ProductResponse response(ProductSnapshot snapshot) {
+        return ProductResponse.from(
+                snapshot.product(), snapshot.uploadedMediaId(), inventory.available(snapshot.product().id().value()));
     }
 
     private static byte[] readBytes(MultipartFile file) {

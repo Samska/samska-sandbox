@@ -12,6 +12,8 @@ public record PaymentErrorResponse(String code, UUID attemptId) {
     public static final String ATTEMPT_ID_CONFLICT = "attempt-id-conflict";
     public static final String CAPACITY_EXCEEDED = "attempt-capacity-exceeded";
 
+    public static final String OUT_OF_STOCK = "out-of-stock";
+
     public static final String STORE_UNAVAILABLE = "payment-store-unavailable";
 
     public static PaymentErrorResponse storeUnavailable() {
@@ -32,5 +34,9 @@ public record PaymentErrorResponse(String code, UUID attemptId) {
 
     public static PaymentErrorResponse capacityExceeded() {
         return new PaymentErrorResponse(CAPACITY_EXCEEDED, null);
+    }
+
+    public static PaymentErrorResponse outOfStock() {
+        return new PaymentErrorResponse(OUT_OF_STOCK, null);
     }
 }

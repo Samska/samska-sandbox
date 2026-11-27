@@ -19,6 +19,7 @@ export type OrderApiErrorKind =
   | "bad-request"
   | "not-found"
   | "not-approved"
+  | "out-of-stock"
   | "network"
   | "server"
   | "invalid-response";
@@ -61,6 +62,9 @@ async function request(path: string, expected: number[], options?: RequestInit):
     if (response.status === 404) throw new OrderApiError("not-found");
     if (response.status === 409 && (await errorCode(response)) === "payment-not-approved") {
       throw new OrderApiError("not-approved");
+    }
+    if (response.status === 409 && (await errorCode(response)) === "out-of-stock") {
+      throw new OrderApiError("out-of-stock");
     }
     throw new OrderApiError("server");
   }
