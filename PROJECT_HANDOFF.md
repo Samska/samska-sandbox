@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-070 — Order history and tracking (#135, v0.4.0)
+
+- Build: `GET /api/orders` and `GET /api/orders/{id}/shipment`, `orders.created_at` (`V7`), `shipping` module with derived shipments ([ADR 0014](docs/adr/0014-derive-simulated-shipments.md)); web Orders and tracking screens from the Bench design, Track link on the Order result.
+- Agent Verification: backend suites including `ShipmentTest` and `OrderTrackingApiTest`, 284 web tests, typecheck, 15 Playwright tests.
+- Next step: v0.5.0 Inventory.
+
 ## SS-069 — Accounts and sessions (#133, v0.3.0)
 
 - Build on `release/1.0`: `account` module, Spring Security sessions with cookie-to-header CSRF, per-account Cart, Payment attempts and Orders (`V5`, `V6`), `ADMIN` role for Product writes, administrator from `samska.admin.*`, web account screen and shell gating ([ADR 0013](docs/adr/0013-adopt-account-sessions-and-ownership.md)).

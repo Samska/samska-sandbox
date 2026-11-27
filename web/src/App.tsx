@@ -6,11 +6,14 @@ import AccountPage, { accountPath } from "./auth/AccountPage";
 import { useAuth, type AuthState } from "./auth/AuthContext";
 import Button from "./ui/Button";
 import StatusMessage from "./ui/StatusMessage";
+import OrdersPage, { ordersPath } from "./orders/OrdersPage";
+import TrackingPage from "./orders/TrackingPage";
 import NotFound from "./NotFound";
 import { attemptIdForPath, checkoutPath, marketPath, usePath } from "./journey/routes";
 
 const adminProductsPath = "/admin/products";
 const adminProductNewPath = "/admin/products/new";
+const orderTrackingPattern = /^\/orders\/([^/]+)$/;
 const adminProductEditPattern = /^\/admin\/products\/([^/]+)\/edit$/;
 
 export default function App() {
@@ -21,6 +24,7 @@ export default function App() {
     (auth.state.status === "signed-in" && auth.state.account.role === "ADMIN");
   const isMarket = path === marketPath;
   const isStorefront = isMarket || path === checkoutPath || attemptIdForPath(path) !== null;
+  const isOrders = path === ordersPath || path.startsWith(`${ordersPath}/`);
   const isAdmin =
     path === adminProductsPath || path.startsWith(`${adminProductsPath}/`);
 
@@ -33,7 +37,7 @@ export default function App() {
         Skip to main content
       </a>
       <header className="sticky top-0 z-20 border-b-2 border-ink bg-canvas/95 backdrop-blur-sm">
-        <div className="mx-auto flex min-h-[3.75rem] w-[min(100%-2.5rem,76rem)] items-center justify-between gap-3 sm:gap-6">
+        <div className="mx-auto flex min-h-[3.75rem] w-[min(100%-2.5rem,76rem)] flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1 sm:gap-x-6">
           <a
             className="inline-flex items-center gap-2.5 text-ink no-underline"
             href="/"
@@ -69,6 +73,15 @@ export default function App() {
                 aria-current={isAdmin ? "page" : undefined}
               >
                 Admin
+              </a>
+            ) : null}
+            {auth.state.status === "signed-in" ? (
+              <a
+                className={navLinkClassName(isOrders)}
+                href={ordersPath}
+                aria-current={isOrders ? "page" : undefined}
+              >
+                Orders
               </a>
             ) : null}
             <AccountControls state={auth.state} onSignOut={auth.signOut} isCurrent={path === accountPath} />
@@ -135,18 +148,38 @@ function renderSurface(path: string, auth: AuthState) {
   }
 
   const isCheckout = path === checkoutPath || attemptIdForPath(path) !== null;
+  const orderMatch = orderTrackingPattern.exec(path);
+  const isOrdersPath = path === ordersPath || orderMatch !== null;
   const isAdminPath = path === adminProductsPath || path.startsWith(`${adminProductsPath}/`);
 
-  if ((isCheckout || isAdminPath) && auth.status === "loading") {
+  if ((isCheckout || isAdminPath || isOrdersPath) && auth.status === "loading") {
     return <StatusMessage tone="pending">Checking your session...</StatusMessage>;
   }
 
-  if ((isCheckout || isAdminPath) && auth.status === "anonymous") {
+  if ((isCheckout || isAdminPath || isOrdersPath) && auth.status === "anonymous") {
     return (
       <AccountPage
-        notice={isAdminPath ? "Sign in with the administrator account to manage the catalog." : "Sign in to check out."}
+        notice={
+          isAdminPath
+            ? "Sign in with the administrator account to manage the catalog."
+            : isOrdersPath
+              ? "Sign in to see your orders."
+              : "Sign in to check out."
+        }
       />
     );
+  }
+
+  if (path === ordersPath) {
+    return <OrdersPage />;
+  }
+
+  if (orderMatch !== null) {
+    const orderId = decodePathSegment(orderMatch[1]);
+
+    if (orderId !== null) {
+      return <TrackingPage orderId={orderId} />;
+    }
   }
 
   if (isAdminPath && auth.status === "signed-in" && auth.account.role !== "ADMIN") {
