@@ -2,7 +2,7 @@
 
 ## Security Baseline
 
-Assume the repository is public and a future demo may receive hostile users and automated traffic. Security requirements apply from the first implementation change. The current backend has unauthenticated Catalog, Cart, Payment, and Order APIs. Products, media, Cart, and Payment attempts are process-local; Orders and items are persisted in a loopback-only PostgreSQL database. There is no external integration or deployed public environment; the frontend provides Catalog browsing, Cart, and Checkout interactions.
+Assume the repository is public and a future demo may receive hostile users and automated traffic. Security requirements apply from the first implementation change. The current backend has unauthenticated Catalog, Cart, Payment, and Order APIs. Products, media, and Payment attempts are process-local; Orders, items, and the single current Cart are persisted in a loopback-only PostgreSQL database. There is no external integration or deployed public environment; the frontend provides Catalog browsing, Cart, and Checkout interactions.
 
 ## Data and Secrets
 

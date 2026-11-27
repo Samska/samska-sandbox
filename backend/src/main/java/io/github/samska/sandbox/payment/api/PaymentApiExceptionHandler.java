@@ -1,12 +1,15 @@
 package io.github.samska.sandbox.payment.api;
 
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.transaction.TransactionException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import io.github.samska.sandbox.cart.CartRevisionMismatchException;
+import io.github.samska.sandbox.cart.api.CartErrorResponse;
 import io.github.samska.sandbox.payment.InvalidPaymentAttemptException;
 import io.github.samska.sandbox.payment.application.PaymentAlreadyApprovedException;
 import io.github.samska.sandbox.payment.application.PaymentAttemptConflictException;
@@ -48,5 +51,10 @@ public class PaymentApiExceptionHandler {
     @ExceptionHandler(PaymentCapacityExceededException.class)
     public ResponseEntity<PaymentErrorResponse> handleCapacityExceeded() {
         return ResponseEntity.status(503).body(PaymentErrorResponse.capacityExceeded());
+    }
+
+    @ExceptionHandler({DataAccessResourceFailureException.class, TransactionException.class})
+    public ResponseEntity<CartErrorResponse> handleCartStoreUnavailable() {
+        return ResponseEntity.status(503).body(CartErrorResponse.storeUnavailable());
     }
 }

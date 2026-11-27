@@ -38,30 +38,29 @@ public class CartApplicationService {
         var validatedQuantity = quantity(quantity);
         var product = productCatalog.findById(productId)
                 .orElseThrow(() -> new ProductUnavailableException(productId));
-        var cart = cartStore.current();
-        cart.addItem(new ProductReference(product.id()), product.name(), product.price(), validatedQuantity);
-        return cart;
+        return cartStore.update(cart -> cart.addItem(
+                new ProductReference(product.id()), product.name(), product.price(), validatedQuantity));
     }
 
     public Cart updateQuantity(UUID productId, Integer quantity) {
         var validatedQuantity = quantity(quantity);
         var productReference = new ProductReference(productId);
-        var cart = cartStore.current();
-        if (!cart.hasItem(productReference)) {
-            throw new CartItemNotFoundException(productId);
-        }
-        cart.updateQuantity(productReference, validatedQuantity);
-        return cart;
+        return cartStore.update(cart -> {
+            if (!cart.hasItem(productReference)) {
+                throw new CartItemNotFoundException(productId);
+            }
+            cart.updateQuantity(productReference, validatedQuantity);
+        });
     }
 
     public Cart removeItem(UUID productId) {
         var productReference = new ProductReference(productId);
-        var cart = cartStore.current();
-        if (!cart.hasItem(productReference)) {
-            throw new CartItemNotFoundException(productId);
-        }
-        cart.removeItem(productReference);
-        return cart;
+        return cartStore.update(cart -> {
+            if (!cart.hasItem(productReference)) {
+                throw new CartItemNotFoundException(productId);
+            }
+            cart.removeItem(productReference);
+        });
     }
 
     private static Quantity quantity(Integer value) {
