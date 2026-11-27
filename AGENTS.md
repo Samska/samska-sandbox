@@ -28,7 +28,7 @@ Read the relevant detailed guidance in [docs/AI-GOVERNANCE.md](docs/AI-GOVERNANC
 
 This file is the common entry point for any coding agent, regardless of tool, model, or provider. Repository instructions are tool-independent; local agent-tool configuration is not a repository requirement. The repository does not require a specific provider, model, effort, permission, or agent tool.
 
-No orchestrator, assigned-role hierarchy, or specialist catalogue is required. Delegation is optional and does not grant authorization or replace independent review. Automatic loading of this file is tool-dependent and is not claimed by the repository. A tool that does not read `AGENTS.md` natively needs an operator-provided pointer; the repository does not add one.
+No orchestrator, assigned-role hierarchy, or specialist catalogue is required. Delegation is optional and does not grant authorization or replace independent review. Automatic loading of this file is tool-dependent and is not claimed by the repository. A tool that does not read `AGENTS.md` natively needs a pointer. Claude Code is the owner's current harness and reads `CLAUDE.md`, so the repository carries a thin [CLAUDE.md](CLAUDE.md) that imports this file and adds no rules of its own; this file stays the single source.
 
 ## Build Execution
 

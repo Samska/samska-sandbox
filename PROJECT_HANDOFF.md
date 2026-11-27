@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-058 — Adopt Claude as the agent harness (#111)
+
+- The owner moved from ChatGPT and OpenCode to Claude (Claude Desktop and Claude Code). `AGENTS.md` remains the shared, tool-independent source; a thin root `CLAUDE.md` imports it so Claude Code loads the same rules. No rule, provider, model, permission, or tooling configuration was added.
+- The "Agent Runtime" section below stays as history. Historical Learning Records and `docs/design/` are unchanged. Branch `chore/agent-tooling-official-restore` (SS-048, vendored OpenCode skills) is not to proceed and is deleted by owner authorization after merge; no `.claude/` configuration is part of this work.
+- Next step: pull request creation and merge each need separate explicit owner authorization.
+
 ## SS-056 — Order, Admin, and fallback interfaces design (#108)
 
 - Named version `SS-056 Batch 4 — Order, Admin, and fallbacks — review-ready` (`revn 151`, created 2026-10-29T13:45:01.312Z) is owner-reported visually approved: “Eu aprovo” (2026-10-29). This is visual approval of that named version only; it does not imply execution of every checklist item, application/browser Human Verification, documentation approval, or commit/push authorization.
