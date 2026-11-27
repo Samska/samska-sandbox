@@ -9,6 +9,20 @@ Status: **Owner-approved Candidate 03 — design approval only. Provisional illu
 - Candidate: `Samska Store — Catalog Candidate 03`
 - Token source: [tokens.json](tokens.json)
 
+## SS-057 — HTML prototypes replace Penpot as the design source (owner-verified)
+
+Status: **Owner-approved approach and Vitrine direction (2026-11-27). Design approval only. Not production adoption.**
+
+- Issue: [SS-057 / #110](https://github.com/Samska/samska-sandbox/issues/110)
+- Owner decision (2026-11-27, project thread): approved HTML prototypes and tokens versioned in this repository as the design source, replacing Penpot, and approved the Vitrine direction with the exact answer “Eu aprovo os dois pontos.”
+- Source of truth: [prototypes/vitrine.html](prototypes/vitrine.html), a single self-contained file that opens in a browser with no build step, and [prototypes/vitrine.tokens.json](prototypes/vitrine.tokens.json). Fonts load from Google Fonts with system fallbacks; everything else is inline.
+- Screens: Market with search and sort, Product detail, Cart drawer, Checkout, simulated Payment (approved, declined, pending), Order, and Admin (list, create, edit, image upload). Light and dark themes; checked at 1280 and 390 px widths.
+- Direction change from SS-052 to SS-056: cool grey-blue canvas with cobalt and a yellow highlight instead of sand and teal; Bricolage Grotesque with Inter instead of Fraunces; large color-block product tiles instead of bordered cards; persistent header search; Cart as a side drawer; one-page Checkout with a three-step rail.
+- Workflow: a design change is a revision of the HTML file in a pull request. Review the rendered file locally; the diff reviews the code and tokens. No external design tool is required.
+- Penpot status: the SS-052 to SS-056 Penpot records below remain as history. Penpot is no longer the source of truth; the Candidate 03 to SS-056 designs are superseded by the Vitrine direction for future work but were not deleted.
+- Assumptions to confirm: amounts keep the en-US two-decimal format without a currency symbol; illustrations stay provisional and geometric; product names and prices come from the earlier design examples; the prototype has no stock concept because the application has none.
+- Not changed: `web/` code, backend behavior, and the Penpot-era token file [tokens.json](tokens.json). Applying the redesign to the application is separate, explicitly authorized work.
+
 ## SS-053 — Current-interface Batch 1 (owner-approved, revn 52)
 
 Status: **Owner-approved design delivery (Batch 1) at `revn 52`; completed via Issue #102 and merged PR #103. Design approval only; not production adoption.**

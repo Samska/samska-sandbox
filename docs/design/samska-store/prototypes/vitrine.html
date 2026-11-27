@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Samska Store Vitrine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: "Vitrine". Product-first storefront. Big color-block product tiles, one persistent header with search + cart, cart as a side drawer, checkout as one page with a 3-step rail. */
+:root {
+  --bg: #eceef2;
+  --surface: #ffffff;
+  --surface-2: #e2e5eb;
+  --ink: #0f1319;
+  --muted: #586070;
+  --line: #d3d8e0;
+  --accent: #2b45f5;
+  --accent-ink: #ffffff;
+  --pop: #ffd43b;
+  --pop-ink: #0f1319;
+  --ok: #0f7a3d;
+  --ok-bg: #dcf3e4;
+  --bad: #b3153f;
+  --bad-bg: #fde3ea;
+  --wait: #8a5a00;
+  --wait-bg: #fff0c2;
+  --focus: #ff7a00;
+  --font-display: "Bricolage Grotesque", "Arial Black", system-ui, sans-serif;
+  --font-ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r: 14px;
+  --r-lg: 22px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c0f14; --surface: #161b23; --surface-2: #212833; --ink: #f1f3f7; --muted: #9aa4b5; --line: #2a3340;
+    --accent: #7d8fff; --accent-ink: #0c0f14; --pop: #ffd43b; --pop-ink: #0f1319;
+    --ok: #5fd68c; --ok-bg: #12301f; --bad: #ff8fa9; --bad-bg: #3a1420; --wait: #ffd36b; --wait-bg: #382b0a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c0f14; --surface: #161b23; --surface-2: #212833; --ink: #f1f3f7; --muted: #9aa4b5; --line: #2a3340;
+  --accent: #7d8fff; --accent-ink: #0c0f14; --pop: #ffd43b; --pop-ink: #0f1319;
+  --ok: #5fd68c; --ok-bg: #12301f; --bad: #ff8fa9; --bad-bg: #3a1420; --wait: #ffd36b; --wait-bg: #382b0a;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+img { max-width: 100%; }
+body { margin: 0; font-size: 1rem; background: var(--bg); color: var(--ink); font-family: var(--font-ui); line-height: 1.5; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 0; min-height: 100vh; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--bg); }
+h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.02em; margin: 0; text-wrap: balance; line-height: 1.05; }
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+.wrap { max-width: 1180px; margin-inline: auto; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* header */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40; background: var(--bg); padding-block: 14px; }
+.top .wrap { display: grid; grid-template-columns: auto 1fr auto; gap: 14px 20px; align-items: center; }
+.brand { font-family: var(--font-display); font-weight: 800; font-size: 1.45rem; letter-spacing: -0.04em; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.brand i { width: 14px; height: 14px; border-radius: 50%; background: var(--accent); display: inline-block; box-shadow: 10px 0 0 -3px var(--pop); margin-right: 8px; }
+.search { position: relative; max-width: 560px; width: 100%; justify-self: center; }
+.search.off { visibility: hidden; }
+.search input { width: 100%; height: 46px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); padding: 0 44px 0 44px; font: inherit; }
+.search svg { position: absolute; left: 15px; top: 13px; width: 20px; height: 20px; color: var(--muted); }
+.search .clear { position: absolute; right: 8px; top: 7px; width: 32px; height: 32px; border: 0; background: var(--surface-2); border-radius: 50%; display: grid; place-items: center; }
+.hdr-actions { display: flex; gap: 8px; align-items: center; }
+.pill { height: 46px; padding: 0 18px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+.pill[aria-current="page"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.cart-btn { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.cart-btn b { background: var(--pop); color: var(--pop-ink); min-width: 24px; height: 24px; border-radius: 12px; display: inline-grid; place-items: center; font-size: .8rem; padding: 0 6px; }
+.icon-btn { width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--surface); display: grid; place-items: center; }
+@media (max-width: 760px) {
+  .top .wrap { grid-template-columns: 1fr auto; }
+  .search { grid-column: 1 / -1; grid-row: 2; max-width: none; }
+  .search.off { display: none; }
+  .pill.nav { display: none; }
+}
+
+main { padding-block: 10px 64px; }
+.eyebrow { font-size: .75rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+
+/* market */
+.hero { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; margin-block: 8px 22px; }
+.hero-main { background: var(--accent); color: var(--accent-ink); border-radius: var(--r-lg); padding: clamp(22px, 4vw, 40px); display: grid; gap: 14px; align-content: end; min-height: 220px; position: relative; overflow: hidden; }
+.hero-main h1 { font-size: clamp(2rem, 5vw, 3.6rem); font-weight: 800; max-width: 12ch; }
+.hero-main p { margin: 0; max-width: 40ch; opacity: .9; }
+.hero-main svg { position: absolute; right: -30px; top: -30px; width: 260px; opacity: .22; }
+.hero-side { background: var(--pop); color: var(--pop-ink); border-radius: var(--r-lg); padding: 24px; display: grid; align-content: space-between; gap: 18px; }
+.hero-side .big { font-family: var(--font-display); font-weight: 800; font-size: 3.2rem; line-height: 1; }
+.hero-side p { margin: 0; font-weight: 500; }
+@media (max-width: 760px) { .hero { grid-template-columns: 1fr; } .hero-main svg { width: 180px; } }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.chips { display: flex; gap: 8px; flex-wrap: wrap; }
+.chip { height: 38px; padding: 0 16px; border-radius: 999px; border: 1.5px solid var(--line); background: transparent; font-weight: 600; font-size: .9rem; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.count { color: var(--muted); font-size: .9rem; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; list-style: none; margin: 0; padding: 0; }
+.card { position: relative; display: grid; gap: 12px; }
+.tile { position: relative; aspect-ratio: 1 / 1; border-radius: var(--r-lg); overflow: hidden; border: 0; padding: 0; display: block; width: 100%; transition: transform .2s; }
+.tile svg, .tile img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.card:hover .tile { transform: translateY(-3px); }
+.add { position: absolute; right: 12px; bottom: 12px; height: 44px; padding: 0 16px 0 12px; border-radius: 999px; border: 0; background: var(--ink); color: var(--bg); font-weight: 700; display: inline-flex; gap: 6px; align-items: center; z-index: 2; }
+.add:active { transform: scale(.96); }
+.meta { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding-inline: 4px; }
+.meta h3 { font-size: 1.15rem; font-weight: 700; }
+.meta h3 a { text-decoration: none; }
+.tilewrap { position: relative; }
+a.tile { text-decoration: none; }
+.price { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; white-space: nowrap; }
+.desc { margin: 0; color: var(--muted); font-size: .92rem; padding-inline: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.empty { background: var(--surface); border-radius: var(--r-lg); padding: 36px; text-align: center; display: grid; gap: 8px; justify-items: center; }
+
+/* buttons */
+.btn { height: 48px; padding: 0 24px; border-radius: 999px; border: 0; background: var(--ink); color: var(--bg); font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+.btn.accent { background: var(--accent); color: var(--accent-ink); }
+.btn.ghost { background: transparent; border: 1.5px solid var(--line); color: var(--ink); }
+.btn.sm { height: 38px; padding: 0 16px; font-size: .9rem; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn.block { width: 100%; }
+
+/* detail */
+.crumb { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; text-decoration: none; margin-block: 10px 16px; color: var(--muted); }
+.detail { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 48px); align-items: start; }
+.detail .art { border-radius: var(--r-lg); overflow: hidden; aspect-ratio: 1/1; }
+.detail .art svg, .detail .art img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.buy { position: sticky; top: 120px; display: grid; gap: 18px; }
+.buy h1 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; }
+.buy .price { font-size: 2rem; }
+.buy p { margin: 0; color: var(--muted); max-width: 48ch; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.stepper { display: inline-flex; align-items: center; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); }
+.stepper button { width: 40px; height: 40px; border: 0; background: transparent; border-radius: 50%; font-size: 1.2rem; font-weight: 700; }
+.stepper output { min-width: 28px; text-align: center; font-weight: 700; }
+.facts { display: grid; gap: 0; border-top: 1px solid var(--line); }
+.facts div { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); font-size: .93rem; }
+.facts dt { color: var(--muted); } .facts dd { margin: 0; font-weight: 600; }
+@media (max-width: 760px) { .detail { grid-template-columns: 1fr; } .buy { position: static; } }
+
+/* drawer */
+.scrim { position: fixed; inset: 0; background: rgb(8 10 14 / .5); z-index: 70; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.scrim.on { opacity: 1; pointer-events: auto; }
+.drawer { position: fixed; top: 0; bottom: 0; right: 0; width: min(440px, 100%); z-index: 80; background: var(--surface); padding: calc(20px + env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) 20px; display: grid; grid-template-rows: auto 1fr auto; gap: 16px; transform: translateX(102%); transition: transform .25s; border-radius: var(--r-lg) 0 0 var(--r-lg); }
+.drawer.on { transform: none; }
+.drawer-head { display: flex; justify-content: space-between; align-items: center; }
+.drawer-head h2 { font-size: 1.6rem; }
+.lines { overflow-y: auto; display: grid; align-content: start; gap: 14px; }
+.line { display: grid; grid-template-columns: 76px 1fr auto; gap: 12px; align-items: center; }
+.line .th { width: 76px; height: 76px; border-radius: 14px; overflow: hidden; }
+.line .th svg, .line .th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.line h4 { font-size: 1rem; font-weight: 700; }
+.line small { color: var(--muted); }
+.line .stepper { transform: scale(.85); transform-origin: left; margin-top: 4px; }
+.total { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; }
+.foot { display: grid; gap: 12px; }
+
+/* checkout */
+.steps { display: flex; gap: 8px; margin-block: 8px 22px; flex-wrap: wrap; }
+.step { display: inline-flex; align-items: center; gap: 8px; height: 38px; padding: 0 16px 0 8px; border-radius: 999px; background: var(--surface-2); color: var(--muted); font-weight: 600; font-size: .9rem; }
+.step b { width: 24px; height: 24px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; font-size: .78rem; }
+.step.now { background: var(--ink); color: var(--bg); } .step.now b { background: var(--pop); color: var(--pop-ink); }
+.step.done { background: var(--ok-bg); color: var(--ok); }
+.co { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .co { grid-template-columns: 1fr; } }
+.panel { background: var(--surface); border-radius: var(--r-lg); padding: clamp(18px, 3vw, 28px); display: grid; gap: 16px; }
+.panel h2 { font-size: 1.5rem; }
+.sim { background: var(--wait-bg); color: var(--wait); border-radius: var(--r); padding: 12px 14px; font-size: .9rem; font-weight: 500; display: flex; gap: 10px; align-items: flex-start; }
+.opts { display: grid; gap: 10px; }
+.opt { display: flex; gap: 12px; align-items: center; border: 1.5px solid var(--line); border-radius: var(--r); padding: 14px; cursor: pointer; }
+.opt:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+.opt input { accent-color: var(--accent); width: 18px; height: 18px; }
+.opt strong { display: block; } .opt span { color: var(--muted); font-size: .88rem; }
+.sum-line { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.status { border-radius: var(--r); padding: 14px 16px; font-weight: 600; }
+.status.bad { background: var(--bad-bg); color: var(--bad); }
+.status.ok { background: var(--ok-bg); color: var(--ok); }
+.spin { width: 18px; height: 18px; border-radius: 50%; border: 3px solid currentColor; border-right-color: transparent; animation: sp .8s linear infinite; }
+@keyframes sp { to { transform: rotate(360deg); } }
+
+/* order */
+.ticket { background: var(--ink); color: var(--bg); border-radius: var(--r-lg); padding: clamp(22px, 4vw, 40px); display: grid; gap: 14px; position: relative; overflow: hidden; }
+.ticket h1 { font-size: clamp(2rem, 5vw, 3.4rem); max-width: 14ch; }
+.ticket .code { font-family: var(--font-display); font-weight: 800; color: var(--pop); font-size: 1.2rem; letter-spacing: .02em; }
+.ticket p { margin: 0; opacity: .8; }
+.timeline { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.timeline li { display: grid; grid-template-columns: 22px 1fr; gap: 12px; padding-bottom: 18px; position: relative; }
+.timeline li::before { content: ""; position: absolute; left: 10px; top: 22px; bottom: 0; width: 2px; background: var(--line); }
+.timeline li:last-child::before { display: none; }
+.timeline i { width: 22px; height: 22px; border-radius: 50%; background: var(--ok); display: block; }
+.timeline li.todo i { background: var(--surface-2); }
+.timeline small { color: var(--muted); display: block; }
+
+/* admin */
+.adm-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: end; margin-block: 14px 18px; }
+.adm-head h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
+.table-wrap { background: var(--surface); border-radius: var(--r-lg); overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 560px; }
+th { text-align: left; font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); padding: 14px 18px; }
+td { padding: 12px 18px; border-top: 1px solid var(--line); vertical-align: middle; }
+td .th { width: 52px; height: 52px; border-radius: 12px; overflow: hidden; }
+td .th svg, td .th img { width: 100%; height: 100%; object-fit: cover; display: block; }
+td.r, th.r { text-align: right; }
+.form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 360px); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .form { grid-template-columns: 1fr; } }
+.field { display: grid; gap: 6px; }
+.field label { font-weight: 600; font-size: .9rem; }
+.field input, .field textarea { height: 46px; border-radius: var(--r); border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); padding: 0 14px; font: inherit; width: 100%; }
+.field textarea { height: 110px; padding: 12px 14px; resize: vertical; }
+.field .err { color: var(--bad); font-weight: 600; font-size: .85rem; }
+.drop { border: 2px dashed var(--line); border-radius: var(--r-lg); display: grid; place-items: center; text-align: center; gap: 8px; padding: 18px; min-height: 280px; background: var(--bg); position: relative; overflow: hidden; }
+.drop.over { border-color: var(--accent); }
+.drop .prev { position: absolute; inset: 0; }
+.drop .prev svg, .drop .prev img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.drop .ctl { position: relative; background: var(--surface); border-radius: var(--r); padding: 12px 14px; display: grid; gap: 8px; justify-items: center; }
+.swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+.sw { width: 32px; height: 32px; border-radius: 50%; border: 3px solid var(--surface); box-shadow: 0 0 0 1.5px var(--line); }
+.sw[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--accent); }
+
+/* toast + notes */
+.toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 140%); background: var(--ink); color: var(--bg); padding: 12px 20px; border-radius: 999px; font-weight: 600; z-index: 90; transition: transform .25s; max-width: calc(100% - 32px); }
+.toast.on { transform: translate(-50%, 0); }
+.notes-fab { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 50; height: 40px; border-radius: 999px; border: 0; background: var(--pop); color: var(--pop-ink); font-weight: 700; padding: 0 16px; box-shadow: 0 4px 16px rgb(0 0 0 / .2); }
+.notes { position: fixed; left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); width: min(420px, calc(100% - 32px)); max-height: 70vh; overflow-y: auto; z-index: 85; background: var(--surface); border-radius: var(--r-lg); padding: 20px; box-shadow: 0 10px 40px rgb(0 0 0 / .3); display: grid; gap: 10px; }
+.notes h2 { font-size: 1.3rem; } .notes h3 { font-size: .95rem; font-family: var(--font-ui); letter-spacing: 0; margin-top: 6px; }
+.notes ul { margin: 0; padding-left: 18px; font-size: .9rem; display: grid; gap: 4px; } .notes p { margin: 0; font-size: .9rem; color: var(--muted); }
+.guess { background: var(--wait-bg); color: var(--wait); border-radius: 6px; padding: 0 6px; font-size: .75rem; font-weight: 700; }
+footer { color: var(--muted); font-size: .85rem; padding-block: 24px 90px; border-top: 1px solid var(--line); }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+</head>
+<body>
+<div class="top">
+  <div class="wrap">
+    <a class="brand" href="#market" aria-label="Samska Store, home"><i></i>samska</a>
+    <div class="search" id="searchbox">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="Search products by name" aria-label="Search products by name" autocomplete="off">
+      <button class="clear" id="qclear" aria-label="Clear search" hidden>✕</button>
+    </div>
+    <div class="hdr-actions">
+      <a class="pill nav" id="nav-market" href="#market">Market</a>
+      <a class="pill nav" id="nav-admin" href="#admin">Admin</a>
+      <button class="pill cart-btn" id="cartbtn" aria-label="Open cart">Cart <b class="num" id="cartcount">0</b></button>
+    </div>
+  </div>
+</div>
+
+<main class="wrap" id="app" tabindex="-1"></main>
+<footer class="wrap">Samska Store is a fictional storefront for engineering practice. Prototype: nothing here is saved.</footer>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Cart" aria-hidden="true"></aside>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<button class="notes-fab" id="notesbtn" aria-expanded="false">Design notes</button>
+<section class="notes" id="notes" hidden aria-label="Design notes">
+  <h2>O que mudou e por quê</h2>
+  <p>Direção anterior (SS-052 a 056): fundo bege, azul-petróleo, serifada Fraunces, cartões com borda e botões pequenos dentro do cartão.</p>
+  <h3>Mudanças</h3>
+  <ul>
+    <li><b>Produto como protagonista:</b> blocos de cor quadrados e grandes, preço e nome sem moldura em volta.</li>
+    <li><b>Busca e carrinho sempre no topo:</b> a busca deixa de ser um bloco acima da lista e o carrinho vira gaveta lateral, sem sair da vitrine.</li>
+    <li><b>Adicionar com um toque</b> direto no bloco do produto; "Details" some, o bloco inteiro abre o detalhe.</li>
+    <li><b>Checkout em uma página</b> com trilha de 3 passos (Cart, Payment, Order) e resumo ao lado.</li>
+    <li><b>Pagamento simulado explícito:</b> aviso fixo e escolha do resultado (aprovado, recusado, pendente) para testar os estados.</li>
+    <li><b>Paleta fria</b> (cinza azulado, cobalto, amarelo de destaque) e tipografia Bricolage Grotesque + Inter, com modo escuro.</li>
+  </ul>
+  <h3>Palpites meus <span class="guess">confirmar</span></h3>
+  <ul>
+    <li>Valores seguem a convenção atual: duas casas, sem símbolo de moeda.</li>
+    <li>Ilustrações provisórias geométricas (sem fotos), como no Candidate 03.</li>
+    <li>Nomes e preços dos produtos vêm dos exemplos do README de design.</li>
+    <li>Estoque não existe no app hoje, então não aparece.</li>
+    <li>Admin com tabela simples; excluir produto fora do escopo deste protótipo.</li>
+  </ul>
+  <p>Use a barra de busca, abra um produto, adicione ao carrinho e siga até o pedido. Em Admin dá para criar um produto e enviar uma imagem.</p>
+</section>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const fmt = n => n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* illustrations: flat geometric stand-ins */
+const ART = {
+  lamp: c => `<rect width="400" height="400" fill="${c}"/><circle cx="270" cy="150" r="120" fill="#fff" opacity=".25"/><path d="M110 330h130" stroke="#0f1319" stroke-width="18" stroke-linecap="round"/><path d="M175 330C175 190 215 120 285 110" stroke="#0f1319" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M255 95l75 38-25 50z" fill="#0f1319"/><circle cx="307" cy="184" r="12" fill="#fff"/>`,
+  vessel: c => `<rect width="400" height="400" fill="${c}"/><ellipse cx="200" cy="335" rx="110" ry="16" fill="#0f1319" opacity=".18"/><path d="M150 90h100v30c70 30 90 100 60 170-20 40-60 50-110 50s-90-10-110-50c-30-70-10-140 60-170z" fill="#0f1319"/><ellipse cx="200" cy="90" rx="50" ry="10" fill="#fff" opacity=".9"/><circle cx="165" cy="230" r="10" fill="${c}"/><circle cx="215" cy="270" r="16" fill="${c}"/>`,
+  tote: c => `<rect width="400" height="400" fill="${c}"/><path d="M150 150c0-70 100-70 100 0" stroke="#fff" stroke-width="14" fill="none" stroke-linecap="round"/><rect x="95" y="150" width="210" height="210" rx="10" fill="#f6f1e6"/><rect x="135" y="215" width="130" height="14" fill="#0f1319"/><rect x="135" y="245" width="90" height="14" fill="#0f1319"/><circle cx="235" cy="300" r="22" fill="${c}"/>`,
+  pour: c => `<rect width="400" height="400" fill="${c}"/><ellipse cx="200" cy="340" rx="120" ry="16" fill="#0f1319" opacity=".15"/><path d="M110 130h180l-50 120h-80z" fill="#0f1319"/><rect x="150" y="262" width="100" height="70" rx="12" fill="#fff"/><rect x="150" y="262" width="100" height="22" fill="#0f1319" opacity=".15"/><path d="M250 285c40-6 40 36 0 30" stroke="#fff" stroke-width="12" fill="none"/><path d="M200 250v12" stroke="#0f1319" stroke-width="8"/>`,
+  bench: c => `<rect width="400" height="400" fill="${c}"/><rect x="50" y="170" width="300" height="34" rx="6" fill="#ffd43b"/><rect x="75" y="204" width="26" height="150" fill="#fff"/><rect x="299" y="204" width="26" height="150" fill="#fff"/><rect x="75" y="270" width="250" height="14" fill="#fff" opacity=".7"/><rect x="120" y="115" width="60" height="55" rx="6" fill="#2b45f5"/><circle cx="260" cy="145" r="25" fill="#fff"/>`,
+  throw_: c => `<rect width="400" height="400" fill="${c}"/><path d="M60 120c80-40 160 40 280 0v200c-120 40-200-40-280 0z" fill="#0f1319"/><path d="M60 170c80-40 160 40 280 0M60 220c80-40 160 40 280 0M60 270c80-40 160 40 280 0" stroke="${c}" stroke-width="10" fill="none"/>`,
+  blank: c => `<rect width="400" height="400" fill="${c}"/><circle cx="200" cy="200" r="70" fill="#0f1319" opacity=".85"/><rect x="180" y="150" width="40" height="100" fill="${c}"/>`
+};
+const art = (p, big) => p.image ? `<img src="${p.image}" alt="">` : `<svg viewBox="0 0 400 400" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${esc(p.name)} illustration">${ART[p.art || "blank"](p.color)}</svg>`;
+const COLORS = ["#ffd43b", "#7be0c3", "#2b45f5", "#c9bdff", "#1b2330", "#ffb3c7", "#ff9d5c"];
+
+let products = [
+  { id: "arc-lamp", name: "Arc Table Lamp", price: 129, color: COLORS[0], art: "lamp", description: "A slim steel arc that throws warm light over a desk or reading chair. Matte black finish, cloth cord." },
+  { id: "terra-vessel", name: "Terra Vessel", price: 68, color: COLORS[1], art: "vessel", description: "Hand-glazed stoneware vessel for stems, brushes or nothing at all." },
+  { id: "market-tote", name: "Canvas Market Tote", price: 34, color: COLORS[2], art: "tote", description: "Heavy organic canvas with a reinforced base. Holds a full week of groceries." },
+  { id: "pour-over", name: "Stoneware Pour-Over Set", price: 92, color: COLORS[3], art: "pour", description: "Dripper, carafe and mug in one glazed set. Makes two cups." },
+  { id: "workbench", name: "Workshop Workbench", price: 420, color: COLORS[4], art: "bench", description: "Solid ash top on a bolted steel frame, 140 cm wide, with a lower shelf for tools." },
+  { id: "linen-throw", name: "Linen Throw", price: 54.5, color: COLORS[5], art: "throw_", description: "Stonewashed linen blanket that gets softer with every wash." }
+];
+const S = { cart: {}, q: "", sort: "featured", qty: 1, outcome: "approved", paying: false, payError: "", order: null, draft: null, orderSeq: 1048 };
+const byId = id => products.find(p => p.id === id);
+const lines = () => Object.entries(S.cart).map(([id, q]) => ({ p: byId(id), q })).filter(l => l.p);
+const total = () => lines().reduce((s, l) => s + l.p.price * l.q, 0);
+const count = () => lines().reduce((s, l) => s + l.q, 0);
+
+/* toast */
+let tt; function toast(m) { const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("on"), 2200); }
+function add(id, n = 1) { S.cart[id] = (S.cart[id] || 0) + n; sync(); toast(`${byId(id).name} added to cart`); }
+function setQty(id, q) { if (q <= 0) delete S.cart[id]; else S.cart[id] = q; sync(); }
+function sync() { $("#cartcount").textContent = count(); renderDrawer(); const r = route().name; if (r === "checkout") render(); }
+
+/* drawer */
+function renderDrawer() {
+  const L = lines();
+  $("#drawer").innerHTML = `<div class="drawer-head"><h2>Your cart</h2><button class="icon-btn" id="dclose" aria-label="Close cart">✕</button></div>
+  <div class="lines">${L.length ? L.map(({ p, q }) => `<div class="line"><div class="th">${art(p)}</div><div><h4>${esc(p.name)}</h4><small class="num">${fmt(p.price)} each</small>
+    <div class="stepper"><button data-dec="${p.id}" aria-label="Remove one ${esc(p.name)}">−</button><output class="num">${q}</output><button data-inc="${p.id}" aria-label="Add one ${esc(p.name)}">+</button></div></div>
+    <strong class="num">${fmt(p.price * q)}</strong></div>`).join("") : `<div class="empty"><h3>Your cart is empty</h3><p class="count">Add something from the market to start an order.</p><button class="btn ghost sm" data-close-go="market">Browse products</button></div>`}</div>
+  <div class="foot"><div class="total"><span>Total</span><span class="num">${fmt(total())}</span></div><button class="btn accent block" id="gocheckout" ${L.length ? "" : "disabled"}>Go to checkout</button></div>`;
+}
+function openDrawer(on) { $("#drawer").classList.toggle("on", on); $("#scrim").classList.toggle("on", on); $("#drawer").setAttribute("aria-hidden", String(!on)); if (on) $("#dclose").focus(); else $("#cartbtn").focus(); }
+$("#cartbtn").onclick = () => openDrawer(true);
+$("#scrim").onclick = () => openDrawer(false);
+document.addEventListener("keydown", e => { if (e.key === "Escape") { openDrawer(false); closeNotes(); } });
+$("#drawer").addEventListener("click", e => {
+  const t = e.target.closest("button"); if (!t) return;
+  if (t.id === "dclose") openDrawer(false);
+  else if (t.id === "gocheckout") { openDrawer(false); go("checkout"); }
+  else if (t.dataset.inc) setQty(t.dataset.inc, S.cart[t.dataset.inc] + 1);
+  else if (t.dataset.dec) setQty(t.dataset.dec, S.cart[t.dataset.dec] - 1);
+  else if (t.dataset.closeGo) { openDrawer(false); go(t.dataset.closeGo); }
+});
+
+/* notes */
+function closeNotes() { $("#notes").hidden = true; $("#notesbtn").setAttribute("aria-expanded", "false"); }
+$("#notesbtn").onclick = () => { const h = $("#notes").hidden; $("#notes").hidden = !h; $("#notesbtn").setAttribute("aria-expanded", String(h)); };
+
+/* routing */
+const go = h => { location.hash = h; };
+function route() {
+  const h = location.hash.slice(1) || "market";
+  if (h.startsWith("product-")) return { name: "product", id: h.slice(8) };
+  if (h.startsWith("admin-edit-")) return { name: "admin-edit", id: h.slice(11) };
+  return { name: h };
+}
+function render() {
+  const r = route(), app = $("#app");
+  const showSearch = r.name === "market";
+  $("#searchbox").classList.toggle("off", !showSearch);
+  $("#nav-market").setAttribute("aria-current", ["market", "product", "checkout", "order"].includes(r.name) ? "page" : "false");
+  $("#nav-admin").setAttribute("aria-current", r.name.startsWith("admin") ? "page" : "false");
+  let html;
+  switch (r.name) {
+    case "market": html = vMarket(r); break;
+    case "product": html = vProduct(r); break;
+    case "checkout": html = vCheckout(r); break;
+    case "order": html = vOrder(r); break;
+    case "admin": html = vAdmin(r); break;
+    case "admin-new": case "admin-edit": html = vForm(r); break;
+    default: html = `<div class="empty"><h2>Page not found</h2><a class="btn" href="#market">Back to market</a></div>`;
+  }
+  app.innerHTML = html;
+  if (r.name === "market") paintGrid();
+  if (r.name === "admin-new" || r.name === "admin-edit") bindForm(r);
+}
+window.addEventListener("hashchange", () => { S.payError = ""; S.qty = 1; window.scrollTo(0, 0); render(); });
+
+/* market */
+function vMarket() {
+  return `<section class="hero"><div class="hero-main"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="50" cy="50" r="12" fill="currentColor"/></svg>
+    <p class="eyebrow" style="color:inherit;opacity:.8">Samska Store</p><h1>Things worth keeping on the shelf.</h1><p>A small catalog of objects for the home and the workshop. Add them straight from the grid.</p></div>
+    <div class="hero-side"><span class="eyebrow" style="color:inherit">In the market</span><div class="big num" id="hcount">${products.length}</div><p>products, each with a quick add and a full detail page.</p></div></section>
+  <div class="bar"><div class="chips" role="group" aria-label="Sort products">
+    ${[["featured", "Featured"], ["low", "Price: low to high"], ["high", "Price: high to low"], ["az", "Name A–Z"]].map(([k, l]) => `<button class="chip" data-sort="${k}" aria-pressed="${S.sort === k}">${l}</button>`).join("")}</div>
+    <span class="count" id="ccount" aria-live="polite"></span></div>
+  <ul class="grid" id="grid"></ul><div id="noresult"></div>`;
+}
+function paintGrid() {
+  let L = products.filter(p => p.name.toLowerCase().includes(S.q.trim().toLowerCase()));
+  if (S.sort === "low") L = [...L].sort((a, b) => a.price - b.price);
+  if (S.sort === "high") L = [...L].sort((a, b) => b.price - a.price);
+  if (S.sort === "az") L = [...L].sort((a, b) => a.name.localeCompare(b.name));
+  $("#ccount").textContent = S.q.trim() ? `${L.length} of ${products.length} products` : `${products.length} products`;
+  $("#qclear").hidden = !S.q;
+  $("#grid").innerHTML = L.map(p => `<li class="card"><div class="tilewrap"><a class="tile" href="#product-${p.id}" aria-label="View ${esc(p.name)}">${art(p)}</a>
+    <button class="add" data-add="${p.id}" aria-label="Add ${esc(p.name)} to cart"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add</button></div>
+    <div class="meta"><h3><a href="#product-${p.id}">${esc(p.name)}</a></h3><span class="price num">${fmt(p.price)}</span></div><p class="desc">${esc(p.description)}</p></li>`).join("");
+  $("#noresult").innerHTML = L.length ? "" : `<div class="empty"><h3>No products match “${esc(S.q.trim())}”</h3><p class="count">Check the spelling or clear the search to see all products.</p><button class="btn ghost sm" id="clr2">Clear search</button></div>`;
+}
+$("#q").addEventListener("input", e => { S.q = e.target.value; if (route().name === "market") paintGrid(); });
+$("#qclear").onclick = () => { S.q = ""; $("#q").value = ""; if (route().name === "market") paintGrid(); $("#q").focus(); };
+$("#app").addEventListener("click", e => {
+  const t = e.target.closest("button, a"); if (!t) return;
+  if (t.dataset.add) add(t.dataset.add);
+  else if (t.dataset.sort) { S.sort = t.dataset.sort; document.querySelectorAll(".chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.sort === S.sort))); paintGrid(); }
+  else if (t.id === "clr2") { S.q = ""; $("#q").value = ""; paintGrid(); }
+  else if (t.dataset.qinc) { S.qty = Math.max(1, S.qty + Number(t.dataset.qinc)); $("#qv").textContent = S.qty; }
+  else if (t.id === "addn") { add(t.dataset.id, S.qty); S.qty = 1; $("#qv").textContent = 1; }
+  else if (t.id === "buynow") { add(t.dataset.id, S.qty); go("checkout"); }
+  else if (t.id === "pay") pay();
+  else if (t.id === "done") { S.order = null; go("market"); }
+  else if (t.dataset.del) { products = products.filter(p => p.id !== t.dataset.del); delete S.cart[t.dataset.del]; $("#cartcount").textContent = count(); render(); toast("Product removed"); }
+});
+
+/* product detail */
+function vProduct(r) {
+  const p = byId(r.id); if (!p) return `<div class="empty"><h2>Product not found</h2><a class="btn" href="#market">Back to market</a></div>`;
+  return `<a class="crumb" href="#market">← Back to products</a>
+  <div class="detail"><div class="art">${art(p)}</div>
+  <div class="buy"><p class="eyebrow">Catalog</p><h1>${esc(p.name)}</h1><span class="price num">${fmt(p.price)}</span><p>${esc(p.description)}</p>
+    <div class="row"><div class="stepper"><button data-qinc="-1" aria-label="Decrease quantity">−</button><output id="qv" class="num">${S.qty}</output><button data-qinc="1" aria-label="Increase quantity">+</button></div>
+      <button class="btn accent" id="addn" data-id="${p.id}">Add to cart</button><button class="btn ghost" id="buynow" data-id="${p.id}">Buy now</button></div>
+    <dl class="facts"><div><dt>Product ID</dt><dd>${p.id}</dd></div><div><dt>Price</dt><dd class="num">${fmt(p.price)}</dd></div><div><dt>Payment</dt><dd>Simulated</dd></div></dl></div></div>`;
+}
+
+/* checkout + payment */
+const stepRail = n => `<div class="steps" aria-label="Progress">${["Cart", "Payment", "Order"].map((s, i) => `<span class="step ${i + 1 < n ? "done" : i + 1 === n ? "now" : ""}" ${i + 1 === n ? 'aria-current="step"' : ""}><b>${i + 1 < n ? "✓" : i + 1}</b>${s}</span>`).join("")}</div>`;
+function vCheckout() {
+  const L = lines();
+  if (!L.length) return `${stepRail(1)}<div class="empty"><h2>Nothing to check out</h2><p class="count">Your cart is empty.</p><a class="btn accent" href="#market">Browse products</a></div>`;
+  return `${stepRail(2)}<div class="co">
+  <section class="panel" aria-labelledby="payh"><h2 id="payh">Payment</h2>
+    <div class="sim"><span aria-hidden="true">⚠</span><span>This is a simulated payment. No card is used and no money moves. Pick the result you want to test.</span></div>
+    <fieldset class="opts" style="border:0;padding:0;margin:0"><legend class="eyebrow" style="margin-bottom:8px">Simulated result</legend>
+      ${[["approved", "Approved", "Payment is captured and the order is created."], ["declined", "Declined", "Payment fails. Your cart stays as it is so you can retry."], ["pending", "Pending", "Payment is still processing when the order is created."]].map(([v, t, d]) => `<label class="opt"><input type="radio" name="out" value="${v}" ${S.outcome === v ? "checked" : ""}><span><strong>${t}</strong><span>${d}</span></span></label>`).join("")}</fieldset>
+    ${S.payError ? `<div class="status bad" role="alert">${S.payError}</div>` : ""}
+    <button class="btn accent block" id="pay" ${S.paying ? "disabled" : ""}>${S.paying ? '<span class="spin"></span> Processing' : `Pay ${fmt(total())}`}</button>
+    <a class="btn ghost block" href="#market">Keep shopping</a></section>
+  <aside class="panel" aria-labelledby="sumh"><h2 id="sumh">Order summary</h2>
+    <div>${L.map(({ p, q }) => `<div class="sum-line"><span>${q} × ${esc(p.name)}</span><strong class="num">${fmt(p.price * q)}</strong></div>`).join("")}</div>
+    <div class="total"><span>Total</span><span class="num">${fmt(total())}</span></div></aside></div>`;
+}
+$("#app").addEventListener("change", e => { if (e.target.name === "out") S.outcome = e.target.value; });
+function pay() {
+  S.paying = true; S.payError = ""; render();
+  setTimeout(() => {
+    S.paying = false;
+    if (S.outcome === "declined") { S.payError = "Payment declined by the simulator. Your cart is unchanged. Try again or choose another result."; render(); return; }
+    S.order = { id: "SS-" + (++S.orderSeq), status: S.outcome === "pending" ? "pending" : "paid", lines: lines().map(l => ({ ...l })), total: total(), at: new Date() };
+    S.cart = {}; sync(); go("order");
+  }, 1100);
+}
+function vOrder() {
+  const o = S.order; if (!o) return `<div class="empty"><h2>No order yet</h2><a class="btn accent" href="#market">Browse products</a></div>`;
+  const paid = o.status === "paid", time = o.at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return `${stepRail(4)}<div class="co"><section class="ticket"><span class="code">Order ${o.id}</span><h1>${paid ? "Thanks, your order is in." : "Order placed. Payment is still processing."}</h1>
+    <p>${paid ? "Payment was captured by the simulator." : "We will mark it as paid as soon as the simulator confirms."}</p>
+    <div class="row"><a class="btn accent" id="done" href="#market">Back to market</a></div></section>
+  <aside class="panel"><h2>Order details</h2>
+    <ul class="timeline"><li><i></i><div><strong>Order created</strong><small>${time}</small></div></li><li class="${paid ? "" : "todo"}"><i></i><div><strong>${paid ? "Payment captured" : "Awaiting payment"}</strong><small>${paid ? time : "Processing"}</small></div></li></ul>
+    <div>${o.lines.map(({ p, q }) => `<div class="sum-line"><span>${q} × ${esc(p.name)}</span><strong class="num">${fmt(p.price * q)}</strong></div>`).join("")}</div>
+    <div class="total"><span>Total</span><span class="num">${fmt(o.total)}</span></div></aside></div>`;
+}
+
+/* admin */
+function vAdmin() {
+  return `<div class="adm-head"><div><p class="eyebrow">Admin</p><h1>Products</h1></div><a class="btn accent" href="#admin-new">New product</a></div>
+  <div class="table-wrap"><table><thead><tr><th>Image</th><th>Name</th><th class="r">Price</th><th class="r">Actions</th></tr></thead><tbody>
+  ${products.map(p => `<tr><td><div class="th">${art(p)}</div></td><td><strong>${esc(p.name)}</strong><div class="count">${p.id}</div></td><td class="r num">${fmt(p.price)}</td>
+    <td class="r"><a class="btn ghost sm" href="#admin-edit-${p.id}">Edit</a> <button class="btn ghost sm" data-del="${p.id}" aria-label="Delete ${esc(p.name)}">Delete</button></td></tr>`).join("")}</tbody></table></div>`;
+}
+function vForm(r) {
+  const edit = r.name === "admin-edit", p = edit ? byId(r.id) : null;
+  if (edit && !p) return `<div class="empty"><h2>Product not found</h2><a class="btn" href="#admin">Back to products</a></div>`;
+  S.draft = p ? { ...p } : { id: "", name: "", price: "", description: "", color: COLORS[0], art: "blank", image: null };
+  return `<a class="crumb" href="#admin">← Back to products</a><div class="adm-head"><h1>${edit ? "Edit product" : "New product"}</h1></div>
+  <form class="form" id="pf" novalidate><section class="panel">
+    <div class="field"><label for="f-name">Name</label><input id="f-name" value="${esc(S.draft.name)}" required><span class="err" id="e-name" role="alert"></span></div>
+    <div class="field"><label for="f-price">Price</label><input id="f-price" inputmode="decimal" value="${S.draft.price}" placeholder="0.00"><span class="err" id="e-price" role="alert"></span></div>
+    <div class="field"><label for="f-desc">Description</label><textarea id="f-desc">${esc(S.draft.description)}</textarea></div>
+    <div class="row"><button class="btn accent" type="submit">${edit ? "Save changes" : "Create product"}</button><a class="btn ghost" href="#admin">Cancel</a></div></section>
+  <section class="panel"><h2>Image</h2>
+    <div class="drop" id="drop"><div class="prev" id="prev">${art(S.draft)}</div><div class="ctl"><strong>Drop an image here</strong><span class="count">JPG or PNG, up to 2 MB</span><label class="btn ghost sm" for="f-file" style="cursor:pointer">Choose file</label><input id="f-file" type="file" accept="image/jpeg,image/png" hidden><span class="err" id="e-file" role="alert" style="color:var(--bad);font-weight:600;font-size:.85rem"></span></div></div>
+    <div><p class="eyebrow" style="margin-bottom:8px">Or pick a color tile</p><div class="swatches" id="sws">${COLORS.map(c => `<button type="button" class="sw" style="background:${c}" data-c="${c}" aria-label="Color ${c}" aria-pressed="${!S.draft.image && S.draft.color === c}"></button>`).join("")}</div></div></section></form>`;
+}
+function bindForm(r) {
+  const drop = $("#drop"), file = $("#f-file"), prev = () => $("#prev").innerHTML = art(S.draft);
+  const take = f => {
+    $("#e-file").textContent = "";
+    if (!f) return;
+    if (!/^image\/(jpeg|png)$/.test(f.type)) { $("#e-file").textContent = "Use a JPG or PNG file."; return; }
+    if (f.size > 2 * 1024 * 1024) { $("#e-file").textContent = "File is larger than 2 MB."; return; }
+    const fr = new FileReader(); fr.onload = () => { S.draft.image = fr.result; prev(); document.querySelectorAll(".sw").forEach(s => s.setAttribute("aria-pressed", "false")); }; fr.readAsDataURL(f);
+  };
+  file.onchange = () => take(file.files[0]);
+  drop.ondragover = e => { e.preventDefault(); drop.classList.add("over"); };
+  drop.ondragleave = () => drop.classList.remove("over");
+  drop.ondrop = e => { e.preventDefault(); drop.classList.remove("over"); take(e.dataTransfer.files[0]); };
+  $("#sws").onclick = e => { const b = e.target.closest(".sw"); if (!b) return; S.draft.color = b.dataset.c; S.draft.image = null; document.querySelectorAll(".sw").forEach(s => s.setAttribute("aria-pressed", String(s === b))); prev(); };
+  $("#pf").onsubmit = e => {
+    e.preventDefault();
+    const name = $("#f-name").value.trim(), price = parseFloat($("#f-price").value.replace(",", "."));
+    $("#e-name").textContent = name ? "" : "Enter a product name.";
+    $("#e-price").textContent = price > 0 ? "" : "Enter a price greater than 0.";
+    if (!name || !(price > 0)) return;
+    Object.assign(S.draft, { name, price, description: $("#f-desc").value.trim() });
+    if (r.name === "admin-edit") Object.assign(byId(r.id), S.draft);
+    else { S.draft.id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + products.length; products.push(S.draft); }
+    toast(r.name === "admin-edit" ? "Product saved" : "Product created"); go("admin");
+  };
+}
+
+renderDrawer(); render();
+</script>
+</body>
+</html>
