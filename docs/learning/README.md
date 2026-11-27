@@ -77,6 +77,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-058-claude-harness-adoption.md](ss-058-claude-harness-adoption.md) | Keeping one tool-independent instruction source, thin per-tool pointer files, separating harness-specific history from active rules, and retiring abandoned tool-specific work. |
 | [ss-059-web-dependabot-remediation.md](ss-059-web-dependabot-remediation.md) | Reading Dependabot alerts as package, vulnerable range and first patched version, pinned versus in-range bumps, why a test-runner bump moves transitive packages, and verifying with `npm audit` plus the existing gates. |
 | [ss-061-approval-gate-change.md](ss-061-approval-gate-change.md) | Recording a change of owner approval gates, what stays gated (merge, Human Verification, stop conditions), and superseding policy text with a dated note and an immutable link. |
+| [ss-062-design-before-build.md](ss-062-design-before-build.md) | Design-first delivery, using an approved HTML prototype as the contract for a feature, linking it from the Issue, and handling work with no user-facing change. |
 
 The SS-045, SS-046, and SS-047 records describe the agent role layer that was superseded as active requirements on 2026-10-27. They remain historical learning records; their operational instructions are not current.
 

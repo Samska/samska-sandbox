@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-062 — Require an approved design before building a feature (#120)
+
+- Owner decision (2026-11-27): before a feature is built, its design must be ready as an owner-approved HTML prototype under `docs/design/`. `docs/AI-GOVERNANCE.md` (Frontend Design Review), `AGENTS.md`, the Issue Form description, and the design record now say so; the prior wording is linked at commit `d70fddd`. A feature without user-facing change records `Design: Not applicable`.
+- Unchanged: merge authorization, Human Verification, the stop conditions, and historical records. Producing prototypes for existing screens and upcoming features is separate design work.
+- Next step: owner review and merge authorization.
+
 ## SS-061 — Build and pull request creation no longer need separate approval (#117)
 
 - Owner decision (2026-11-27): the owner does not approve each Build or pull request creation; the owner reviews the open pull request and authorizes merge. `docs/AI-GOVERNANCE.md` and `AGENTS.md` now say so, with a dated supersession note linking the prior wording at commit `1425873`. `CLAUDE.md` follows.

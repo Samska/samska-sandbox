@@ -6,7 +6,7 @@ Before meaningful work, an agent must:
 
 1. Read this file, documentation relevant to the task, and the existing implementation.
 2. Confirm requested scope, acceptance criteria, affected modules, documentation, security implications, and risk-based verification.
-3. Produce a concise plan before substantial changes and stop for a human decision when material uncertainty exists.
+3. Produce a concise plan before substantial changes and stop for a human decision when material uncertainty exists. For a user-facing feature, confirm the approved design exists first.
 4. Implement only the scope defined by the owner's request and the Issue; do not pull roadmap work forward.
 5. Update affected documentation, create or update required learning records under [docs/learning/](docs/learning/README.md), and create an ADR for significant, durable architecture decisions.
 6. Run appropriate verification.
@@ -22,7 +22,7 @@ Follow these rules:
 - Human review, understanding, and validation remain mandatory; never accept AI output blindly.
 - Maintain the Issue Handoff items and Pull Request Handoff sections defined in [the handoff protocol](docs/AI-GOVERNANCE.md#issue-and-project-handoff-protocol), and keep [PROJECT_HANDOFF.md](PROJECT_HANDOFF.md) a concise project snapshot.
 
-Read the relevant detailed guidance in [docs/AI-GOVERNANCE.md](docs/AI-GOVERNANCE.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/architecture/principles.md](docs/architecture/principles.md), [docs/TESTING.md](docs/TESTING.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/learning/README.md](docs/learning/README.md), and [docs/adr/README.md](docs/adr/README.md). Frontend design work also follows the [Frontend Design Review](docs/AI-GOVERNANCE.md#frontend-design-review) rule.
+Read the relevant detailed guidance in [docs/AI-GOVERNANCE.md](docs/AI-GOVERNANCE.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/architecture/principles.md](docs/architecture/principles.md), [docs/TESTING.md](docs/TESTING.md), [docs/SECURITY.md](docs/SECURITY.md), [docs/learning/README.md](docs/learning/README.md), and [docs/adr/README.md](docs/adr/README.md). A user-facing feature also follows the [Frontend Design Review](docs/AI-GOVERNANCE.md#frontend-design-review) rule: its design must be an owner-approved HTML prototype under [docs/design/](docs/design/samska-store/README.md) before Build.
 
 ## Portable Instruction Base
 
