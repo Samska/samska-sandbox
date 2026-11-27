@@ -4,6 +4,13 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-063 — Bench brand and all-screen design (#121)
+
+- Owner request (2026-11-27): Vitrine felt generic, so redesign everything that exists and the upcoming features before building them. PR #118 (SS-060, Vitrine in `web/`) was closed by the owner; its branch is kept.
+- Deliverable: [prototypes/bench.html](docs/design/samska-store/prototypes/bench.html) and its tokens, plus the SS-063 section of the [design record](docs/design/samska-store/README.md). An instrument-maker's catalog identity; every current screen and state, and design-only previews of upcoming features marked as not approved scope.
+- Agent Verification: Chromium at 1280 and 390 px, light and dark, all routes, no console errors or overflow. Human Verification: the owner reviews the open pull request and the rendered file.
+- Next step: owner review of the direction; applying it to `web/` needs its own Issue.
+
 ## SS-061 — Build and pull request creation no longer need separate approval (#117)
 
 - Owner decision (2026-11-27): the owner does not approve each Build or pull request creation; the owner reviews the open pull request and authorizes merge. `docs/AI-GOVERNANCE.md` and `AGENTS.md` now say so, with a dated supersession note linking the prior wording at commit `1425873`. `CLAUDE.md` follows.
