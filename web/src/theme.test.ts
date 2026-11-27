@@ -32,7 +32,19 @@ function themeBlock(source: string, opener: string): string {
 }
 
 const light = declarations(themeBlock(indexCss, "@theme"));
-const dark = { ...light, ...declarations(themeBlock(indexCss, "@media (prefers-color-scheme: dark)")) };
+const darkOverrides = declarations(themeBlock(indexCss, "@media (prefers-color-scheme: dark)"));
+const dark = { ...light, ...darkOverrides };
+
+it("keeps the pinned Dark palette identical to the system-dark palette", () => {
+  const pinned = declarations(themeBlock(indexCss, ':root[data-theme="dark"]'));
+  expect(pinned).toEqual(darkOverrides);
+  expect(indexCss).toContain(':root:not([data-theme="light"])');
+});
+
+it("loads the early theme script from a file the Content-Security-Policy allows", () => {
+  expect(indexHtml).toContain('<script src="/theme-init.js"></script>');
+  expect(indexHtml).not.toMatch(/<script(?![^>]*src=)[^>]*>/);
+});
 
 function luminance(hex: string): number {
   const channels = [1, 3, 5].map((offset) => {

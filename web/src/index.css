@@ -38,8 +38,10 @@
   --shadow-product-hover: 0 0.3rem 0 var(--color-ink);
 }
 
+/* Dark palette. It applies when the system is dark unless the person pinned Light, or when they pinned
+   Dark (data-theme set by the theme control); keep the two copies identical. */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     color-scheme: dark;
     --color-canvas: #0e1114;
     --color-surface: #171b1f;
@@ -66,6 +68,38 @@
     --color-cart-surface: #171b1f;
     --color-count-surface: #4a2216;
   }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-canvas: #0e1114;
+  --color-surface: #171b1f;
+  --color-surface-muted: #232930;
+  --color-ink: #eef0ec;
+  --color-muted: #98a39d;
+  --color-brand: #ff5a2e;
+  --color-brand-dark: #eef0ec;
+  --color-on-brand: #111518;
+  --color-on-danger: #111518;
+  --color-focus: #7aa6ff;
+  --color-success: #6fe0a0;
+  --color-danger: #ff8fa5;
+  --color-border: #343c43;
+  --color-border-strong: #eef0ec;
+  --color-media-teal: #3a4d41;
+  --color-media-olive: #5a4c26;
+  --color-media-rose: #4a3d57;
+  --color-media-slate: #34475a;
+  --color-success-surface: #12301f;
+  --color-success-border: #1f5a38;
+  --color-success-text: #6fe0a0;
+  --color-pending-surface: #382b0a;
+  --color-cart-surface: #171b1f;
+  --color-count-surface: #4a2216;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
 }
 
 @layer base {

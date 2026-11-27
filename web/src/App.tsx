@@ -8,6 +8,7 @@ import { useAuth, type AuthState } from "./auth/AuthContext";
 import Button from "./ui/Button";
 import StatusMessage from "./ui/StatusMessage";
 import DemoBanner from "./demo/DemoBanner";
+import ThemeToggle from "./theme/ThemeToggle";
 import OperationsPage, { operationsPath } from "./operations/OperationsPage";
 import OrdersPage, { ordersPath } from "./orders/OrdersPage";
 import TrackingPage from "./orders/TrackingPage";
@@ -99,6 +100,9 @@ export default function App() {
               </a>
             ) : null}
             <AccountControls state={auth.state} onSignOut={auth.signOut} isCurrent={path === accountPath} />
+            <span className="ml-1 sm:ml-2">
+              <ThemeToggle />
+            </span>
           </nav>
         </div>
       </header>
@@ -171,6 +175,9 @@ function AdminShell({
                 Sign out
               </Button>
             ) : null}
+            <span className="ml-1 sm:ml-2">
+              <ThemeToggle inverted />
+            </span>
           </nav>
         </div>
       </header>
