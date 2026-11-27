@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-068 — Release plan to v1.0.0 (#132)
+
+- Owner request (2026-11-27): define releases in the Roadmap and deliver everything up to v1.0.0, contacting him only when 1.0 is ready. Plan in [Roadmap](docs/ROADMAP.md) and [ADR 0012](docs/adr/0012-adopt-release-plan-to-v1.md): v0.2.0 Durable Store, v0.3.0 Accounts, v0.4.0 Order History and Tracking, v0.5.0 Inventory, v0.6.0 Operations, v1.0.0 Secured Public Demo. Caching, messaging, React Native and IaC move beyond 1.0.
+- Workflow decision (owner, 2026-11-27, "Ótimo"): integration branch `release/1.0`; each feature is a small pull request with tests and green CI merged into it by the agent; `main` changes only when the owner validates `release/1.0` locally and authorizes one merge and the `v1.0.0` tag. CI runs on pull requests targeting `release/1.0`.
+- Next step: build v0.3.0 Accounts.
+
 ## SS-067 — Persist the Catalog in PostgreSQL (#130)
 
 - Build: Products and uploaded media are stored in PostgreSQL (`V4__create_catalog.sql`, `JdbcProductStore`, [ADR 0011](docs/adr/0011-adopt-postgresql-catalog-persistence.md)), completing the persistence sequence of ADRs 0008 to 0010. Listings keep insertion order and carry media IDs without image bytes; the aggregate media budget is enforced transactionally. New `503 catalog-store-unavailable`. API shapes and `web/` are unchanged.
