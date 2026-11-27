@@ -4,13 +4,19 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-058 — Adopt Claude as the agent harness (#111)
+
+- The owner moved from ChatGPT and OpenCode to Claude (Claude Desktop and Claude Code). `AGENTS.md` remains the shared, tool-independent source; a thin root `CLAUDE.md` imports it so Claude Code loads the same rules. No rule, provider, model, permission, or tooling configuration was added.
+- The "Agent Runtime" section below stays as history. Historical Learning Records and `docs/design/` are unchanged. Branch `chore/agent-tooling-official-restore` (SS-048, vendored OpenCode skills) is not to proceed and is deleted by owner authorization after merge; no `.claude/` configuration is part of this work.
+- Next step: pull request creation and merge each need separate explicit owner authorization.
+
 ## SS-057 — HTML prototypes as the design source (#110)
 
 - Owner decision (2026-11-27): replace Penpot with clickable HTML prototypes and tokens versioned in this repository, and approve the Vitrine direction, with the exact answer “Eu aprovo os dois pontos.” Build is authorized for the scope in [Issue #110](https://github.com/Samska/samska-sandbox/issues/110); PR creation and merge are not.
 - Deliverable: [prototypes/vitrine.html](docs/design/samska-store/prototypes/vitrine.html) and its tokens under `docs/design/samska-store/prototypes/`, plus the SS-057 section of the [design record](docs/design/samska-store/README.md). The SS-052 to SS-056 Penpot records remain as history; Penpot is no longer the source of truth. No application or backend code changed.
 - Agent Verification: opened in Chromium at 1280 and 390 px; add to cart, drawer, declined and approved payment, order, admin create with image upload, search, and dark theme all worked with no horizontal overflow or console errors. Human Verification is recorded below.
 - Human Verification (owner-reported, 2026-11-27): after running the roteiro on the rendered file, the owner reported “A direção visual está ok, aprovo as suposições, não parece que nada quebrou ou ficou confuso.” This covers the Vitrine direction and the listed assumptions on this file; accessibility beyond keyboard focus and cross-browser behavior were not verified.
-- Next: separate PR creation decision on branch `claude/project-thread-n6ywh2`. PR creation, merge, and application implementation remain unauthorized.
+- Next: merge of PR #113 (owner authorized the merge on 2026-11-27, after CI passes). Applying the redesign to `web/` remains unauthorized. Branch naming from the next task on follows `feat/ss-NNN-slug`.
 
 ## SS-056 — Order, Admin, and fallback interfaces design (#108)
 

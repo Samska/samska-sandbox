@@ -74,6 +74,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-055-checkout-payment-design.md](ss-055-checkout-payment-design.md) | Checkout and simulated Payment state matrices from current handlers, confirmed versus unconfirmed outcomes, captured-attempt versus live-Cart ownership, manual versus automatic recovery evidence, and additive design-batch preservation. |
 | [ss-056-order-admin-fallbacks-design.md](ss-056-order-admin-fallbacks-design.md) | Consolidated current-interface design delivery, separating automatic journey recovery from manual Payment and Order checks, mapping Admin list/form/image states from handlers, treating non-existent surfaces as Not applicable, and preserving accepted Penpot baselines through additive masters and hash-checked exports. |
 | [ss-057-html-design-source.md](ss-057-html-design-source.md) | Keeping the design source of truth in the repository as a self-contained, clickable HTML prototype with tokens, why that is reviewable with code, what it gives up, and why design approval is separate from implementation approval. |
+| [ss-058-claude-harness-adoption.md](ss-058-claude-harness-adoption.md) | Keeping one tool-independent instruction source, thin per-tool pointer files, separating harness-specific history from active rules, and retiring abandoned tool-specific work. |
 
 The SS-045, SS-046, and SS-047 records describe the agent role layer that was superseded as active requirements on 2026-10-27. They remain historical learning records; their operational instructions are not current.
 
