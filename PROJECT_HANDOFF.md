@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-075 — Admin area and VPS setup (#146, v1.0.0)
+
+- Build: separate Admin shell for `/admin/*`, administrator sign-in lands in Admin, Caddy TLS service, trusted client-address chain, `deploy/` scripts (deploy, backup, restore), VPS guide ([ADR 0019](docs/adr/0019-separate-admin-area-and-terminate-tls-with-caddy.md)).
+- Owner input needed to host: VPS (Ubuntu 24.04, 2 vCPU, 4 GB), domain with DNS access, SSH key access, `.env.demo` secrets; see [Deployment](docs/DEPLOYMENT.md).
+- Design gap: no Admin shell screen in the Bench prototype; recorded in the ADR.
+
 ## SS-074 — Demo mode and containers (#144, v1.0.0 part 2)
 
 - Build: `GET /api/config`, administrator-only demo reset (optional cron), demo banner, backend and web images, `compose.demo.yaml`, [Deployment](docs/DEPLOYMENT.md), [v1.0.0 release notes](docs/releases/v1.0.0.md) ([ADR 0018](docs/adr/0018-add-demo-mode-and-containers.md)).

@@ -68,14 +68,12 @@ describe("App", () => {
       await screen.findByRole("heading", { name: "Product management", level: 1 })
     ).toBeInTheDocument();
 
-    const navigation = screen.getByRole("navigation", { name: "Primary" });
-    expect(within(navigation).getByRole("link", { name: "Admin" })).toHaveAttribute(
-      "aria-current",
-      "page"
-    );
-    expect(within(navigation).getByRole("link", { name: "Market" })).not.toHaveAttribute(
-      "aria-current"
-    );
+    const navigation = screen.getByRole("navigation", { name: "Admin" });
+    expect(within(navigation).getByRole("link", { name: "Products" })).toHaveAttribute("aria-current", "page");
+    expect(within(navigation).getByRole("link", { name: "Operations" })).not.toHaveAttribute("aria-current");
+    expect(within(navigation).getByRole("link", { name: "View store" })).toHaveAttribute("href", "/");
+    // The Admin area carries no storefront navigation.
+    expect(screen.queryByRole("navigation", { name: "Primary" })).not.toBeInTheDocument();
   });
 
   it("renders a distinct not-found surface for unknown paths", () => {
@@ -113,11 +111,8 @@ describe("App", () => {
     ).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Products", level: 1 })).not.toBeInTheDocument();
 
-    const navigation = screen.getByRole("navigation", { name: "Primary" });
-    expect(within(navigation).getByRole("link", { name: "Admin" })).toHaveAttribute(
-      "aria-current",
-      "page"
-    );
+    const navigation = screen.getByRole("navigation", { name: "Admin" });
+    expect(within(navigation).getByRole("link", { name: "Products" })).toHaveAttribute("aria-current", "page");
   });
 
   it("renders the dedicated edit form at /admin/products/{id}/edit", async () => {

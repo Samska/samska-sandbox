@@ -111,11 +111,12 @@ describe("Operations screen", () => {
     expect(screen.queryByRole("link", { name: "Operations" })).not.toBeInTheDocument();
   });
 
-  it("links to Operations from the header for an administrator", async () => {
+  it("shows administrators the Admin navigation without storefront links", async () => {
     open(admin, () => json(200, snapshot()));
 
-    const link = await screen.findByRole("link", { name: "Operations" });
-    expect(link).toHaveAttribute("aria-current", "page");
+    const navigation = await screen.findByRole("navigation", { name: "Admin" });
+    expect(within(navigation).getByRole("link", { name: "Operations" })).toHaveAttribute("aria-current", "page");
+    expect(screen.queryByRole("link", { name: "Market" })).not.toBeInTheDocument();
   });
 
   it("offers no reset outside demo mode", async () => {

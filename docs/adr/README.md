@@ -58,3 +58,5 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 [ADR 0017: Harden The Public Demo In The Application And The Production Profile](0017-harden-the-public-demo.md) records the rate limiter, API headers, the `prod` profile and the startup guard.
 
 [ADR 0018: Add Demo Mode And A Containerized Runtime](0018-add-demo-mode-and-containers.md) records demo mode, the administrator reset, the nginx web image and the hosted-demo Compose stack.
+
+[ADR 0019: Separate The Admin Area And Terminate TLS With Caddy](0019-separate-admin-area-and-terminate-tls-with-caddy.md) records the Admin shell, role-based sign-in destination, and the Caddy-fronted VPS stack.
