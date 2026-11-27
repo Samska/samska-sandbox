@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-061 — Build and pull request creation no longer need separate approval (#117)
+
+- Owner decision (2026-11-27): the owner does not approve each Build or pull request creation; the owner reviews the open pull request and authorizes merge. `docs/AI-GOVERNANCE.md` and `AGENTS.md` now say so, with a dated supersession note linking the prior wording at commit `1425873`. `CLAUDE.md` follows.
+- Unchanged: explicit merge authorization, Human Verification before the pull request where required, the stop conditions, and historical records of earlier gates.
+- Next step: owner review and merge authorization.
+
 ## SS-058 — Adopt Claude as the agent harness (#111)
 
 - The owner moved from ChatGPT and OpenCode to Claude (Claude Desktop and Claude Code). `AGENTS.md` remains the shared, tool-independent source; a thin root `CLAUDE.md` imports it so Claude Code loads the same rules. No rule, provider, model, permission, or tooling configuration was added.

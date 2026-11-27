@@ -55,7 +55,7 @@ New or materially changed frontend screens, flows, and components require releva
 - Small visual changes require reviewing only the affected portion. Refactoring without visual changes requires no new design.
 - Record the exact candidate and a traceable owner approval. An AI review is Agent Verification, not owner approval.
 - Material visual decisions discovered during implementation return for review before they are treated as approved design.
-- Design approval does not authorize application implementation, pull request creation, or merge.
+- Design approval does not authorize application implementation or merge.
 - Later implementation is compared with the approved design in the browser, including responsive behavior and accessibility verification.
 - This workflow grants no authorization for automated enforcement, new tooling, services, or dependencies. Any such addition requires separately scoped owner authorization.
 
@@ -73,13 +73,13 @@ A change that materially affects code, tests, governance, CI, or security requir
 
 ## Build Authorization and Execution Loop
 
-A Build begins only when the owner explicitly authorizes implementation of an approved Issue or instruction. The authorization is recorded in the Issue Handoff or in a traceable owner instruction. Approval of a plan, or permission to inspect and plan, is not Build authorization unless it names implementation. An agent may not move an Issue to `In Build` on its own.
+Since 2026-11-27 the owner does not approve each Build. A Build may begin on an owner request or instruction that defines the work, once the work has an Issue with an Issue Handoff stating the scope, acceptance criteria, and verification plan. The agent may move that Issue to `In Build`. The owner's gates are reviewing the open pull request and authorizing its merge. Permission to inspect and plan alone does not start a Build, and the stop conditions below still apply.
 
-After Build authorization, the agent continues through implementation, appropriate verification, diagnosis, in-scope correction, documentation, and evidence preparation without asking for confirmation for routine work already covered by the approved scope, acceptance criteria, and verification plan.
+Once a Build has begun, the agent continues through implementation, appropriate verification, diagnosis, in-scope correction, documentation, and evidence preparation without asking for confirmation for routine work already covered by the approved scope, acceptance criteria, and verification plan.
 
 ### Authorization scope
 
-Build authorization may cover scoped commits and pushes to the task branch, subject to required engineering review and Human Verification. Do not request renewed permission for actions already covered by that authorization. Pull request creation and merge each require separate explicit authorization. Stop when an action is not authorized or a required condition is unmet.
+A Build covers scoped commits and pushes to the task branch and, since 2026-11-27, creating the pull request, subject to required engineering review and Human Verification. Do not request renewed permission for actions already covered. Merge requires separate explicit owner authorization. Stop when an action is not authorized or a required condition is unmet.
 
 Branch and worktree names and locations are implementation choices within approved scope; record them in the handoff rather than requesting separate approval.
 
@@ -89,7 +89,7 @@ Branch and worktree names and locations are implementation choices within approv
 
 - Work is complete only when its acceptance criteria are satisfied and supported by evidence. Passing tests or a clean build alone do not establish completion, product acceptance, accessibility, or Human Verification.
 - Continue until the work is complete and its evidence is ready for the next gate, the next required human decision or verification gate is reached, or a stop condition applies.
-- Required engineering review and Human Verification precede the commit or push they cover. Pull request creation and merge each require separate explicit authorization.
+- Required engineering review and Human Verification precede the commit or push they cover. Merge requires separate explicit owner authorization.
 - The next applicable human decision or verification gate ends the autonomous sequence. Do not perform a later action merely because earlier work succeeded.
 - Stop and request an owner decision when scope, acceptance criteria, or authorization is missing, ambiguous, or must change; a new dependency, infrastructure capability, architectural pattern, or published contract change is proposed; an action is not authorized or a required condition is unmet; uncommitted, abandoned, shared, or preserved work would be overwritten, reset, cleaned, or deleted; a destructive or irreversible action is proposed; a material verification gap or risk must be accepted; or evidence contradicts an approved claim.
 - Do not mark the Issue or Project complete before the authorized merge and the required completion documentation.
@@ -260,6 +260,10 @@ Every setup-affecting change must also review whether the repository [local-deve
 ## Evidence and Review
 
 Every meaningful change should leave durable evidence in the repository: code and tests where applicable, updated documentation, ADRs for significant decisions, and a reviewable change description. Human review remains required regardless of whether a change was authored manually or with AI assistance. AI assistance is successful only when the human can understand and approve the important decisions it supported.
+
+## Superseded Approval Gates (2026-11-27)
+
+On 2026-11-27 the owner decided that Build and pull request creation no longer need separate explicit authorization, and that the owner reviews the open pull request and authorizes its merge. The previous wording, which required explicit Build authorization and separate pull request creation authorization, is preserved at commit `1425873a22e5227384617bd95eba0f2721bbdea5`. Merge authorization, required Human Verification before the pull request, and the stop conditions are unchanged.
 
 ## Superseded Agent Role Instructions (2026-10-27)
 
