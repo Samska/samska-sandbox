@@ -9,9 +9,8 @@ licensed under the [Apache License 2.0](LICENSE).
 
 ## Current Milestone
 
-- **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; SS-038, SS-044, SS-045, SS-046, SS-049, SS-051, SS-052, SS-053, SS-054, and SS-055 are complete and merged. Candidate 03 and SS-053 Batch 1 were owner-approved in Penpot for the reviewed catalog, current-interface shell, and Market; SS-054 Batch 2 received qualified first-version visual acceptance and was completed through Issue #104 and PR #105; SS-055 Batch 3 received owner-reported visual acceptance “Parece ok” and was completed through Issue #106 and PR #107. SS-056 Batch 4 (Order, Admin, and fallbacks) is owner-reported visually approved at its named version with the exact answer “Eu aprovo” (2026-10-29); the seven-file documentation is approved and commit/push is authorized. After successful push, the separate PR creation decision is the next gate. The accepted designs contain provisional illustrations, and the production UI is not rebranded.
-- **Next planned work:** the release plan to `v1.0.0` in the [Roadmap](docs/ROADMAP.md), built on the `release/1.0` integration branch; `main` changes only after the owner validates it.
+- **Latest published release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
+- **Release candidate:** `v1.0.0 — Secured Public Demo` is prepared on the `release/1.0` integration branch (accounts, order history and tracking, inventory, an Operations screen, security hardening, demo mode and a containerized runtime). `main` changes only after the owner validates it; see the [v1.0.0 release notes](docs/releases/v1.0.0.md) and [Deployment](docs/DEPLOYMENT.md).
 
 [View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
 
@@ -63,7 +62,12 @@ validation, learning, and risk.
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | Automated browser E2E | Implemented | Two Chromium Playwright tests against the real frontend, Vite proxy, and a fresh exclusively owned backend: First Order success with reload/direct-entry recovery, frozen data, explicit Order creation, and keyboard/focus checks, plus a declined outcome without an Order path; serialized execution, synthetic fixtures through existing APIs, diagnostics on failure. |
-| PostgreSQL | Implemented for Orders | Required local Compose runtime with JDBC, Flyway migration, and database health; persists Orders and items only. |
+| PostgreSQL | Implemented | Required local Compose runtime with JDBC, Flyway migrations, and database health; persists Products, media, Carts, Payment attempts, Orders, accounts and stock. |
+| Accounts and sessions | Implemented (release/1.0) | Synthetic registration, sign-in and sign-out, server-side sessions, an administrator role, and per-account Cart, Payment attempts and Orders. |
+| Order history and tracking | Implemented (release/1.0) | Order history and a simulated shipment lifecycle derived from the Order time. |
+| Inventory | Implemented (release/1.0) | Stock per Product, reservation on approved payment, consumption on Order, sold-out states, and a Stock field in Admin. |
+| Operations | Implemented (release/1.0) | An administrator screen with real figures, correlation IDs and structured request logs. |
+| Security and demo mode | Implemented (release/1.0) | Rate limiting, security headers, a `prod` profile, a threat model, a demo banner, a synthetic-data reset and a containerized runtime. |
 | Deployment | Planned | No deployment exists; interactive browser checks and real-browser accessibility remain Human Verification concerns. |
 
 ## Architecture
@@ -211,10 +215,9 @@ implementation and production adoption require separate authorization. The next
 product capability remains unselected and no identifier is reserved. The SS-038
 Human Verification pilot retained concise scenarios as an optional practice for
 relevant flows; its documentation-only PR #94 is merged and Issue #64 is closed;
-it is not part of SS-042. Authentication and authorization remain deferred until
-after the local MVP but are mandatory before any hosted environment;
-`/admin/products` is navigation and not an access-control boundary, and the
-simulated-payment endpoints are unauthenticated and local-only. Future
+it is not part of SS-042. On `release/1.0`, accounts and roles guard Admin and
+the API (see [Security](docs/SECURITY.md) and the [Threat Model](docs/THREAT-MODEL.md));
+the simulated-payment endpoints are for synthetic data only. Future
 capabilities receive an SS identifier only when their GitHub Issue is created;
 the roadmap does not reserve future identifiers.
 

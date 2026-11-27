@@ -1,0 +1,55 @@
+# Hosted-demo stack: PostgreSQL (no published port), backend (prod profile) and web.
+# Copy .env.demo.example to .env.demo, fill the values, then:
+#   docker compose --env-file .env.demo -f compose.demo.yaml up --build -d
+services:
+  postgres:
+    image: postgres:18-trixie
+    environment:
+      POSTGRES_DB: samska
+      POSTGRES_USER: samska_demo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+    volumes:
+      - demo-postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: backend
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/samska?connectTimeout=5&socketTimeout=10&loginTimeout=5
+      SPRING_DATASOURCE_USERNAME: samska_demo
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      SAMSKA_ADMIN_EMAIL: ${SAMSKA_ADMIN_EMAIL:?}
+      SAMSKA_ADMIN_PASSWORD: ${SAMSKA_ADMIN_PASSWORD:?}
+      SAMSKA_DEMO_ENABLED: "true"
+      SAMSKA_DEMO_RESET_CRON: ${SAMSKA_DEMO_RESET_CRON:--}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080 && printf \"GET /actuator/health HTTP/1.0\\r\\n\\r\\n\" >&3 && grep -q UP <&3'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+  web:
+    build:
+      context: web
+    ports:
+      - "${DEMO_BIND_ADDRESS:-127.0.0.1}:${DEMO_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  demo-postgres-data:
