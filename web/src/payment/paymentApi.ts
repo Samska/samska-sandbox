@@ -1,3 +1,4 @@
+import { apiFetch } from "../http";
 export type PaymentScenario = "approve" | "decline" | "temporary-failure";
 
 export type PaymentStatus = "approved" | "declined" | "failed";
@@ -64,7 +65,7 @@ async function requestPaymentAttempt(
   let response: Response;
 
   try {
-    response = await fetch(path, options);
+    response = await apiFetch(path, options);
   } catch {
     throw new PaymentApiError("network");
   }

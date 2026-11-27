@@ -6,6 +6,7 @@ import java.util.function.Consumer;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.github.samska.sandbox.account.CurrentAccount;
 import io.github.samska.sandbox.cart.Cart;
 import io.github.samska.sandbox.cart.CartItem;
 import io.github.samska.sandbox.cart.ProductReference;
@@ -14,12 +15,12 @@ import io.github.samska.sandbox.cart.application.CartStore;
 
 public class JdbcCartStore implements CartStore {
 
-    private static final short CART_ID = 1;
-
     private final JdbcClient jdbc;
+    private final CurrentAccount currentAccount;
 
-    public JdbcCartStore(JdbcClient jdbc) {
+    public JdbcCartStore(JdbcClient jdbc, CurrentAccount currentAccount) {
         this.jdbc = jdbc;
+        this.currentAccount = currentAccount;
     }
 
     @Override
@@ -31,13 +32,13 @@ public class JdbcCartStore implements CartStore {
     @Override
     @Transactional
     public Cart update(Consumer<Cart> change) {
-        // The migration seeds the row; this covers a database whose row was removed. The row lock
+        // Creates the owner's row on first use. The row lock
         // serializes every change, so revisions are strictly increasing and no update is lost.
-        jdbc.sql("INSERT INTO cart (cart_id, revision) VALUES (:cartId, 0) ON CONFLICT (cart_id) DO NOTHING")
-                .param("cartId", CART_ID)
+        jdbc.sql("INSERT INTO cart (owner_id, revision) VALUES (:ownerId, 0) ON CONFLICT (owner_id) DO NOTHING")
+                .param("ownerId", currentAccount.id())
                 .update();
-        jdbc.sql("SELECT revision FROM cart WHERE cart_id = :cartId FOR UPDATE")
-                .param("cartId", CART_ID)
+        jdbc.sql("SELECT revision FROM cart WHERE owner_id = :ownerId FOR UPDATE")
+                .param("ownerId", currentAccount.id())
                 .query(Long.class)
                 .single();
 
@@ -53,8 +54,8 @@ public class JdbcCartStore implements CartStore {
     }
 
     private Cart load() {
-        var revision = jdbc.sql("SELECT revision FROM cart WHERE cart_id = :cartId")
-                .param("cartId", CART_ID)
+        var revision = jdbc.sql("SELECT revision FROM cart WHERE owner_id = :ownerId")
+                .param("ownerId", currentAccount.id())
                 .query(Long.class)
                 .optional()
                 .orElse(0L);
@@ -62,10 +63,10 @@ public class JdbcCartStore implements CartStore {
         List<CartItem> items = jdbc.sql("""
                         SELECT product_id, name, unit_price, quantity
                         FROM cart_items
-                        WHERE cart_id = :cartId
+                        WHERE owner_id = :ownerId
                         ORDER BY line_number
                         """)
-                .param("cartId", CART_ID)
+                .param("ownerId", currentAccount.id())
                 .query((resultSet, rowNumber) -> new CartItem(
                         new ProductReference(resultSet.getObject("product_id", java.util.UUID.class)),
                         resultSet.getString("name"),
@@ -77,17 +78,17 @@ public class JdbcCartStore implements CartStore {
     }
 
     private void save(List<CartItem> items, long revision) {
-        jdbc.sql("DELETE FROM cart_items WHERE cart_id = :cartId")
-                .param("cartId", CART_ID)
+        jdbc.sql("DELETE FROM cart_items WHERE owner_id = :ownerId")
+                .param("ownerId", currentAccount.id())
                 .update();
 
         int lineNumber = 1;
         for (var item : items) {
             jdbc.sql("""
-                            INSERT INTO cart_items (cart_id, line_number, product_id, name, unit_price, quantity)
-                            VALUES (:cartId, :lineNumber, :productId, :name, :unitPrice, :quantity)
+                            INSERT INTO cart_items (owner_id, line_number, product_id, name, unit_price, quantity)
+                            VALUES (:ownerId, :lineNumber, :productId, :name, :unitPrice, :quantity)
                             """)
-                    .param("cartId", CART_ID)
+                    .param("ownerId", currentAccount.id())
                     .param("lineNumber", lineNumber)
                     .param("productId", item.product().value())
                     .param("name", item.name())
@@ -97,9 +98,9 @@ public class JdbcCartStore implements CartStore {
             lineNumber++;
         }
 
-        jdbc.sql("UPDATE cart SET revision = :revision WHERE cart_id = :cartId")
+        jdbc.sql("UPDATE cart SET revision = :revision WHERE owner_id = :ownerId")
                 .param("revision", revision)
-                .param("cartId", CART_ID)
+                .param("ownerId", currentAccount.id())
                 .update();
     }
 }

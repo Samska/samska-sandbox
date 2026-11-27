@@ -1,4 +1,6 @@
+import { mkdirSync } from "node:fs";
 import { request } from "@playwright/test";
+import { adminCredentials, authStatePath, xsrfHeaders } from "./session";
 
 const backendHealthUrl = "http://127.0.0.1:8080/actuator/health";
 const webBaseUrl = "http://127.0.0.1:5173";
@@ -32,18 +34,10 @@ export default async function globalSetup(): Promise<void> {
     }, "GET /api/products through the Vite proxy to return an array");
 
     await waitFor(async () => {
-      const cart = await throughProxy.get("/api/cart");
-      if (cart.status() !== 200) {
-        return false;
-      }
-
-      const body = (await cart.json()) as { items?: unknown; total?: unknown; revision?: unknown };
-      return (
-        Array.isArray(body.items) &&
-        typeof body.total === "number" &&
-        Number.isInteger(body.revision)
-      );
-    }, "GET /api/cart through the Vite proxy to return a valid Cart");
+      const me = await throughProxy.get("/api/auth/me");
+      return me.status() === 204;
+    }, "GET /api/auth/me through the Vite proxy to answer 204 for a visitor");
+    await signInAdministrator(webBaseUrl);
   } finally {
     await direct.dispose();
     await throughProxy.dispose();
@@ -66,4 +60,27 @@ async function waitFor(check: () => Promise<boolean>, description: string): Prom
   }
 
   throw new Error(`Timed out waiting for ${description}`);
+}
+
+// Every test runs as the configured synthetic administrator, who can also shop. The session is stored
+// once and reused, so no test depends on sign-in screens unless it is about them.
+async function signInAdministrator(webBaseUrl: string): Promise<void> {
+  const context = await request.newContext({ baseURL: webBaseUrl });
+
+  try {
+    await context.get("/api/auth/me");
+    const response = await context.post("/api/auth/login", {
+      data: adminCredentials(),
+      headers: await xsrfHeaders(context)
+    });
+
+    if (response.status() !== 200) {
+      throw new Error(`Administrator sign-in failed with HTTP ${response.status()}`);
+    }
+
+    mkdirSync(".auth", { recursive: true });
+    await context.storageState({ path: authStatePath });
+  } finally {
+    await context.dispose();
+  }
 }

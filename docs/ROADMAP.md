@@ -73,7 +73,7 @@ Market Product-name search (SS-044, #81) is complete and merged via PR #82 (squa
 
 ### MVP Boundaries
 
-The local MVP deliberately defers authentication and authorization. They are
+From v0.3.0 (SS-069) accounts, sessions and per-account Cart, Payment attempts and Orders exist; the paragraph below is the v0.1.0 boundary and is kept as history. The local MVP deliberately deferred authentication and authorization. They are
 deferred until after the local First Order MVP but are a mandatory prerequisite
 for any hosted environment, and no hosting work begins before the MVP. Orders
 and their items are persisted in PostgreSQL and survive a backend restart. Since

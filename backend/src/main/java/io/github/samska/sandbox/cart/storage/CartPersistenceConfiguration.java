@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
+import io.github.samska.sandbox.account.CurrentAccount;
 import io.github.samska.sandbox.cart.application.CartStore;
 
 @Configuration(proxyBeanMethods = false)
@@ -14,7 +15,7 @@ import io.github.samska.sandbox.cart.application.CartStore;
 public class CartPersistenceConfiguration {
 
     @Bean
-    CartStore cartStore(DataSource dataSource) {
-        return new JdbcCartStore(JdbcClient.create(dataSource));
+    CartStore cartStore(DataSource dataSource, CurrentAccount currentAccount) {
+        return new JdbcCartStore(JdbcClient.create(dataSource), currentAccount);
     }
 }

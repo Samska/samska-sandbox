@@ -131,6 +131,8 @@ test.describe("Bench identity in a real browser", () => {
       await page.emulateMedia({ colorScheme: scheme });
       await page.goto("/");
       const add = page.getByRole("button", { name: `Add ${product.name} to Cart` });
+      // The Cart loads after the session is known; Add stays disabled, and unfocusable, until then.
+      await expect(add).toBeEnabled();
       await add.focus();
       await page.keyboard.press("Shift+Tab");
       await page.keyboard.press("Tab");
