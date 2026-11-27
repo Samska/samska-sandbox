@@ -1,0 +1,53 @@
+{
+  "$description": "Samska Store Vitrine prototype tokens (SS-057). Extracted from prototypes/vitrine.html; the HTML is the source of truth. Prototype only, not production adoption.",
+  "color": {
+    "light": {
+      "bg": "#eceef2",
+      "surface": "#ffffff",
+      "surface2": "#e2e5eb",
+      "ink": "#0f1319",
+      "muted": "#586070",
+      "line": "#d3d8e0",
+      "accent": "#2b45f5",
+      "accentInk": "#ffffff",
+      "pop": "#ffd43b",
+      "popInk": "#0f1319",
+      "ok": "#0f7a3d",
+      "okBg": "#dcf3e4",
+      "bad": "#b3153f",
+      "badBg": "#fde3ea",
+      "wait": "#8a5a00",
+      "waitBg": "#fff0c2",
+      "focus": "#ff7a00"
+    },
+    "dark": {
+      "bg": "#0c0f14",
+      "surface": "#161b23",
+      "surface2": "#212833",
+      "ink": "#f1f3f7",
+      "muted": "#9aa4b5",
+      "line": "#2a3340",
+      "accent": "#7d8fff",
+      "accentInk": "#0c0f14",
+      "pop": "#ffd43b",
+      "popInk": "#0f1319",
+      "ok": "#5fd68c",
+      "okBg": "#12301f",
+      "bad": "#ff8fa9",
+      "badBg": "#3a1420",
+      "wait": "#ffd36b",
+      "waitBg": "#382b0a",
+      "focus": "#ff7a00"
+    }
+  },
+  "font": {
+    "display": "Bricolage Grotesque",
+    "ui": "Inter"
+  },
+  "radius": {
+    "control": "14px",
+    "panel": "22px",
+    "pill": "999px"
+  },
+  "productTiles": ["#ffd43b", "#7be0c3", "#2b45f5", "#c9bdff", "#1b2330", "#ffb3c7", "#ff9d5c"]
+}

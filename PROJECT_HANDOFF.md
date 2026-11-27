@@ -4,6 +4,14 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-057 — HTML prototypes as the design source (#110)
+
+- Owner decision (2026-11-27): replace Penpot with clickable HTML prototypes and tokens versioned in this repository, and approve the Vitrine direction, with the exact answer “Eu aprovo os dois pontos.” Build is authorized for the scope in [Issue #110](https://github.com/Samska/samska-sandbox/issues/110); PR creation and merge are not.
+- Deliverable: [prototypes/vitrine.html](docs/design/samska-store/prototypes/vitrine.html) and its tokens under `docs/design/samska-store/prototypes/`, plus the SS-057 section of the [design record](docs/design/samska-store/README.md). The SS-052 to SS-056 Penpot records remain as history; Penpot is no longer the source of truth. No application or backend code changed.
+- Agent Verification: opened in Chromium at 1280 and 390 px; add to cart, drawer, declined and approved payment, order, admin create with image upload, search, and dark theme all worked with no horizontal overflow or console errors. Human Verification is recorded below.
+- Human Verification (owner-reported, 2026-11-27): after running the roteiro on the rendered file, the owner reported “A direção visual está ok, aprovo as suposições, não parece que nada quebrou ou ficou confuso.” This covers the Vitrine direction and the listed assumptions on this file; accessibility beyond keyboard focus and cross-browser behavior were not verified.
+- Next: separate PR creation decision on branch `claude/project-thread-n6ywh2`. PR creation, merge, and application implementation remain unauthorized.
+
 ## SS-056 — Order, Admin, and fallback interfaces design (#108)
 
 - Named version `SS-056 Batch 4 — Order, Admin, and fallbacks — review-ready` (`revn 151`, created 2026-10-29T13:45:01.312Z) is owner-reported visually approved: “Eu aprovo” (2026-10-29). This is visual approval of that named version only; it does not imply execution of every checklist item, application/browser Human Verification, documentation approval, or commit/push authorization.
