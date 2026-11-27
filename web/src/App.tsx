@@ -6,6 +6,7 @@ import AccountPage, { accountPath } from "./auth/AccountPage";
 import { useAuth, type AuthState } from "./auth/AuthContext";
 import Button from "./ui/Button";
 import StatusMessage from "./ui/StatusMessage";
+import OperationsPage, { operationsPath } from "./operations/OperationsPage";
 import OrdersPage, { ordersPath } from "./orders/OrdersPage";
 import TrackingPage from "./orders/TrackingPage";
 import NotFound from "./NotFound";
@@ -27,6 +28,7 @@ export default function App() {
   const isOrders = path === ordersPath || path.startsWith(`${ordersPath}/`);
   const isAdmin =
     path === adminProductsPath || path.startsWith(`${adminProductsPath}/`);
+  const isOperations = path === operationsPath;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -73,6 +75,15 @@ export default function App() {
                 aria-current={isAdmin ? "page" : undefined}
               >
                 Admin
+              </a>
+            ) : null}
+            {canAdminister ? (
+              <a
+                className={navLinkClassName(isOperations)}
+                href={operationsPath}
+                aria-current={isOperations ? "page" : undefined}
+              >
+                Operations
               </a>
             ) : null}
             {auth.state.status === "signed-in" ? (
@@ -150,7 +161,9 @@ function renderSurface(path: string, auth: AuthState) {
   const isCheckout = path === checkoutPath || attemptIdForPath(path) !== null;
   const orderMatch = orderTrackingPattern.exec(path);
   const isOrdersPath = path === ordersPath || orderMatch !== null;
-  const isAdminPath = path === adminProductsPath || path.startsWith(`${adminProductsPath}/`);
+  const isOperationsPath = path === operationsPath;
+  const isAdminPath =
+    path === adminProductsPath || path.startsWith(`${adminProductsPath}/`) || isOperationsPath;
 
   if ((isCheckout || isAdminPath || isOrdersPath) && auth.status === "loading") {
     return <StatusMessage tone="pending">Checking your session...</StatusMessage>;
@@ -161,7 +174,7 @@ function renderSurface(path: string, auth: AuthState) {
       <AccountPage
         notice={
           isAdminPath
-            ? "Sign in with the administrator account to manage the catalog."
+            ? "Sign in with the administrator account to manage the store."
             : isOrdersPath
               ? "Sign in to see your orders."
               : "Sign in to check out."
@@ -186,7 +199,7 @@ function renderSurface(path: string, auth: AuthState) {
     return (
       <section className="grid gap-3">
         <h1 className="text-4xl font-black uppercase">Not allowed</h1>
-        <p>Your account cannot manage the catalog.</p>
+        <p>Your account cannot manage the store.</p>
         <p>
           <a className="font-bold underline" href="/">
             Back to the market
@@ -198,6 +211,10 @@ function renderSurface(path: string, auth: AuthState) {
 
   if (path === marketPath || path === checkoutPath || attemptIdForPath(path) !== null) {
     return <Catalog />;
+  }
+
+  if (isOperationsPath) {
+    return <OperationsPage />;
   }
 
   if (path === adminProductsPath) {

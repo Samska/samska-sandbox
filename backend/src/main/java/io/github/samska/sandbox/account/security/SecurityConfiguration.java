@@ -77,7 +77,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/auth/me").permitAll()
                         .requestMatchers(HttpMethod.GET,
                                 "/api/products", "/api/products/*", "/api/products/*/media/*").permitAll()
-                        .requestMatchers("/api/products/**").hasRole("ADMIN")
+                        .requestMatchers("/api/products/**", "/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().denyAll());
         return http.build();
