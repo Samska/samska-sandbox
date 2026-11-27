@@ -27,7 +27,7 @@ frontend package's `0.1.0` are build metadata, not the product release version.
 Samska Sandbox uses a fictional catalog and order journey to demonstrate
 evidence-driven engineering. The current application contains a Java/Spring
 Boot backend, a React/TypeScript frontend, a Catalog boundary for Products with
-bounded local media upload, a process-local Cart boundary, an editable Checkout
+bounded local media upload, a Cart boundary persisted in PostgreSQL, an editable Checkout
 view over the current Cart with a simulated payment flow, and a separate Admin
 Product-management surface. Order is a separate boundary that copies approved
 simulated-payment data on an explicit action and persists the immutable Order in
@@ -35,8 +35,8 @@ PostgreSQL; it does not change the Cart. The journey is attempt-addressed:
 `/checkout` hosts the editable Cart and `/checkout/attempts/{attemptId}` recovers
 the simulated payment result or Order confirmation through lookup APIs after a
 full-page reload, direct entry, or history navigation, without a router
-dependency. Orders survive a backend restart; Products, media, Cart, and Payment
-attempts remain process-local.
+dependency. Orders and the Cart survive a backend restart; Products, media, and
+Payment attempts remain process-local.
 
 AI agents are implementation tools operating under repository-defined
 governance. Humans own requirements, architecture, decisions, review,
@@ -50,7 +50,7 @@ validation, learning, and risk.
 | Catalog API | Implemented | Product creation, collection browsing, retrieval by identity, full update, and deletion with a `409` Cart conflict refusal. |
 | Market UI | Implemented | Product-oriented browsing, detail view, Cart selection, and the customer storefront shell at `/`. |
 | Product Discovery | Implemented | Product descriptions with a selectable detail view, local product media with a monogram fallback, Add to Cart, and a return to browsing. |
-| Shopping Cart | Implemented | Process-local Cart contents, quantity changes, removal, and server-calculated totals. |
+| Shopping Cart | Implemented | Cart contents, quantity changes, removal, and server-calculated totals; the single current Cart and its revision are persisted in PostgreSQL and survive restart. |
 | Product UX Foundation | Implemented | Commerce-oriented shell, responsive Product browsing, integrated Cart presentation, and accessible feedback. |
 | Product Storefront UX/UI | Implemented | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged. |
 | Market Product-name search | Implemented | Case- and accent-insensitive substring filter on `Product.name` in the Market; term is held in `Catalog` while mounted, never written to the URL/history/storage/logs, and never sent to the API (`GET /api/products` is unchanged); Admin keeps its accent-sensitive filter by decision. |
@@ -88,9 +88,10 @@ flowchart LR
     Jdbc --> Postgres[(PostgreSQL<br/>Flyway-managed orders and items)]
 ```
 
-The Vite proxy is for local development only. Product and Cart data, including
-uploaded Product media, are held in process memory and are lost when the backend
-restarts. Uploaded media is validated, dimension-checked, and re-encoded as JPEG
+The Vite proxy is for local development only. Product data, including
+uploaded Product media, is held in process memory and is lost when the backend
+restarts. The current Cart is stored in PostgreSQL; a Cart line keeps its own
+name and price snapshot, so it outlives a Product that was lost on restart. Uploaded media is validated, dimension-checked, and re-encoded as JPEG
 before storage, is limited to one image per Product, and is served only for the
 Product's current media ID; rejection leaves the Product and its current image
 unchanged. Checkout is a frontend
@@ -109,8 +110,8 @@ is a separate frontend route over the same Catalog API, and `/admin/products`
 provides no access control. Product deletion is refused with `409` while the
 Product is in the current Cart through a process-local coordination lock that
 covers the HTTP add-to-Cart and delete-Product paths. PostgreSQL is required for
-backend startup and stores Orders and items only; the rest of the application
-remains process-local.
+backend startup and stores Orders, items, and the current Cart; the rest of the
+application remains process-local.
 
 ## Engineering Practices
 

@@ -1,7 +1,9 @@
 package io.github.samska.sandbox.cart.api;
 
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.transaction.TransactionException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -25,5 +27,10 @@ public class CartApiExceptionHandler {
     @ExceptionHandler({ProductUnavailableException.class, CartItemNotFoundException.class})
     public ResponseEntity<Void> handleNotFound() {
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler({DataAccessResourceFailureException.class, TransactionException.class})
+    public ResponseEntity<CartErrorResponse> handleUnavailable() {
+        return ResponseEntity.status(503).body(CartErrorResponse.storeUnavailable());
     }
 }

@@ -1,7 +1,9 @@
 package io.github.samska.sandbox.catalog.api;
 
+import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.transaction.TransactionException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -10,6 +12,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
+import io.github.samska.sandbox.cart.api.CartErrorResponse;
 import io.github.samska.sandbox.catalog.InvalidProductException;
 import io.github.samska.sandbox.catalog.application.InvalidMediaException;
 import io.github.samska.sandbox.catalog.application.MediaCapacityExceededException;
@@ -58,5 +61,10 @@ public class ProductApiExceptionHandler {
     @ExceptionHandler(UnsupportedMediaTypeException.class)
     public ResponseEntity<Void> handleUnsupportedMediaType() {
         return ResponseEntity.status(415).build();
+    }
+
+    @ExceptionHandler({ DataAccessResourceFailureException.class, TransactionException.class })
+    public ResponseEntity<CartErrorResponse> handleCartStoreUnavailable() {
+        return ResponseEntity.status(503).body(CartErrorResponse.storeUnavailable());
     }
 }

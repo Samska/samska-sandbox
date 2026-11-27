@@ -10,7 +10,8 @@ public abstract class OrderDatabaseTestSupport extends PostgresTestSupport {
     private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
-    void clearOrders() {
+    void clearPersistedState() {
         jdbcTemplate.execute("TRUNCATE TABLE order_items, orders");
+        jdbcTemplate.execute("TRUNCATE TABLE cart_items, cart CASCADE");
     }
 }
