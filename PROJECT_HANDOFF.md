@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-073 — Security hardening (#142, v1.0.0 part 1)
+
+- Build: per-client rate limiting, API security headers, `prod` profile with secure cookies and a startup guard, [Threat Model](docs/THREAT-MODEL.md) ([ADR 0017](docs/adr/0017-harden-the-public-demo.md)).
+- Agent Verification: `RateLimiterTest`, `HardeningApiTest`, `SecureCookieApiTest`, `ProductionGuardTest`, full suites.
+- Next step: SS-074 demo banner, reset, container and release notes.
+
 ## SS-072 — Operations (#140, v0.6.0)
 
 - Build: `GET /api/admin/operations` (administrators only), `X-Request-Id` correlation with one structured log line per API request, `payment_attempts.created_at` (`V9`), Operations screen at `/admin/operations` ([ADR 0016](docs/adr/0016-observe-requests-with-correlation-ids.md)).

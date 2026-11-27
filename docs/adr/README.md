@@ -54,3 +54,5 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 [ADR 0015: Add Inventory With Reservations In The Payment Transaction](0015-add-inventory-with-reservations.md) records the `inventory` module, reserve on approval and consume on Order, expiry, and ordered row locks.
 
 [ADR 0016: Observe Requests With Correlation IDs And Micrometer Meters](0016-observe-requests-with-correlation-ids.md) records the request filter, in-process meters, SQL-derived business figures, and the admin-only Operations endpoint.
+
+[ADR 0017: Harden The Public Demo In The Application And The Production Profile](0017-harden-the-public-demo.md) records the rate limiter, API headers, the `prod` profile and the startup guard.

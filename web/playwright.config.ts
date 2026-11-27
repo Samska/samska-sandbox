@@ -48,7 +48,11 @@ export default defineConfig({
       command: backendCommand,
       cwd: "../backend",
       url: backendHealthUrl,
-      env: { SAMSKA_ADMIN_EMAIL: adminEmail, SAMSKA_ADMIN_PASSWORD: adminPassword },
+      env: {
+        SAMSKA_ADMIN_EMAIL: adminEmail,
+        SAMSKA_ADMIN_PASSWORD: adminPassword,
+        SAMSKA_RATELIMIT_ENABLED: "false"
+      },
       timeout: 300_000,
       reuseExistingServer: false,
       stdout: "pipe",
