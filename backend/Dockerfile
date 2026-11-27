@@ -1,4 +1,4 @@
-# Backend image for the hosted demo. Build from the repository root: docker build -f backend/Dockerfile backend
+# Backend image for the hosted demo (Compose and Railway; the port follows $PORT, default 8080). Build from the repository root: docker build -f backend/Dockerfile backend
 FROM eclipse-temurin:25-jdk AS build
 WORKDIR /build
 COPY .mvn .mvn
@@ -13,4 +13,4 @@ WORKDIR /app
 COPY --from=build /build/app.jar app.jar
 USER 10001
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=75", "-jar", "/app/app.jar"]

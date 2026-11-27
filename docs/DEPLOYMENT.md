@@ -1,8 +1,8 @@
 # Deployment
 
-This guide runs the hosted demo: a synthetic-data store that anyone may use, so it is constrained and disposable. It does not choose a hosting provider; the owner decides where it runs.
+This guide runs the hosted demo: a synthetic-data store that anyone may use, so it is constrained and disposable. The same images run in two ways: on [Railway](#railway) (the owner's chosen host) or on a [VPS](#what-runs-on-a-vps) with Docker Compose and Caddy.
 
-## What runs
+## What runs on a VPS
 
 `compose.demo.yaml` starts four containers: Caddy (the only one that publishes ports, 80 and 443, and that obtains and renews the TLS certificate), the web server (nginx serving the single-page application with a restrictive Content-Security-Policy and proxying `/api`), the backend with the `prod` profile and demo mode on, and PostgreSQL (no published port).
 
@@ -14,6 +14,58 @@ The stack supports two access modes, chosen only by configuration:
 - **Public demo.** `DEMO_ACCESS=public` and `SAMSKA_DEMO_ENABLED=true`: the site opens to everyone with the demo banner and the Reset button, and `SAMSKA_DEMO_RESET_CRON="0 0 4 * * *"` resets the data every day at 04:00.
 
 To switch, edit `.env.demo` and run `deploy/deploy.sh`. The administrator account and the application's own sign-in work the same in both modes; the private password is an extra gate in front, not a replacement.
+
+## Railway
+
+On Railway the project has three services, all built from this repository's Dockerfiles, and no Caddy: Railway terminates TLS and gives the web service a public `*.up.railway.app` address.
+
+| Service | Source | Public | Notes |
+| --- | --- | --- | --- |
+| `Postgres` | Railway's PostgreSQL | No | Private network only. |
+| `backend` | Root directory `backend`, config file `/backend/railway.json` | No | Health check `/actuator/health`; reachable only from `web` over the private network. |
+| `web` | Root directory `web`, config file `/web/railway.json` | Yes | nginx serves the single-page application, proxies `/api` to `backend`, and applies the private-mode password. Health check `/healthz` (always open). |
+
+### Variables
+
+`backend` (reference variables use Railway's `${{service.VARIABLE}}` syntax):
+
+| Variable | Value |
+| --- | --- |
+| `PORT` | `8080` |
+| `SPRING_PROFILES_ACTIVE` | `prod` |
+| `SPRING_DATASOURCE_URL` | `jdbc:postgresql://${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}?connectTimeout=5&socketTimeout=10&loginTimeout=5` |
+| `SPRING_DATASOURCE_USERNAME` | `${{Postgres.PGUSER}}` |
+| `SPRING_DATASOURCE_PASSWORD` | `${{Postgres.PGPASSWORD}}` |
+| `SAMSKA_ADMIN_EMAIL`, `SAMSKA_ADMIN_PASSWORD` | The administrator account; the password has at least 12 characters. |
+| `SAMSKA_DEMO_ENABLED`, `SAMSKA_DEMO_RESET_CRON` | `false` and `-` while private; `true` and for example `0 0 4 * * *` for the public demo. |
+
+`web`:
+
+| Variable | Value |
+| --- | --- |
+| `PORT` | `8080` |
+| `API_UPSTREAM` | `${{backend.RAILWAY_PRIVATE_DOMAIN}}:8080` |
+| `WEB_ACCESS` | `private` (default) or `none` for the public demo. |
+| `DEMO_ACCESS_USER`, `DEMO_ACCESS_HASH` | Private mode only: the user name and a bcrypt hash (see below). |
+
+Generate the hash on your own machine, never put the plain password in a variable: `docker run --rm caddy:2-alpine caddy hash-password --plaintext '<password>'`. In private mode `web` refuses to start without a user and a hash, so a missing variable can never open the site.
+
+### Setup (Railway CLI)
+
+1. Install the CLI (`npm install -g @railway/cli`) and sign in once with `railway login`; the sign-in happens in your browser, so no token is shared.
+2. Create the project and add the PostgreSQL service, then add the `backend` and `web` services from this repository (branch `release/1.0`, root directories and config files as in the table), set the variables above, and generate a public domain for `web` only.
+3. Deploy. Railway builds both Dockerfiles; open the `web` address, enter the private-mode password, and sign in as the administrator.
+
+### Public demo later
+
+Switching modes is configuration only: set `WEB_ACCESS=none` on `web` and `SAMSKA_DEMO_ENABLED=true` (and optionally the reset cron) on `backend`, then redeploy both. Setting `WEB_ACCESS=private` again closes the site.
+
+### Notes
+
+- Railway PostgreSQL keeps its own volume and backups policy; `deploy/backup.sh` is for the Compose stack. Take a dump with `pg_dump` against the Railway connection string before risky changes.
+- `web` trusts the client address header only from private and Railway address ranges (`10.0.0.0/8`, `100.64.0.0/10`, `172.16.0.0/12`, `192.168.0.0/16`, `fc00::/7`), so the rate limiter sees each visitor; check after the first deployment that repeated sign-in failures from one address are limited and a second address is not.
+- `web` finds `backend` again after a redeploy because nginx resolves the name per request with the container's own DNS server.
+- Check the web start-up behavior without Railway: `deploy/verify-web-config.sh` (needs Docker).
 
 ## What you need to provide
 
@@ -53,3 +105,5 @@ To switch, edit `.env.demo` and run `deploy/deploy.sh`. The administrator accoun
 ## Verification
 
 The stack was run locally with the Compose file, a prebuilt backend jar and web build in the same base images, and `DEMO_DOMAIN=localhost` (Caddy's internal certificate): the backend became healthy under the `prod` profile; in private mode the site and API answered `401` without the password and `200` with it, and a wrong password was refused; switching to public mode opened the site, `/api/config` reported demo mode and HTTP redirected to HTTPS; a spoofed `X-Forwarded-For` did not bypass the rate limiter (the eleventh credential attempt was refused with `429`); `deploy/backup.sh` captured a created Product and `deploy/restore.sh` brought it back after deletion. Not exercised here: a real domain with a Let's Encrypt certificate, `deploy/deploy.sh` (it needs a Git remote on the server), and the Docker build stages that run `./mvnw` and `npm ci` inside the build, because the sandbox's network proxy intercepts TLS; a build host with TLS interception needs its certificate authority trusted in the build.
+
+The Railway setup was verified here only in part: the web image's start-up configuration (private password, open mode, custom `PORT`, API proxying and the open health path) with `deploy/verify-web-config.sh`, the backend listening on `PORT` and answering the health check, and the Compose file still rendering. Not verified until the first real deployment: the Railway build of both Dockerfiles, the private-network name `RAILWAY_PRIVATE_DOMAIN`, the client-address ranges listed above, and the result recorded in the Issue.

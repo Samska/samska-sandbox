@@ -69,6 +69,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-073-rate-limiting-and-hardening.md](ss-073-rate-limiting-and-hardening.md) | Fixed-window rate limiting, why lockout can backfire, fail-closed production configuration, and a threat model. |
 | [ss-074-demo-mode-and-containers.md](ss-074-demo-mode-and-containers.md) | Multi-stage images, trusting a reverse proxy, and a safe synthetic-data reset. |
 | [ss-075-admin-area-and-vps.md](ss-075-admin-area-and-vps.md) | Interface versus server authorization, TLS termination with a reverse proxy, and tested backups. |
+| [ss-076-railway-deployment.md](ss-076-railway-deployment.md) | Configuring one image by environment, failing closed, and what a platform's proxy changes about client addresses. |
 | [ss-077-empty-state-design-fix.md](ss-077-empty-state-design-fix.md) | Prototype fidelity in the running app and one shared component for a repeated pattern. |
 | [ss-065-cart-persistence.md](ss-065-cart-persistence.md) | Transactional update contract for a mutable aggregate, row-lock serialization of a business revision, domain rules kept out of the store, and snapshot rows without a foreign key. |
 | [ss-049-order-persistence.md](ss-049-order-persistence.md) | Port-first PostgreSQL persistence, unique-key idempotency, transaction rollback versus lost responses, restart evidence, and bounded database-failure behavior. |
