@@ -77,6 +77,7 @@
                         <!-- Tests of unrelated features run without sign-in; AccountsApiTest and the
                              browser journey enforce it. Never set outside tests. -->
                         <samska.security.enforced>false</samska.security.enforced>
+                        <samska.ratelimit.enabled>false</samska.ratelimit.enabled>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
