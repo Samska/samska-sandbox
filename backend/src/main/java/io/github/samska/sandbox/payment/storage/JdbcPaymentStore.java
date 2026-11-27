@@ -11,6 +11,9 @@ import io.github.samska.sandbox.account.CurrentAccount;
 import io.github.samska.sandbox.cart.CartSnapshot;
 import io.github.samska.sandbox.cart.ProductReference;
 import io.github.samska.sandbox.cart.Quantity;
+import io.github.samska.sandbox.inventory.StockLine;
+import io.github.samska.sandbox.inventory.application.InsufficientStockException;
+import io.github.samska.sandbox.inventory.application.Inventory;
 import io.github.samska.sandbox.payment.InvalidPaymentAttemptException;
 import io.github.samska.sandbox.payment.PaymentAttempt;
 import io.github.samska.sandbox.payment.PaymentAttemptItem;
@@ -20,16 +23,19 @@ import io.github.samska.sandbox.payment.application.CartSnapshotProvider;
 import io.github.samska.sandbox.payment.application.PaymentAlreadyApprovedException;
 import io.github.samska.sandbox.payment.application.PaymentAttemptConflictException;
 import io.github.samska.sandbox.payment.application.PaymentAttemptResult;
+import io.github.samska.sandbox.payment.application.PaymentOutOfStockException;
 import io.github.samska.sandbox.payment.application.PaymentStore;
 
 public class JdbcPaymentStore implements PaymentStore {
 
     private final JdbcClient jdbc;
     private final CurrentAccount currentAccount;
+    private final Inventory inventory;
 
-    public JdbcPaymentStore(JdbcClient jdbc, CurrentAccount currentAccount) {
+    public JdbcPaymentStore(JdbcClient jdbc, CurrentAccount currentAccount, Inventory inventory) {
         this.jdbc = jdbc;
         this.currentAccount = currentAccount;
+        this.inventory = inventory;
     }
 
     @Override
@@ -104,6 +110,17 @@ public class JdbcPaymentStore implements PaymentStore {
                     .param("lineSubtotal", item.lineSubtotal())
                     .update();
             lineNumber++;
+        }
+
+        if (attempt.status() == PaymentStatus.APPROVED) {
+            // Same transaction as the attempt: when the units are not there, no approval is recorded.
+            try {
+                inventory.reserve(attemptId, attempt.items().stream()
+                        .map(item -> new StockLine(item.productId(), item.quantity().value()))
+                        .toList());
+            } catch (InsufficientStockException exception) {
+                throw new PaymentOutOfStockException(exception.productId());
+            }
         }
 
         return new PaymentAttemptResult(attempt, true);

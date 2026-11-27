@@ -27,6 +27,8 @@ export function paymentErrorMessage(error: unknown): string {
       return "This Cart revision already has a simulated approval. The existing result is shown.";
     case "attempt-id-conflict":
       return "This payment attempt conflicts with an earlier attempt. Start a new attempt.";
+    case "out-of-stock":
+      return "An item in your Cart is no longer available in that quantity. No payment was approved. Review your Cart and try again.";
     case "capacity":
       return capacityMessage;
     case "not-found":

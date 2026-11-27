@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
+import io.github.samska.sandbox.support.UnlimitedInventory;
 import io.github.samska.sandbox.cart.ProductReference;
 import io.github.samska.sandbox.cart.Quantity;
 import io.github.samska.sandbox.cart.application.CartApplicationService;
@@ -24,7 +25,7 @@ class PaymentApplicationServiceTest {
 
     private final InMemoryCartStore cartStore = new InMemoryCartStore();
     private final CartApplicationService cartApplicationService =
-            new CartApplicationService(cartStore, productId -> Optional.empty());
+            new CartApplicationService(cartStore, productId -> Optional.empty(), new UnlimitedInventory());
     private final PaymentApplicationService paymentApplicationService =
             new PaymentApplicationService(new InMemoryPaymentStore(), cartApplicationService);
 

@@ -64,6 +64,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-066-payment-persistence.md](ss-066-payment-persistence.md) | Constraint-enforced invariants with a partial unique index, reading the winner of a race, frozen snapshot rows, and dropping a memory-only limit. |
 | [ss-069-accounts-and-sessions.md](ss-069-accounts-and-sessions.md) | Server-side sessions, cookie-to-header CSRF, ownership as a port, 404 over 403, and uniform sign-in failures. |
 | [ss-070-derived-state.md](ss-070-derived-state.md) | Derived versus stored state, an injected clock for deterministic tests, and stable pseudo-randomness from an identifier. |
+| [ss-071-inventory-reservations.md](ss-071-inventory-reservations.md) | Reserving then consuming stock in one transaction, ordered row locks, and expiry without a scheduler. |
 | [ss-065-cart-persistence.md](ss-065-cart-persistence.md) | Transactional update contract for a mutable aggregate, row-lock serialization of a business revision, domain rules kept out of the store, and snapshot rows without a foreign key. |
 | [ss-049-order-persistence.md](ss-049-order-persistence.md) | Port-first PostgreSQL persistence, unique-key idempotency, transaction rollback versus lost responses, restart evidence, and bounded database-failure behavior. |
 | [ss-040-release-preparation.md](ss-040-release-preparation.md) | Release preparation versus publication, annotated immutable tags, source-only releases, build metadata versus product version, and exposure-based dependency triage. |

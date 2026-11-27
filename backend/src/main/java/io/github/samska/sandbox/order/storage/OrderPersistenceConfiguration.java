@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 import io.github.samska.sandbox.account.CurrentAccount;
+import io.github.samska.sandbox.inventory.application.Inventory;
 import io.github.samska.sandbox.order.application.OrderStore;
 import io.github.samska.sandbox.payment.application.PaymentAttempts;
 
@@ -16,7 +17,8 @@ import io.github.samska.sandbox.payment.application.PaymentAttempts;
 public class OrderPersistenceConfiguration {
 
     @Bean
-    OrderStore orderStore(DataSource dataSource, PaymentAttempts attempts, CurrentAccount currentAccount) {
-        return new JdbcOrderStore(JdbcClient.create(dataSource), attempts, currentAccount);
+    OrderStore orderStore(
+            DataSource dataSource, PaymentAttempts attempts, CurrentAccount currentAccount, Inventory inventory) {
+        return new JdbcOrderStore(JdbcClient.create(dataSource), attempts, currentAccount, inventory);
     }
 }

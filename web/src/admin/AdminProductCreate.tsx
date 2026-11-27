@@ -6,6 +6,7 @@ import {
   type ProductResponse
 } from "../catalog/catalogApi";
 import ProductFields, {
+  stockToSend,
   validateProductFields,
   type ProductFieldError,
   type ProductFieldValues
@@ -27,7 +28,7 @@ type PostCreateImageState =
   | { kind: "unknown" };
 
 export default function AdminProductCreate() {
-  const [values, setValues] = useState<ProductFieldValues>({ name: "", description: "", price: "" });
+  const [values, setValues] = useState<ProductFieldValues>({ name: "", description: "", price: "", stock: "25" });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const previewUrl = useFilePreview(selectedFile);
   const [fieldError, setFieldError] = useState<ProductFieldError | null>(null);
@@ -91,7 +92,8 @@ export default function AdminProductCreate() {
         name: values.name,
         description: values.description,
         price: Number(values.price),
-        mediaKey: null
+        mediaKey: null,
+        ...stockField(values)
       });
       setCreatedProduct(created);
       setIsCreating(false);
@@ -323,4 +325,9 @@ export default function AdminProductCreate() {
       )}
     </section>
   );
+}
+
+function stockField(values: ProductFieldValues): { stock?: number } {
+  const stock = stockToSend(values);
+  return stock === undefined ? {} : { stock };
 }

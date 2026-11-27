@@ -4,6 +4,7 @@ export interface CreateProductRequest {
   description: string;
   price: number;
   mediaKey: string | null;
+  stock?: number;
 }
 
 export interface ProductResponse {
@@ -13,6 +14,8 @@ export interface ProductResponse {
   price: number;
   mediaKey: string | null;
   uploadedMediaId: string | null;
+  /** Units a customer can still buy; absent in responses from older servers. */
+  stock?: number;
 }
 
 export type CatalogApiErrorKind =
@@ -205,8 +208,11 @@ function isProductResponse(value: unknown): value is ProductResponse {
   const product = value as Record<string, unknown>;
   const keys = Object.keys(product);
 
+  const hasStock = keys.includes("stock");
+
   return (
-    keys.length === 6 &&
+    keys.length === (hasStock ? 7 : 6) &&
+    (!hasStock || (Number.isInteger(product.stock) && (product.stock as number) >= 0)) &&
     keys.includes("id") &&
     keys.includes("name") &&
     keys.includes("description") &&

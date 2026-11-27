@@ -10,6 +10,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import io.github.samska.sandbox.cart.InvalidCartException;
 import io.github.samska.sandbox.cart.application.CartItemNotFoundException;
+import io.github.samska.sandbox.cart.application.OutOfStockException;
 import io.github.samska.sandbox.cart.application.ProductUnavailableException;
 
 @RestControllerAdvice(assignableTypes = CartController.class)
@@ -27,6 +28,11 @@ public class CartApiExceptionHandler {
     @ExceptionHandler({ProductUnavailableException.class, CartItemNotFoundException.class})
     public ResponseEntity<Void> handleNotFound() {
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(OutOfStockException.class)
+    public ResponseEntity<CartStockResponse> handleOutOfStock(OutOfStockException exception) {
+        return ResponseEntity.status(409).body(new CartStockResponse("out-of-stock", exception.available()));
     }
 
     @ExceptionHandler({DataAccessResourceFailureException.class, TransactionException.class})

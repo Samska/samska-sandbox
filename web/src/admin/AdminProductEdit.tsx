@@ -7,6 +7,7 @@ import {
   type ProductResponse
 } from "../catalog/catalogApi";
 import ProductFields, {
+  stockToSend,
   validateProductFields,
   type ProductFieldError,
   type ProductFieldValues
@@ -68,7 +69,8 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
     try {
       const loaded = await getProduct(productId);
       setProduct(loaded);
-      setValues({ name: loaded.name, description: loaded.description, price: String(loaded.price) });
+      setValues({ name: loaded.name, description: loaded.description, price: String(loaded.price),
+        stock: loaded.stock === undefined ? "" : String(loaded.stock) });
     } catch (caughtError) {
       setLoadError(adminLoadErrorMessage(caughtError));
     } finally {
@@ -152,7 +154,8 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
         name: submitted.name,
         description: submitted.description,
         price: Number(submitted.price),
-        mediaKey: product.mediaKey
+        mediaKey: product.mediaKey,
+        ...(stockToSend(submitted) === undefined ? {} : { stock: stockToSend(submitted) })
       });
     } catch (caughtError) {
       if (isNetworkError(caughtError)) {
@@ -175,7 +178,8 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
     }
 
     setProduct(saved);
-    setValues({ name: saved.name, description: saved.description, price: String(saved.price) });
+    setValues({ name: saved.name, description: saved.description, price: String(saved.price),
+        stock: saved.stock === undefined ? "" : String(saved.stock) });
 
     if (operation === null) {
       setIsSaving(false);
@@ -198,7 +202,8 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
       if (operation.kind === "upload") {
         const updated = await uploadProductMedia(productId, operation.file);
         setProduct(updated);
-        setValues({ name: updated.name, description: updated.description, price: String(updated.price) });
+        setValues({ name: updated.name, description: updated.description, price: String(updated.price),
+        stock: updated.stock === undefined ? "" : String(updated.stock) });
         setSelectedFile(null);
         setRemovalStaged(false);
         setPendingMedia(null);
@@ -208,7 +213,8 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
         const reconciled = await tryGetProduct();
         const next = reconciled ?? { ...previous, uploadedMediaId: null };
         setProduct(next);
-        setValues({ name: next.name, description: next.description, price: String(next.price) });
+        setValues({ name: next.name, description: next.description, price: String(next.price),
+        stock: next.stock === undefined ? "" : String(next.stock) });
         setRemovalStaged(false);
         setPendingMedia(null);
         setSuccessMessage(`${next.name} was saved.`);
@@ -222,7 +228,8 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
           setValues({
             name: reconciled.name,
             description: reconciled.description,
-            price: String(reconciled.price)
+            price: String(reconciled.price),
+        stock: reconciled.stock === undefined ? "" : String(reconciled.stock)
           });
           setSelectedFile(null);
           setRemovalStaged(false);
@@ -270,7 +277,8 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
     setValues({
       name: reconciled.name,
       description: reconciled.description,
-      price: String(reconciled.price)
+      price: String(reconciled.price),
+        stock: reconciled.stock === undefined ? "" : String(reconciled.stock)
     });
     setUncertainMessage(null);
     setMediaMessage(null);
@@ -323,7 +331,8 @@ export default function AdminProductEdit({ productId }: { productId: string }) {
     setRemovalStaged(false);
     setMediaMessage(null);
     setUncertainMessage(null);
-    setValues({ name: product.name, description: product.description, price: String(product.price) });
+    setValues({ name: product.name, description: product.description, price: String(product.price),
+        stock: product.stock === undefined ? "" : String(product.stock) });
   }
 
   if (isLoading) {
