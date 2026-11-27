@@ -6,6 +6,7 @@ import { unconfirmedPaymentPrimary } from "../journey/messages";
 import type { PaymentScenario } from "../payment/paymentApi";
 import Button from "../ui/Button";
 import StatusMessage from "../ui/StatusMessage";
+import EmptyState, { EmptyNote, EmptyTitle, emptyActionClassName } from "../ui/EmptyState";
 
 type MutationIntent = {
   kind: "quantity" | "remove";
@@ -181,19 +182,15 @@ export default function CheckoutReview({
           </div>
         ) : null}
         {cart.items.length === 0 ? (
-          <div className="grid gap-2 rounded-sm bg-surface-muted px-4 py-5">
-            <h2
-              id="checkout-empty-heading"
-              ref={emptyStateRef}
-              tabIndex={-1}
-              className="font-bold text-ink"
-            >
+          <EmptyState>
+            <EmptyTitle as="h2" id="checkout-empty-heading" ref={emptyStateRef} tabIndex={-1}>
               Your Cart is empty.
-            </h2>
-            <p className="text-sm text-muted">
-              Add a Product from the Market to continue to Checkout.
-            </p>
-          </div>
+            </EmptyTitle>
+            <EmptyNote>Add a Product from the Market to continue to Checkout.</EmptyNote>
+            <a className={emptyActionClassName} href="/">
+              Browse the Market
+            </a>
+          </EmptyState>
         ) : (
           <>
             <h2 id="checkout-items-heading" className="text-lg leading-[1.15] text-ink">

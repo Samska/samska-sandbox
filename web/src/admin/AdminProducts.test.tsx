@@ -112,6 +112,10 @@ describe("AdminProducts", () => {
 
     expect(await screen.findByText("No Products exist yet.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Create Product" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Create the first Product" })).toHaveAttribute(
+      "href",
+      "/admin/products/new"
+    );
     expect(screen.queryByText(/no products match/i)).not.toBeInTheDocument();
   });
 
