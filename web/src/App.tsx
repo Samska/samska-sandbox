@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import AdminProductCreate from "./admin/AdminProductCreate";
 import AdminProductEdit from "./admin/AdminProductEdit";
+import AdminOrders, { adminOrdersPath } from "./admin/AdminOrders";
 import AdminProducts from "./admin/AdminProducts";
 import Catalog from "./catalog/Catalog";
 import AccountPage, { accountPath } from "./auth/AccountPage";
@@ -135,7 +136,8 @@ function AdminShell({
   children: ReactNode;
 }) {
   const inOperations = path === operationsPath;
-  const inProducts = !inOperations;
+  const inOrders = path === adminOrdersPath;
+  const inProducts = !inOperations && !inOrders;
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -156,6 +158,9 @@ function AdminShell({
           <HeaderMenu label="Admin" inverted>
             <a className={adminNavClassName(inProducts)} href={adminProductsPath} aria-current={inProducts ? "page" : undefined}>
               Products
+            </a>
+            <a className={adminNavClassName(inOrders)} href={adminOrdersPath} aria-current={inOrders ? "page" : undefined}>
+              Orders
             </a>
             <a className={adminNavClassName(inOperations)} href={operationsPath} aria-current={inOperations ? "page" : undefined}>
               Operations
@@ -243,7 +248,10 @@ function renderSurface(path: string, auth: AuthState) {
   const isOrdersPath = path === ordersPath || orderMatch !== null;
   const isOperationsPath = path === operationsPath;
   const isAdminPath =
-    path === adminProductsPath || path.startsWith(`${adminProductsPath}/`) || isOperationsPath;
+    path === adminProductsPath ||
+    path.startsWith(`${adminProductsPath}/`) ||
+    isOperationsPath ||
+    path === adminOrdersPath;
 
   if ((isCheckout || isAdminPath || isOrdersPath) && auth.status === "loading") {
     return <StatusMessage tone="pending">Checking your session...</StatusMessage>;
@@ -295,6 +303,10 @@ function renderSurface(path: string, auth: AuthState) {
 
   if (isOperationsPath) {
     return <OperationsPage />;
+  }
+
+  if (path === adminOrdersPath) {
+    return <AdminOrders />;
   }
 
   if (path === adminProductsPath) {

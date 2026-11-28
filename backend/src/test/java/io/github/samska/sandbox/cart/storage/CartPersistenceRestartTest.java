@@ -35,7 +35,7 @@ class CartPersistenceRestartTest {
 
         try (var first = startApplication()) {
             var jdbc = first.getBean(JdbcTemplate.class);
-            jdbc.execute("TRUNCATE TABLE order_items, orders");
+            jdbc.execute("TRUNCATE TABLE order_items, order_status_events, orders");
             jdbc.execute("TRUNCATE TABLE cart_items, cart CASCADE");
             jdbc.execute("TRUNCATE TABLE payment_attempt_items, payment_attempts");
             jdbc.execute("TRUNCATE TABLE product_media, products CASCADE");

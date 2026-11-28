@@ -43,4 +43,10 @@ public interface Inventory {
      * @throws InsufficientStockException when the units are gone
      */
     void consume(UUID attemptId, List<StockLine> lines);
+
+    /**
+     * Puts units back on hand, for a cancelled Order. A Product that no longer has a stock record stays
+     * without one.
+     */
+    void restock(List<StockLine> lines);
 }

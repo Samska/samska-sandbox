@@ -49,7 +49,7 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 
 [ADR 0013: Adopt Server-Side Sessions And Per-Account Ownership](0013-adopt-account-sessions-and-ownership.md) records the account module, in-memory sessions, cookie-to-header CSRF, the `CurrentAccount` ownership port, role rules, and the administrator bootstrap.
 
-[ADR 0014: Derive Simulated Shipments From The Order And The Clock](0014-derive-simulated-shipments.md) records the `shipping` module, derived rather than stored shipment state, the injected clock, and deterministic delays.
+[ADR 0014: Derive Simulated Shipments From The Order And The Clock](0014-derive-simulated-shipments.md) (superseded by ADR 0021) records the `shipping` module, derived rather than stored shipment state, the injected clock, and deterministic delays.
 
 [ADR 0015: Add Inventory With Reservations In The Payment Transaction](0015-add-inventory-with-reservations.md) records the `inventory` module, reserve on approval and consume on Order, expiry, and ordered row locks.
 
@@ -62,3 +62,5 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 [ADR 0019: Separate The Admin Area And Terminate TLS With Caddy](0019-separate-admin-area-and-terminate-tls-with-caddy.md) records the Admin shell, role-based sign-in destination, and the Caddy-fronted VPS stack.
 
 [ADR 0020: Run On Railway With An Environment-Driven Web Image](0020-run-on-railway-with-environment-driven-web-image.md) records the Railway service layout, the start-up rendered nginx configuration and the private mode moved into the web image.
+
+[ADR 0021: The Administrator Sets Order Status And It Is Stored As Events](0021-administrator-sets-order-status.md) records the stored status events, the administrator endpoints, corrections allowed and cancelling as final with stock returned, and the removal of the simulated courier.

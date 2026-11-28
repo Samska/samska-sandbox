@@ -61,4 +61,11 @@ public class InMemoryInventory implements Inventory {
             onHand.merge(line.productId(), -line.quantity(), Integer::sum);
         }
     }
+
+    @Override
+    public synchronized void restock(List<StockLine> lines) {
+        for (var line : lines) {
+            onHand.computeIfPresent(line.productId(), (id, units) -> Math.min(units + line.quantity(), MAX_ON_HAND));
+        }
+    }
 }

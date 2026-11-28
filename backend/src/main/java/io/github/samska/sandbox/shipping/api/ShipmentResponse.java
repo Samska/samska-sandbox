@@ -6,23 +6,14 @@ import java.util.UUID;
 
 import io.github.samska.sandbox.shipping.Shipment;
 
-public record ShipmentResponse(
-        UUID orderId,
-        String orderNumber,
-        String trackingCode,
-        String courier,
-        String status,
-        boolean delayed,
-        Instant estimatedDelivery,
-        List<Step> steps) {
+public record ShipmentResponse(UUID orderId, String orderNumber, String status, List<Step> steps) {
 
     public record Step(String code, Instant at, boolean done) {
     }
 
     public static ShipmentResponse from(Shipment shipment) {
         return new ShipmentResponse(
-                shipment.orderId(), shipment.orderNumber(), shipment.trackingCode(), shipment.courier(),
-                shipment.status().name(), shipment.delayed(), shipment.estimatedDelivery(),
+                shipment.orderId(), shipment.orderNumber(), shipment.status().name(),
                 shipment.steps().stream().map(step -> new Step(step.code(), step.at(), step.done())).toList());
     }
 }

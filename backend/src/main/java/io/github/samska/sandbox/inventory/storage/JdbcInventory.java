@@ -125,6 +125,18 @@ public class JdbcInventory implements Inventory {
         jdbc.sql("DELETE FROM stock_reservations WHERE attempt_id = :attempt").param("attempt", attemptId).update();
     }
 
+    @Override
+    @Transactional
+    public void restock(List<StockLine> lines) {
+        for (var line : sorted(lines)) {
+            jdbc.sql("UPDATE stock_levels SET on_hand = LEAST(on_hand + :quantity, :max) WHERE product_id = :id")
+                    .param("quantity", line.quantity())
+                    .param("max", MAX_ON_HAND)
+                    .param("id", line.productId())
+                    .update();
+        }
+    }
+
     /**
      * Locks the Product's stock row, so concurrent buyers of the same Product take turns, and returns
      * the units not held by anyone else. Lines are visited in Product order to avoid deadlocks.

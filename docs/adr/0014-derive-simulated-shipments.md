@@ -1,6 +1,6 @@
 # ADR 0014: Derive Simulated Shipments From The Order And The Clock
 
-- Status: Accepted
+- Status: Superseded by [ADR 0021](0021-administrator-sets-order-status.md)
 - Date: 2026-11-27
 - Decision makers: Samska (human owner) with AI implementation support
 - Related: [SS-070 (#135)](https://github.com/Samska/samska-sandbox/issues/135), [ADR 0012](0012-adopt-release-plan-to-v1.md), [ADR 0013](0013-adopt-account-sessions-and-ownership.md)
