@@ -4,6 +4,11 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-081 — Sample Products for the hosted demo (#158, v1.0.0)
+
+- Build: `SAMSKA_DEMO_SEED_PRODUCTS=true` creates six synthetic Products when the catalog is empty; the demo reset keeps Products, so they survive the daily reset (test included).
+- State: set the variable (and `SAMSKA_DEMO_RESET_CRON`) on the Railway `backend` after merge.
+
 ## SS-080 — Web resolver fix for Railway (#156, v1.0.0)
 
 - Build: the first Railway deployment answered `502` on `/api` because nginx used Docker's `127.0.0.11` resolver; the web image now sets `NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1` so it uses the container's DNS server; `deploy/verify-web-config.sh` checks it.
