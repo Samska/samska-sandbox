@@ -121,19 +121,117 @@ Delivery state (2026-11-27): v0.2.0 to v1.0.0 are built on `release/1.0` and awa
 
 ## Beyond v1.0.0
 
-The earlier directional themes are kept as candidates after 1.0. None has measured evidence yet, so none is scheduled. A technology is evaluated only when an identified engineering problem justifies it.
+Decided on 2026-11-28 at the owner's request: after 1.0 the roadmap covers the whole project, not only features. This section replaces the earlier directional table, whose themes (Redis, RabbitMQ, React Native, microservices and others) are kept as the "Candidate pool" below and stay unscheduled until measured evidence exists.
 
-| Candidate | Evidence That May Trigger Evaluation |
-| --- | --- |
-| Caching / Redis | Measured catalog read pressure or unacceptable latency |
-| Event-driven processing / RabbitMQ | Synchronous workflows become slow, fragile, or operationally coupled |
-| React Native | A justified mobile learning or product need exists |
-| Infrastructure as Code | Repeated environment setup requires reproducibility and reviewability |
-| Performance engineering | Performance risks or service objectives require measurement and tuning |
-| Security engineering expansion | Threat-model or assessment findings justify additional controls |
-| Data engineering and simulation engine | Analytics or simulation needs require governed data pipelines |
-| Resilience, SRE and chaos engineering | Failure-mode analysis and reliable operational signals support them |
-| v2.0: evaluate service extraction | Clear independently evolving boundaries and operational evidence justify it |
+Starting point (v1.0.0): a single-owner store on Railway at `store.samska.dev`; orders are approved at checkout and the administrator sets their status; a fixed catalog of 18 example Products with Bench illustrations; PostgreSQL holds all state; sessions, rate limits and request metrics live in one process; there is no Dependabot, code scanning, linter, accessibility automation, pagination, backup schedule or uptime monitor yet. Those gaps drive the order below.
+
+Rules for every release: each release is a milestone with a theme, scope and exit criteria; a user-facing item needs an owner-approved HTML prototype before Build; work lands on a `release/x.y` branch and the release merges into `main` once, then is tagged; priorities are P1 (do first), P2 (do if the theme has room), P3 (candidate). Items are one line with the reason; Issues receive their SS identifier only when created.
+
+### v1.1 — Solid Ground (trust what is already live)
+
+Exit criteria: the live store can be restored from a backup, is watched, and every pull request is scanned and checked for accessibility.
+
+| Area | Pri | Item | Why |
+| --- | --- | --- | --- |
+| Infra and ops | P1 | Scheduled PostgreSQL backups stored outside Railway, plus a documented restore drill | The only copy of Orders and accounts is one database; `backup.sh` was never exercised on the hosted setup |
+| Infra and ops | P1 | External uptime and health monitor with a notification for `store.samska.dev` | Today an outage is noticed only by visiting |
+| Infra and ops | P1 | Deploy from `main` with a post-deploy smoke test (sign in, list Products, place and cancel an Order) | Deploys currently trust CI only; a smoke test catches configuration mistakes such as the resolver 502 |
+| Infra and ops | P2 | Decide whether to keep or retire the VPS/Caddy path | It is documented but unexercised; carrying it has a cost |
+| Security | P1 | Dependabot for Maven, npm, Docker and Actions; CodeQL; secret scanning; pin Actions by SHA | No automated dependency or code scanning exists |
+| Security | P1 | Sessions stored in PostgreSQL | Every restart or deploy signs the owner out and drops rate-limit state |
+| Security | P1 | Optional TOTP second factor for the administrator | The owner's account controls Orders and the catalog and has only a password |
+| Security | P1 | Progressive sign-in lockout per client address | Deferred from the pre-1.0 review; the limiter is per process today |
+| Security | P2 | `security.txt`, CSP violation reporting, Admin audit log of status and catalog changes | Visibility into who changed what |
+| Quality | P1 | Automated accessibility checks (axe) in Playwright for every screen, light and dark | Accessibility is a stated principle and today it is manual |
+| Quality | P1 | ESLint, Prettier and a backend formatter wired into CI | There is no linter or formatter, so style drifts and mistakes reach review |
+| Quality | P2 | Coverage reporting (JaCoCo, Vitest) as information without a threshold | Shows where tests are thin; no threshold until the numbers are understood |
+| Quality | P2 | E2E on Firefox and WebKit for the main journey | Chromium only today |
+| CI/CD | P2 | Faster CI: Maven and npm caches, parallel jobs, Testcontainers reuse | Feedback time shapes how often the owner can merge |
+| CI/CD | P2 | Release workflow that builds notes and a GitHub Release from a tag | Publication is manual under RELEASING.md |
+| Docs | P1 | Cut `docs/ROADMAP.md` and `PROJECT_HANDOFF.md` down to current state; move history to release notes | `ROADMAP.md` carries paragraphs of SS-0xx history that bury the plan |
+| Docs | P1 | Operations runbook: deploy, roll back, rotate secrets, restore, rotate the administrator password | Knowledge now lives in chat and memory |
+| Docs | P2 | ADR index review: mark superseded ADRs and add the missing payment-removal and single-user decisions | Several ADRs describe removed behavior |
+| Cleanup | P1 | Remove code left by the single-user decision (customer role paths, reservation leftovers, simulated-courier copy) | Dead paths mislead readers and widen the attack surface |
+
+### v1.2 — A Better Store (product and design)
+
+Exit criteria: browsing, buying and administering feel like a complete small store, on phone and desktop.
+
+| Area | Pri | Item | Why |
+| --- | --- | --- | --- |
+| Product | P1 | Categories or tags, sorting and filters on the Market | 18 Products already need more than a name search |
+| Product | P1 | Server-side pagination and search for Products and Orders | Lists return everything; this limits growth and is a learning goal |
+| Product | P2 | Multiple images and a gallery per Product | A single image per Product is thin for a store page |
+| Product | P2 | Shipping address and order notes captured at checkout | An Order with no destination is unrealistic |
+| Product | P2 | Printable order receipt | Gives the owner a tangible output of an Order |
+| Product | P2 | Low-stock indicator and Admin stock adjustments with history | Inventory exists but has no operational view |
+| Product | P3 | Discount codes; product variants (size, colour) | Realistic commerce rules to practice domain modelling |
+| Admin | P2 | Catalog import and export (CSV) | Bulk changes without clicking each Product |
+| Design | P1 | Design system page: tokens, components and states, kept with the prototypes | The owner decided design leads; a single reference stops drift |
+| Design | P2 | Full accessibility pass: keyboard, screen reader, reduced motion, 200 percent zoom | Automated checks do not cover these |
+| Design | P2 | Portuguese (pt-BR) interface alongside English | The owner works in Portuguese; also practices i18n |
+| Design | P3 | Installable PWA | A phone-first owner could pin the store |
+| Frontend | P2 | Route-level code splitting and image optimization (sizes, WebP) | Smaller first load, measured under v1.3 |
+
+### v1.3 — Performance and Visibility
+
+Exit criteria: the owner can answer "is it healthy and is it fast?" from data, and performance has budgets.
+
+| Area | Pri | Item | Why |
+| --- | --- | --- | --- |
+| Observability | P1 | Structured logs and metrics shipped to a hosted viewer (Grafana Cloud or similar) | Metrics today reset on restart and live in one screen |
+| Observability | P1 | OpenTelemetry tracing across web, backend and database | Request correlation IDs exist; traces show where time goes |
+| Observability | P2 | Alerts on error rate, latency and failed health checks | Turns dashboards into action |
+| Performance | P1 | Baseline load test (k6) of browse and checkout with recorded results | No performance number exists to improve against |
+| Performance | P1 | Database indexes and query review driven by the load test | Pagination and filters add query patterns |
+| Performance | P2 | Lighthouse CI with budgets for the web app | Prevents silent frontend regressions |
+| Performance | P2 | HTTP caching with ETag for Product reads | Cheapest cache; do this before any Redis |
+| Performance | P3 | Redis only if the baseline shows catalog read pressure | The old v0.3 theme, kept evidence-gated |
+
+### v1.4 — Architecture and Data
+
+Exit criteria: module boundaries are enforced by tests and the API is a documented contract.
+
+| Area | Pri | Item | Why |
+| --- | --- | --- | --- |
+| Architecture | P1 | Enforce module boundaries with ArchUnit or Spring Modulith | ADR 0001 relies on convention only |
+| Architecture | P1 | OpenAPI description generated from the backend; the web client typed from it | The contract is implicit in code and mocks |
+| Architecture | P2 | In-process domain events and a transactional outbox | Decouples Order, Inventory and notifications without a broker |
+| Architecture | P2 | Per-module package review for the modules that grew (Order, Operations) | Keeps the monolith modular |
+| Data | P1 | Migration policy: expand-contract changes and a restore-then-migrate test | Flyway runs forward only |
+| Data | P2 | Point-in-time recovery and retention rules | Beyond daily dumps |
+| Data | P2 | Account data export and erasure for the owner | Practices data-governance habits on synthetic data |
+| Data | P3 | Analytics views over Orders (daily sales, top Products) in Admin | First use of the data for decisions |
+
+### v1.5 — Resilience and Reliability
+
+Exit criteria: failure behavior is designed, measured and rehearsed.
+
+| Area | Pri | Item | Why |
+| --- | --- | --- | --- |
+| Reliability | P1 | Service objectives (availability, checkout latency) and an error budget on the monitor | Defines "reliable" before improving it |
+| Reliability | P1 | Failure-mode review and tests: database down, slow queries, deploy during checkout | Resilience needs known failure modes |
+| Reliability | P2 | Graceful degradation: read-only Market when writes fail; clear UI errors | Turns outages into understandable states |
+| Reliability | P2 | Rate limiting that survives restart and instance count (PostgreSQL or Redis) | Limits are per process today |
+| Reliability | P3 | Small, safe chaos experiments in a staging copy | Only once monitoring and runbooks are trustworthy |
+| Infra and ops | P2 | Staging environment from a branch deploy, with infrastructure as code for Railway | Repeatable environments; makes failure tests safe |
+
+### Cross-cutting tracks (any release)
+
+| Area | Item | Why |
+| --- | --- | --- |
+| Portfolio | Case-study page on the site: goals, architecture diagram, key ADRs, screenshots, what was learned | The project doubles as a portfolio piece |
+| Portfolio | README and repository social preview kept current with each release | First impression for readers |
+| Governance | Labels and GitHub milestones per release; Project board fields aligned with the release plan | Makes this roadmap visible in tracking |
+| Governance | Review `AI-GOVERNANCE.md` yearly and after each release; trim rules that no longer pay for themselves | Process should shrink as trust grows |
+| Learning | Keep `docs/learning/` notes only for decisions worth teaching; link them from ADRs | Prevents note sprawl |
+| DX | Dev container and one-command local setup; script to reset local data | New machine, new session or new agent starts fast |
+| DX | Pre-commit checks for formatting and secrets | Catch problems before CI |
+| Security | Yearly threat-model refresh and dependency-risk review | Keeps the threat model true |
+
+### Candidate pool (unscheduled, evidence-gated)
+
+RabbitMQ or another broker (when synchronous workflows become slow or fragile), React Native (a justified mobile need), simulation engine, data engineering pipelines, chaos engineering at scale, evaluation of service extraction (v2.0, only with independently evolving boundaries and operational evidence). Real payments, real couriers and email are not planned; the store stays synthetic.
 
 Any significant change to this direction requires the relevant documentation
 and, when architectural, an ADR update. See [ARCHITECTURE.md](ARCHITECTURE.md)
