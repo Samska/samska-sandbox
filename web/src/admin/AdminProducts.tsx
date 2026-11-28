@@ -6,6 +6,7 @@ import {
   type ProductResponse
 } from "../catalog/catalogApi";
 import ProductMedia from "../catalog/ProductMedia";
+import StockBadge from "../catalog/StockBadge";
 import { hasCuratedMedia } from "../catalog/mediaCatalog";
 import { formatAmount } from "../formatAmount";
 import Button from "../ui/Button";
@@ -163,6 +164,7 @@ export default function AdminProducts() {
               <input
                 {...control}
                 type="search"
+                placeholder="Search by name"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
                 disabled={isBusy}
@@ -209,18 +211,23 @@ export default function AdminProducts() {
           <ul className="grid list-none gap-2 p-0 m-0">
             {visibleProducts.map((product) => (
               <li key={product.id} className="rounded-sm border-[1.5px] border-ink bg-surface">
-                <div className="grid gap-3 p-3 min-[40rem]:min-h-16 min-[40rem]:grid-cols-[auto_minmax(0,1fr)_auto_auto] min-[40rem]:items-center min-[40rem]:gap-4">
-                  <ProductMedia product={product} variant="thumbnail" />
+                <div className="grid grid-cols-[3rem_minmax(0,1fr)] items-start gap-x-3 gap-y-1.5 p-3 min-[40rem]:min-h-16 min-[40rem]:grid-cols-[auto_minmax(0,1fr)_auto_auto] min-[40rem]:items-center min-[40rem]:gap-4">
+                  <div className="row-span-3 min-[40rem]:row-span-1">
+                    <ProductMedia product={product} variant="thumbnail" />
+                  </div>
                   <div className="grid min-w-0 gap-0.5">
                     <h3 className="truncate text-base font-extrabold leading-snug tracking-[-0.01em] text-ink">
                       {product.name}
                     </h3>
                     <p className="text-sm text-muted">{imageStateLabel(product)}</p>
                   </div>
-                  <p className="text-base font-extrabold tracking-[-0.01em] text-ink">
-                    {formatAmount(product.price)}
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                    <p className="font-mono text-[0.95rem] font-semibold text-ink">
+                      {formatAmount(product.price)}
+                    </p>
+                    <StockBadge product={product} />
+                  </div>
+                  <div className="col-start-2 flex flex-wrap items-center gap-2 min-[40rem]:col-start-auto">
                     <a
                       id={`admin-edit-${product.id}`}
                       className="inline-flex min-h-10 items-center justify-center rounded-sm border-[1.5px] border-ink bg-surface px-3 font-mono text-[0.75rem] font-semibold uppercase tracking-[0.06em] text-ink no-underline hover:bg-ink hover:text-canvas"
