@@ -1,4 +1,4 @@
-# ADR 0021: The Administrator Sets Order Status And It Is Stored As Events
+# ADR 0022: The Administrator Sets Order Status And It Is Stored As Events
 
 - Status: Accepted
 - Date: 2026-11-28

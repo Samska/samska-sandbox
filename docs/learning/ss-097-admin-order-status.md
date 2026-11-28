@@ -5,7 +5,7 @@
 - Last reviewed: 2026-11-28
 - Work item: [SS-097 (#196)](https://github.com/Samska/samska-sandbox/issues/196)
 - Pull request: See the Issue
-- ADRs: [ADR 0021](../adr/0021-administrator-sets-order-status.md), which supersedes [ADR 0014](../adr/0014-derive-simulated-shipments.md)
+- ADRs: [ADR 0022](../adr/0022-administrator-sets-order-status.md), which supersedes [ADR 0014](../adr/0014-derive-simulated-shipments.md)
 - Canonical documentation: [Architecture](../ARCHITECTURE.md), [Testing](../TESTING.md)
 
 `Last reviewed` records document maintenance or revalidation, not personal study activity.
