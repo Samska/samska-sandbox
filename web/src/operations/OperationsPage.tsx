@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import Button from "../ui/Button";
 import StatusMessage from "../ui/StatusMessage";
-import { useDemoMode } from "../demo/useDemoMode";
-import { resetDemoData } from "../demo/demoApi";
 import { formatWhen } from "../orders/shipmentText";
 import { getOperations, OperationsApiError, type OperationsSnapshot } from "./operationsApi";
 
@@ -19,19 +17,6 @@ export default function OperationsPage() {
   const [load, setLoad] = useState<Load>({ state: "loading" });
   const [refreshing, setRefreshing] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const demo = useDemoMode();
-  const [reset, setReset] = useState<"idle" | "confirm" | "working" | "done" | "failed">("idle");
-
-  const resetData = async () => {
-    setReset("working");
-    const ok = await resetDemoData();
-    setReset(ok ? "done" : "failed");
-
-    if (ok) {
-      await refresh();
-    }
-  };
-
   const refresh = useCallback(async () => {
     setRefreshing(true);
 
@@ -65,25 +50,6 @@ export default function OperationsPage() {
           {refreshing ? "Refreshing..." : "Refresh"}
         </Button>
       </div>
-      {demo ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-sm border-[1.5px] border-dashed border-ink p-4">
-          <p className="flex-1 text-sm">
-            Demo mode is on. Resetting removes every Order, Cart and customer account, and restores
-            stock. Products and your own session stay.
-          </p>
-          {reset === "idle" || reset === "done" || reset === "failed" ? (
-            <Button variant="secondary" size="sm" onClick={() => setReset("confirm")}>
-              Reset demo data
-            </Button>
-          ) : (
-            <Button variant="primary" size="sm" disabled={reset === "working"} onClick={() => void resetData()}>
-              {reset === "working" ? "Resetting..." : "Confirm reset"}
-            </Button>
-          )}
-          {reset === "done" ? <StatusMessage tone="success">Demo data was reset.</StatusMessage> : null}
-          {reset === "failed" ? <StatusMessage tone="error">The reset failed. Try again.</StatusMessage> : null}
-        </div>
-      ) : null}
       {load.state === "loading" ? <StatusMessage tone="pending">Loading store figures...</StatusMessage> : null}
       {load.state === "error" ? (
         <StatusMessage tone="error">
@@ -98,15 +64,22 @@ export default function OperationsPage() {
 }
 
 function Figures({ snapshot }: { snapshot: OperationsSnapshot }) {
+  const attempts = snapshot.approvedAttempts + snapshot.declinedAttempts + snapshot.failedAttempts;
+
   return (
     <>
       <p className="text-sm text-muted">
-        Figures were read {formatWhen(snapshot.generatedAt)}. Orders come from the database; latency and
+        Figures were read {formatWhen(snapshot.generatedAt)}. Orders and payments come from the database; latency and
         errors are measured by this server process since it started.
       </p>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Figure label="Orders, last hour" value={String(snapshot.ordersLastHour)}>
           {snapshot.ordersLast24Hours} in the last 24 hours
+        </Figure>
+        <Figure label="Approval rate, 24 hours" value={percent(snapshot.approvalRate)}>
+          {attempts === 0
+            ? "No payment attempts in the last 24 hours"
+            : `${snapshot.approvedAttempts} approved, ${snapshot.declinedAttempts} declined, ${snapshot.failedAttempts} failed`}
         </Figure>
         <Figure
           label="Checkout latency p95"
@@ -114,7 +87,7 @@ function Figures({ snapshot }: { snapshot: OperationsSnapshot }) {
         >
           {snapshot.checkoutSamples === 0
             ? "No checkout requests since start"
-            : `${snapshot.checkoutSamples} Order requests, about the last 15 minutes`}
+            : `${snapshot.checkoutSamples} Payment attempt requests, about the last 15 minutes`}
         </Figure>
         <Figure label="Server error rate" value={percent(snapshot.errorRate)}>
           {snapshot.requests === 0

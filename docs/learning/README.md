@@ -73,6 +73,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-077-empty-state-design-fix.md](ss-077-empty-state-design-fix.md) | Prototype fidelity in the running app and one shared component for a repeated pattern. |
 | [ss-078-theme-switch.md](ss-078-theme-switch.md) | Layering a user theme override over the system preference, flash-free loading under a strict CSP, and failure-tolerant storage. |
 | [ss-079-image-build-in-ci.md](ss-079-image-build-in-ci.md) | Why deployment artifacts are built in CI, and the Maven wrapper's dependency on `unzip`. |
+| [ss-098-sample-catalog.md](ss-098-sample-catalog.md) | Idempotent seeding by natural key, and permanent example data. |
 | [ss-084-product-art.md](ss-084-product-art.md) | Theme-aware inline SVG, and a safe data migration in a seed. |
 | [ss-090-orders-catalog-number.md](ss-090-orders-catalog-number.md) | A customer-facing number beside a UUID key, and migrating a populated table. |
 | [ss-086-clear-cart-on-order.md](ss-086-clear-cart-on-order.md) | Side effects after a commit, idempotent replays, and changing a documented decision. |
@@ -80,6 +81,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-095-remove-self-sign-up.md](ss-095-remove-self-sign-up.md) | Removing an attack surface instead of guarding it, and why roles outlive sign-up. |
 | [ss-091-plain-copy.md](ss-091-plain-copy.md) | Error messages as interface, and stale messages as defects. |
 | [ss-099-remove-payment-simulation.md](ss-099-remove-payment-simulation.md) | Removing a feature with its support code, and keeping the idempotency key. |
+| [ss-094-remove-demo-reset.md](ss-094-remove-demo-reset.md) | Retiring a capability when its context changes, and nginx header inheritance. |
 | [ss-081-demo-sample-products.md](ss-081-demo-sample-products.md) | Idempotent seeding of demo data and why it must not overwrite existing data. |
 | [ss-080-web-dns-resolver.md](ss-080-web-dns-resolver.md) | Why the web image must use the platform's DNS resolver, and how it was verified. |
 | [ss-065-cart-persistence.md](ss-065-cart-persistence.md) | Transactional update contract for a mutable aggregate, row-lock serialization of a business revision, domain rules kept out of the store, and snapshot rows without a foreign key. |

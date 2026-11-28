@@ -13,7 +13,7 @@ import OperationsPage, { operationsPath } from "./operations/OperationsPage";
 import OrdersPage, { ordersPath } from "./orders/OrdersPage";
 import TrackingPage from "./orders/TrackingPage";
 import NotFound from "./NotFound";
-import { checkoutPath, marketPath, usePath } from "./journey/routes";
+import { attemptIdForPath, checkoutPath, marketPath, usePath } from "./journey/routes";
 
 const adminProductsPath = "/admin/products";
 const adminProductNewPath = "/admin/products/new";
@@ -27,7 +27,7 @@ export default function App() {
     auth.state.status === "local" ||
     (auth.state.status === "signed-in" && auth.state.account.role === "ADMIN");
   const isMarket = path === marketPath;
-  const isStorefront = isMarket || path === checkoutPath;
+  const isStorefront = isMarket || path === checkoutPath || attemptIdForPath(path) !== null;
   const isOrders = path === ordersPath || path.startsWith(`${ordersPath}/`);
   const isAdmin =
     path === adminProductsPath || path.startsWith(`${adminProductsPath}/`);
@@ -55,7 +55,7 @@ export default function App() {
           <a
             className="inline-flex items-center gap-2.5 text-ink no-underline"
             href="/"
-            aria-label="Samska Sandbox home"
+            aria-label="Samska Store home"
           >
             <svg aria-hidden="true" viewBox="0 0 34 34" className="h-8 w-8 flex-none">
               <circle cx="17" cy="17" r="15" fill="none" stroke="currentColor" strokeWidth="2.5" />
@@ -114,8 +114,8 @@ export default function App() {
       </main>
       <footer className="border-t-2 border-ink bg-surface">
         <div className="mx-auto flex w-[min(100%-2.5rem,76rem)] flex-wrap items-center justify-between gap-2 py-6 text-sm text-muted">
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.12em] text-ink">Samska Sandbox</p>
-          <p>Samska Store · a personal storefront project</p>
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.12em] text-ink">Samska Store</p>
+          <p>© 2026 Samska Store.</p>
         </div>
       </footer>
     </div>
@@ -238,7 +238,7 @@ function renderSurface(path: string, auth: AuthState) {
     return <AccountPage />;
   }
 
-  const isCheckout = path === checkoutPath;
+  const isCheckout = path === checkoutPath || attemptIdForPath(path) !== null;
   const orderMatch = orderTrackingPattern.exec(path);
   const isOrdersPath = path === ordersPath || orderMatch !== null;
   const isOperationsPath = path === operationsPath;
@@ -289,7 +289,7 @@ function renderSurface(path: string, auth: AuthState) {
     );
   }
 
-  if (path === marketPath || path === checkoutPath) {
+  if (path === marketPath || path === checkoutPath || attemptIdForPath(path) !== null) {
     return <Catalog />;
   }
 

@@ -23,7 +23,7 @@ describe("App", () => {
     stubFetch();
     render(<App />);
 
-    expect(screen.getByRole("link", { name: "Samska Sandbox home" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Samska Store home" })).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: "Skip to main content" })).toBeInTheDocument();
     expect(await screen.findByRole("heading", { name: "Products", level: 1 })).toBeInTheDocument();
 
@@ -42,7 +42,7 @@ describe("App", () => {
     render(<App />);
     await screen.findByRole("heading", { name: "Products", level: 1 });
 
-    const home = screen.getByRole("link", { name: "Samska Sandbox home" });
+    const home = screen.getByRole("link", { name: "Samska Store home" });
     expect(home.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
     expect(home).toHaveTextContent("Samska");
     expect(home.textContent).toContain("STORE");
