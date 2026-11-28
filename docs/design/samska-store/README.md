@@ -388,3 +388,7 @@ Status: **Approved by the owner in the project thread (2026-11-27) and implement
 - Why: the three photos on the sample Products did not look like the Bench identity, and three samples had no image.
 - Source of truth: [prototypes/product-art.html](prototypes/product-art.html): six original illustrations (tote, pour-over set, workbench, apron, camp mug, serving board) on Bench stages with the 25% grid and catalog number; ink linework and one signal color, so light and dark follow the theme tokens.
 - Implemented in `web/src/catalog/productArt.ts` (drawings keyed `art-*`) and `ProductMedia`; uploaded images still take precedence.
+
+## SS-087 — Currency symbol
+
+The earlier prototypes show amounts without a currency symbol. On 2026-11-27 the owner approved adding one after the pre-1.0 review: the application shows US dollars (`$12.50`) everywhere prices appear; form inputs keep plain numbers. The prototypes stay as the historical record.

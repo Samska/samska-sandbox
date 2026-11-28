@@ -104,8 +104,8 @@ describe("Checkout review flow", () => {
     expect(screen.queryByRole("dialog", { name: "Your Cart" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { expanded: false })).not.toBeInTheDocument();
     expect(screen.getByLabelText("Quantity for Canvas Tote")).toHaveValue(2);
-    expect(screen.getByText("12.50 each")).toBeInTheDocument();
-    expect(screen.getByText("Total").parentElement).toHaveTextContent("93.50");
+    expect(screen.getByText("$12.50 each")).toBeInTheDocument();
+    expect(screen.getByText("Total").parentElement).toHaveTextContent("$93.50");
     expect(fetchMock.mock.calls.some(([input]) => String(input).includes("checkout"))).toBe(false);
   });
 
@@ -165,7 +165,7 @@ describe("Checkout review flow", () => {
     resolveMutation(response(200, increasedCart));
 
     await waitFor(() => expect(screen.getByLabelText("Quantity for Canvas Tote")).toHaveValue(3));
-    expect(screen.getByText("Total").parentElement).toHaveTextContent("37.50");
+    expect(screen.getByText("Total").parentElement).toHaveTextContent("$37.50");
     expect(fetchMock).toHaveBeenCalledWith(`/api/cart/items/${product.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -190,7 +190,7 @@ describe("Checkout review flow", () => {
     fireEvent.click(decrease);
 
     await waitFor(() => expect(screen.getByLabelText("Quantity for Canvas Tote")).toHaveValue(1));
-    expect(screen.getByText("Total").parentElement).toHaveTextContent("12.50");
+    expect(screen.getByText("Total").parentElement).toHaveTextContent("$12.50");
     expect(fetchMock).toHaveBeenCalledWith(`/api/cart/items/${product.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -214,7 +214,7 @@ describe("Checkout review flow", () => {
     fireEvent.blur(input);
 
     await waitFor(() => expect(screen.getByLabelText("Quantity for Canvas Tote")).toHaveValue(4));
-    expect(screen.getByText("Total").parentElement).toHaveTextContent("50.00");
+    expect(screen.getByText("Total").parentElement).toHaveTextContent("$50.00");
     expect(fetchMock).toHaveBeenCalledWith(`/api/cart/items/${product.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -240,7 +240,7 @@ describe("Checkout review flow", () => {
 
     await waitFor(() => expect(screen.queryByText("Canvas Tote")).not.toBeInTheDocument());
     expect(screen.getByText("Pour-Over Set")).toBeInTheDocument();
-    expect(screen.getByText("Total").parentElement).toHaveTextContent("68.50");
+    expect(screen.getByText("Total").parentElement).toHaveTextContent("$68.50");
     await waitFor(() => expect(screen.getByLabelText("Quantity for Pour-Over Set")).toHaveFocus());
   });
 

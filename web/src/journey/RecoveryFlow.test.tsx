@@ -73,7 +73,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     });
 
     expect(await screen.findByRole("heading", { name: "Order created", level: 1 })).toBeInTheDocument();
-    expect(screen.getByText(/Order total: 25.00/)).toBeInTheDocument();
+    expect(screen.getByText(/Order total: \$25.00/)).toBeInTheDocument();
     expect(calls.some((path) => path.startsWith("/api/payment-attempts/"))).toBe(false);
   });
 

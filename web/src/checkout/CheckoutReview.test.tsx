@@ -63,12 +63,11 @@ describe("CheckoutReview", () => {
     expect(screen.getByRole("button", { name: "Decrease quantity for Canvas Tote" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Increase quantity for Canvas Tote" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Remove Canvas Tote" })).toBeInTheDocument();
-    expect(screen.getByText("12.50 each")).toBeInTheDocument();
-    expect(screen.getByText("25.00")).toBeInTheDocument();
-    expect(screen.getByText("68.50 each")).toBeInTheDocument();
-    expect(screen.getByText("68.50")).toBeInTheDocument();
-    expect(screen.getByText("Total").parentElement).toHaveTextContent("93.50");
-    expect(screen.queryByText(/\$/)).not.toBeInTheDocument();
+    expect(screen.getByText("$12.50 each")).toBeInTheDocument();
+    expect(screen.getByText("$25.00")).toBeInTheDocument();
+    expect(screen.getByText("$68.50 each")).toBeInTheDocument();
+    expect(screen.getByText("$68.50")).toBeInTheDocument();
+    expect(screen.getByText("Total").parentElement).toHaveTextContent("$93.50");
   });
 
   it("calls the existing Cart handlers for direct edits", () => {

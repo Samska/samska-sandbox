@@ -8,6 +8,9 @@ Update rule: this snapshot must be updated in the same change when project state
 
 - Build: Archivo and IBM Plex Mono are served from `/fonts/` (the production CSP blocked the Google Fonts stylesheet, so the hosted site used fallback fonts); favicon, description and Open Graph text added; `deploy/verify-web-config.sh` checks font serving. Found in the pre-1.0 review.
 - State: takes effect when `web` redeploys from `release/1.0`.
+## SS-087 — Currency symbol (#172, v1.0.0)
+
+- Build: every price shows `$` through the shared `formatAmount`; the design README records that this supersedes the "no currency symbol" assumption. Found in the pre-1.0 review.
 
 ## SS-086 — Empty the Cart on Order (#170, v1.0.0)
 

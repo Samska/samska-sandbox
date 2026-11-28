@@ -17,7 +17,7 @@ test.describe("Order history and tracking in a real browser", () => {
     const reference = order.orderId.replace(/-/g, "").slice(0, 8).toUpperCase();
     const row = page.getByRole("row", { name: new RegExp(`${reference.slice(0, 4)}-${reference.slice(4)}`) });
     await expect(row).toBeVisible();
-    await expect(row).toContainText("42.00");
+    await expect(row).toContainText("$42.00");
     await expect(row).toContainText("Processing");
 
     await row.getByRole("link", { name: /^Track order/ }).click();

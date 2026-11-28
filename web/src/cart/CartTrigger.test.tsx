@@ -9,7 +9,7 @@ describe("CartTrigger", () => {
       <CartTrigger itemCount={2} total={197} isOpen={false} onClick={() => undefined} buttonRef={createRef()} />
     );
 
-    expect(screen.getByRole("button", { name: "Cart, 2 items, total 197.00" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Cart, 2 items, total $197.00" })).toHaveAttribute(
       "aria-expanded",
       "false"
     );
@@ -20,7 +20,7 @@ describe("CartTrigger", () => {
       <CartTrigger itemCount={1} total={12.5} isOpen onClick={() => undefined} buttonRef={createRef()} />
     );
 
-    const trigger = screen.getByRole("button", { name: "Cart, 1 item, total 12.50" });
+    const trigger = screen.getByRole("button", { name: "Cart, 1 item, total $12.50" });
     expect(trigger).toHaveAttribute("aria-expanded", "true");
     expect(trigger).toHaveAttribute("aria-haspopup", "dialog");
   });
