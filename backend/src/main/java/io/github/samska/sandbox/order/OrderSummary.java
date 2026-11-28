@@ -5,5 +5,5 @@ import java.time.Instant;
 import java.util.UUID;
 
 /** One line of an account's Order history. */
-public record OrderSummary(UUID orderId, Instant createdAt, int itemCount, BigDecimal total) {
+public record OrderSummary(UUID orderId, long orderNumber, Instant createdAt, int itemCount, BigDecimal total) {
 }

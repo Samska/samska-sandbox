@@ -9,6 +9,7 @@ export interface OrderItemResponse {
 
 export interface OrderResponse {
   orderId: string;
+  orderNumber: string;
   paymentAttemptId: string;
   cartRevision: number;
   items: OrderItemResponse[];
@@ -95,8 +96,9 @@ function isOrder(value: unknown): value is OrderResponse {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
   const data = value as Record<string, unknown>;
   return (
-    Object.keys(data).length === 5 &&
+    Object.keys(data).length === 6 &&
     typeof data.orderId === "string" &&
+    typeof data.orderNumber === "string" &&
     typeof data.paymentAttemptId === "string" &&
     Number.isInteger(data.cartRevision) &&
     (data.cartRevision as number) >= 0 &&

@@ -35,14 +35,14 @@ public class ShipmentService {
 
     /** The shipment of one of the signed-in account's Orders; unknown or foreign Orders are not found. */
     public Shipment track(UUID orderId) {
-        var createdAt = orders.createdAt(orderId);
-        return Shipment.of(orderId, createdAt, clock.instant(), policy);
+        var summary = orders.summary(orderId);
+        return Shipment.of(orderId, summary.orderNumber(), summary.createdAt(), clock.instant(), policy);
     }
 
     public List<HistoryEntry> history() {
         var now = clock.instant();
         return orders.history().stream()
-                .map(summary -> new HistoryEntry(summary, Shipment.of(summary.orderId(), summary.createdAt(), now, policy)))
+                .map(summary -> new HistoryEntry(summary, Shipment.of(summary.orderId(), summary.orderNumber(), summary.createdAt(), now, policy)))
                 .toList();
     }
 

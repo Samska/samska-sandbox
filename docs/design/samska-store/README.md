@@ -51,7 +51,7 @@ Status: **Implemented for owner local validation (2026-11-27). The owner approve
 
 ## SS-085 — Market list, payment-resume notice, Orders and Order number (for owner review)
 
-Status: **First version for owner review (2026-11-28). Design only. Not approved until the owner approves it, and not production adoption.**
+Status: **Owner-approved (2026-11-28, project thread: "Eu aprovo"). Applied in SS-090. Design only until built.**
 
 - Source of truth: [prototypes/catalog-orders.html](prototypes/catalog-orders.html), same Bench tokens as `bench.html`. A bar at the top switches screen and theme; checked at 390 and 1280 px in light and dark with no horizontal overflow.
 - Market list: compact horizontal object rows (88 px stage, name, price, stock tag, one line of description, Details and Add to cart) instead of full-width cards.

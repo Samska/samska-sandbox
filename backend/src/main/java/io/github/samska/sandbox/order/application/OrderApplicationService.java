@@ -1,6 +1,5 @@
 package io.github.samska.sandbox.order.application;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,7 +57,7 @@ public class OrderApplicationService {
         return store.listForCurrentAccount();
     }
 
-    public Instant createdAt(UUID orderId) {
-        return store.findCreatedAt(orderId).orElseThrow(OrderNotFoundException::new);
+    public OrderSummary summary(UUID orderId) {
+        return store.findSummary(orderId).orElseThrow(OrderNotFoundException::new);
     }
 }

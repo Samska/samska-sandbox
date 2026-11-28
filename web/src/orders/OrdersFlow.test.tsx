@@ -44,7 +44,7 @@ function open(path: string) {
 
 const entry = (over: Partial<OrderHistoryEntry> = {}): OrderHistoryEntry => ({
   orderId,
-  reference: "2AFA-6574",
+  orderNumber: "SK-000128",
   createdAt: "2026-11-27T10:43:00Z",
   itemCount: 2,
   total: 312.5,
@@ -54,7 +54,7 @@ const entry = (over: Partial<OrderHistoryEntry> = {}): OrderHistoryEntry => ({
 
 const shipment = (over: Partial<Shipment> = {}): Shipment => ({
   orderId,
-  reference: "2AFA-6574",
+  orderNumber: "SK-000128",
   trackingCode: "SK-1B2C-4D",
   courier: "Simulated Express",
   status: "IN_TRANSIT",
@@ -72,18 +72,18 @@ const shipment = (over: Partial<Shipment> = {}): Shipment => ({
 
 describe("Order history", () => {
   it("lists the orders with status, total and a Track link", async () => {
-    stub({ "/api/orders": () => json(200, [entry(), entry({ orderId: "b", reference: "91C2-0D1E", status: "DELIVERED", total: 68 })]) });
+    stub({ "/api/orders": () => json(200, [entry(), entry({ orderId: "b", orderNumber: "SK-000127", status: "DELIVERED", total: 68 })]) });
     open("/orders");
 
     expect(await screen.findByRole("heading", { name: "Your orders", level: 1 })).toBeInTheDocument();
-    const table = await screen.findByRole("table", { name: "Your orders, newest first" });
-    const rows = within(table).getAllByRole("row");
-    expect(rows).toHaveLength(3);
-    expect(within(rows[1]).getByText("2AFA-6574")).toBeInTheDocument();
-    expect(within(rows[1]).getByText("Packed")).toBeInTheDocument();
-    expect(within(rows[1]).getByText("$312.50")).toBeInTheDocument();
-    expect(within(rows[2]).getByText("Delivered")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Track order 2AFA-6574" })).toHaveAttribute("href", `/orders/${orderId}`);
+    const list = await screen.findByRole("list", { name: "Your orders, newest first" });
+    const rows = within(list).getAllByRole("listitem");
+    expect(rows).toHaveLength(2);
+    expect(within(rows[0]).getByText("SK-000128")).toBeInTheDocument();
+    expect(within(rows[0]).getByText("Packed")).toBeInTheDocument();
+    expect(within(rows[0]).getByText("$312.50")).toBeInTheDocument();
+    expect(within(rows[1]).getByText("Delivered")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Track order SK-000128" })).toHaveAttribute("href", `/orders/${orderId}`);
     expect(within(screen.getByRole("navigation", { name: "Primary" })).getByRole("link", { name: "Orders" })).toHaveAttribute(
       "aria-current",
       "page"

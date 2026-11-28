@@ -158,15 +158,17 @@ test.describe("First Order journey in a real browser", () => {
     expect(tracker.orderPosts()).toBe(1);
     expect(tracker.paymentPosts()).toBe(1);
 
-    const orderId = (await page.getByText(/^Order ID:/).innerText())
-      .replace("Order ID:", "")
-      .trim();
+    const orderNumber = (await page.getByLabel(/^Order number /).innerText()).trim();
+    expect(orderNumber).toMatch(/^SK-\d{6}$/);
+    const trackHref = (await page.getByRole("link", { name: "Track this order" }).getAttribute("href")) ?? "";
+    const orderId = trackHref.replace("/orders/", "");
     expect(orderId).toMatch(/^[0-9a-f-]{36}$/i);
 
     const orderByAttempt = await fetchOrderByAttempt(request, attemptId);
     expect(orderByAttempt.status()).toBe(200);
     const capturedOrder = (await orderByAttempt.json()) as OrderDto;
     expect(capturedOrder.orderId).toBe(orderId);
+    expect(capturedOrder.orderNumber).toBe(orderNumber);
     expect(capturedOrder.paymentAttemptId).toBe(attemptId);
     expect(capturedOrder.cartRevision).toBe(capturedAttempt.cartRevision);
     expect(capturedOrder.total).toBe(37.5);
@@ -195,15 +197,16 @@ test.describe("First Order journey in a real browser", () => {
     // IDs, Cart revision, total, and every item field.
     await page.goto(attemptUrl);
     await expect(page.getByRole("heading", { name: "Order created", level: 1 })).toBeVisible();
-    await expect(page.getByText(orderId)).toBeVisible();
-    await expect(page.getByText(`${product.name} × 3 · $12.50 each`)).toBeVisible();
+    await expect(page.getByLabel(`Order number ${orderNumber}`)).toBeVisible();
+    await expect(page.getByText(product.name)).toBeVisible();
+    await expect(page.getByText("× 3 · $12.50 each")).toBeVisible();
     await expect(page.getByText("Order total: $37.50")).toBeVisible();
     expect((await (await fetchOrderByAttempt(request, attemptId)).json()) as OrderDto).toEqual(capturedOrder);
     expect((await (await fetchOrderById(request, orderId)).json()) as OrderDto).toEqual(capturedOrder);
 
     await page.reload();
     await expect(page.getByRole("heading", { name: "Order created", level: 1 })).toBeVisible();
-    await expect(page.getByText(orderId)).toBeVisible();
+    await expect(page.getByLabel(`Order number ${orderNumber}`)).toBeVisible();
     await expect(page.getByText("Order total: $37.50")).toBeVisible();
     expect((await (await fetchOrderByAttempt(request, attemptId)).json()) as OrderDto).toEqual(capturedOrder);
 
@@ -213,8 +216,8 @@ test.describe("First Order journey in a real browser", () => {
       const coldOrderTracker = trackTransactionalRequests(coldOrderPage);
       await coldOrderPage.goto(attemptUrl);
       await expect(coldOrderPage.getByRole("heading", { name: "Order created", level: 1 })).toBeVisible();
-      await expect(coldOrderPage.getByText(orderId)).toBeVisible();
-      await expect(coldOrderPage.getByText(`${product.name} × 3 · $12.50 each`)).toBeVisible();
+      await expect(coldOrderPage.getByLabel(`Order number ${orderNumber}`)).toBeVisible();
+      await expect(coldOrderPage.getByText("× 3 · $12.50 each")).toBeVisible();
       await expect(coldOrderPage.getByText("Order total: $37.50")).toBeVisible();
       expect((await (await fetchOrderByAttempt(request, attemptId)).json()) as OrderDto).toEqual(capturedOrder);
       expect(coldOrderTracker.paymentPosts() + coldOrderTracker.orderPosts()).toBe(0);

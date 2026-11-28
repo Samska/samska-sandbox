@@ -10,7 +10,7 @@ const item = { productId: product.id, name: product.name, quantity: 2, unitPrice
 const cart = { revision: 1, items: [item], total: 25 };
 const attemptId = "aaaaaaaa-1111-1111-1111-111111111111";
 const attempt = { attemptId, status: "approved", cartRevision: 1, items: [item], total: 25 };
-const order = { orderId: "bbbbbbbb-2222-2222-2222-222222222222", paymentAttemptId: attemptId,
+const order = { orderId: "bbbbbbbb-2222-2222-2222-222222222222", orderNumber: "SK-000128", paymentAttemptId: attemptId,
   cartRevision: 1, items: [item], total: 25 };
 
 function response(status: number, body?: unknown): Response {
@@ -90,9 +90,24 @@ describe("Order creation from a confirmed approved payment", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Back to Market" }));
     await screen.findByRole("heading", { name: "Products", level: 1 });
-    fireEvent.click(screen.getByRole("link", { name: "View latest journey" }));
-    expect(await screen.findByRole("heading", { name: "Order created", level: 1 })).toBeInTheDocument();
-    expect(window.location.pathname).toBe(`/checkout/attempts/${approvedAttemptId}`);
+    expect(screen.queryByRole("link", { name: "Resume payment" })).not.toBeInTheDocument();
+  });
+
+  it("shows the friendly Order number instead of the UUID and copies it", async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    setup();
+    await approve();
+    fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
+    await screen.findByRole("heading", { name: "Order created", level: 1 });
+
+    expect(screen.getByLabelText("Order number SK-000128")).toHaveTextContent("SK-000128");
+    expect(screen.queryByText(order.orderId)).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Track this order" })).toHaveAttribute("href", `/orders/${order.orderId}`);
+
+    fireEvent.click(screen.getByRole("button", { name: "Copy" }));
+    await screen.findByRole("button", { name: "Copied" });
+    expect(writeText).toHaveBeenCalledWith("SK-000128");
   });
 
   it("treats a lost POST as unconfirmed until the original Order is found by attempt", async () => {
@@ -104,7 +119,7 @@ describe("Order creation from a confirmed approved payment", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Back to Market" }));
     await screen.findByRole("heading", { name: "Products", level: 1 });
-    fireEvent.click(screen.getByRole("link", { name: "View latest journey" }));
+    fireEvent.click(screen.getByRole("link", { name: "Resume payment" }));
     fireEvent.click(await screen.findByRole("button", { name: "Check Order result" }));
 
     expect(await screen.findByRole("heading", { name: "Order created", level: 1 })).toBeInTheDocument();

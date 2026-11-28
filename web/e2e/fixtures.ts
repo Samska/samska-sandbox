@@ -31,6 +31,7 @@ export interface PaymentAttemptDto {
 
 export interface OrderDto {
   orderId: string;
+  orderNumber: string;
   paymentAttemptId: string;
   cartRevision: number;
   items: CartItemDto[];

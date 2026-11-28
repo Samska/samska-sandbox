@@ -139,31 +139,22 @@ export default function ProductBrowse({
         </div>
       ) : null}
       {!isPending && error === null && visibleProducts.length > 0 ? (
-        <ul className="grid list-none gap-6 p-0 m-0 min-[32rem]:grid-cols-2 min-[47rem]:grid-cols-3 min-[62rem]:grid-cols-4">
+        <ul className="m-0 grid list-none gap-2.5 p-0 min-[48rem]:grid-cols-2 min-[68rem]:grid-cols-3">
           {visibleProducts.map((product) => (
             <li
               key={product.id}
-              className="grid grid-rows-[auto_minmax(0,1fr)_auto] gap-3"
+              className="grid grid-cols-[5.5rem_minmax(0,1fr)] items-start gap-x-3 gap-y-1 rounded-sm border-[1.5px] border-ink bg-surface p-2.5"
             >
-              <div className="relative">
-                <ProductMedia product={product} variant="card" />
-                <span className="absolute right-3 top-3">
-                  <StockBadge product={product} />
-                </span>
-                <p className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full border-[1.5px] border-ink bg-surface px-3 py-1 font-mono text-sm font-semibold text-ink">
-                  <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full border-[1.5px] border-ink" />
-                  {formatAmount(product.price)}
-                </p>
+              <div className="row-span-3">
+                <ProductMedia product={product} variant="row" />
               </div>
-              <div className="grid min-w-0 content-start gap-1">
-                <h3 className="text-xl text-ink">
-                  {product.name}
-                </h3>
-                <p className="line-clamp-2 text-sm leading-relaxed text-muted">
-                  {product.description}
-                </p>
+              <h3 className="min-w-0 text-base uppercase leading-tight text-ink">{product.name}</h3>
+              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                <p className="font-mono text-[0.95rem] font-semibold text-ink">{formatAmount(product.price)}</p>
+                <StockBadge product={product} />
               </div>
-              <div className="flex items-center gap-2">
+              <p className="line-clamp-1 text-[0.82rem] text-muted">{product.description}</p>
+              <div className="col-start-2 flex items-center gap-2">
                 <Button
                   variant="secondary"
                   size="sm"

@@ -88,7 +88,7 @@ class OrderTrackingApiTest {
                 .containsExactly(second, first);
         assertThat((Integer) JsonPath.read(history.body(), "$[0].itemCount")).isEqualTo(1);
         assertThat(((Number) JsonPath.read(history.body(), "$[0].total")).doubleValue()).isEqualTo(30.0);
-        assertThat((String) JsonPath.read(history.body(), "$[0].reference")).matches("[0-9A-F]{4}-[0-9A-F]{4}");
+        assertThat((String) JsonPath.read(history.body(), "$[0].orderNumber")).matches("SK-\\d{6}");
         assertThat((String) JsonPath.read(history.body(), "$[0].status")).isEqualTo("PROCESSING");
 
         var shipment = client.get("/api/orders/" + second + "/shipment");

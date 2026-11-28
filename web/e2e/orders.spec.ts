@@ -14,8 +14,7 @@ test.describe("Order history and tracking in a real browser", () => {
 
     await expect(page).toHaveURL(/\/orders$/);
     await expect(page.getByRole("heading", { name: "Your orders", level: 1 })).toBeFocused();
-    const reference = order.orderId.replace(/-/g, "").slice(0, 8).toUpperCase();
-    const row = page.getByRole("row", { name: new RegExp(`${reference.slice(0, 4)}-${reference.slice(4)}`) });
+    const row = page.getByRole("listitem").filter({ hasText: order.orderNumber });
     await expect(row).toBeVisible();
     await expect(row).toContainText("$42.00");
     await expect(row).toContainText("Processing");

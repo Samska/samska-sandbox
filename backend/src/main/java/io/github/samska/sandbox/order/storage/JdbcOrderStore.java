@@ -1,7 +1,6 @@
 package io.github.samska.sandbox.order.storage;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,7 +24,12 @@ import io.github.samska.sandbox.payment.application.PaymentAttempts;
 
 public class JdbcOrderStore implements OrderStore {
 
-    private static final String ORDER_COLUMNS = "order_id, payment_attempt_id, cart_revision, total";
+    private static final String ORDER_COLUMNS = "order_id, order_number, payment_attempt_id, cart_revision, total";
+
+    private static final String SUMMARY_SELECT = """
+            SELECT o.order_id, o.order_number, o.created_at, o.total,
+                   (SELECT COUNT(*) FROM order_items i WHERE i.order_id = o.order_id) AS item_count
+            FROM orders o""";
 
     private final JdbcClient jdbc;
     private final PaymentAttempts attempts;
@@ -63,14 +67,14 @@ public class JdbcOrderStore implements OrderStore {
                         INSERT INTO orders (order_id, account_id, payment_attempt_id, cart_revision, total)
                         VALUES (:orderId, :accountId, :attemptId, :cartRevision, :total)
                         ON CONFLICT (payment_attempt_id) DO NOTHING
-                        RETURNING order_id
+                        RETURNING order_number
                         """)
                 .param("orderId", orderId)
                 .param("accountId", currentAccount.id())
                 .param("attemptId", attemptId)
                 .param("cartRevision", attempt.cartRevision())
                 .param("total", attempt.total())
-                .query((resultSet, rowNumber) -> resultSet.getObject("order_id", UUID.class))
+                .query((resultSet, rowNumber) -> resultSet.getLong("order_number"))
                 .optional();
 
         if (inserted.isEmpty()) {
@@ -114,7 +118,7 @@ public class JdbcOrderStore implements OrderStore {
         }
 
         return new OrderResult(
-                new Order(orderId, attemptId, attempt.cartRevision(), items, attempt.total()), true);
+                new Order(orderId, inserted.get(), attemptId, attempt.cartRevision(), items, attempt.total()), true);
     }
 
     @Override
@@ -132,35 +136,33 @@ public class JdbcOrderStore implements OrderStore {
     @Override
     @Transactional(readOnly = true)
     public List<OrderSummary> listForCurrentAccount() {
-        return jdbc.sql("""
-                        SELECT o.order_id, o.created_at, o.total,
-                               (SELECT COUNT(*) FROM order_items i WHERE i.order_id = o.order_id) AS item_count
-                        FROM orders o
-                        WHERE o.account_id = :accountId
-                        ORDER BY o.created_at DESC, o.order_id
-                        """)
+        return jdbc.sql(SUMMARY_SELECT + " WHERE o.account_id = :accountId ORDER BY o.order_number DESC")
                 .param("accountId", currentAccount.id())
-                .query((resultSet, rowNumber) -> new OrderSummary(
-                        resultSet.getObject("order_id", UUID.class),
-                        resultSet.getObject("created_at", java.time.OffsetDateTime.class).toInstant(),
-                        resultSet.getInt("item_count"),
-                        resultSet.getBigDecimal("total")))
+                .query(JdbcOrderStore::toSummary)
                 .list();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Instant> findCreatedAt(UUID orderId) {
+    public Optional<OrderSummary> findSummary(UUID orderId) {
         if (orderId == null) {
             return Optional.empty();
         }
 
-        return jdbc.sql("SELECT created_at FROM orders WHERE order_id = :orderId AND account_id = :accountId")
+        return jdbc.sql(SUMMARY_SELECT + " WHERE o.order_id = :orderId AND o.account_id = :accountId")
                 .param("orderId", orderId)
                 .param("accountId", currentAccount.id())
-                .query((resultSet, rowNumber) -> resultSet.getObject("created_at", java.time.OffsetDateTime.class)
-                        .toInstant())
+                .query(JdbcOrderStore::toSummary)
                 .optional();
+    }
+
+    private static OrderSummary toSummary(java.sql.ResultSet resultSet, int rowNumber) throws java.sql.SQLException {
+        return new OrderSummary(
+                resultSet.getObject("order_id", UUID.class),
+                resultSet.getLong("order_number"),
+                resultSet.getObject("created_at", java.time.OffsetDateTime.class).toInstant(),
+                resultSet.getInt("item_count"),
+                resultSet.getBigDecimal("total"));
     }
 
     private Optional<Order> findOrder(String column, UUID value) {
@@ -173,6 +175,7 @@ public class JdbcOrderStore implements OrderStore {
                 .param("accountId", currentAccount.id())
                 .query((resultSet, rowNumber) -> new OrderRow(
                         resultSet.getObject("order_id", UUID.class),
+                        resultSet.getLong("order_number"),
                         resultSet.getObject("payment_attempt_id", UUID.class),
                         resultSet.getLong("cart_revision"),
                         resultSet.getBigDecimal("total")))
@@ -200,11 +203,12 @@ public class JdbcOrderStore implements OrderStore {
             throw new IllegalStateException("Order has no items: " + row.orderId());
         }
 
-        return new Order(row.orderId(), row.paymentAttemptId(), row.cartRevision(), items, row.total());
+        return new Order(row.orderId(), row.orderNumber(), row.paymentAttemptId(), row.cartRevision(), items, row.total());
     }
 
     private record OrderRow(
             UUID orderId,
+            long orderNumber,
             UUID paymentAttemptId,
             long cartRevision,
             BigDecimal total) {
