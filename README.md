@@ -23,14 +23,14 @@ frontend package's `0.1.0` are build metadata, not the product release version.
 
 ## Live Demo
 
-A public demo runs on Railway: <https://store.samska.dev>. Everything in it is synthetic and no payment is real. The example catalog of 18 Products is fixed and is never reset.
+A public demo runs on Railway: <https://store.samska.dev>. Everything in it is synthetic and there is no payment. The example catalog of 18 Products is fixed and is never reset.
 
 A short tour:
 
 1. Browse the Market and open a Product.
 2. Add Products to the Cart (the Cart drawer opens from the header).
 3. Go to Checkout. Checkout needs a signed-in account and the demo has no sign-up, so the tour stops here unless you have the administrator account.
-4. Choose a simulated payment outcome (Approve, Decline or Temporary failure) and create the Order; the Cart empties.
+4. Place the order: Checkout has one "Place order" step, the Order is approved directly and the Cart empties.
 5. Open your Orders and track the simulated shipment.
 
 Only one account exists, the administrator, which is configured on the server and is not published here. It can shop as well as use the Admin area and the Operations screen. See [Deployment](docs/DEPLOYMENT.md).
@@ -41,14 +41,13 @@ Samska Sandbox uses a fictional catalog and order journey to demonstrate
 evidence-driven engineering. The current application contains a Java/Spring
 Boot backend, a React/TypeScript frontend, a Catalog boundary for Products with
 bounded local media upload, a Cart boundary persisted in PostgreSQL, an editable Checkout
-view over the current Cart with a simulated payment flow, and a separate Admin
-Product-management surface. Order is a separate boundary that copies approved
-simulated-payment data on an explicit action and persists the immutable Order in
-PostgreSQL and, once a new Order is stored, empties the account's Cart. The journey is attempt-addressed:
-`/checkout` hosts the editable Cart and `/checkout/attempts/{attemptId}` recovers
-the simulated payment result or Order confirmation through lookup APIs after a
-full-page reload, direct entry, or history navigation, without a router
-dependency. Orders, the Cart, Payment attempts, and the Catalog with its uploaded media
+view over the current Cart with a single "Place order" step, and a separate Admin
+Product-management surface. Order is a separate boundary that copies the current
+Cart snapshot when the customer places the order, persists the immutable Order in
+PostgreSQL, takes the stock in the same transaction and, once a new Order is stored,
+empties the account's Cart. A retry with the same request ID returns the same Order,
+so an unconfirmed response never places two. There is no payment: every Order is
+approved directly. Orders, the Cart, and the Catalog with its uploaded media
 survive a backend restart.
 
 AI agents are implementation tools operating under repository-defined
@@ -67,19 +66,18 @@ validation, learning, and risk.
 | Product UX Foundation | Implemented | Commerce-oriented shell, responsive Product browsing, integrated Cart presentation, and accessible feedback. |
 | Product Storefront UX/UI | Implemented | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged. |
 | Market Product-name search | Implemented | Case- and accent-insensitive substring filter on `Product.name` in the Market; term is held in `Catalog` while mounted, never written to the URL/history/storage/logs, and never sent to the API (`GET /api/products` is unchanged); Admin keeps its accent-sensitive filter by decision. |
-| Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource or identity exists; payment initiation captures the immutable revision-checked snapshot. |
-| Payment Simulator | Implemented | An explicit local-demo outcome over a revision-checked immutable Cart snapshot; Payment owns identified attempts with UUID replay, GET reconciliation, one approval per unchanged Cart revision, persisted in PostgreSQL with no attempt cap. Approval alone creates no Order or real payment; attempts are lost on restart. |
-| Order creation | Implemented | Explicit creation from an approved attempt; immutable copied lines and total persisted with the Order in PostgreSQL; same-attempt replay and GET reconciliation survive restart; the former 32-Order process-local cap is removed. |
-| First Order journey | Implemented | Attempt-addressed `/checkout` and `/checkout/attempts/{attemptId}` surfaces recover the simulated payment result or Order confirmation through lookup APIs after reload, direct entry, and history; route reads are GET-only with pending-operation and stale-response guards; a recovered result does not require the live Cart, the live Cart is never cleared, and one `sessionStorage` reference is only a discovery hint. |
+| Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource or identity exists; placing the order captures the immutable revision-checked snapshot. |
+| Order creation | Implemented | One "Place order" step from Checkout: the server reads the Cart at the reviewed revision, stores immutable copied lines and total with the Order in PostgreSQL, takes the stock in the same transaction, empties the Cart, and replays the same Order for the same request ID. The simulated payment (SS-036) was removed in SS-099; every Order is approved directly. |
+| First Order journey | Implemented | Add to Cart, review in Checkout, place the order, and see the Order number; the Order then shows in the history and opens its tracking. |
 | Admin Catalog Management | Implemented | Compact management list at `/admin/products` with case-insensitive name search, thumbnails, Edit links, and delete confirmation; dedicated `/admin/products/new` and `/admin/products/{id}/edit` forms with staged image selection; Admin paths require an administrator sign-in. |
 | Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in PostgreSQL under a bounded total size; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
 | Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
-| Automated browser E2E | Implemented | Two Chromium Playwright tests against the real frontend, Vite proxy, and a fresh exclusively owned backend: First Order success with reload/direct-entry recovery, frozen data, explicit Order creation, and keyboard/focus checks, plus a declined outcome without an Order path; serialized execution, synthetic fixtures through existing APIs, diagnostics on failure. |
-| PostgreSQL | Implemented | Required local Compose runtime with JDBC, Flyway migrations, and database health; persists Products, media, Carts, Payment attempts, Orders, accounts and stock. |
-| Accounts and sessions | Implemented (release/1.0) | Sign-in and sign-out (no self sign-up: the administrator account comes from configuration), server-side sessions, an administrator role, and per-account Cart, Payment attempts and Orders. |
+| Automated browser E2E | Implemented | Chromium Playwright tests against the real frontend, Vite proxy, and a fresh exclusively owned backend, including the First Order in one Checkout step with frozen data and keyboard/focus checks; serialized execution, synthetic fixtures through existing APIs, diagnostics on failure. |
+| PostgreSQL | Implemented | Required local Compose runtime with JDBC, Flyway migrations, and database health; persists Products, media, Carts, Orders, accounts and stock. |
+| Accounts and sessions | Implemented (release/1.0) | Sign-in and sign-out (no self sign-up: the administrator account comes from configuration), server-side sessions, an administrator role, and per-account Cart and Orders. |
 | Order history and tracking | Implemented (release/1.0) | Order history and a simulated shipment lifecycle derived from the Order time. |
-| Inventory | Implemented (release/1.0) | Stock per Product, reservation on approved payment, consumption on Order, sold-out states, and a Stock field in Admin. |
+| Inventory | Implemented (release/1.0) | Stock per Product, consumption when the Order is placed, sold-out states, and a Stock field in Admin. |
 | Operations | Implemented (release/1.0) | An administrator screen with real figures, correlation IDs and structured request logs. |
 | Security and demo mode | Implemented (release/1.0) | Rate limiting, security headers, a `prod` profile, a threat model and a containerized runtime. |
 | Deployment | Planned | No deployment exists; interactive browser checks and real-browser accessibility remain Human Verification concerns. |
@@ -88,20 +86,18 @@ validation, learning, and risk.
 
 ```mermaid
 flowchart LR
-    User[User / browser] --> UI[React / TypeScript<br/>Market, Admin, Cart,<br/>Checkout, Payment, and Order UI]
+    User[User / browser] --> UI[React / TypeScript<br/>Market, Admin, Cart,<br/>Checkout, and Order UI]
     UI --> Adapter[Feature API adapters]
     Adapter --> Proxy[Vite development<br/>/api proxy]
-    Proxy --> HTTP[Spring Boot<br/>Catalog, Cart, Payment,<br/>and Order HTTP APIs]
-    HTTP --> App[Catalog, Cart, Payment, and Order<br/>applications plus Product/Cart<br/>deletion coordination]
+    Proxy --> HTTP[Spring Boot<br/>Catalog, Cart,<br/>and Order HTTP APIs]
+    HTTP --> App[Catalog, Cart, and Order<br/>applications plus Product/Cart<br/>deletion coordination]
     App --> Domain[Product domain]
     App --> Store[ProductStore boundary]
     Store --> Memory[JdbcProductStore<br/>PostgreSQL<br/>Product + uploaded media]
     App --> Cart[Cart aggregate]
     Cart --> CartMemory[JdbcCartStore<br/>PostgreSQL<br/>single current Cart]
-    App --> Payment[Payment application<br/>revision-checked snapshots,<br/>replay, and approvals]
-    Payment --> Cart
-    App --> Order[Order application<br/>immutable records and<br/>attempt replay]
-    Order --> Payment
+    App --> Order[Order application<br/>revision-checked snapshots,<br/>immutable records and<br/>request replay]
+    Order --> Cart
     Order --> Jdbc[JdbcOrderStore<br/>transactional write and replay]
     Jdbc --> Postgres[(PostgreSQL<br/>Flyway-managed orders and items)]
 ```
@@ -112,21 +108,17 @@ a backend restart; a Cart line keeps its own name and price snapshot. Uploaded m
 before storage, is limited to one image per Product, and is served only for the
 Product's current media ID; rejection leaves the Product and its current image
 unchanged. Checkout is a frontend
-review of the current Cart; payment initiation captures an immutable,
-revision-checked Cart snapshot owned by the Payment attempt store, persisted in
-PostgreSQL, which replays identical submissions by attempt ID. Approval alone creates no Order; an explicit action copies the
-approved frozen attempt into an immutable Order persisted with its items in
-PostgreSQL. The First Order journey is attempt-addressed: after a reload or
-direct entry, the attempt URL resolves the Payment result or Order through
-read-only lookups, never by resending a request, and a result cannot be
-confirmed by only a missing record. A saved attempt URL still recovers a stored
-Order after the backend restarts, even though the source Payment attempt is
-gone. No real payment, credentials, or provider is involved. The Admin surface
+review of the current Cart; placing the order captures an immutable,
+revision-checked Cart snapshot, copies it into an Order persisted with its items in
+PostgreSQL and takes the stock in the same transaction. The client sends a request ID
+with the reviewed Cart revision, so a retry after an unconfirmed response returns the
+same Order instead of placing a second one. No payment, credentials, or provider is
+involved. The Admin surface
 is a separate frontend area over the same Catalog API, and the server requires
 the administrator role for it. Product deletion is refused with `409` while the
 Product is in the current Cart through a process-local coordination lock that
 covers the HTTP add-to-Cart and delete-Product paths. PostgreSQL is required for
-backend startup and stores Orders, items, the current Cart, Payment attempts, Products, and uploaded
+backend startup and stores Orders, items, the current Cart, Products, and uploaded
 media.
 
 ## Engineering Practices
@@ -179,9 +171,8 @@ The Product Storefront UX/UI refinement (SS-031) is complete and merged through
 PR #52. Checkout (SS-032) is implemented as an editable live view of the current
 Cart. Admin Catalog Management (SS-033) is complete and merged through PR #56.
 Product Media Upload (SS-034) is complete and merged through PR #58. Payment
-Simulator (SS-036) provides explicit simulated payment outcomes over a
-revision-checked immutable Cart snapshot owned by the Payment attempt store,
-persisted in PostgreSQL. Order creation (SS-037) is implemented and merged through PR #67; the
+Simulator (SS-036) provided explicit simulated payment outcomes; it was removed
+by SS-099 and Checkout now places the Order in one step. Order creation (SS-037) is implemented and merged through PR #67; the
 owner observed the main browser flow, while API replay, uncertain-response
 recovery, and accessibility checks remain unobserved for SS-037 itself. The
 First Order journey (SS-039) is complete and merged through PR #70: `/checkout`
@@ -204,8 +195,8 @@ historical files remain at commit `4ec11f8`, and the portable rules now live in
 `AGENTS.md` and AI Engineering Governance. SS-046 (#87) remains historical
 adoption evidence. SS-049 (#95) is complete and merged through PR #96:
 PostgreSQL persistence for Orders and items, with JDBC and Flyway, the Order
-capacity guard removed, and Products, media, Cart, and Payment attempts still
-process-local. SS-051 (#98) is complete and merged through PR #99 (squash
+capacity guard removed, and Products, media, and Cart still
+process-local at that point (all were persisted later). SS-051 (#98) is complete and merged through PR #99 (squash
 `db9047b`, merged 2026-10-27): it removes the mandatory Orchestrator, role
 hierarchy, specialist catalogue, and Maestri adapter, and establishes a bounded
 engineering loop without changing application behavior. SS-052 (#100) is
@@ -231,7 +222,7 @@ Human Verification pilot retained concise scenarios as an optional practice for
 relevant flows; its documentation-only PR #94 is merged and Issue #64 is closed;
 it is not part of SS-042. On `release/1.0`, accounts and roles guard Admin and
 the API (see [Security](docs/SECURITY.md) and the [Threat Model](docs/THREAT-MODEL.md));
-the simulated-payment endpoints are for synthetic data only. Future
+Orders are for synthetic data only. Future
 capabilities receive an SS identifier only when their GitHub Issue is created;
 the roadmap does not reserve future identifiers.
 
