@@ -21,6 +21,20 @@ GitHub-generated source archives and no additional assets. See the
 [Releasing](docs/RELEASING.md). The backend's `0.1.0-SNAPSHOT` and the private
 frontend package's `0.1.0` are build metadata, not the product release version.
 
+## Live Demo
+
+A public demo runs on Railway: <https://web-production-6ff86cf5.up.railway.app>. Everything in it is synthetic and no payment is real. The demo data is reset daily, so orders you place are temporary.
+
+A short tour:
+
+1. Browse the Market and open a Product.
+2. Add Products to the Cart (the Cart drawer opens from the header).
+3. Register with any synthetic email, then go to Checkout.
+4. Choose a simulated payment outcome (Approve, Decline or Temporary failure) and create the Order; the Cart empties.
+5. Open your Orders and track the simulated shipment.
+
+The Admin area and the Operations screen need the administrator account, which is configured on the server and is not published here. See [Deployment](docs/DEPLOYMENT.md).
+
 ## Purpose And Scope
 
 Samska Sandbox uses a fictional catalog and order journey to demonstrate
@@ -67,7 +81,7 @@ validation, learning, and risk.
 | Order history and tracking | Implemented (release/1.0) | Order history and a simulated shipment lifecycle derived from the Order time. |
 | Inventory | Implemented (release/1.0) | Stock per Product, reservation on approved payment, consumption on Order, sold-out states, and a Stock field in Admin. |
 | Operations | Implemented (release/1.0) | An administrator screen with real figures, correlation IDs and structured request logs. |
-| Security and demo mode | Implemented (release/1.0) | Rate limiting, security headers, a `prod` profile, a threat model, a demo banner, a synthetic-data reset and a containerized runtime. |
+| Security and demo mode | Implemented (release/1.0) | Rate limiting, security headers, a `prod` profile, a threat model, a synthetic-data reset and a containerized runtime. |
 | Deployment | Planned | No deployment exists; interactive browser checks and real-browser accessibility remain Human Verification concerns. |
 
 ## Architecture
