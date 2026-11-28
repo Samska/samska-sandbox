@@ -23,22 +23,20 @@ const stageGridStyle = {
   backgroundSize: "25% 25%"
 } as const;
 
-type ProductMediaVariant = "card" | "detail" | "thumbnail" | "square" | "row";
+type ProductMediaVariant = "card" | "detail" | "thumbnail" | "square";
 
 const mediaVariantClassName: Record<ProductMediaVariant, string> = {
   card: "aspect-square rounded-sm",
   detail: "aspect-[4/3] rounded-lg",
   thumbnail: "h-12 w-12 shrink-0 rounded-sm",
-  square: "aspect-square rounded-md",
-  row: "h-[5.5rem] w-[5.5rem] shrink-0 rounded-sm"
+  square: "aspect-square rounded-md"
 };
 
 const monogramVariantClassName: Record<ProductMediaVariant, string> = {
   card: "h-28 w-28 text-6xl",
   detail: "h-32 w-32 text-7xl",
   thumbnail: "h-8 w-8 text-sm",
-  square: "h-20 w-20 text-4xl",
-  row: "h-10 w-10 text-xl"
+  square: "h-20 w-20 text-4xl"
 };
 
 type ProductMediaProduct = Pick<ProductResponse, "id" | "name" | "mediaKey" | "uploadedMediaId">;
@@ -75,11 +73,7 @@ export default function ProductMedia({
     );
   }
 
-  const showMarks = variant === "card" || variant === "detail" || variant === "row";
-  const markClassName =
-    variant === "row"
-      ? "absolute bottom-1 left-1 z-10 rounded-[2px] border border-ink bg-surface px-1 font-mono text-[0.55rem] text-ink"
-      : "absolute left-3 top-3 z-10 rounded-[3px] border-[1.5px] border-ink bg-surface px-1.5 font-mono text-[0.7rem] text-ink";
+  const showMarks = variant === "card" || variant === "detail";
   const art = source === undefined ? productArt(product.mediaKey) : undefined;
 
   if (art !== undefined) {
@@ -91,7 +85,7 @@ export default function ProductMedia({
         data-product-art={product.mediaKey ?? undefined}
       >
         {showMarks ? (
-          <span className={markClassName}>
+          <span className="absolute left-3 top-3 z-10 rounded-[3px] border-[1.5px] border-ink bg-surface px-1.5 font-mono text-[0.7rem] text-ink">
             No. {catalogNumber(product.id)}
           </span>
         ) : null}
@@ -112,7 +106,7 @@ export default function ProductMedia({
       aria-hidden="true"
     >
       {showMarks ? (
-        <span className={markClassName}>
+        <span className="absolute left-3 top-3 rounded-[3px] border-[1.5px] border-ink bg-surface px-1.5 font-mono text-[0.7rem] text-ink">
           No. {catalogNumber(product.id)}
         </span>
       ) : null}
