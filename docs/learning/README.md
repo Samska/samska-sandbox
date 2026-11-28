@@ -73,6 +73,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-077-empty-state-design-fix.md](ss-077-empty-state-design-fix.md) | Prototype fidelity in the running app and one shared component for a repeated pattern. |
 | [ss-078-theme-switch.md](ss-078-theme-switch.md) | Layering a user theme override over the system preference, flash-free loading under a strict CSP, and failure-tolerant storage. |
 | [ss-079-image-build-in-ci.md](ss-079-image-build-in-ci.md) | Why deployment artifacts are built in CI, and the Maven wrapper's dependency on `unzip`. |
+| [ss-081-demo-sample-products.md](ss-081-demo-sample-products.md) | Idempotent seeding of demo data and why it must not overwrite existing data. |
 | [ss-080-web-dns-resolver.md](ss-080-web-dns-resolver.md) | Why the web image must use the platform's DNS resolver, and how it was verified. |
 | [ss-065-cart-persistence.md](ss-065-cart-persistence.md) | Transactional update contract for a mutable aggregate, row-lock serialization of a business revision, domain rules kept out of the store, and snapshot rows without a foreign key. |
 | [ss-049-order-persistence.md](ss-049-order-persistence.md) | Port-first PostgreSQL persistence, unique-key idempotency, transaction rollback versus lost responses, restart evidence, and bounded database-failure behavior. |
