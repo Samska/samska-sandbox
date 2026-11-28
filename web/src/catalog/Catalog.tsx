@@ -565,15 +565,6 @@ export default function Catalog() {
     void refreshCart();
   }
 
-  function handleForgetLatestReference() {
-    if (latestReference === null) {
-      return;
-    }
-
-    forgetLatestReferenceIf(latestReference);
-    setReferenceNotice(referenceForgottenMessage);
-  }
-
   async function handleAddToCart(product: ProductResponse) {
     if (anonymous) {
       navigateTo("/account");
@@ -922,17 +913,15 @@ export default function Catalog() {
   );
 
   const latestJourneyLink =
-    latestReference !== null && (isMarketPath || isCheckoutPath) ? (
+    latestReference !== null && !isReferenceFinished(latestReference) && (isMarketPath || isCheckoutPath) ? (
       <LatestJourneyLink
         reference={latestReference}
-        unresolved={!isReferenceFinished(latestReference)}
         busy={
           (paymentPending && paymentPendingAttemptId === latestReference) ||
           orderPendingAttemptIds.has(latestReference)
         }
         onOpen={() => navigateJourney(attemptPath(latestReference))}
         onAbandon={() => handleAbandonReference(latestReference)}
-        onForget={handleForgetLatestReference}
       />
     ) : null;
 

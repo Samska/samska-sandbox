@@ -4,13 +4,15 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+import io.github.samska.sandbox.order.Order;
+
 /**
  * A simulated shipment. It is derived from the Order's creation time and the current time, so there is
  * no stored state to keep in sync; the same inputs always give the same shipment.
  */
 public record Shipment(
         UUID orderId,
-        String reference,
+        String orderNumber,
         String trackingCode,
         String courier,
         ShipmentStatus status,
@@ -20,7 +22,7 @@ public record Shipment(
 
     public static final String COURIER = "Simulated Express";
 
-    public static Shipment of(UUID orderId, Instant createdAt, Instant now, ShippingPolicy policy) {
+    public static Shipment of(UUID orderId, long orderNumber, Instant createdAt, Instant now, ShippingPolicy policy) {
         var delayed = isDelayed(orderId);
         var extra = delayed ? policy.delay() : java.time.Duration.ZERO;
 
@@ -48,19 +50,13 @@ public record Shipment(
             status = ShipmentStatus.PROCESSING;
         }
 
-        return new Shipment(orderId, reference(orderId), trackingCode(orderId), COURIER, status, delayed,
+        return new Shipment(orderId, Order.displayNumber(orderNumber), trackingCode(orderId), COURIER, status, delayed,
                 delivered, steps);
     }
 
     /** About one Order in five is delayed, chosen from the Order ID so it is stable. */
     public static boolean isDelayed(UUID orderId) {
         return Math.floorMod(orderId.getLeastSignificantBits(), 5L) == 0;
-    }
-
-    /** The short code shown to people, such as {@code 2AFA-6574}. */
-    public static String reference(UUID orderId) {
-        var hex = orderId.toString().replace("-", "").toUpperCase(java.util.Locale.ROOT);
-        return hex.substring(0, 4) + "-" + hex.substring(4, 8);
     }
 
     public static String trackingCode(UUID orderId) {

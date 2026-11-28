@@ -8,7 +8,7 @@ import io.github.samska.sandbox.shipping.Shipment;
 
 public record ShipmentResponse(
         UUID orderId,
-        String reference,
+        String orderNumber,
         String trackingCode,
         String courier,
         String status,
@@ -21,7 +21,7 @@ public record ShipmentResponse(
 
     public static ShipmentResponse from(Shipment shipment) {
         return new ShipmentResponse(
-                shipment.orderId(), shipment.reference(), shipment.trackingCode(), shipment.courier(),
+                shipment.orderId(), shipment.orderNumber(), shipment.trackingCode(), shipment.courier(),
                 shipment.status().name(), shipment.delayed(), shipment.estimatedDelivery(),
                 shipment.steps().stream().map(step -> new Step(step.code(), step.at(), step.done())).toList());
     }

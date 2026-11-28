@@ -3,7 +3,7 @@ import { createOrder, getOrder, getOrderByPaymentAttempt, OrderApiError } from "
 
 const attemptId = "aaaaaaaa-1111-1111-1111-111111111111";
 const order = {
-  orderId: "bbbbbbbb-2222-2222-2222-222222222222", paymentAttemptId: attemptId, cartRevision: 1,
+  orderId: "bbbbbbbb-2222-2222-2222-222222222222", orderNumber: "SK-000128", paymentAttemptId: attemptId, cartRevision: 1,
   items: [{ productId: "cccccccc-3333-3333-3333-333333333333", name: "Canvas Tote",
     unitPrice: 12.5, quantity: 2, lineSubtotal: 25 }], total: 25
 };

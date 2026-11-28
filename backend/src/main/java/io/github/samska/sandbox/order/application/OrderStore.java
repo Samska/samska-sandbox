@@ -1,6 +1,5 @@
 package io.github.samska.sandbox.order.application;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,6 +18,6 @@ public interface OrderStore {
     /** The signed-in account's Orders, newest first. */
     List<OrderSummary> listForCurrentAccount();
 
-    /** When the signed-in account's Order was created; empty for an unknown or foreign Order. */
-    Optional<Instant> findCreatedAt(UUID orderId);
+    /** The signed-in account's Order line; empty for an unknown or foreign Order. */
+    Optional<OrderSummary> findSummary(UUID orderId);
 }

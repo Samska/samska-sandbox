@@ -92,6 +92,23 @@ class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
     }
 
     @Test
+    void numbersOrdersInCreationOrderWithAFriendlyDisplayForm() {
+        attempts.put(FIRST, attempt(FIRST, PaymentScenario.APPROVE, "Canvas Tote", "12.50", 1, "12.50"));
+        attempts.put(SECOND, attempt(SECOND, PaymentScenario.APPROVE, "Canvas Tote", "12.50", 1, "12.50"));
+
+        var first = store.create(FIRST).order();
+        var second = store.create(SECOND).order();
+
+        assertThat(second.orderNumber()).isGreaterThan(first.orderNumber());
+        assertThat(store.create(FIRST).order().orderNumber()).isEqualTo(first.orderNumber());
+        assertThat(store.findSummary(second.orderId())).get()
+                .extracting(summary -> summary.orderNumber()).isEqualTo(second.orderNumber());
+        assertThat(store.listForCurrentAccount()).extracting(summary -> summary.orderNumber())
+                .containsExactly(second.orderNumber(), first.orderNumber());
+        assertThat(Order.displayNumber(128)).isEqualTo("SK-000128");
+    }
+
+    @Test
     void preservesItemOrderForMultiItemOrders() {
         attempts.put(FIRST, new PaymentAttempt(FIRST, 1, PaymentScenario.APPROVE,
                 List.of(
@@ -205,8 +222,8 @@ class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
             }
 
             @Override
-            public Optional<java.time.Instant> findCreatedAt(UUID orderId) {
-                return store.findCreatedAt(orderId);
+            public Optional<io.github.samska.sandbox.order.OrderSummary> findSummary(UUID orderId) {
+                return store.findSummary(orderId);
             }
         };
 

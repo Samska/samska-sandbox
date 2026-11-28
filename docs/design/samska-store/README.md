@@ -49,6 +49,17 @@ Status: **Implemented for owner local validation (2026-11-27). The owner approve
 - Deviations from the prototype: the catalog number is derived from the Product id because Products have no catalog number yet; the fallback stage uses a monogram because there are no illustrations; the success text color was darkened from `#0d7a3f` to `#0b6b37` in the app, the prototype and the tokens to reach 4.5:1 on its surface (found by the new contrast test).
 - Verification: unit and component tests, a contrast test over the token pairs, and Playwright checks at 1280 and 390 px in light and dark, as described in [TESTING.md](../../TESTING.md).
 
+## SS-085 — Market list, payment-resume notice, Orders and Order number (for owner review)
+
+Status: **Owner-approved (2026-11-28, project thread: "Eu aprovo"). Applied in SS-088. Design only until built.**
+
+- Source of truth: [prototypes/catalog-orders.html](prototypes/catalog-orders.html), same Bench tokens as `bench.html`. A bar at the top switches screen and theme; checked at 390 and 1280 px in light and dark with no horizontal overflow.
+- Market list: compact horizontal object rows (88 px stage, name, price, stock tag, one line of description, Details and Add to cart) instead of full-width cards.
+- Payment-resume notice: replaces the "View latest journey / Forget latest reference" box. It shows only while the last payment attempt is unfinished, with "Resume payment" and "Dismiss"; it is hidden once the attempt finished.
+- Orders: slips on mobile, aligned one-line rows from 768 px; no table and no horizontal scroll.
+- Order created and Order number: the customer sees a sequential number such as `SK-000128` with a Copy button instead of a UUID. Recommended storage: keep the UUID as the primary key and in URLs, add a unique `order_number` column filled from a database sequence (Flyway migration, back-filled in creation order), and render it with a prefix and six digits.
+- Not changed: `web/` code and backend behavior. Building this needs its own approved Issue.
+
 ## SS-053 — Current-interface Batch 1 (owner-approved, revn 52)
 
 Status: **Owner-approved design delivery (Batch 1) at `revn 52`; completed via Issue #102 and merged PR #103. Design approval only; not production adoption.**

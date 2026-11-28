@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Samska Bench — Catalog list, Orders and Order number</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Revision of the Bench identity for the Market list, the payment-resume notice, Orders and the Order created screen.
+   Same tokens as bench.html. Design only: it changes no application code. */
+:root { --ground:#e4e7e4; --paper:#f7f8f5; --paper2:#dde1de; --ink:#111518; --muted:#5a6560; --hair:#b8beb9; --signal:#ff4a1c; --focus:#0a58ff; --ok:#0b6b37; --okbg:#dcefe3; --warn:#7a4a00; --warnbg:#f8e8bd; --info:#1a3f8f; --infobg:#dfe8fb; --bad:#a3141f; --badbg:#f9dcdc; --display:"Archivo","Arial Narrow",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace; --r:6px; }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ground:#0e1114;--paper:#171b1f;--paper2:#1f252a;--ink:#eef0ec;--muted:#98a39d;--hair:#343c43;--signal:#ff5a2e;--focus:#7aa6ff;--ok:#6fd49b;--okbg:#12301f;--warn:#f0c46a;--warnbg:#3a2d0c;--info:#9db9ff;--infobg:#17274a;--bad:#ff9a9a;--badbg:#3d1519;color-scheme:dark}}
+:root[data-theme="dark"]{--ground:#0e1114;--paper:#171b1f;--paper2:#1f252a;--ink:#eef0ec;--muted:#98a39d;--hair:#343c43;--signal:#ff5a2e;--focus:#7aa6ff;--ok:#6fd49b;--okbg:#12301f;--warn:#f0c46a;--warnbg:#3a2d0c;--info:#9db9ff;--infobg:#17274a;--bad:#ff9a9a;--badbg:#3d1519;color-scheme:dark}
+*{box-sizing:border-box} [hidden]{display:none!important}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--display);line-height:1.5}
+button{font:inherit;color:inherit;cursor:pointer} a{color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.proto{display:flex;gap:8px;flex-wrap:wrap;padding:8px 16px;background:var(--paper);border-bottom:1.5px dashed var(--ink);font-family:var(--mono);font-size:.7rem;position:sticky;top:0;z-index:20}
+.proto button{border:1.5px solid var(--ink);background:transparent;border-radius:var(--r);padding:4px 8px}
+.proto button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+.proto i{font-style:normal;opacity:.6;align-self:center}
+header.shell{border-bottom:1.5px solid var(--ink);background:var(--ground)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:0 16px;max-width:76rem;margin:0 auto}
+.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none}.brand svg{width:32px;height:32px}
+.brand b{font-weight:900;font-stretch:125%;font-size:1.3rem;letter-spacing:.02em;text-transform:uppercase}
+.menu-btn{min-height:44px;padding:0 12px;border:1.5px solid var(--ink);border-radius:var(--r);background:transparent;font-family:var(--mono);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+main{max-width:76rem;margin:0 auto;padding:20px 16px 48px;display:grid;gap:18px}
+h1{margin:0;font-weight:900;font-stretch:75%;text-transform:uppercase;font-size:clamp(2.2rem,6vw,3.6rem);line-height:.95}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 14px;border:1.5px solid var(--ink);border-radius:var(--r);background:var(--paper);font-family:var(--mono);font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;text-decoration:none}
+.btn.primary{background:var(--signal);color:#111518;box-shadow:0 3px 0 var(--ink)}
+.btn.quiet{border-color:transparent;background:transparent;text-decoration:underline}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sm{min-height:40px;padding:0 12px;font-size:.72rem}
+input[type=search]{width:100%;min-height:44px;padding:0 12px;border:1.5px solid var(--ink);border-radius:var(--r);background:var(--paper);font:inherit;color:inherit}
+.search{display:grid;gap:4px;max-width:26rem}.search label{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.count{font-family:var(--mono);font-size:.75rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+
+/* 1 — Market list: horizontal object rows */
+.objects{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+@media(min-width:48rem){.objects{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:68rem){.objects{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.obj{display:grid;grid-template-columns:88px minmax(0,1fr);gap:4px 12px;padding:10px;border:1.5px solid var(--ink);border-radius:var(--r);background:var(--paper);align-items:start}
+.stage{grid-row:span 3;width:88px;height:88px;border:1.5px solid var(--ink);border-radius:4px;position:relative;overflow:hidden;background:var(--paper2)}
+.stage svg{display:block;width:100%;height:100%}
+.stage .no{position:absolute;left:4px;bottom:3px;font-family:var(--mono);font-size:.56rem;letter-spacing:.06em;background:var(--paper);border:1px solid var(--ink);padding:0 3px;border-radius:2px}
+.obj h3{margin:0;font-weight:800;font-size:1.02rem;line-height:1.2;text-transform:uppercase;font-stretch:90%}
+.obj .meta{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;font-family:var(--mono);font-size:.75rem}
+.price{font-weight:600;font-size:.95rem}
+.obj p{margin:0;font-size:.82rem;color:var(--muted);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.obj .acts{display:flex;gap:8px;align-items:center}
+.obj .acts .btn:last-child{flex:1}
+.tag{display:inline-flex;align-items:center;gap:5px;padding:0 8px;border:1.5px solid currentColor;border-radius:999px;font-family:var(--mono);font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;line-height:1.5}
+.tag.ok{color:var(--ok);background:var(--okbg)}.tag.warn{color:var(--warn);background:var(--warnbg)}.tag.info{color:var(--info);background:var(--infobg)}.tag.bad{color:var(--bad);background:var(--badbg)}
+
+/* 2 — payment resume notice */
+.notice{display:grid;gap:10px;padding:12px 14px;border:1.5px solid var(--ink);border-left-width:6px;border-radius:var(--r);background:var(--paper)}
+.notice .row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between}
+.notice strong{display:block;font-weight:800;text-transform:uppercase;font-stretch:90%}
+.notice span.sub{font-size:.85rem;color:var(--muted)}
+.notice .acts{display:flex;gap:8px;flex-wrap:wrap}
+
+/* 3 — Orders: slips, no table */
+.slips{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.slip{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:14px;border:1.5px solid var(--ink);border-radius:var(--r);background:var(--paper);align-items:center}
+.slip .no{font-family:var(--mono);font-weight:600;font-size:1.05rem;letter-spacing:.02em}
+.slip .when{font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.slip .tot{font-family:var(--mono);font-weight:600;font-size:1.05rem;text-align:right}
+.slip .go{grid-column:1/-1;border-top:1.5px dashed var(--hair);padding-top:10px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+@media(min-width:48rem){
+  .slip{grid-template-columns:minmax(9rem,1.1fr) 1.4fr 11rem 7rem auto;padding:10px 14px;gap:12px}
+  .slip .go{display:contents;border:0;padding:0}
+  .slip .tot{grid-column:4;grid-row:1}
+  .slip .goBtn{grid-column:5;grid-row:1}
+  .slip .stat{grid-column:3;grid-row:1}
+  .slip .head{grid-column:1;grid-row:1}
+  .slip .whenwrap{grid-column:2;grid-row:1}
+}
+.legend{display:none;font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:0 14px}
+@media(min-width:48rem){.legend{display:grid;grid-template-columns:minmax(9rem,1.1fr) 1.4fr 11rem 7rem 5.2rem;gap:12px}.legend span:nth-child(4){text-align:right}}
+.empty{display:grid;justify-items:start;gap:10px;padding:28px 20px;border:1.5px dashed var(--ink);border-radius:var(--r)}
+
+/* 4 — Order created: perforated slip with a human order number */
+.receipt{max-width:40rem;margin:0 auto;width:100%;border:1.5px solid var(--ink);border-radius:var(--r);background:var(--paper);box-shadow:0 4px 0 var(--ink);overflow:hidden}
+.receipt .top{padding:18px 18px 14px;display:grid;gap:8px}
+.stamp{justify-self:start;transform:rotate(-2deg);border:2.5px solid var(--ok);color:var(--ok);border-radius:4px;padding:2px 10px;font-weight:900;font-stretch:90%;text-transform:uppercase;letter-spacing:.08em}
+.num{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.num b{font-family:var(--mono);font-size:clamp(1.7rem,7vw,2.4rem);font-weight:600;letter-spacing:.02em}
+.perf{border-top:2px dashed var(--ink);position:relative;margin:0}
+.perf:before,.perf:after{content:"";position:absolute;top:-9px;width:16px;height:16px;border-radius:50%;background:var(--ground);border:1.5px solid var(--ink)}
+.perf:before{left:-9px}.perf:after{right:-9px}
+.receipt .body{padding:14px 18px 18px;display:grid;gap:12px}
+.lines{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.lines li{display:flex;justify-content:space-between;gap:12px;font-size:.95rem}
+.lines .q{font-family:var(--mono);color:var(--muted);font-size:.8rem}
+.total{display:flex;justify-content:space-between;border-top:1.5px solid var(--ink);padding-top:10px;font-weight:800;font-size:1.15rem}
+.total span:last-child{font-family:var(--mono)}
+.note{font-size:.82rem;color:var(--muted);margin:0}
+.facts{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pill{font-family:var(--mono);font-size:.62rem}
+.spec{margin-top:8px;padding:12px 14px;border:1.5px dashed var(--ink);border-radius:var(--r);font-size:.82rem;color:var(--muted)}
+.spec b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="proto" role="group" aria-label="Prototype controls">
+  <button data-s="market">Market list</button><button data-s="resume">Resume notice</button><button data-s="orders">Orders</button><button data-s="empty">Orders empty</button><button data-s="created">Order created</button>
+  <i>|</i><button data-th="system">Auto</button><button data-th="light">Light</button><button data-th="dark">Dark</button>
+</div>
+<header class="shell"><div class="bar">
+  <a class="brand" href="#"><svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="13" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="16" cy="16" r="6.5" fill="#ff4a1c" stroke="currentColor" stroke-width="2.5"/><path d="M16 0v7M16 25v7M0 16h7M25 16h7" stroke="currentColor" stroke-width="2.5"/></svg><b>Samska</b></a>
+  <button class="menu-btn">☰ Menu</button>
+</div></header>
+<main id="main"></main>
+<script>
+const P=[
+ ["Canvas Market Tote","29.90","Heavy cotton canvas, navy stripes, reinforced handles.","SK-0001","ok","In stock",0],
+ ["Stoneware Pour-over Set","64.00","Hand-glazed dripper and carafe for slow mornings.","SK-0002","warn","Low · 3 left",1],
+ ["Workshop Workbench","540.00","Solid beech top with a vise and tool well.","SK-0003","ok","In stock",2],
+ ["Brass Desk Lamp","88.50","Adjustable arm, warm light, weighted base.","SK-0004","bad","Sold out",3],
+ ["Field Notebook Trio","18.00","Three dot-grid notebooks, stitched spine.","SK-0005","ok","In stock",4],
+ ["Linen Apron","42.00","Washed linen with two deep pockets.","SK-0006","info","Preorder",5]];
+const C=["#ff4a1c","#0a58ff","#d6a400","#1b8a5a","#7a3fd1","#111518"];
+const art=i=>`<svg viewBox="0 0 88 88" aria-hidden="true"><rect width="88" height="88" fill="${C[i]}" opacity=".16"/><path d="M0 22h88M0 44h88M0 66h88M22 0v88M44 0v88M66 0v88" stroke="currentColor" opacity=".18"/><circle cx="44" cy="40" r="${14+i*2}" fill="${C[i]}" stroke="currentColor" stroke-width="2"/></svg>`;
+const obj=P.map((p,i)=>`<li class="obj"><div class="stage">${art(p[6])}<span class="no">${p[3]}</span></div>
+<h3>${p[0]}</h3><div class="meta"><span class="price">${p[1]}</span><span class="tag ${p[4]}">${p[5]}</span></div>
+<p>${p[2]}</p><div class="acts" style="grid-column:2"><a class="btn sm" href="#" aria-label="Details for ${p[0]}">Details</a><button class="btn sm primary" ${p[4]==="bad"?"disabled":""}>${p[4]==="bad"?"Sold out":"Add to cart"}</button></div></li>`).join("");
+const head=(e,t,s)=>`<div><p class="eyebrow">${e}</p><h1>${t}</h1>${s?`<p style="margin:6px 0 0;color:var(--muted)">${s}</p>`:""}</div>`;
+const market=(n)=>`${n||""}${head("Catalog","Products")}
+<div class="toolbar"><div class="search"><label for="q">Search products by name</label><input id="q" type="search"></div><button class="btn primary">Cart · 2 items · 59.80</button></div>
+<p class="count">6 products</p><ul class="objects">${obj}</ul>`;
+const resumeNotice=`<aside class="notice" aria-label="Payment in progress" style="border-left-color:var(--signal)"><div class="row"><div><strong>Payment not finished</strong><span class="sub">Your last simulated payment has no confirmed result yet.</span></div>
+<div class="acts"><a class="btn sm primary" href="#">Resume payment</a><button class="btn sm">Dismiss</button></div></div></aside>`;
+const S=[["SK-000128","27 Nov · 21:33","PACKED","warn","59.80",2],["SK-000127","26 Nov · 18:05","IN TRANSIT","info","128.00",1],["SK-000121","20 Nov · 09:12","DELIVERED","ok","540.00",1]];
+const orders=`${head("Account","Your orders")}<div class="legend"><span>Order</span><span>Placed</span><span>Status</span><span>Total</span><span></span></div>
+<ul class="slips">${S.map(o=>`<li class="slip"><div class="head"><div class="no">${o[0]}</div></div><div class="tot">${o[4]}</div>
+<div class="whenwrap when">${o[1]} · ${o[5]} item${o[5]>1?"s":""}</div><div class="go"><span class="stat"><span class="tag ${o[3]}">${o[2]}</span></span><a class="btn sm goBtn" href="#" aria-label="Track order ${o[0]}">Track</a></div></li>`).join("")}</ul>`;
+const empty=`${head("Account","Your orders")}<div class="empty"><h2 style="margin:0;font-weight:900;text-transform:uppercase">No orders yet</h2><p style="margin:0;color:var(--muted)">Orders you place appear here.</p><a class="btn primary" href="#">Browse catalog</a></div>`;
+const created=`<section class="receipt"><div class="top"><span class="stamp">Order placed</span><div class="eyebrow">Order number</div>
+<div class="num"><b id="on">SK-000128</b><button class="btn sm" id="cp">Copy</button></div>
+<div class="facts"><span>27 Nov 2026 · 21:33</span><span>Simulated payment · approved</span></div></div><hr class="perf">
+<div class="body"><ul class="lines"><li><span>Canvas Market Tote <span class="q">× 2 · 29.90</span></span><strong>59.80</strong></li></ul>
+<div class="total"><span>Order total</span><span>59.80</span></div>
+<p class="note">No real payment was made. Your live cart was not cleared and may have changed.</p>
+<div class="actions"><a class="btn primary" href="#">Track this order</a><a class="btn" href="#">Back to market</a><a class="btn quiet" href="#">Back to checkout</a></div></div></section>`;
+const spec={
+ market:`<div class="spec"><b>1 · Market list.</b> Horizontal object rows: 88 px stage, name, price and stock tag on one line, one line of description, two compact actions. About 120 px per product instead of ~560 px. One column at 390 px, two from 768 px, three from 1088 px. Search, count and cart stay as they are.</div>`,
+ resume:`<div class="spec"><b>2 · Resume notice.</b> The old box links back to the last payment attempt (a browser-session reference). Proposed: show it only while that attempt is unfinished, as a slim notice with "Resume payment" and "Dismiss". Once the payment finished, nothing is shown; the Order lives in Orders. "Latest journey" and "reference" wording disappears. Safety copy (a sent request may still complete) moves into the confirm step after Dismiss.</div>`,
+ orders:`<div class="spec"><b>3 · Orders.</b> No table and no horizontal scroll. At 390 px each order is a slip: number and total, date and item count, status and Track. From 768 px the same slip is one row with aligned columns. Statuses use the existing pill colors.</div>`,
+ empty:``,
+ created:`<div class="spec"><b>4 · Order number.</b> Shown to the customer as <b>SK-000128</b> (sequential, six digits, mono) with a Copy button, replacing the UUID. The UUID stays the internal key and in URLs; the number is stored in its own unique column. Track becomes the primary action; Back to checkout stays as a quiet link.</div>`};
+const main=document.getElementById("main");
+function show(s){document.querySelectorAll("[data-s]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.s===s));
+ main.innerHTML=({market:market(),resume:market(resumeNotice),orders,empty,created})[s]+spec[s];
+ const cp=document.getElementById("cp");if(cp)cp.onclick=async()=>{try{await navigator.clipboard.writeText("SK-000128");cp.textContent="Copied"}catch{cp.textContent="Copy failed"}};
+ history.replaceState(null,"","#"+s)}
+function theme(t){document.querySelectorAll("[data-th]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.th===t));
+ t==="system"?document.documentElement.removeAttribute("data-theme"):document.documentElement.dataset.theme=t}
+document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>show(b.dataset.s));
+document.querySelectorAll("[data-th]").forEach(b=>b.onclick=()=>theme(b.dataset.th));
+theme("system");show(location.hash.slice(1)||"market");
+</script>
+</body>
+</html>

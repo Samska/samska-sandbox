@@ -386,9 +386,9 @@ describe("Checkout simulated payment flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Back to Market" }));
 
     expect(await screen.findByRole("heading", { name: "Products", level: 1 })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "View latest journey" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Resume payment" })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("link", { name: "View latest journey" }));
+    fireEvent.click(screen.getByRole("link", { name: "Resume payment" }));
 
     expect(await screen.findByRole("heading", { name: "Payment in progress", level: 1 })).toBeInTheDocument();
     expect(countPaymentPosts(fetchMock)).toBe(1);
@@ -426,7 +426,7 @@ describe("Checkout simulated payment flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Back to Market" }));
     expect(await screen.findByRole("heading", { name: "Products", level: 1 })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("link", { name: "View latest journey" }));
+    fireEvent.click(screen.getByRole("link", { name: "Resume payment" }));
     expect(
       await screen.findByRole("heading", {
         name: "Payment result is unconfirmed. Check this attempt before trying again.",

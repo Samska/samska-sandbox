@@ -41,7 +41,7 @@ public class NoDatabaseOrderStoreConfiguration {
             }
 
             @Override
-            public Optional<Instant> findCreatedAt(UUID orderId) {
+            public Optional<OrderSummary> findSummary(UUID orderId) {
                 throw new UnsupportedOperationException("Order persistence is not available in this test");
             }
         };

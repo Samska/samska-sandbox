@@ -80,7 +80,7 @@ export default function TrackingPage({ orderId }: { orderId: string }) {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="font-mono text-[0.75rem] font-semibold uppercase tracking-[0.12em] text-muted">
-            Order {ready.reference}
+            Order {ready.orderNumber}
           </p>
           <h1 ref={headingRef} tabIndex={-1} className="text-[clamp(2rem,5vw,3.25rem)] font-black uppercase leading-none">
             {statusHeadline[ready.status]}

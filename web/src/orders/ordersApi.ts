@@ -4,7 +4,7 @@ export type ShipmentStatus = "PROCESSING" | "PACKED" | "IN_TRANSIT" | "DELAYED" 
 
 export interface OrderHistoryEntry {
   orderId: string;
-  reference: string;
+  orderNumber: string;
   createdAt: string;
   itemCount: number;
   total: number;
@@ -19,7 +19,7 @@ export interface ShipmentStep {
 
 export interface Shipment {
   orderId: string;
-  reference: string;
+  orderNumber: string;
   trackingCode: string;
   courier: string;
   status: ShipmentStatus;
@@ -93,7 +93,7 @@ function isHistoryEntry(value: unknown): value is OrderHistoryEntry {
   return (
     isRecord(value) &&
     typeof value.orderId === "string" &&
-    typeof value.reference === "string" &&
+    typeof value.orderNumber === "string" &&
     typeof value.createdAt === "string" &&
     typeof value.itemCount === "number" &&
     typeof value.total === "number" &&
@@ -106,7 +106,7 @@ function isShipment(value: unknown): value is Shipment {
   return (
     isRecord(value) &&
     typeof value.orderId === "string" &&
-    typeof value.reference === "string" &&
+    typeof value.orderNumber === "string" &&
     typeof value.trackingCode === "string" &&
     typeof value.courier === "string" &&
     typeof value.status === "string" &&

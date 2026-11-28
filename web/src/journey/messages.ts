@@ -12,7 +12,7 @@ export const unconfirmedPaymentPrimary =
   "Payment result is unconfirmed. Check this attempt before trying again.";
 
 export const paymentInProgressNote =
-  "This request is not cancelled if you leave this page. You can return through the latest journey link.";
+  "This request is not cancelled if you leave this page. You can return through the Resume payment link.";
 
 export const awaitingOrderMessage =
   "An approved payment attempt is awaiting its Order. Create the Order or stop following this " +

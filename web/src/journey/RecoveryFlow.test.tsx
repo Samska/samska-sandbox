@@ -22,6 +22,7 @@ const attempt = { attemptId, status: "approved", cartRevision: 1, items: [item],
 const declinedAttempt = { ...attempt, status: "declined" };
 const order = {
   orderId: "bbbbbbbb-2222-2222-2222-222222222222",
+  orderNumber: "SK-000128",
   paymentAttemptId: attemptId,
   cartRevision: 1,
   items: [item],
@@ -212,7 +213,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     render(<Catalog />);
 
     expect(await screen.findByRole("heading", { name: "Products", level: 1 })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "View latest journey" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Resume payment" })).not.toBeInTheDocument();
   });
 
   it("completes the journey when browser storage is unavailable", async () => {
@@ -346,7 +347,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
       "A previous payment attempt reference is unresolved"
     );
 
-    fireEvent.click(screen.getByRole("button", { name: "Forget latest reference" }));
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(screen.getByText(/does not cancel a request or delete a record/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Stop following" }));
 
@@ -356,7 +357,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Simulate payment" })).toBeEnabled()
     );
-    expect(screen.queryByRole("link", { name: "View latest journey" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Resume payment" })).not.toBeInTheDocument();
     expect(
       fetchMock.mock.calls.filter(([, options]) => options?.method === "POST")
     ).toHaveLength(0);

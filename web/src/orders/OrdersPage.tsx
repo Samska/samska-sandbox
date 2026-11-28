@@ -50,43 +50,46 @@ export default function OrdersPage() {
         </div>
       ) : null}
       {load.state === "ready" && load.orders.length > 0 ? (
-        <div className="overflow-x-auto rounded-sm border-[1.5px] border-ink bg-surface">
-          <table className="w-full min-w-[34rem] border-collapse text-left">
-            <caption className="sr-only">Your orders, newest first</caption>
-            <thead>
-              <tr className="border-b-[1.5px] border-ink font-mono text-[0.75rem] uppercase tracking-[0.08em]">
-                <th scope="col" className="px-4 py-3">Order</th>
-                <th scope="col" className="px-4 py-3">Date</th>
-                <th scope="col" className="px-4 py-3">Status</th>
-                <th scope="col" className="px-4 py-3 text-right">Total</th>
-                <th scope="col" className="px-4 py-3">
-                  <span className="sr-only">Tracking</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {load.orders.map((order) => (
-                <tr key={order.orderId} className="border-b border-border last:border-b-0">
-                  <td className="px-4 py-3 font-mono font-semibold">{order.reference}</td>
-                  <td className="px-4 py-3">{formatWhen(order.createdAt)}</td>
-                  <td className="px-4 py-3">
+        <>
+          <div
+            aria-hidden="true"
+            className="hidden grid-cols-[minmax(9rem,1.1fr)_1.4fr_11rem_7rem_5.5rem] gap-3 px-4 font-mono text-[0.7rem] uppercase tracking-[0.1em] text-muted min-[48rem]:grid"
+          >
+            <span>Order</span>
+            <span>Placed</span>
+            <span>Status</span>
+            <span className="text-right">Total</span>
+            <span />
+          </div>
+          <ul aria-label="Your orders, newest first" className="m-0 grid list-none gap-2.5 p-0">
+            {load.orders.map((order) => (
+              <li
+                key={order.orderId}
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 rounded-sm border-[1.5px] border-ink bg-surface p-3.5 min-[48rem]:grid-cols-[minmax(9rem,1.1fr)_1.4fr_11rem_7rem_5.5rem] min-[48rem]:gap-3 min-[48rem]:py-2.5"
+              >
+                <span className="font-mono text-[1.05rem] font-semibold">{order.orderNumber}</span>
+                <span className="text-right font-mono text-[1.05rem] font-semibold min-[48rem]:order-4">
+                  {formatAmount(order.total)}
+                </span>
+                <span className="font-mono text-[0.75rem] text-muted min-[48rem]:order-2">
+                  {formatWhen(order.createdAt)} · {order.itemCount} {order.itemCount === 1 ? "item" : "items"}
+                </span>
+                <span className="col-span-2 flex items-center justify-between gap-3 border-t-[1.5px] border-dashed border-border pt-2.5 min-[48rem]:contents">
+                  <span className="min-[48rem]:order-3">
                     <StatusPill status={order.status} />
-                  </td>
-                  <td className="px-4 py-3 text-right font-mono">{formatAmount(order.total)}</td>
-                  <td className="px-4 py-3 text-right">
-                    <a
-                      className="inline-flex min-h-10 items-center rounded-sm border-[1.5px] border-ink px-3 font-mono text-[0.75rem] font-semibold uppercase tracking-[0.06em] no-underline hover:bg-ink hover:text-canvas"
-                      href={`${ordersPath}/${encodeURIComponent(order.orderId)}`}
-                      aria-label={`Track order ${order.reference}`}
-                    >
-                      Track
-                    </a>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </span>
+                  <a
+                    className="inline-flex min-h-10 items-center justify-center rounded-sm border-[1.5px] border-ink bg-surface px-3 font-mono text-[0.75rem] font-semibold uppercase tracking-[0.06em] no-underline hover:bg-ink hover:text-canvas min-[48rem]:order-5"
+                    href={`${ordersPath}/${encodeURIComponent(order.orderId)}`}
+                    aria-label={`Track order ${order.orderNumber}`}
+                  >
+                    Track
+                  </a>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </>
       ) : null}
     </section>
   );

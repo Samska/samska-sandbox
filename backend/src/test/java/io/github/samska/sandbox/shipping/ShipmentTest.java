@@ -21,7 +21,7 @@ class ShipmentTest {
     private static final UUID LATE = new UUID(0x91C20D1E_0000_4000L, 10L);
 
     private static Shipment at(UUID id, String offset) {
-        return Shipment.of(id, CREATED, CREATED.plus(Duration.parse(offset)), POLICY);
+        return Shipment.of(id, 128, CREATED, CREATED.plus(Duration.parse(offset)), POLICY);
     }
 
     @Test
@@ -66,7 +66,7 @@ class ShipmentTest {
     void derivesStableHumanReadableCodes() {
         var id = UUID.fromString("2afa6574-1b2c-4d3e-8f90-a1b2c3d4e5f6");
 
-        assertThat(Shipment.reference(id)).isEqualTo("2AFA-6574");
+        assertThat(at(id, "PT0S").orderNumber()).isEqualTo("SK-000128");
         assertThat(Shipment.trackingCode(id)).isEqualTo("SK-1B2C-4D");
         assertThat(at(id, "PT0S").courier()).isEqualTo("Simulated Express");
     }
