@@ -70,10 +70,8 @@ class AccountSecurityApiTest {
                 .isEqualTo(401);
         assertThat(visitor.put("/api/cart/items/" + id, "{\"quantity\":2}").status()).isEqualTo(401);
         assertThat(visitor.delete("/api/cart/items/" + id).status()).isEqualTo(401);
-        assertThat(visitor.post("/api/payment-attempts",
-                "{\"attemptId\":\"" + id + "\",\"cartRevision\":0,\"scenario\":\"approve\"}").status())
+        assertThat(visitor.post("/api/orders", "{\"requestId\":\"" + id + "\",\"cartRevision\":0}").status())
                 .isEqualTo(401);
-        assertThat(visitor.post("/api/orders", "{\"paymentAttemptId\":\"" + id + "\"}").status()).isEqualTo(401);
         assertThat(visitor.get("/api/orders").status()).isEqualTo(401);
     }
 
