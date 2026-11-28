@@ -74,6 +74,14 @@ server {
         try_files $uri =404;
     }
 
+    # Fonts keep fixed names, so they are cached for a month rather than forever.
+    location /fonts/ {
+        add_header Cache-Control "public, max-age=2592000";
+        add_header Content-Security-Policy "default-src 'self'" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        try_files $uri =404;
+    }
+
     location / {
         try_files $uri /index.html;
     }
