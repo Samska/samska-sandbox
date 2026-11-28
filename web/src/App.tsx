@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import AdminProductCreate from "./admin/AdminProductCreate";
 import AdminProductEdit from "./admin/AdminProductEdit";
 import AdminOrders, { adminOrdersPath } from "./admin/AdminOrders";
@@ -10,6 +10,7 @@ import Button from "./ui/Button";
 import StatusMessage from "./ui/StatusMessage";
 import HeaderMenu from "./ui/HeaderMenu";
 import ThemeToggle from "./theme/ThemeToggle";
+import { pageTitle } from "./pageTitle";
 import OperationsPage, { operationsPath } from "./operations/OperationsPage";
 import OrdersPage, { ordersPath } from "./orders/OrdersPage";
 import TrackingPage from "./orders/TrackingPage";
@@ -24,6 +25,11 @@ const adminProductEditPattern = /^\/admin\/products\/([^/]+)\/edit$/;
 export default function App() {
   const path = usePath();
   const auth = useAuth();
+
+  useEffect(() => {
+    document.title = pageTitle(path);
+  }, [path]);
+
   const canAdminister =
     auth.state.status === "local" ||
     (auth.state.status === "signed-in" && auth.state.account.role === "ADMIN");

@@ -153,6 +153,13 @@
     outline-offset: 3px;
   }
 
+  /* A page heading takes focus after navigation so assistive technology starts at the new screen; it is not a
+     control, so it shows no ring. */
+  h1[tabindex="-1"]:focus,
+  h1[tabindex="-1"]:focus-visible {
+    outline: none;
+  }
+
   [role="alert"] {
     color: var(--color-danger);
     font-weight: 700;

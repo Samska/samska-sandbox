@@ -56,6 +56,7 @@ describe("Admin orders", () => {
     open(admin, () => json(200, [order(), order({ orderId: "o2", orderNumber: "SK-000128", status: "SHIPPED" })]));
 
     expect(await screen.findByRole("heading", { name: "Orders", level: 1 })).toBeInTheDocument();
+    expect(document.title).toBe("Admin orders \u00b7 Samska Store");
     const list = await screen.findByRole("list", { name: "Orders, newest first" });
     const rows = within(list).getAllByRole("listitem");
     expect(rows).toHaveLength(2);
