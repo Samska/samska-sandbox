@@ -31,7 +31,6 @@ services:
       SAMSKA_ADMIN_EMAIL: ${SAMSKA_ADMIN_EMAIL:?}
       SAMSKA_ADMIN_PASSWORD: ${SAMSKA_ADMIN_PASSWORD:?}
       SAMSKA_DEMO_ENABLED: ${SAMSKA_DEMO_ENABLED:-false}
-      SAMSKA_DEMO_RESET_CRON: ${SAMSKA_DEMO_RESET_CRON:--}
     depends_on:
       postgres:
         condition: service_healthy

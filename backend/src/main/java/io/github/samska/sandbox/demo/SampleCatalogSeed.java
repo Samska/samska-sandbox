@@ -16,7 +16,7 @@ import io.github.samska.sandbox.inventory.application.Inventory;
 /**
  * Gives a hosted demo a few synthetic Products so that the store is not empty. It runs only when
  * {@code samska.demo.seed-products} is true and only while the catalog has no Product, so Products added or
- * removed later by the administrator are never overwritten. The daily demo reset does not touch Products.
+ * removed later by the administrator are never overwritten.
  */
 @Component
 class SampleCatalogSeed implements ApplicationRunner {

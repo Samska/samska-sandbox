@@ -23,7 +23,7 @@ frontend package's `0.1.0` are build metadata, not the product release version.
 
 ## Live Demo
 
-A public demo runs on Railway: <https://store.samska.dev>. Everything in it is synthetic and no payment is real. The demo data is reset daily, so orders you place are temporary.
+A public demo runs on Railway: <https://store.samska.dev>. Everything in it is synthetic and no payment is real.
 
 A short tour:
 
@@ -81,7 +81,7 @@ validation, learning, and risk.
 | Order history and tracking | Implemented (release/1.0) | Order history and a simulated shipment lifecycle derived from the Order time. |
 | Inventory | Implemented (release/1.0) | Stock per Product, reservation on approved payment, consumption on Order, sold-out states, and a Stock field in Admin. |
 | Operations | Implemented (release/1.0) | An administrator screen with real figures, correlation IDs and structured request logs. |
-| Security and demo mode | Implemented (release/1.0) | Rate limiting, security headers, a `prod` profile, a threat model, a synthetic-data reset and a containerized runtime. |
+| Security and demo mode | Implemented (release/1.0) | Rate limiting, security headers, a `prod` profile, a threat model and a containerized runtime. |
 | Deployment | Planned | No deployment exists; interactive browser checks and real-browser accessibility remain Human Verification concerns. |
 
 ## Architecture

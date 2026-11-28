@@ -4,6 +4,12 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+
+## SS-094 — Remove the demo reset (#191, v1.0.0)
+
+- Build: the reset endpoint, scheduled reset, session registry and the Operations control are gone (the application can no longer erase Orders, accounts or stock); footer text corrected; every web response carries HSTS. Found in the second pre-1.0 review.
+- State: remove `SAMSKA_DEMO_RESET_CRON` from Railway; the variable is no longer read, but until this ships the old service would still reset.
+
 ## SS-088 — Self-hosted fonts, favicon and metadata (#174, v1.0.0)
 
 - Build: Archivo and IBM Plex Mono are served from `/fonts/` (the production CSP blocked the Google Fonts stylesheet, so the hosted site used fallback fonts); favicon, description and Open Graph text added; `deploy/verify-web-config.sh` checks font serving. Found in the pre-1.0 review.
