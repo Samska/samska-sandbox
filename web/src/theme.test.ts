@@ -121,9 +121,14 @@ describe("Bench theme tokens", () => {
     expect(themeBlock(indexCss, "@layer base")).toMatch(/text-transform:\s*uppercase/);
   });
 
-  it("loads both fonts from Google Fonts and names the store", () => {
-    expect(indexHtml).toContain("family=Archivo:wdth,wght@62..125,100..900");
-    expect(indexHtml).toContain("family=IBM+Plex+Mono");
+  it("loads both fonts from this origin, never a third-party host, and names the store", () => {
+    expect(indexHtml).toContain('href="/fonts/fonts.css"');
+    expect(indexHtml).not.toContain("fonts.googleapis.com");
+    expect(indexHtml).not.toContain("fonts.gstatic.com");
+    const faces = readFileSync("public/fonts/fonts.css", "utf8");
+    expect(faces).toContain('font-family: "Archivo"');
+    expect(faces).toContain('font-family: "IBM Plex Mono"');
     expect(indexHtml).toContain("<title>Samska Store</title>");
+    expect(indexHtml).toContain('rel="icon"');
   });
 });

@@ -4,6 +4,11 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-088 — Self-hosted fonts, favicon and metadata (#174, v1.0.0)
+
+- Build: Archivo and IBM Plex Mono are served from `/fonts/` (the production CSP blocked the Google Fonts stylesheet, so the hosted site used fallback fonts); favicon, description and Open Graph text added; `deploy/verify-web-config.sh` checks font serving. Found in the pre-1.0 review.
+- State: takes effect when `web` redeploys from `release/1.0`.
+
 ## SS-087 — Currency symbol (#172, v1.0.0)
 
 - Build: every price shows `$` through the shared `formatAmount`; the design README records that this supersedes the "no currency symbol" assumption. Found in the pre-1.0 review.

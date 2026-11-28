@@ -24,6 +24,7 @@ check() { # description expected actual
 
 mkdir -p "$TMP/html"
 echo '<h1>spa</h1>' > "$TMP/html/index.html"
+mkdir -p "$TMP/html/fonts" && echo font > "$TMP/html/fonts/x.woff2"
 docker network create "$NET" >/dev/null
 # A stand-in backend named like the Compose service: any answer from it proves the proxy path works.
 docker run -d --name samska-verify-backend --network "$NET" --network-alias backend "$IMAGE" >/dev/null
@@ -58,6 +59,11 @@ check "private: health check stays open" 200 "$(code "localhost:$PORT_ON_HOST/he
 PORT=9090 start_web -e WEB_ACCESS=none -e PORT=9090
 check "open mode on a custom PORT: site" 200 "$(code "localhost:$PORT_ON_HOST/")"
 check "open mode: API proxied" 404 "$(code "localhost:$PORT_ON_HOST/api/x")"
+
+# Self-hosted fonts are served from this origin, cached, and a missing one is a 404 rather than the SPA page.
+check "open mode: font file" 200 "$(code "localhost:$PORT_ON_HOST/fonts/x.woff2")"
+check "open mode: font cache header" "max-age=2592000" "$(curl -sI "localhost:$PORT_ON_HOST/fonts/x.woff2" | tr -d '\r' | sed -n 's/^[Cc]ache-[Cc]ontrol: public, //p')"
+check "open mode: missing font is 404" 404 "$(code "localhost:$PORT_ON_HOST/fonts/missing.woff2")"
 
 # The resolver must be the container's own DNS server, not Docker's 127.0.0.11 fallback (Railway has no
 # 127.0.0.11: that was the 502 on the first deployment). The image sets NGINX_ENTRYPOINT_LOCAL_RESOLVERS.
