@@ -31,7 +31,7 @@ There is no real customer data, no card data and no real payment or courier inte
 | Clickjacking, sniffing, referrer leaks | `frame-ancestors 'none'`, `X-Frame-Options`, `nosniff`, `Referrer-Policy: no-referrer`, `Permissions-Policy`, HSTS over HTTPS | None known |
 | Request flooding | Generous per-client limit on the rest of the API; bounded upload sizes | A volumetric attack needs an upstream defence the demo does not have |
 | Stock or Order races | Row locks in the Payment and Order transactions; unique constraints | None known |
-| Accidental real data | Synthetic data and simulated payments only; banner on the demo; reset | Visitors may type real data; the banner says not to |
+| Accidental real data | Synthetic data and simulated payments only; reset | Visitors may type real data; the demo is reset regularly |
 | Secrets in the repository or logs | No secrets committed; logs carry method, path, status and duration only | Operators must keep deployment secrets out of version control |
 | Unsafe configuration | The `prod` profile refuses to start when enforcement is off, cookies are not secure, the database password is missing or the administrator password is short | An operator can still run without the `prod` profile |
 
