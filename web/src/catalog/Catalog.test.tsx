@@ -41,7 +41,7 @@ describe("Catalog", () => {
     expect(screen.getByText("1 product")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Add Canvas Tote to Cart" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "View details for Canvas Tote" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cart, 0 items, total 0.00" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cart, 0 items, total $0.00" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Your Cart" })).not.toBeInTheDocument();
 
     fireEvent.click(cartTrigger());
@@ -107,7 +107,7 @@ describe("Catalog", () => {
     expect(screen.getByRole("heading", { name: "Canvas Tote", level: 1 })).toBeInTheDocument();
     expect(screen.getByText(createdProduct.description)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Add Canvas Tote to Cart" })).toBeInTheDocument();
-    expect(screen.getByText("12.50")).toBeInTheDocument();
+    expect(screen.getByText("$12.50")).toBeInTheDocument();
     expect(cartTrigger()).toBeInTheDocument();
 
     const backActions = screen.getAllByRole("button", { name: "Back to Products" });
@@ -213,14 +213,14 @@ describe("Catalog", () => {
 
     fireEvent.click(cartTrigger());
     const dialog = await screen.findByRole("dialog", { name: "Your Cart" });
-    expect(within(dialog).getByText("Total").parentElement).toHaveTextContent("12.50");
+    expect(within(dialog).getByText("Total").parentElement).toHaveTextContent("$12.50");
     expect(within(dialog).getByText("1 item")).toBeInTheDocument();
 
     fireEvent.click(within(dialog).getByRole("button", { name: "Close Cart" }));
     fireEvent.click(screen.getByRole("button", { name: "Back to Products" }));
 
     expect(await screen.findByRole("heading", { name: "Products" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cart, 1 item, total 12.50" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cart, 1 item, total $12.50" })).toBeInTheDocument();
   });
 
   it("adds a Product and renders the authoritative Cart response", async () => {
@@ -264,8 +264,8 @@ describe("Catalog", () => {
 
     fireEvent.click(cartTrigger());
     const dialog = await screen.findByRole("dialog", { name: "Your Cart" });
-    expect(within(dialog).getByText("Total").parentElement).toHaveTextContent("12.50");
-    expect(within(dialog).getByText("12.50 each")).toBeInTheDocument();
+    expect(within(dialog).getByText("Total").parentElement).toHaveTextContent("$12.50");
+    expect(within(dialog).getByText("$12.50 each")).toBeInTheDocument();
     expect(within(dialog).getByText("Subtotal")).toBeInTheDocument();
   });
 
@@ -602,7 +602,7 @@ describe("Catalog product search", () => {
     expect(screen.getByRole("heading", { name: "Canvas Tote" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Everyday Tote" })).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Enamel Pin" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Cart, 1 item, total 12.50" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Cart, 1 item, total $12.50" })).toBeInTheDocument();
   });
 
   it("keeps the search field keyboard reachable with a single polite live region", async () => {

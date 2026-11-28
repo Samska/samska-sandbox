@@ -50,13 +50,13 @@ describe("ProductBrowse (Bench catalog)", () => {
     expect(cards).toHaveLength(2);
     const first = within(cards[0]);
     expect(first.getByRole("heading", { name: "Arc Table Lamp", level: 3 })).toBeInTheDocument();
-    expect(first.getByText("129.00")).toBeInTheDocument();
+    expect(first.getByText("$129.00")).toBeInTheDocument();
     expect(cards[0].textContent).toMatch(/No\. \d{4}/);
   });
 
   it("keeps the price inside the object stage, not as a separate row", () => {
     renderBrowse();
-    const price = screen.getByText("68.00");
+    const price = screen.getByText("$68.00");
 
     expect(price.closest("p")?.className).toContain("rounded-full");
     expect(price.closest("p")?.className).toContain("absolute");
