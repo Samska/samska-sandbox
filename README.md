@@ -29,11 +29,11 @@ A short tour:
 
 1. Browse the Market and open a Product.
 2. Add Products to the Cart (the Cart drawer opens from the header).
-3. Register with any synthetic email, then go to Checkout.
+3. Go to Checkout. Checkout needs a signed-in account and the demo has no sign-up, so the tour stops here unless you have the administrator account.
 4. Place the order: Checkout has one "Place order" step, the Order is approved directly and the Cart empties.
 5. Open your Orders and track the simulated shipment.
 
-The Admin area and the Operations screen need the administrator account, which is configured on the server and is not published here. See [Deployment](docs/DEPLOYMENT.md).
+Only one account exists, the administrator, which is configured on the server and is not published here. It can shop as well as use the Admin area and the Operations screen. See [Deployment](docs/DEPLOYMENT.md).
 
 ## Purpose And Scope
 
@@ -75,7 +75,7 @@ validation, learning, and risk.
 | Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
 | Automated browser E2E | Implemented | Chromium Playwright tests against the real frontend, Vite proxy, and a fresh exclusively owned backend, including the First Order in one Checkout step with frozen data and keyboard/focus checks; serialized execution, synthetic fixtures through existing APIs, diagnostics on failure. |
 | PostgreSQL | Implemented | Required local Compose runtime with JDBC, Flyway migrations, and database health; persists Products, media, Carts, Orders, accounts and stock. |
-| Accounts and sessions | Implemented (release/1.0) | Synthetic registration, sign-in and sign-out, server-side sessions, an administrator role, and per-account Cart and Orders. |
+| Accounts and sessions | Implemented (release/1.0) | Sign-in and sign-out (no self sign-up: the administrator account comes from configuration), server-side sessions, an administrator role, and per-account Cart and Orders. |
 | Order history and tracking | Implemented (release/1.0) | Order history and a simulated shipment lifecycle derived from the Order time. |
 | Inventory | Implemented (release/1.0) | Stock per Product, consumption when the Order is placed, sold-out states, and a Stock field in Admin. |
 | Operations | Implemented (release/1.0) | An administrator screen with real figures, correlation IDs and structured request logs. |

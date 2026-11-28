@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Limits requests per client address: sign-in and registration are strict, the rest of the API is generous.
+ * Limits requests per client address: sign-in is strict, the rest of the API is generous.
  * The address is the one the servlet container reports; behind a trusted proxy the {@code prod} profile makes
  * that the forwarded client address. There is deliberately no per-account lockout, so nobody can lock a
  * victim out. The limiter is per process and in memory.
@@ -60,7 +60,6 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
     private static boolean isCredentialRequest(HttpServletRequest request) {
         var path = request.getRequestURI();
-        return "POST".equals(request.getMethod())
-                && (path.equals("/api/auth/login") || path.equals("/api/auth/register"));
+        return "POST".equals(request.getMethod()) && path.equals("/api/auth/login");
     }
 }

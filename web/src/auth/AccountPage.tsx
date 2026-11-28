@@ -3,16 +3,13 @@ import Button from "../ui/Button";
 import FormField from "../ui/FormField";
 import StatusMessage from "../ui/StatusMessage";
 import { navigateTo } from "../journey/routes";
-import { AuthApiError, register, signIn } from "./authApi";
+import { AuthApiError, signIn } from "./authApi";
 import { useAuth } from "./AuthContext";
 
 export const accountPath = "/account";
 
-type Mode = "signin" | "create";
-
 const errorMessages = {
-  invalid: "Check the details: use a valid email, a name, and a password of 8 characters or more.",
-  duplicate: "That email already has an account. Sign in instead.",
+  invalid: "Check the details: use a valid email and a password.",
   credentials: "The email or password is not right.",
   network: "The server could not be reached. Try again.",
   server: "Something went wrong. Try again."
@@ -20,14 +17,11 @@ const errorMessages = {
 
 export default function AccountPage({ notice }: { notice?: string }) {
   const { state, setAccount } = useAuth();
-  const [mode, setMode] = useState<Mode>("signin");
   const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const creating = mode === "create";
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -35,7 +29,7 @@ export default function AccountPage({ notice }: { notice?: string }) {
     setError(null);
 
     try {
-      const account = creating ? await register(email, name, password) : await signIn(email, password);
+      const account = await signIn(email, password);
       setAccount(account);
       navigateTo(account.role === "ADMIN" ? "/admin/products" : "/");
     } catch (caught) {
@@ -68,13 +62,13 @@ export default function AccountPage({ notice }: { notice?: string }) {
       <section className="grid content-start gap-4 rounded-sm bg-ink p-[clamp(1.4rem,4vw,2.75rem)] text-canvas">
         <span className="font-mono text-base tracking-[0.06em] text-brand">MEMBER AREA</span>
         <h1 className="text-[clamp(2.4rem,6vw,4.4rem)] font-black uppercase leading-none">
-          {creating ? "Open an account" : "Sign in"}
+          Sign in
         </h1>
-        <p>Keep your cart, orders and delivery updates in one place. Use any synthetic email. No real data.</p>
+        <p>This store is private. Sign in to manage the catalog or to check out.</p>
       </section>
       <section className="grid content-start gap-4 rounded-sm border-[1.5px] border-ink bg-surface p-5">
         {notice !== undefined ? <StatusMessage tone="neutral">{notice}</StatusMessage> : null}
-        <h2 className="text-2xl font-black uppercase">{creating ? "Create account" : "Welcome back"}</h2>
+        <h2 className="text-2xl font-black uppercase">Welcome back</h2>
         <form className="grid gap-4" onSubmit={handleSubmit} noValidate>
           <FormField id="account-email" label="Email" error={null}>
             {(control) => (
@@ -91,29 +85,13 @@ export default function AccountPage({ notice }: { notice?: string }) {
               />
             )}
           </FormField>
-          {creating ? (
-            <FormField id="account-name" label="Name" error={null}>
-              {(control) => (
-                <input
-                  {...control}
-                  name="displayName"
-                  autoComplete="name"
-                  placeholder="Synthetic name"
-                  value={name}
-                  onChange={(event) => setName(event.target.value)}
-                  disabled={pending}
-                  required
-                />
-              )}
-            </FormField>
-          ) : null}
           <FormField id="account-password" label="Password" error={null}>
             {(control) => (
               <input
                 {...control}
                 type="password"
                 name="password"
-                autoComplete={creating ? "new-password" : "current-password"}
+                autoComplete="current-password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 disabled={pending}
@@ -123,18 +101,9 @@ export default function AccountPage({ notice }: { notice?: string }) {
           </FormField>
           {error !== null ? <StatusMessage tone="error">{error}</StatusMessage> : null}
           <Button type="submit" disabled={pending}>
-            {pending ? "Working..." : creating ? "Create account" : "Sign in"}
+            {pending ? "Working..." : "Sign in"}
           </Button>
         </form>
-        <Button
-          variant="quiet"
-          onClick={() => {
-            setMode(creating ? "signin" : "create");
-            setError(null);
-          }}
-        >
-          {creating ? "I already have an account" : "Create an account"}
-        </Button>
       </section>
     </div>
   );

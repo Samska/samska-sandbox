@@ -77,6 +77,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-090-orders-catalog-number.md](ss-090-orders-catalog-number.md) | A customer-facing number beside a UUID key, and migrating a populated table. |
 | [ss-086-clear-cart-on-order.md](ss-086-clear-cart-on-order.md) | Side effects after a commit, idempotent replays, and changing a documented decision. |
 | [ss-088-self-hosted-fonts.md](ss-088-self-hosted-fonts.md) | Content-Security-Policy against third-party fonts, subsetting, and cache lifetimes. |
+| [ss-095-remove-self-sign-up.md](ss-095-remove-self-sign-up.md) | Removing an attack surface instead of guarding it, and why roles outlive sign-up. |
 | [ss-091-plain-copy.md](ss-091-plain-copy.md) | Error messages as interface, and stale messages as defects. |
 | [ss-094-remove-payment-simulation.md](ss-094-remove-payment-simulation.md) | Removing a feature with its support code, and keeping the idempotency key. |
 | [ss-081-demo-sample-products.md](ss-081-demo-sample-products.md) | Idempotent seeding of demo data and why it must not overwrite existing data. |

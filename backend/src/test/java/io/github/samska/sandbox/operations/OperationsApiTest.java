@@ -36,11 +36,7 @@ class OperationsApiTest {
     }
 
     private static Client customer() throws Exception {
-        var client = app.client();
-        assertThat(client.post("/api/auth/register", "{\"email\":\"ops-" + UUID.randomUUID()
-                + "@samska.test\",\"displayName\":\"Synthetic\",\"password\":\"correct-horse\"}").status())
-                .isEqualTo(201);
-        return client;
+        return app.customer("ops-" + UUID.randomUUID() + "@samska.test");
     }
 
     private static void shop(Client client, String productId) throws Exception {

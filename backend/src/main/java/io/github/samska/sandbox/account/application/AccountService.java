@@ -33,6 +33,10 @@ public class AccountService {
         this.unknownAccountHash = encoder.encode("not-a-real-password");
     }
 
+    /**
+     * Creates an account. There is no public sign-up: the only caller in production is the administrator
+     * bootstrap, and tests use it to create customer accounts.
+     */
     public Account register(String email, String displayName, String password, Role role) {
         var normalizedEmail = normalizeEmail(email);
         var name = displayName == null ? "" : displayName.strip();

@@ -11,7 +11,7 @@ v1.0.0 exposes the application to hostile users and automated traffic. The contr
 
 ## Decision
 
-A first servlet filter after request observability applies an in-memory fixed-window limiter per client address: strict for `POST /api/auth/login` and `/register`, generous for everything else under `/api`, answering `429 {"code":"rate-limited"}` with `Retry-After`. There is no per-account lockout. Spring Security adds a restrictive API policy, `Referrer-Policy`, `Permissions-Policy` and HSTS. A `prod` profile turns on secure cookies and forwarded-header handling, and a `ProductionGuard` refuses unsafe settings at startup. Tests and the browser suite switch the limiter off with `samska.ratelimit.enabled=false`; dedicated API tests prove it.
+A first servlet filter after request observability applies an in-memory fixed-window limiter per client address: strict for `POST /api/auth/login`, generous for everything else under `/api`, answering `429 {"code":"rate-limited"}` with `Retry-After`. There is no per-account lockout. Spring Security adds a restrictive API policy, `Referrer-Policy`, `Permissions-Policy` and HSTS. A `prod` profile turns on secure cookies and forwarded-header handling, and a `ProductionGuard` refuses unsafe settings at startup. Tests and the browser suite switch the limiter off with `samska.ratelimit.enabled=false`; dedicated API tests prove it.
 
 ## Alternatives Considered
 

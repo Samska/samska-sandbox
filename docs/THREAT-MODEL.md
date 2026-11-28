@@ -13,7 +13,7 @@ There is no real customer data, no card data and no real payment or courier inte
 ## Boundaries and entry points
 
 - The browser to the reverse proxy over TLS, then the proxy to the backend, then the backend to PostgreSQL. PostgreSQL is not published outside its network.
-- Public: Product reads, `GET /api/auth/me`, registration, sign-in, health.
+- Public: Product reads, `GET /api/auth/me`, sign-in, health. There is no self sign-up (SS-095).
 - Signed in: Cart, Orders, tracking.
 - Administrator: Product writes and media, Operations, demo reset.
 
@@ -21,7 +21,7 @@ There is no real customer data, no card data and no real payment or courier inte
 
 | Threat | Control | Residual risk |
 | --- | --- | --- |
-| Credential stuffing and password guessing | BCrypt hashes; identical sign-in failures; strict per-client limit on sign-in and registration with `429` and `Retry-After` | A distributed attacker has many addresses; limits are per process and in memory |
+| Credential stuffing and password guessing | BCrypt hashes; identical sign-in failures; strict per-client limit on sign-in with `429` and `Retry-After` | A distributed attacker has many addresses; limits are per process and in memory |
 | Account lockout abuse | No per-account lockout, so nobody can lock a victim out | Guessing against one account is bounded only by the per-client limit |
 | Session theft | HttpOnly, SameSite Lax session cookie; `Secure` in production; sessions are in memory and end on restart | A stolen cookie works until sign-out or restart |
 | Cross-site request forgery | Cookie-to-header token on every state-changing request | None known |
@@ -37,4 +37,4 @@ There is no real customer data, no card data and no real payment or courier inte
 
 ## Known limitations at v1.0.0
 
-Registration reveals whether an email address is already used. Sessions and rate limits live in one process and are lost on restart. There is no email verification, no password reset, no multi-factor sign-in and no external identity provider. The demo trusts the forwarded client address only behind a proxy the operator controls.
+Sessions and rate limits live in one process and are lost on restart. There is no email verification, no password reset, no multi-factor sign-in and no external identity provider. The demo trusts the forwarded client address only behind a proxy the operator controls.

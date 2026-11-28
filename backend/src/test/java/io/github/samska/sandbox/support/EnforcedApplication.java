@@ -18,11 +18,14 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import io.github.samska.sandbox.SamskaSandboxApplication;
+import io.github.samska.sandbox.account.Role;
+import io.github.samska.sandbox.account.application.AccountService;
 
 /** Starts the real application on PostgreSQL with sign-in enforced, and offers cookie-aware clients. */
 public final class EnforcedApplication implements AutoCloseable {
 
     public static final String ADMIN_EMAIL = "admin@samska.test";
+    public static final String CUSTOMER_PASSWORD = "correct-horse";
     public static final String ADMIN_PASSWORD = "synthetic-admin-pass";
 
     private final ConfigurableApplicationContext context;
@@ -64,6 +67,21 @@ public final class EnforcedApplication implements AutoCloseable {
 
     public Client client() {
         return new Client(base);
+    }
+
+    /**
+     * A signed-in customer. The application has no sign-up, so the account is created through the service
+     * (as an administrator would provision it) and the client then signs in through the real endpoint.
+     */
+    public Client customer(String email) throws Exception {
+        context.getBean(AccountService.class).register(email, "Synthetic", CUSTOMER_PASSWORD, Role.CUSTOMER);
+        var client = client();
+        var reply = client.post("/api/auth/login",
+                "{\"email\":\"" + email + "\",\"password\":\"" + CUSTOMER_PASSWORD + "\"}");
+        if (reply.status() != 200) {
+            throw new IllegalStateException("Customer sign-in failed: " + reply.status());
+        }
+        return client;
     }
 
     @Override
