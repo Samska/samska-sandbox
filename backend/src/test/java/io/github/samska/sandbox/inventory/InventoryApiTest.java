@@ -20,8 +20,7 @@ class InventoryApiTest {
 
     @BeforeAll
     static void start() {
-        // A short hold, so expiry can be observed in real time.
-        app = EnforcedApplication.start("--samska.inventory.reservation-ttl=PT2S");
+        app = EnforcedApplication.start();
     }
 
     @AfterAll
@@ -59,15 +58,16 @@ class InventoryApiTest {
         return client.post("/api/cart/items", "{\"productId\":\"" + id + "\",\"quantity\":" + quantity + "}").status();
     }
 
-    private static UUID approve(Client client, String productId, int quantity) throws Exception {
+    private static int place(Client client, String productId, int quantity) throws Exception {
         var cart = client.post("/api/cart/items", "{\"productId\":\"" + productId + "\",\"quantity\":" + quantity + "}");
         assertThat(cart.status()).as(cart.body()).isEqualTo(200);
         int revision = JsonPath.read(cart.body(), "$.revision");
-        var attempt = UUID.randomUUID();
-        var reply = client.post("/api/payment-attempts", "{\"attemptId\":\"" + attempt + "\",\"cartRevision\":"
-                + revision + ",\"scenario\":\"approve\"}");
-        assertThat(reply.status()).as(reply.body()).isEqualTo(201);
-        return attempt;
+        return placeAtRevision(client, UUID.randomUUID(), revision).status();
+    }
+
+    private static EnforcedApplication.Reply placeAtRevision(Client client, UUID requestId, int revision)
+            throws Exception {
+        return client.post("/api/orders", "{\"requestId\":\"" + requestId + "\",\"cartRevision\":" + revision + "}");
     }
 
     @Test
@@ -130,97 +130,55 @@ class InventoryApiTest {
     }
 
     @Test
-    void anApprovedPaymentHoldsTheUnitsFromOtherCustomersUntilTheHoldExpires() throws Exception {
-        var admin = admin();
-        var id = product(admin, ",\"stock\":1");
-        var first = customer("holder@example.test");
-        var second = customer("waiting@example.test");
-
-        approve(first, id, 1);
-
-        assertThat(stockOf(second, id)).isZero();
-        assertThat(add(second, id, 1)).isEqualTo(409);
-
-        Thread.sleep(2500);
-        assertThat(stockOf(second, id)).isEqualTo(1);
-        assertThat(add(second, id, 1)).isEqualTo(200);
-    }
-
-    @Test
-    void creatingTheOrderConsumesTheUnits() throws Exception {
+    void placingTheOrderTakesTheUnitsAndAReplayTakesNoMore() throws Exception {
         var admin = admin();
         var id = product(admin, ",\"stock\":5");
         var shopper = customer("consumer@example.test");
-        var attempt = approve(shopper, id, 2);
+        var cart = shopper.post("/api/cart/items", "{\"productId\":\"" + id + "\",\"quantity\":2}");
+        int revision = JsonPath.read(cart.body(), "$.revision");
+        var requestId = UUID.randomUUID();
 
+        assertThat(stockOf(shopper, id)).isEqualTo(5);
+        assertThat(placeAtRevision(shopper, requestId, revision).status()).isEqualTo(201);
         assertThat(stockOf(shopper, id)).isEqualTo(3);
-        assertThat(shopper.post("/api/orders", "{\"paymentAttemptId\":\"" + attempt + "\"}").status()).isEqualTo(201);
 
-        assertThat(stockOf(shopper, id)).isEqualTo(3);
-        // Replaying the request does not take more units.
-        assertThat(shopper.post("/api/orders", "{\"paymentAttemptId\":\"" + attempt + "\"}").status()).isEqualTo(200);
-        assertThat(stockOf(shopper, id)).isEqualTo(3);
-        Thread.sleep(2500);
+        assertThat(placeAtRevision(shopper, requestId, revision).status()).isEqualTo(200);
         assertThat(stockOf(shopper, id)).isEqualTo(3);
     }
 
     @Test
-    void aSecondApprovalForTheLastUnitIsRefusedAndRecordsNothing() throws Exception {
+    void theSecondOrderForTheLastUnitIsRefusedAndRecordsNothing() throws Exception {
         var admin = admin();
         var id = product(admin, ",\"stock\":1");
         var first = customer("first-unit@example.test");
         var second = customer("second-unit@example.test");
-        // Both carts hold the unit before either pays.
+        // Both carts hold the unit before either places an Order.
         var firstCart = first.post("/api/cart/items", "{\"productId\":\"" + id + "\",\"quantity\":1}");
         var secondCart = second.post("/api/cart/items", "{\"productId\":\"" + id + "\",\"quantity\":1}");
         int firstRevision = JsonPath.read(firstCart.body(), "$.revision");
         int secondRevision = JsonPath.read(secondCart.body(), "$.revision");
 
-        var winner = UUID.randomUUID();
-        var loser = UUID.randomUUID();
-        assertThat(first.post("/api/payment-attempts", "{\"attemptId\":\"" + winner + "\",\"cartRevision\":"
-                + firstRevision + ",\"scenario\":\"approve\"}").status()).isEqualTo(201);
-        var refused = second.post("/api/payment-attempts", "{\"attemptId\":\"" + loser + "\",\"cartRevision\":"
-                + secondRevision + ",\"scenario\":\"approve\"}");
+        assertThat(placeAtRevision(first, UUID.randomUUID(), firstRevision).status()).isEqualTo(201);
+        var refused = placeAtRevision(second, UUID.randomUUID(), secondRevision);
 
         assertThat(refused.status()).isEqualTo(409);
         assertThat((String) JsonPath.read(refused.body(), "$.code")).isEqualTo("out-of-stock");
-        assertThat(second.get("/api/payment-attempts/" + loser).status()).isEqualTo(404);
-        // A decline needs no units and is still recorded.
-        assertThat(second.post("/api/payment-attempts", "{\"attemptId\":\"" + UUID.randomUUID()
-                + "\",\"cartRevision\":" + secondRevision + ",\"scenario\":\"decline\"}").status()).isEqualTo(201);
+        assertThat((Object) JsonPath.read(second.get("/api/orders").body(), "$")).asList().isEmpty();
+        // The refused Cart is untouched, so the customer can adjust it.
+        assertThat((Object) JsonPath.read(second.get("/api/cart").body(), "$.items")).asList().hasSize(1);
+        assertThat(stockOf(second, id)).isZero();
     }
 
     @Test
-    void anExpiredHoldWhoseUnitsWereSoldCannotBecomeAnOrder() throws Exception {
+    void aSoldOutProductCannotBeBoughtAgain() throws Exception {
         var admin = admin();
         var id = product(admin, ",\"stock\":1");
-        var slow = customer("slow@example.test");
-        var quick = customer("quick@example.test");
+        var shopper = customer("last-unit@example.test");
 
-        var slowAttempt = approve(slow, id, 1);
-        Thread.sleep(2500);
-        var quickAttempt = approve(quick, id, 1);
-        assertThat(quick.post("/api/orders", "{\"paymentAttemptId\":\"" + quickAttempt + "\"}").status())
-                .isEqualTo(201);
+        assertThat(place(shopper, id, 1)).isEqualTo(201);
 
-        var late = slow.post("/api/orders", "{\"paymentAttemptId\":\"" + slowAttempt + "\"}");
-
-        assertThat(late.status()).isEqualTo(409);
-        assertThat((String) JsonPath.read(late.body(), "$.code")).isEqualTo("out-of-stock");
-        assertThat(stockOf(slow, id)).isZero();
-    }
-
-    @Test
-    void anExpiredHoldIsStillHonouredWhileTheUnitsAreFree() throws Exception {
-        var admin = admin();
-        var id = product(admin, ",\"stock\":1");
-        var patient = customer("patient@example.test");
-        var attempt = approve(patient, id, 1);
-        Thread.sleep(2500);
-
-        assertThat(patient.post("/api/orders", "{\"paymentAttemptId\":\"" + attempt + "\"}").status()).isEqualTo(201);
-        assertThat(stockOf(patient, id)).isZero();
+        assertThat(add(shopper, id, 1)).isEqualTo(409);
+        assertThat(stockOf(shopper, id)).isZero();
     }
 
     @Test

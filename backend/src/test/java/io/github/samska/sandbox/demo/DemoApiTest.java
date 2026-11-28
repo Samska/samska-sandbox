@@ -51,11 +51,8 @@ class DemoApiTest {
             var shopper = customer(app, "demo-shopper@samska.test");
             var cart = shopper.post("/api/cart/items", "{\"productId\":\"" + product + "\",\"quantity\":2}");
             int revision = JsonPath.read(cart.body(), "$.revision");
-            var attempt = UUID.randomUUID();
-            assertThat(shopper.post("/api/payment-attempts", "{\"attemptId\":\"" + attempt + "\",\"cartRevision\":"
-                    + revision + ",\"scenario\":\"approve\"}").status()).isEqualTo(201);
-            assertThat(shopper.post("/api/orders", "{\"paymentAttemptId\":\"" + attempt + "\"}").status())
-                    .isEqualTo(201);
+            assertThat(shopper.post("/api/orders", "{\"requestId\":\"" + UUID.randomUUID()
+                    + "\",\"cartRevision\":" + revision + "}").status()).isEqualTo(201);
             assertThat((int) JsonPath.read(admin.get("/api/products/" + product).body(), "$.stock")).isEqualTo(5);
 
             assertThat(customer(app, "other@samska.test").post("/api/admin/demo/reset", null).status())

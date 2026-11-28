@@ -174,37 +174,8 @@ describe("App", () => {
     );
   });
 
-  it("renders attempt recovery for an unknown reference at its URL", async () => {
-    const id = "aaaaaaaa-1111-1111-1111-111111111111";
-    window.history.replaceState({}, "", `/checkout/attempts/${id}`);
-    vi.stubGlobal(
-      "fetch",
-      vi.fn((input: RequestInfo | URL) => {
-        const path = String(input);
-
-        if (path === "/api/products") {
-          return Promise.resolve(response(200, []));
-        }
-
-        if (path === "/api/cart") {
-          return Promise.resolve(response(200, { items: [], total: 0, revision: 0 }));
-        }
-
-        return Promise.resolve(response(404));
-      })
-    );
-    render(<App />);
-
-    expect(
-      await screen.findByRole("heading", {
-        name: "We couldn't find a result for this payment.",
-        level: 1
-      })
-    ).toBeInTheDocument();
-  });
-
-  it("keeps malformed attempt references on the not-found surface", () => {
-    window.history.replaceState({}, "", "/checkout/attempts/not-a-uuid");
+  it("keeps the retired attempt URLs on the not-found surface", () => {
+    window.history.replaceState({}, "", "/checkout/attempts/aaaaaaaa-1111-1111-1111-111111111111");
     stubFetch();
     render(<App />);
 

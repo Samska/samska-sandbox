@@ -19,7 +19,7 @@ Concise guidance for preparing, approving, and publishing a Samska Sandbox produ
 - Release evidence keeps three things distinct: the preparation pull request's CI result on its exact final head, the historical SS-039 verification for the merged implementation, and the final candidate verification on the resulting `main` SHA.
 - Release notes exist at `docs/releases/vX.Y.Z.md` with status "prepared; awaiting publication".
 - Current dependency alerts are reviewed with fresh evidence and recorded: advisory, affected resolved version and path, application-runtime exposure versus developer/CI exposure, exploit conditions, available fix, and release relevance. A source-only release does not remove dependency risk: the tagged source archive contains the committed lockfile, so installing dependencies from it reproduces the same resolved versions until the lockfile is updated. Remediation or acceptance of a material risk is an owner decision, and release preparation does not change dependencies.
-- Deliberate limitations are preserved accurately and never presented as resolved: synthetic data and simulated payments only, no authentication or authorization, no hosting or persistence, process-local state that is lost on restart, and no automated browser end-to-end suite.
+- Deliberate limitations are preserved accurately and never presented as resolved: synthetic data only and no payment, no authentication or authorization, no hosting or persistence, process-local state that is lost on restart, and no automated browser end-to-end suite.
 
 ## Release Notes And Release Body
 

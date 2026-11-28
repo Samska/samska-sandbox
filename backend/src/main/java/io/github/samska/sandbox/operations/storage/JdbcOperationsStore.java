@@ -22,10 +22,7 @@ class JdbcOperationsStore implements OperationsStore {
         var dayAgo = Timestamp.from(now.minus(Duration.ofHours(24)));
         long lastHour = count("SELECT count(*) FROM orders WHERE created_at >= :since", hourAgo);
         long lastDay = count("SELECT count(*) FROM orders WHERE created_at >= :since", dayAgo);
-        long approved = count("SELECT count(*) FROM payment_attempts WHERE status = 'APPROVED' AND created_at >= :since", dayAgo);
-        long declined = count("SELECT count(*) FROM payment_attempts WHERE status = 'DECLINED' AND created_at >= :since", dayAgo);
-        long failed = count("SELECT count(*) FROM payment_attempts WHERE status = 'FAILED' AND created_at >= :since", dayAgo);
-        return new Counts(lastHour, lastDay, approved, declined, failed);
+        return new Counts(lastHour, lastDay);
     }
 
     private long count(String sql, Timestamp since) {

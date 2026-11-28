@@ -52,14 +52,12 @@ class OrderTrackingApiTest {
         return JsonPath.read(reply.body(), "$.id");
     }
 
-    /** Adds the Product, approves a payment and creates the Order; returns its ID. */
+    /** Adds the Product and places the Order; returns its ID. */
     private static String order(Client client, String productId, int quantity) throws Exception {
         var cart = client.post("/api/cart/items", "{\"productId\":\"" + productId + "\",\"quantity\":" + quantity + "}");
         int revision = JsonPath.read(cart.body(), "$.revision");
-        var attempt = UUID.randomUUID();
-        assertThat(client.post("/api/payment-attempts", "{\"attemptId\":\"" + attempt + "\",\"cartRevision\":"
-                + revision + ",\"scenario\":\"approve\"}").status()).isEqualTo(201);
-        var created = client.post("/api/orders", "{\"paymentAttemptId\":\"" + attempt + "\"}");
+        var created = client.post("/api/orders", "{\"requestId\":\"" + UUID.randomUUID()
+                + "\",\"cartRevision\":" + revision + "}");
         assertThat(created.status()).isEqualTo(201);
         return JsonPath.read(created.body(), "$.orderId");
     }

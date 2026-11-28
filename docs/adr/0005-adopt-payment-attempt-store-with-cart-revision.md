@@ -1,6 +1,6 @@
 # ADR 0005: Adopt a Payment-Owned In-Memory Attempt Store with Revision-Checked Cart Snapshots
 
-- Status: Accepted
+- Status: Superseded by [ADR 0021](0021-remove-the-simulated-payment.md) (SS-094 removed the Payment module)
 - Date: 2026-09-28
 - Decision makers: Samska (human owner) with AI implementation support
 - Related: [SS-036](https://github.com/Samska/samska-sandbox/issues/61), [SS-032](https://github.com/Samska/samska-sandbox/issues/53), [ADR 0001](0001-adopt-modular-monolith.md), [Architecture](../ARCHITECTURE.md), [Security](../SECURITY.md), [Testing](../TESTING.md), [Product](../PRODUCT.md)

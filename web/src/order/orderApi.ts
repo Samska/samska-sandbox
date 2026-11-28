@@ -10,7 +10,6 @@ export interface OrderItemResponse {
 export interface OrderResponse {
   orderId: string;
   orderNumber: string;
-  paymentAttemptId: string;
   cartRevision: number;
   items: OrderItemResponse[];
   total: number;
@@ -18,8 +17,7 @@ export interface OrderResponse {
 
 export type OrderApiErrorKind =
   | "bad-request"
-  | "not-found"
-  | "not-approved"
+  | "cart-changed"
   | "out-of-stock"
   | "network"
   | "server"
@@ -34,20 +32,13 @@ export class OrderApiError extends Error {
   }
 }
 
-export function createOrder(paymentAttemptId: string): Promise<OrderResponse> {
+/** The request ID makes a retry safe: the server returns the same Order for the same ID. */
+export function createOrder(requestId: string, cartRevision: number): Promise<OrderResponse> {
   return request("/api/orders", [200, 201], {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ paymentAttemptId })
+    body: JSON.stringify({ requestId, cartRevision })
   });
-}
-
-export function getOrder(orderId: string): Promise<OrderResponse> {
-  return request(`/api/orders/${encodeURIComponent(orderId)}`, [200]);
-}
-
-export function getOrderByPaymentAttempt(paymentAttemptId: string): Promise<OrderResponse> {
-  return request(`/api/orders/payment-attempts/${encodeURIComponent(paymentAttemptId)}`, [200]);
 }
 
 async function request(path: string, expected: number[], options?: RequestInit): Promise<OrderResponse> {
@@ -60,12 +51,10 @@ async function request(path: string, expected: number[], options?: RequestInit):
 
   if (!expected.includes(response.status)) {
     if (response.status === 400) throw new OrderApiError("bad-request");
-    if (response.status === 404) throw new OrderApiError("not-found");
-    if (response.status === 409 && (await errorCode(response)) === "payment-not-approved") {
-      throw new OrderApiError("not-approved");
-    }
-    if (response.status === 409 && (await errorCode(response)) === "out-of-stock") {
-      throw new OrderApiError("out-of-stock");
+    if (response.status === 409) {
+      const code = await errorCode(response);
+      if (code === "cart-changed") throw new OrderApiError("cart-changed");
+      if (code === "out-of-stock") throw new OrderApiError("out-of-stock");
     }
     throw new OrderApiError("server");
   }
@@ -96,10 +85,9 @@ function isOrder(value: unknown): value is OrderResponse {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
   const data = value as Record<string, unknown>;
   return (
-    Object.keys(data).length === 6 &&
+    Object.keys(data).length === 5 &&
     typeof data.orderId === "string" &&
     typeof data.orderNumber === "string" &&
-    typeof data.paymentAttemptId === "string" &&
     Number.isInteger(data.cartRevision) &&
     (data.cartRevision as number) >= 0 &&
     Array.isArray(data.items) && data.items.length > 0 && data.items.every(isItem) &&

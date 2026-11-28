@@ -1,6 +1,6 @@
 # ADR 0015: Add Inventory With Reservations In The Payment Transaction
 
-- Status: Accepted
+- Status: Accepted; the reservation taken on payment approval is superseded by [ADR 0021](0021-remove-the-simulated-payment.md) (SS-094): stock is now consumed when the Order is placed
 - Date: 2026-11-27
 - Decision makers: Samska (human owner) with AI implementation support
 - Related: [SS-071 (#138)](https://github.com/Samska/samska-sandbox/issues/138), [ADR 0012](0012-adopt-release-plan-to-v1.md)

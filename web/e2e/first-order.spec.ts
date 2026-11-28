@@ -1,23 +1,16 @@
 import { expect, test } from "@playwright/test";
-import { authStatePath, xsrfHeaders } from "./session";
+import { xsrfHeaders } from "./session";
 import {
   clearCart,
   createProduct,
-  fetchOrderByAttempt,
   fetchOrderById,
-  fetchPaymentAttempt,
   getCart,
   trackTransactionalRequests,
-  type OrderDto,
-  type PaymentAttemptDto
+  type OrderDto
 } from "./fixtures";
 
 test.describe("First Order journey in a real browser", () => {
-  test("completes the First Order journey with explicit Order creation and recovery", async ({
-    page,
-    browser,
-    request
-  }) => {
+  test("places the First Order in one Checkout step", async ({ page, request }) => {
     await clearCart(request);
     const product = await createProduct(request, `E2E Success ${Date.now()}`, 12.5);
     const tracker = trackTransactionalRequests(page);
@@ -63,123 +56,43 @@ test.describe("First Order journey in a real browser", () => {
     await expect(page.getByText("Cart updated.")).toBeVisible();
     await expect(cartDialog.locator("dd")).toHaveText("$37.50");
 
-    // Checkout: heading focus, explicit approve outcome, transactional click.
+    // Checkout: heading focus, then one step. There is no payment to choose or simulate.
     await cartDialog.getByRole("button", { name: "Checkout" }).click();
     await expect(page).toHaveURL(/\/checkout$/);
     await expect(page.getByRole("heading", { name: "Checkout", level: 1 })).toBeFocused();
+    await expect(page.getByLabel("Demo outcome")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Simulate payment" })).toHaveCount(0);
 
-    await page.getByLabel("Demo outcome").selectOption("approve");
-    await page.getByRole("button", { name: "Simulate payment" }).click();
-    await expect(page).toHaveURL(/\/checkout\/attempts\/[0-9a-f-]{36}$/);
-    const attemptUrl = page.url();
-    const attemptId = attemptUrl.split("/").at(-1) ?? "";
-    expect(attemptId).toMatch(/^[0-9a-f-]{36}$/i);
-
-    // Approval alone must not create an Order.
-    await expect(
-      page.getByRole("heading", { name: "Payment approved", level: 1 })
-    ).toBeFocused();
-    expect(tracker.paymentPosts()).toBe(1);
-    expect(tracker.orderPosts()).toBe(0);
-    expect((await fetchOrderByAttempt(request, attemptId)).status()).toBe(404);
-
-    const attemptResponse = await fetchPaymentAttempt(request, attemptId);
-    expect(attemptResponse.status()).toBe(200);
-    const capturedAttempt = (await attemptResponse.json()) as PaymentAttemptDto;
-    expect(capturedAttempt.status).toBe("approved");
-    expect(capturedAttempt.total).toBe(37.5);
-    expect(capturedAttempt.items).toHaveLength(1);
-    expect(capturedAttempt.items[0]).toMatchObject({
-      productId: product.id,
-      quantity: 3,
-      lineSubtotal: 37.5
-    });
-    await expect(page.getByText(`${product.name} × 3`)).toBeVisible();
-    await expect(page.locator("#payment-result dd")).toHaveText("$37.50");
-
-    // Reload recovers the approved attempt through reads only.
-    await page.reload();
-    await expect(
-      page.getByRole("heading", { name: "Payment approved", level: 1 })
-    ).toBeVisible();
-    await expect(page.getByText(`${product.name} × 3`)).toBeVisible();
-    await expect(page.locator("#payment-result dd")).toHaveText("$37.50");
-    expect(tracker.paymentPosts()).toBe(1);
-    expect(tracker.orderPosts()).toBe(0);
-    expect((await fetchOrderByAttempt(request, attemptId)).status()).toBe(404);
-
-    // The recovered Payment record must equal the captured original in full:
-    // attempt ID, status, Cart revision, total, and every item field.
-    const recoveredAttempt = (await (await fetchPaymentAttempt(request, attemptId)).json()) as PaymentAttemptDto;
-    expect(recoveredAttempt).toEqual(capturedAttempt);
-
-    // Direct entry with empty browser storage recovers the same attempt.
-    const coldAttemptContext = await browser.newContext({ storageState: authStatePath });
-    try {
-      const coldAttemptPage = await coldAttemptContext.newPage();
-      const coldTracker = trackTransactionalRequests(coldAttemptPage);
-      await coldAttemptPage.goto(attemptUrl);
-      await expect(
-        coldAttemptPage.getByRole("heading", { name: "Payment approved", level: 1 })
-      ).toBeVisible();
-      await expect(coldAttemptPage.getByText(`${product.name} × 3`)).toBeVisible();
-      await expect(coldAttemptPage.getByText("$12.50 each")).toBeVisible();
-      await expect(coldAttemptPage.locator("#payment-result dd")).toHaveText("$37.50");
-      const coldAttemptRecord = (await (await fetchPaymentAttempt(request, attemptId)).json()) as PaymentAttemptDto;
-      expect(coldAttemptRecord).toEqual(capturedAttempt);
-      expect(coldTracker.paymentPosts() + coldTracker.orderPosts()).toBe(0);
-    } finally {
-      await coldAttemptContext.close();
-    }
-
-    // A live Cart change must not alter the captured snapshot.
-    await page.goto("/checkout");
-    await expect(page.getByRole("heading", { name: "Checkout", level: 1 })).toBeVisible();
+    // A live Cart change before placing the order is reflected in what is ordered.
     const checkoutQuantity = page.getByRole("spinbutton", { name: `Quantity for ${product.name}`, exact: true });
-    await checkoutQuantity.fill("5");
+    await checkoutQuantity.fill("4");
     await checkoutQuantity.press("Enter");
     await expect(page.getByText("Cart updated.")).toBeVisible();
-    await expect(page.locator("#checkout dd")).toHaveText("$62.50");
+    await expect(page.locator("#checkout dd")).toHaveText("$50.00");
 
-    await page.goto(attemptUrl);
-    await expect(
-      page.getByRole("heading", { name: "Payment approved", level: 1 })
-    ).toBeVisible();
-    await expect(page.getByText(`${product.name} × 3`)).toBeVisible();
-    await expect(page.locator("#payment-result dd")).toHaveText("$37.50");
-    const unchangedAttempt = (await (await fetchPaymentAttempt(request, attemptId)).json()) as PaymentAttemptDto;
-    expect(unchangedAttempt).toEqual(capturedAttempt);
-
-    // Explicit Order creation through keyboard activation.
-    const createOrder = page.getByRole("button", { name: "Create Order" });
-    await expect(createOrder).toBeEnabled();
-    await createOrder.press("Enter");
+    // Placing the Order through keyboard activation approves it directly.
+    const placeOrder = page.getByRole("button", { name: "Place order" });
+    await expect(placeOrder).toBeEnabled();
+    await placeOrder.press("Enter");
     await expect(page.getByRole("heading", { name: "Order created", level: 1 })).toBeFocused();
     expect(tracker.orderPosts()).toBe(1);
-    expect(tracker.paymentPosts()).toBe(1);
 
     const orderNumber = (await page.getByLabel(/^Order number /).innerText()).trim();
     expect(orderNumber).toMatch(/^SK-\d{6}$/);
     const trackHref = (await page.getByRole("link", { name: "Track this order" }).getAttribute("href")) ?? "";
     const orderId = trackHref.replace("/orders/", "");
     expect(orderId).toMatch(/^[0-9a-f-]{36}$/i);
-
-    const orderByAttempt = await fetchOrderByAttempt(request, attemptId);
-    expect(orderByAttempt.status()).toBe(200);
-    const capturedOrder = (await orderByAttempt.json()) as OrderDto;
-    expect(capturedOrder.orderId).toBe(orderId);
-    expect(capturedOrder.orderNumber).toBe(orderNumber);
-    expect(capturedOrder.paymentAttemptId).toBe(attemptId);
-    expect(capturedOrder.cartRevision).toBe(capturedAttempt.cartRevision);
-    expect(capturedOrder.total).toBe(37.5);
-    expect(capturedOrder.items[0]).toMatchObject({ productId: product.id, quantity: 3, lineSubtotal: 37.5 });
-    await expect(page.getByText("Order total: $37.50")).toBeVisible();
+    await expect(page.getByText("Order total: $50.00")).toBeVisible();
+    await expect(page.getByText("× 4 · $12.50 each")).toBeVisible();
 
     const orderById = await fetchOrderById(request, orderId);
     expect(orderById.status()).toBe(200);
-    expect((await orderById.json()) as OrderDto).toEqual(capturedOrder);
+    const capturedOrder = (await orderById.json()) as OrderDto;
+    expect(capturedOrder.orderNumber).toBe(orderNumber);
+    expect(capturedOrder.total).toBe(50);
+    expect(capturedOrder.items[0]).toMatchObject({ productId: product.id, quantity: 4, lineSubtotal: 50 });
 
-    // Creating the Order empties the live Cart; a new Cart change leaves the frozen Order untouched.
+    // Placing the Order emptied the live Cart; a new Cart change leaves the frozen Order untouched.
     const emptiedCart = await getCart(request);
     expect(emptiedCart.items).toHaveLength(0);
     expect(emptiedCart.total).toBe(0);
@@ -188,124 +101,23 @@ test.describe("First Order journey in a real browser", () => {
       headers: await xsrfHeaders(request)
     });
     expect(refilled.status()).toBe(200);
-    const changedCart = await getCart(request);
-    expect(changedCart.total).toBe(87.5);
-    expect(changedCart.items[0]).toMatchObject({ productId: product.id, quantity: 7, lineSubtotal: 87.5 });
-
-    // The frozen Order survives the post-order Cart change, reload, and entry,
-    // and every recovered record must equal the captured original in full:
-    // IDs, Cart revision, total, and every item field.
-    await page.goto(attemptUrl);
-    await expect(page.getByRole("heading", { name: "Order created", level: 1 })).toBeVisible();
-    await expect(page.getByLabel(`Order number ${orderNumber}`)).toBeVisible();
-    await expect(page.getByText(product.name)).toBeVisible();
-    await expect(page.getByText("× 3 · $12.50 each")).toBeVisible();
-    await expect(page.getByText("Order total: $37.50")).toBeVisible();
-    expect((await (await fetchOrderByAttempt(request, attemptId)).json()) as OrderDto).toEqual(capturedOrder);
     expect((await (await fetchOrderById(request, orderId)).json()) as OrderDto).toEqual(capturedOrder);
 
-    await page.reload();
-    await expect(page.getByRole("heading", { name: "Order created", level: 1 })).toBeVisible();
-    await expect(page.getByLabel(`Order number ${orderNumber}`)).toBeVisible();
-    await expect(page.getByText("Order total: $37.50")).toBeVisible();
-    expect((await (await fetchOrderByAttempt(request, attemptId)).json()) as OrderDto).toEqual(capturedOrder);
+    // The Order shows in the history and opens its tracking.
+    await page.goto("/orders");
+    const row = page.getByRole("listitem").filter({ hasText: orderNumber });
+    await expect(row).toBeVisible();
+    await expect(row).toContainText("$50.00");
+    await row.getByRole("link", { name: /^Track order/ }).click();
+    await expect(page).toHaveURL(new RegExp(`/orders/${orderId}$`));
 
-    const coldOrderContext = await browser.newContext({ storageState: authStatePath });
-    try {
-      const coldOrderPage = await coldOrderContext.newPage();
-      const coldOrderTracker = trackTransactionalRequests(coldOrderPage);
-      await coldOrderPage.goto(attemptUrl);
-      await expect(coldOrderPage.getByRole("heading", { name: "Order created", level: 1 })).toBeVisible();
-      await expect(coldOrderPage.getByLabel(`Order number ${orderNumber}`)).toBeVisible();
-      await expect(coldOrderPage.getByText("× 3 · $12.50 each")).toBeVisible();
-      await expect(coldOrderPage.getByText("Order total: $37.50")).toBeVisible();
-      expect((await (await fetchOrderByAttempt(request, attemptId)).json()) as OrderDto).toEqual(capturedOrder);
-      expect(coldOrderTracker.paymentPosts() + coldOrderTracker.orderPosts()).toBe(0);
-    } finally {
-      await coldOrderContext.close();
-    }
-
-    // Back/Forward history traversal stays read-only and keeps the frozen data.
-    await page.goBack();
+    // Back at Checkout the new Cart is a fresh review, with no payment notice left behind.
+    await page.goto("/checkout");
     await expect(page.getByRole("heading", { name: "Checkout", level: 1 })).toBeVisible();
     await expect(page.locator("#checkout dd")).toHaveText("$87.50");
-    await page.goForward();
-    await expect(page.getByRole("heading", { name: "Order created", level: 1 })).toBeVisible();
-    await expect(page.getByText("Order total: $37.50")).toBeVisible();
-    expect((await (await fetchOrderByAttempt(request, attemptId)).json()) as OrderDto).toEqual(capturedOrder);
+    await expect(page.getByText("Payment not finished")).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Resume payment" })).toHaveCount(0);
 
-    expect(tracker.paymentPosts(), "exactly one browser payment POST across the journey").toBe(1);
     expect(tracker.orderPosts(), "exactly one browser Order POST across the journey").toBe(1);
-  });
-
-  test("keeps a declined simulated payment ineligible for an Order across recovery", async ({
-    page,
-    browser,
-    request
-  }) => {
-    await clearCart(request);
-    const product = await createProduct(request, `E2E Decline ${Date.now()}`, 8.25);
-    const tracker = trackTransactionalRequests(page);
-
-    await page.goto("/");
-    await page.getByRole("button", { name: `Add ${product.name} to Cart` }).click();
-    await expect(page.getByText(`${product.name} added to your Cart.`)).toBeVisible();
-
-    await page.getByRole("button", { name: /^Cart\b/ }).click();
-    await page.getByRole("dialog", { name: "Your Cart" }).getByRole("button", { name: "Checkout" }).click();
-    await expect(page.getByRole("heading", { name: "Checkout", level: 1 })).toBeFocused();
-
-    await page.getByLabel("Demo outcome").selectOption("decline");
-    await page.getByRole("button", { name: "Simulate payment" }).click();
-    await expect(page).toHaveURL(/\/checkout\/attempts\/[0-9a-f-]{36}$/);
-    const attemptUrl = page.url();
-    const attemptId = attemptUrl.split("/").at(-1) ?? "";
-
-    await expect(
-      page.getByRole("heading", { name: "Payment declined", level: 1 })
-    ).toBeFocused();
-    await expect(page.getByText("No payment was made. You can try again with your current Cart.")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Try again with the current Cart" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Create Order" })).toHaveCount(0);
-
-    const attemptResponse = await fetchPaymentAttempt(request, attemptId);
-    expect(attemptResponse.status()).toBe(200);
-    const capturedDeclinedAttempt = (await attemptResponse.json()) as PaymentAttemptDto;
-    expect(capturedDeclinedAttempt.status).toBe("declined");
-    expect(capturedDeclinedAttempt.total).toBe(8.25);
-
-    expect((await fetchOrderByAttempt(request, attemptId)).status()).toBe(404);
-    expect(tracker.paymentPosts()).toBe(1);
-    expect(tracker.orderPosts()).toBe(0);
-
-    // Reload recovers the declined attempt without any transactional request,
-    // and the recovered record equals the captured original in full.
-    await page.reload();
-    await expect(
-      page.getByRole("heading", { name: "Payment declined", level: 1 })
-    ).toBeVisible();
-    await expect(page.getByRole("button", { name: "Create Order" })).toHaveCount(0);
-    const recoveredDeclined = (await (await fetchPaymentAttempt(request, attemptId)).json()) as PaymentAttemptDto;
-    expect(recoveredDeclined).toEqual(capturedDeclinedAttempt);
-    expect(tracker.paymentPosts()).toBe(1);
-    expect(tracker.orderPosts()).toBe(0);
-
-    // Direct entry with empty browser storage behaves identically.
-    const coldContext = await browser.newContext({ storageState: authStatePath });
-    try {
-      const coldPage = await coldContext.newPage();
-      const coldTracker = trackTransactionalRequests(coldPage);
-      await coldPage.goto(attemptUrl);
-      await expect(
-        coldPage.getByRole("heading", { name: "Payment declined", level: 1 })
-      ).toBeVisible();
-      await expect(coldPage.getByText("$8.25 each")).toBeVisible();
-      await expect(coldPage.locator("#payment-result dd")).toHaveText("$8.25");
-      await expect(coldPage.getByRole("button", { name: "Create Order" })).toHaveCount(0);
-      expect((await (await fetchPaymentAttempt(request, attemptId)).json()) as PaymentAttemptDto).toEqual(capturedDeclinedAttempt);
-      expect(coldTracker.paymentPosts() + coldTracker.orderPosts()).toBe(0);
-    } finally {
-      await coldContext.close();
-    }
   });
 });

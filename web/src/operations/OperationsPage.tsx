@@ -68,7 +68,7 @@ export default function OperationsPage() {
       {demo ? (
         <div className="flex flex-wrap items-center gap-3 rounded-sm border-[1.5px] border-dashed border-ink p-4">
           <p className="flex-1 text-sm">
-            Demo mode is on. Resetting removes every Order, Payment attempt, Cart and customer account, and restores
+            Demo mode is on. Resetting removes every Order, Cart and customer account, and restores
             stock. Products and your own session stay.
           </p>
           {reset === "idle" || reset === "done" || reset === "failed" ? (
@@ -98,22 +98,15 @@ export default function OperationsPage() {
 }
 
 function Figures({ snapshot }: { snapshot: OperationsSnapshot }) {
-  const attempts = snapshot.approvedAttempts + snapshot.declinedAttempts + snapshot.failedAttempts;
-
   return (
     <>
       <p className="text-sm text-muted">
-        Figures were read {formatWhen(snapshot.generatedAt)}. Orders and payments come from the database; latency and
+        Figures were read {formatWhen(snapshot.generatedAt)}. Orders come from the database; latency and
         errors are measured by this server process since it started.
       </p>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Figure label="Orders, last hour" value={String(snapshot.ordersLastHour)}>
           {snapshot.ordersLast24Hours} in the last 24 hours
-        </Figure>
-        <Figure label="Approval rate, 24 hours" value={percent(snapshot.approvalRate)}>
-          {attempts === 0
-            ? "No payment attempts in the last 24 hours"
-            : `${snapshot.approvedAttempts} approved, ${snapshot.declinedAttempts} declined, ${snapshot.failedAttempts} failed`}
         </Figure>
         <Figure
           label="Checkout latency p95"
@@ -121,7 +114,7 @@ function Figures({ snapshot }: { snapshot: OperationsSnapshot }) {
         >
           {snapshot.checkoutSamples === 0
             ? "No checkout requests since start"
-            : `${snapshot.checkoutSamples} Payment attempt requests, about the last 15 minutes`}
+            : `${snapshot.checkoutSamples} Order requests, about the last 15 minutes`}
         </Figure>
         <Figure label="Server error rate" value={percent(snapshot.errorRate)}>
           {snapshot.requests === 0

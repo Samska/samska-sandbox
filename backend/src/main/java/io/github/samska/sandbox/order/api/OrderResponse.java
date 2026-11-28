@@ -6,11 +6,11 @@ import java.util.UUID;
 
 import io.github.samska.sandbox.order.Order;
 
-public record OrderResponse(UUID orderId, String orderNumber, UUID paymentAttemptId, long cartRevision,
+public record OrderResponse(UUID orderId, String orderNumber, long cartRevision,
         List<OrderItemResponse> items, BigDecimal total) {
 
     public static OrderResponse from(Order order) {
-        return new OrderResponse(order.orderId(), Order.displayNumber(order.orderNumber()), order.paymentAttemptId(), order.cartRevision(),
+        return new OrderResponse(order.orderId(), Order.displayNumber(order.orderNumber()), order.cartRevision(),
                 order.items().stream().map(item -> new OrderItemResponse(item.productId(), item.name(),
                         item.unitPrice(), item.quantity(), item.lineSubtotal())).toList(), order.total());
     }

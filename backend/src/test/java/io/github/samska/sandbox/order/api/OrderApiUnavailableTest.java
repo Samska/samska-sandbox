@@ -17,6 +17,7 @@ import io.github.samska.sandbox.order.application.OrderStore;
 import io.github.samska.sandbox.support.NoDatabaseTest;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -43,23 +44,17 @@ class OrderApiUnavailableTest {
 
     @Test
     void returnsTheStableUnavailableCodeWhenTheOrderStoreCannotReachTheDatabase() throws Exception {
-        when(orderStore.create(any()))
+        when(orderStore.create(any(), anyLong(), any()))
                 .thenThrow(new CannotCreateTransactionException("database unavailable"));
         when(orderStore.findById(any())).thenThrow(new DataAccessResourceFailureException("database unavailable"));
-        when(orderStore.findByPaymentAttemptId(any()))
-                .thenThrow(new DataAccessResourceFailureException("database unavailable"));
 
         mvc.perform(post("/api/orders").contentType("application/json")
-                        .content("{\"paymentAttemptId\":\"" + UUID.randomUUID() + "\"}"))
+                        .content("{\"requestId\":\"" + UUID.randomUUID() + "\",\"cartRevision\":0}"))
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(jsonPath("$.code").value("order-store-unavailable"));
 
         mvc.perform(get("/api/orders/{orderId}", UUID.randomUUID()))
                 .andExpect(status().isServiceUnavailable())
                 .andExpect(content().json("{\"code\":\"order-store-unavailable\"}"));
-
-        mvc.perform(get("/api/orders/payment-attempts/{attemptId}", UUID.randomUUID()))
-                .andExpect(status().isServiceUnavailable())
-                .andExpect(jsonPath("$.code").value("order-store-unavailable"));
     }
 }

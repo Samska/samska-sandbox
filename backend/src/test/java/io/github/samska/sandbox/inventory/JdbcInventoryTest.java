@@ -1,8 +1,5 @@
 package io.github.samska.sandbox.inventory;
 
-import java.time.Clock;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -15,38 +12,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.TestPropertySource;
 
 import io.github.samska.sandbox.inventory.application.InsufficientStockException;
 import io.github.samska.sandbox.inventory.application.Inventory;
 import io.github.samska.sandbox.inventory.storage.JdbcInventory;
-import io.github.samska.sandbox.support.MutableClock;
 import io.github.samska.sandbox.support.PostgresTestSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
-@Import(JdbcInventoryTest.ClockConfiguration.class)
-@TestPropertySource(properties = "samska.inventory.reservation-ttl=PT10M")
 class JdbcInventoryTest extends PostgresTestSupport {
-
-    static final MutableClock CLOCK = new MutableClock(Instant.parse("2026-11-27T12:00:00Z"));
-
-    @TestConfiguration(proxyBeanMethods = false)
-    static class ClockConfiguration {
-
-        @Bean
-        @Primary
-        Clock testClock() {
-            return CLOCK;
-        }
-    }
 
     @Autowired
     private Inventory inventory;
@@ -56,7 +33,7 @@ class JdbcInventoryTest extends PostgresTestSupport {
 
     @BeforeEach
     void reset() {
-        jdbc.execute("TRUNCATE TABLE stock_reservations, stock_levels");
+        jdbc.execute("TRUNCATE TABLE stock_levels");
     }
 
     private static List<StockLine> lines(UUID product, int quantity) {
@@ -92,135 +69,46 @@ class JdbcInventoryTest extends PostgresTestSupport {
     }
 
     @Test
-    void holdsUnitsForAnApprovedAttemptUntilItExpires() {
+    void consumingTakesUnitsOutForGood() {
         var id = stocked(5);
 
-        inventory.reserve(UUID.randomUUID(), lines(id, 3));
-        assertThat(inventory.available(id)).isEqualTo(2);
-
-        CLOCK.advance(Duration.ofMinutes(11));
-        assertThat(inventory.available(id)).isEqualTo(5);
-    }
-
-    @Test
-    void refusesToHoldMoreThanOthersHaveNotHeld() {
-        var id = stocked(5);
-        inventory.reserve(UUID.randomUUID(), lines(id, 4));
-
-        assertThatThrownBy(() -> inventory.reserve(UUID.randomUUID(), lines(id, 2)))
-                .isInstanceOfSatisfying(InsufficientStockException.class, exception -> {
-                    assertThat(exception.productId()).isEqualTo(id);
-                    assertThat(exception.available()).isEqualTo(1);
-                });
-        inventory.reserve(UUID.randomUUID(), lines(id, 1));
-        assertThat(inventory.available(id)).isZero();
-    }
-
-    @Test
-    void replacingAnAttemptsHoldDoesNotCountItAgainstItself() {
-        var id = stocked(5);
-        var attempt = UUID.randomUUID();
-        inventory.reserve(attempt, lines(id, 5));
-
-        inventory.reserve(attempt, lines(id, 5));
-
-        assertThat(inventory.available(id)).isZero();
-    }
-
-    @Test
-    void aRefusedReservationHoldsNothing() {
-        var plenty = stocked(10);
-        var scarce = stocked(1);
-
-        assertThatThrownBy(() -> inventory.reserve(UUID.randomUUID(),
-                List.of(new StockLine(plenty, 4), new StockLine(scarce, 2))))
-                .isInstanceOf(InsufficientStockException.class);
-
-        assertThat(inventory.available(plenty)).isEqualTo(10);
-    }
-
-    @Test
-    void consumingTakesUnitsOutForGoodAndReleasesTheHold() {
-        var id = stocked(5);
-        var attempt = UUID.randomUUID();
-        inventory.reserve(attempt, lines(id, 2));
-
-        inventory.consume(attempt, lines(id, 2));
+        inventory.consume(lines(id, 2));
 
         assertThat(inventory.available(id)).isEqualTo(3);
         assertThat(jdbc.queryForObject("SELECT on_hand FROM stock_levels WHERE product_id = ?", Integer.class, id))
                 .isEqualTo(3);
-        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM stock_reservations", Integer.class)).isZero();
     }
 
     @Test
-    void anExpiredHoldCanStillBeConsumedWhileTheUnitsAreFree() {
+    void refusesToConsumeMoreThanIsOnHand() {
         var id = stocked(2);
-        var attempt = UUID.randomUUID();
-        inventory.reserve(attempt, lines(id, 2));
-        CLOCK.advance(Duration.ofMinutes(11));
 
-        inventory.consume(attempt, lines(id, 2));
-
-        assertThat(inventory.available(id)).isZero();
+        assertThatThrownBy(() -> inventory.consume(lines(id, 3)))
+                .isInstanceOfSatisfying(InsufficientStockException.class, exception -> {
+                    assertThat(exception.productId()).isEqualTo(id);
+                    assertThat(exception.available()).isEqualTo(2);
+                });
+        assertThat(inventory.available(id)).isEqualTo(2);
     }
 
     @Test
-    void anExpiredHoldCannotBeConsumedOnceSomeoneElseHoldsTheUnits() {
-        var id = stocked(1);
-        var late = UUID.randomUUID();
-        inventory.reserve(late, lines(id, 1));
-        CLOCK.advance(Duration.ofMinutes(11));
-        inventory.reserve(UUID.randomUUID(), lines(id, 1));
+    void aRefusedConsumptionTakesNothingFromTheOtherLinesOfTheTransaction() {
+        var plenty = stocked(10);
+        var scarce = stocked(1);
 
-        assertThatThrownBy(() -> inventory.consume(late, lines(id, 1)))
+        assertThatThrownBy(() -> inventory.consume(List.of(new StockLine(plenty, 4), new StockLine(scarce, 2))))
                 .isInstanceOf(InsufficientStockException.class);
-        assertThat(jdbc.queryForObject("SELECT on_hand FROM stock_levels WHERE product_id = ?", Integer.class, id))
-                .isEqualTo(1);
+        assertThat(inventory.available(plenty)).isEqualTo(10);
+        assertThat(inventory.available(scarce)).isEqualTo(1);
     }
 
     @Test
-    void removingAProductForgetsItsStockAndHolds() {
+    void removingAProductForgetsItsStock() {
         var id = stocked(3);
-        inventory.reserve(UUID.randomUUID(), lines(id, 1));
 
         inventory.remove(id);
 
         assertThat(inventory.available(id)).isZero();
-        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM stock_reservations", Integer.class)).isZero();
-    }
-
-    @Test
-    void concurrentBuyersOfTheLastUnitProduceExactlyOneHold() throws Exception {
-        var id = stocked(1);
-        int buyers = 8;
-        var barrier = new CyclicBarrier(buyers);
-        var executor = Executors.newFixedThreadPool(buyers);
-        try {
-            List<Callable<Boolean>> tasks = new ArrayList<>();
-            for (int index = 0; index < buyers; index++) {
-                tasks.add(() -> {
-                    barrier.await();
-                    try {
-                        inventory.reserve(UUID.randomUUID(), lines(id, 1));
-                        return true;
-                    } catch (InsufficientStockException exception) {
-                        return false;
-                    }
-                });
-            }
-            var won = 0;
-            for (var future : executor.invokeAll(tasks)) {
-                if (future.get()) {
-                    won++;
-                }
-            }
-            assertThat(won).isEqualTo(1);
-            assertThat(inventory.available(id)).isZero();
-        } finally {
-            executor.shutdownNow();
-            executor.awaitTermination(5, TimeUnit.SECONDS);
-        }
     }
 
     @Test
@@ -235,7 +123,7 @@ class JdbcInventoryTest extends PostgresTestSupport {
                 tasks.add(() -> {
                     barrier.await();
                     try {
-                        inventory.consume(UUID.randomUUID(), lines(id, 1));
+                        inventory.consume(lines(id, 1));
                         return true;
                     } catch (InsufficientStockException exception) {
                         return false;

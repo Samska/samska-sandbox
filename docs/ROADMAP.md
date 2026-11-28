@@ -32,7 +32,7 @@ never renumbered.
 | Checkout vertical slice | SS-032 |
 | Admin Catalog Management | SS-033 |
 | Product Media Upload | SS-034 |
-| Payment Simulator | SS-036 |
+| Payment Simulator (removed by SS-094) | SS-036 |
 | Order creation | SS-037 |
 | First Order end-to-end journey | SS-039 |
 | Release v0.1.0 — First Order (published 2026-10-15) | SS-040, SS-041 |
@@ -43,9 +43,8 @@ SS-042 — Minimal real-browser First Order regression suite (#77) is
 complete and merged via PR #78 (squash `eb829cc`, merged 2026-10-15). It adds
 two Playwright/TypeScript Chromium tests that drive the real frontend through
 the Vite proxy against a fresh, exclusively owned backend: the First Order
-success journey with attempt-addressed recovery, frozen data, explicit Order
-creation, and focused keyboard/focus checks, plus a declined outcome that
-exposes no Order path. Execution is serialized on Windows 11 Pro/Git Bash
+success journey with frozen data and focused keyboard/focus checks (simplified
+to one Place order step by SS-094). Execution is serialized on Windows 11 Pro/Git Bash
 locally and Ubuntu 24.04 in the Browser E2E CI job, using synthetic data and
 existing APIs only. The next product capability is not yet selected. Future
 capabilities receive their SS identifier when their Issues are created.
@@ -61,30 +60,27 @@ not an access-control boundary. Payment Simulator (SS-036) is complete and
 merged through PR #62: it captures a revision-checked immutable Cart snapshot,
 applies one of three explicit simulated outcomes, owns identified attempts with
 UUID replay and GET reconciliation, and records at most one approval per
-unchanged Cart revision in a bounded 32-attempt process-local store (persisted without the cap by SS-066). CI test result
+unchanged Cart revision in a bounded 32-attempt process-local store (persisted without the cap by SS-066). SS-094 removed the simulator again: Checkout places the Order directly ([ADR 0021](adr/0021-remove-the-simulated-payment.md)). CI test result
 visibility (SS-035) was investigated separately and cancelled on 2026-09-28; its
 issue is closed as not
 planned and its pull request closed without merging, so it delivers nothing and
 is not part of the product sequence.
 
-Order creation is a separate explicit step from simulated approval. It copies the frozen approved attempt into an immutable record, with same-attempt replay and lookup; SS-049 later made that record durable in PostgreSQL. No full-page UI recovery or Cart clearing is introduced by that capability alone. Order creation (SS-037) is complete and merged through PR #67; the owner verified the main browser flow, while API replay, uncertain-response recovery, and accessibility remain unobserved real-browser checks for SS-037 itself. The First Order end-to-end journey (SS-039) is complete and merged through PR #70: `/checkout` and `/checkout/attempts/{attemptId}` recover the simulated result or frozen Order through read-only lookups after reload, direct entry, and history, keep the live Cart editable, and require explicit abandonment before a new journey replaces an unresolved reference.
+Order creation copies the Cart snapshot into an immutable record, with same-request replay and lookup (originally from a frozen approved payment attempt, removed by SS-094); SS-049 later made that record durable in PostgreSQL. No full-page UI recovery or Cart clearing is introduced by that capability alone. Order creation (SS-037) is complete and merged through PR #67; the owner verified the main browser flow, while API replay, uncertain-response recovery, and accessibility remain unobserved real-browser checks for SS-037 itself. The First Order end-to-end journey (SS-039) is complete and merged through PR #70: `/checkout` and `/checkout/attempts/{attemptId}` recover the simulated result or frozen Order through read-only lookups after reload, direct entry, and history, keep the live Cart editable, and require explicit abandonment before a new journey replaces an unresolved reference.
 
 Market Product-name search (SS-044, #81) is complete and merged via PR #82 (squash `8b32000`, merged 2026-10-15). It adds a local, case- and accent-insensitive substring filter on `Product.name` to the Market: the term lives in `Catalog` state while mounted so it survives Product details and Market → Checkout → Back to Market and resets only on a full-page reload; the term is never written to the URL, history, sessionStorage, localStorage, or logs, and never sent to the API — `GET /api/products` is unchanged and filtering runs entirely in the browser over the already-loaded list. Admin Catalog Management keeps its accent-sensitive filter (`String.prototype.toLowerCase` only) by decision; the documented difference is that Market is accent-insensitive and Admin is accent-sensitive. The existing focus-return mechanism is reused, with a fallback to the search input when the originating View details control is no longer in the map. No new dependency, server endpoint, persistence, accessibility test, ADR, or learning record is introduced. SS-045 (#84) introduced versioned agent instructions under `docs/agents/` and merged via PR #85 (squash `54b9afc`, merged 2026-10-16). The mandatory Orchestrator, role hierarchy, specialist catalogue, and Maestri adapter were superseded as active requirements on 2026-10-27; the historical files remain at commit `4ec11f8`, and the portable rules now live in `AGENTS.md` and AI Engineering Governance. SS-046 (#87) remains historical adoption evidence. SS-049 (#95) is complete and merged via PR #96: Orders and their items are durable in PostgreSQL through the existing OrderStore, the process-local 32-order guard is removed, PostgreSQL is required at startup, and Products, media, Cart, and Payment attempts remain in memory. SS-051 (#98) is complete and merged via PR #99 (squash `db9047b`, merged 2026-10-27); it removes the mandatory orchestration layer and establishes a bounded engineering loop without changing application behavior. SS-052 (#100) is complete and merged through PR #101, and SS-053 (#102) is complete and merged through PR #103: Candidate 03 is owner-approved for the reviewed catalog, foundations, and components, and SS-053 Batch 1 is owner-approved for the current-interface shell and functional Market at `revn 52`; both contain provisional illustrations and do not authorize application implementation or production adoption. SS-054 (#104) adds the Product detail and Cart drawer designs at `revn 78`, received qualified first-version visual acceptance, and is completed through merged PR #105. SS-055 (#106) adds the Checkout and simulated Payment designs at `revn 96`, including the approved minimal payment-attempt recovery surface; it received owner-reported visual acceptance “Parece ok” and is completed through Issue #106 and merged PR #107. SS-056 (#108) adds Order/recovery, Admin list/create/edit, and not-found/fallback designs and is owner-reported visually approved at its named version with the exact answer “Eu aprovo” (2026-10-29); the seven-file documentation is approved and commit/push is authorized. After successful push, the separate PR creation decision is the next gate. Production UI adoption remains a separate future decision. The next product capability remains unselected.
 
 ### MVP Boundaries
 
-From v0.3.0 (SS-069) accounts, sessions and per-account Cart, Payment attempts and Orders exist; the paragraph below is the v0.1.0 boundary and is kept as history. The local MVP deliberately deferred authentication and authorization. They are
+From v0.3.0 (SS-069) accounts, sessions and per-account Cart and Orders exist; the paragraph below is the v0.1.0 boundary and is kept as history. The local MVP deliberately deferred authentication and authorization. They are
 deferred until after the local First Order MVP but are a mandatory prerequisite
 for any hosted environment, and no hosting work begins before the MVP. Orders
 and their items are persisted in PostgreSQL and survive a backend restart. Since
 SS-065 (#125), SS-066 (#127) and SS-067 (#130), the single current Cart with its
-revision, simulated payment attempts with their frozen snapshots and the
-one-approval-per-revision rule, and Catalog Products with their uploaded media
+revision, and Catalog Products with their uploaded media
 are persisted too, so no application state is process-local any more. A Cart line
 keeps its own name and price snapshot and has no foreign key to Catalog. The
-attempt-addressed URL and one browser-session reference remain lookup hints for
-recovery. Payment Simulator captures the revision-checked Cart snapshot, and its unauthenticated scenario selector and endpoints are
-a local-only use constraint, not access control or a hosting posture. Orders are
+Order placement captures the revision-checked Cart snapshot. Orders are
 unauthenticated synthetic records in a loopback-only local database; the
 application has no deployment environment.
 
@@ -112,14 +108,14 @@ Design baseline for every release is the owner-approved [Bench prototype](design
 
 | Release | Name | Scope | Exit criteria | Design status |
 | --- | --- | --- | --- | --- |
-| v0.2.0 | Durable Store | Orders, Cart, Payment attempts, Catalog and uploaded media in PostgreSQL (SS-049, SS-065 to SS-067); Bench identity applied to `web/` (SS-063, SS-064) | No state is lost on restart; browser journey passes against the real database | Bench approved |
-| v0.3.0 | Accounts | Registration, sign-in and sign-out with synthetic accounts; server-side sessions; per-account Cart, Payment attempts and Orders; an administrator role that guards Admin and media endpoints; CSRF protection | Anonymous visitors browse only; a customer cannot read another account's data; Admin is refused to customers; E2E journey runs signed in | Account screen in Bench. Gap: sign-out and signed-in header state |
+| v0.2.0 | Durable Store | Orders, Cart, Catalog and uploaded media in PostgreSQL (SS-049, SS-065 to SS-067); Bench identity applied to `web/` (SS-063, SS-064) | No state is lost on restart; browser journey passes against the real database | Bench approved |
+| v0.3.0 | Accounts | Registration, sign-in and sign-out with synthetic accounts; server-side sessions; per-account Cart and Orders; an administrator role that guards Admin and media endpoints; CSRF protection | Anonymous visitors browse only; a customer cannot read another account's data; Admin is refused to customers; E2E journey runs signed in | Account screen in Bench. Gap: sign-out and signed-in header state |
 | v0.4.0 | Order History and Tracking | Order history for the signed-in account; a simulated shipment lifecycle (packed, left warehouse, out for delivery, delivered, or delayed) derived from a controllable clock; tracking screen | History shows only own Orders; shipment status is deterministic under a fixed clock; tracking reachable from history and Order result | Orders and Tracking screens in Bench (states: empty, list, in transit, delayed, delivered). Gap: none |
-| v0.5.0 | Inventory | Stock quantity per Product; a stock reservation taken when a Payment attempt is approved and consumed when the Order is created; concurrency-safe decrement; inventory states on catalog and detail; stock field in Admin | No oversell under concurrent Orders; out-of-stock Products cannot be added or paid; reservations expire | Inventory states and public demo banner in Bench. Gap: Admin stock field and reservation-expired message, designed in the existing form and notice patterns |
+| v0.5.0 | Inventory | Stock quantity per Product; stock consumed when the Order is placed (a reservation on payment approval existed until SS-094); concurrency-safe decrement; inventory states on catalog and detail; stock field in Admin | No oversell under concurrent Orders; out-of-stock Products cannot be added or ordered | Inventory states and public demo banner in Bench. Gap: Admin stock field and reservation-expired message, designed in the existing form and notice patterns |
 | v0.6.0 | Operations | An administrator Operations screen with figures from real data (Orders per hour, approval rate, checkout latency, error rate, service health) from Actuator and Micrometer; structured request logging with correlation IDs | Every figure is traceable to a stated query or metric; screen is admin-only | Operations screen in Bench. Gap: loading and empty states |
 | v1.0.0 | Secured Public Demo | Security hardening (headers, rate limiting, production configuration without default credentials, secure cookies), containerized runtime and hosted-demo configuration, threat model, demo banner and synthetic-data reset, release documentation | Security checklist and threat model reviewed; all suites and E2E green on the release candidate; documentation matches behavior | Demo banner in Bench |
 
-Limits that remain true at v1.0.0 and are never presented as resolved: synthetic data and simulated payments only, a single application process, no email or real couriers, no real identity provider. The mobile phone layout in Bench stays a responsive-web design; a native app is not part of 1.0.
+Limits that remain true at v1.0.0 and are never presented as resolved: synthetic data only with no payment, a single application process, no email or real couriers, no real identity provider. The mobile phone layout in Bench stays a responsive-web design; a native app is not part of 1.0.
 
 Delivery state (2026-11-27): v0.2.0 to v1.0.0 are built on `release/1.0` and await the owner's validation; see the [v1.0.0 release notes](releases/v1.0.0.md). The owner added to v1.0.0 on 2026-11-27: signup and sign-in and two roles (buyer and administrator, delivered in v0.3.0), a manageable area separate from the customer area, and hosting on a VPS (SS-075, [Deployment](DEPLOYMENT.md)).
 

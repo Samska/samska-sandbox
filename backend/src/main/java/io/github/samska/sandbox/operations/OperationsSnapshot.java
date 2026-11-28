@@ -5,16 +5,12 @@ import java.util.List;
 
 /**
  * Figures shown on the Operations screen. A null rate or latency means there is nothing to measure yet.
- * Orders and attempts come from SQL; latency, requests and errors come from in-process metrics.
+ * Orders come from SQL; latency, requests and errors come from in-process metrics.
  */
 public record OperationsSnapshot(
         Instant generatedAt,
         long ordersLastHour,
         long ordersLast24Hours,
-        long approvedAttempts,
-        long declinedAttempts,
-        long failedAttempts,
-        Double approvalRate,
         Double checkoutP95Millis,
         long checkoutSamples,
         long requests,

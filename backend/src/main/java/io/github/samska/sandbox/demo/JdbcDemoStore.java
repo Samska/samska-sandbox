@@ -18,8 +18,7 @@ class JdbcDemoStore implements DemoStore {
     @Override
     public void reset() {
         transaction.executeWithoutResult(status -> {
-            jdbc.sql("TRUNCATE TABLE order_items, orders, payment_attempt_items, payment_attempts, "
-                    + "cart_items, cart, stock_reservations").update();
+            jdbc.sql("TRUNCATE TABLE order_items, orders, cart_items, cart").update();
             jdbc.sql("DELETE FROM accounts WHERE role <> 'ADMIN'").update();
             jdbc.sql("UPDATE stock_levels SET on_hand = :stock").param("stock", DEFAULT_STOCK).update();
         });

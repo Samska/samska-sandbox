@@ -8,7 +8,7 @@ They apply to the future v0.1 backend and its integrations. The current reposito
 
 ## Modular Monolith Baseline
 
-v0.1 uses one deployable backend application with explicit internal business-module boundaries. Candidate modules are catalog, cart, orders, payments, and inventory. They are in-process boundaries, not independently deployed services.
+v0.1 uses one deployable backend application with explicit internal business-module boundaries. Candidate modules are catalog, cart, orders, and inventory (payments were removed in SS-094). They are in-process boundaries, not independently deployed services.
 
 ## Module Boundaries and Ownership
 
