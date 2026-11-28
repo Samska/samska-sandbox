@@ -96,7 +96,7 @@ Switching modes is configuration only: set `WEB_ACCESS=none` on `web` and `SAMSK
 
 ## Demo mode
 
-There is no reset. Set `SAMSKA_DEMO_SEED_PRODUCTS=true` to create six synthetic sample Products (each with a Bench illustration) when the backend starts with an empty catalog; they are ordinary Products, and nothing is created while the catalog has Products, so changes made by the administrator are never overwritten (deleting every Product and restarting the backend creates the samples again).
+There is no reset. Set `SAMSKA_DEMO_SEED_PRODUCTS=true` to create the fixed example catalog of 18 synthetic Products (each with a Bench illustration) when the backend starts; missing samples are added by name and existing Products are never changed, so changes made by the administrator are never overwritten (deleting every Product and restarting the backend creates the samples again).
 
 ## Operating notes
 

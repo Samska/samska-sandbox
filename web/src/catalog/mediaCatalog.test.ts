@@ -10,10 +10,12 @@ describe("curated media", () => {
     expect(hasCuratedMedia(null)).toBe(false);
   });
 
-  it("has an illustration for each sample Product, drawn with theme tokens only", () => {
-    const keys = ["tote", "pour-over", "workbench", "linen-apron", "camp-mug", "serving-board"].map(
-      (name) => `art-${name}`
-    );
+  it("has an illustration for each of the 18 sample Products, drawn with theme tokens only", () => {
+    const keys = [
+      "tote", "pour-over", "workbench", "linen-apron", "camp-mug", "serving-board", "arc-lamp", "terra-vessel",
+      "linen-throw", "desk-clock", "hand-plane", "tape-measure", "journal", "rucksack", "planter", "wall-shelf",
+      "kettle", "stool"
+    ].map((name) => `art-${name}`);
 
     for (const key of keys) {
       const art = productArt(key);
