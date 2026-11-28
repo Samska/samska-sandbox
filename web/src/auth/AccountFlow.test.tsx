@@ -64,6 +64,16 @@ describe("accounts in the application shell", () => {
     expect(calls.some((call) => call.path === "/api/cart")).toBe(false);
   });
 
+  it("sends a visitor to sign in from the Cart button and from Add to Cart, without calling the Cart API", async () => {
+    const calls = stubApi(null);
+    renderApp();
+
+    fireEvent.click(await screen.findByRole("button", { name: /^Cart\b/ }));
+    await waitFor(() => expect(window.location.pathname).toBe("/account"));
+    expect(calls.some((call) => call.path.startsWith("/api/cart"))).toBe(false);
+    expect(screen.queryByRole("dialog", { name: "Your Cart" })).not.toBeInTheDocument();
+  });
+
   it("asks a visitor to sign in before checkout and for Admin", async () => {
     stubApi(null);
     window.history.replaceState({}, "", "/checkout");
@@ -157,17 +167,14 @@ describe("accounts in the application shell", () => {
     expect(window.location.pathname).toBe("/account");
   });
 
-  it("creates an account and reports a duplicate email", async () => {
-    stubApi(null, (path) => (path === "/api/auth/register" ? json(409, { code: "email-already-registered" }) : undefined));
+  it("offers no way to create an account", async () => {
+    stubApi(null);
     window.history.replaceState({}, "", "/account");
     renderApp();
 
-    fireEvent.click(await screen.findByRole("button", { name: "Create an account" }));
-    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "ana@example.test" } });
-    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Ana" } });
-    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "correct-horse" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
-
-    expect(await screen.findByRole("alert")).toHaveTextContent("already has an account");
+    expect(await screen.findByLabelText("Email")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /create/i })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Name")).not.toBeInTheDocument();
+    expect(screen.queryByText(/open an account|create account/i)).not.toBeInTheDocument();
   });
 });

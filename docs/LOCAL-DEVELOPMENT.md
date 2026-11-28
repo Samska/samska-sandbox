@@ -330,4 +330,4 @@ This guide is the canonical human-facing local setup reference; [`scripts/dev.sh
 
 ## Administrator Account (SS-069)
 
-The backend creates no account by default. To use Admin locally, set synthetic values before starting it, for example in PowerShell `$env:SAMSKA_ADMIN_EMAIL = "admin@samska.test"; $env:SAMSKA_ADMIN_PASSWORD = "<a synthetic password of 8 or more characters>"`, then sign in at `/account`. Visitors register their own customer accounts there. Sessions are in memory, so restarting the backend signs everyone out.
+The backend creates no account by default. To use Admin locally, set synthetic values before starting it, for example in PowerShell `$env:SAMSKA_ADMIN_EMAIL = "admin@samska.test"; $env:SAMSKA_ADMIN_PASSWORD = "<a synthetic password of 8 or more characters>"`, then sign in at `/account`. There is no sign-up: the administrator is the only account, and it can also shop. Sessions are in memory, so restarting the backend signs everyone out.
