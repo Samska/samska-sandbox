@@ -157,17 +157,14 @@ describe("accounts in the application shell", () => {
     expect(window.location.pathname).toBe("/account");
   });
 
-  it("creates an account and reports a duplicate email", async () => {
-    stubApi(null, (path) => (path === "/api/auth/register" ? json(409, { code: "email-already-registered" }) : undefined));
+  it("offers no way to create an account", async () => {
+    stubApi(null);
     window.history.replaceState({}, "", "/account");
     renderApp();
 
-    fireEvent.click(await screen.findByRole("button", { name: "Create an account" }));
-    fireEvent.change(screen.getByLabelText("Email"), { target: { value: "ana@example.test" } });
-    fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Ana" } });
-    fireEvent.change(screen.getByLabelText("Password"), { target: { value: "correct-horse" } });
-    fireEvent.click(screen.getByRole("button", { name: "Create account" }));
-
-    expect(await screen.findByRole("alert")).toHaveTextContent("already has an account");
+    expect(await screen.findByLabelText("Email")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /create/i })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Name")).not.toBeInTheDocument();
+    expect(screen.queryByText(/open an account|create account/i)).not.toBeInTheDocument();
   });
 });

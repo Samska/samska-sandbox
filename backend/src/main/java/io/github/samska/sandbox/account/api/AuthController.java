@@ -3,7 +3,6 @@ package io.github.samska.sandbox.account.api;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.github.samska.sandbox.account.Account;
-import io.github.samska.sandbox.account.Role;
 import io.github.samska.sandbox.account.application.AccountService;
 import io.github.samska.sandbox.account.security.AccountPrincipal;
 
@@ -30,14 +28,6 @@ public class AuthController {
     public AuthController(AccountService accounts, SecurityContextRepository contextRepository) {
         this.accounts = accounts;
         this.contextRepository = contextRepository;
-    }
-
-    @PostMapping("/register")
-    public ResponseEntity<AccountResponse> register(
-            @RequestBody RegisterRequest body, HttpServletRequest request, HttpServletResponse response) {
-        var account = accounts.register(body.email(), body.displayName(), body.password(), Role.CUSTOMER);
-        signIn(account, request, response);
-        return ResponseEntity.status(HttpStatus.CREATED).body(AccountResponse.from(account));
     }
 
     @PostMapping("/login")

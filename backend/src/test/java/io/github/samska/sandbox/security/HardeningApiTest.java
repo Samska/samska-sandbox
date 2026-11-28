@@ -40,10 +40,7 @@ class HardeningApiTest {
         assertThat(refused.body()).contains("rate-limited");
         assertThat(Long.parseLong(refused.raw().headers().firstValue("Retry-After").orElseThrow()))
                 .isBetween(1L, 60L);
-        // Registration shares the strict bucket, and reads elsewhere are unaffected.
-        assertThat(client.post("/api/auth/register",
-                "{\"email\":\"a@samska.test\",\"displayName\":\"A\",\"password\":\"correct-horse\"}").status())
-                .isEqualTo(429);
+        // Reads elsewhere are unaffected.
         assertThat(client.get("/api/products").status()).isEqualTo(200);
     }
 
