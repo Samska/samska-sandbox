@@ -64,6 +64,16 @@ describe("accounts in the application shell", () => {
     expect(calls.some((call) => call.path === "/api/cart")).toBe(false);
   });
 
+  it("sends a visitor to sign in from the Cart button and from Add to Cart, without calling the Cart API", async () => {
+    const calls = stubApi(null);
+    renderApp();
+
+    fireEvent.click(await screen.findByRole("button", { name: /^Cart\b/ }));
+    await waitFor(() => expect(window.location.pathname).toBe("/account"));
+    expect(calls.some((call) => call.path.startsWith("/api/cart"))).toBe(false);
+    expect(screen.queryByRole("dialog", { name: "Your Cart" })).not.toBeInTheDocument();
+  });
+
   it("asks a visitor to sign in before checkout and for Admin", async () => {
     stubApi(null);
     window.history.replaceState({}, "", "/checkout");

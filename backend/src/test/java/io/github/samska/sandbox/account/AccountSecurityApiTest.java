@@ -63,6 +63,22 @@ class AccountSecurityApiTest {
     }
 
     @Test
+    void anonymousVisitorsCannotBuyAnythingThroughTheApi() throws Exception {
+        var visitor = app.client();
+        var id = UUID.randomUUID();
+
+        assertThat(visitor.post("/api/cart/items", "{\"productId\":\"" + id + "\",\"quantity\":1}").status())
+                .isEqualTo(401);
+        assertThat(visitor.put("/api/cart/items/" + id, "{\"quantity\":2}").status()).isEqualTo(401);
+        assertThat(visitor.delete("/api/cart/items/" + id).status()).isEqualTo(401);
+        assertThat(visitor.post("/api/payment-attempts",
+                "{\"attemptId\":\"" + id + "\",\"cartRevision\":0,\"scenario\":\"approve\"}").status())
+                .isEqualTo(401);
+        assertThat(visitor.post("/api/orders", "{\"paymentAttemptId\":\"" + id + "\"}").status()).isEqualTo(401);
+        assertThat(visitor.get("/api/orders").status()).isEqualTo(401);
+    }
+
+    @Test
     void thereIsNoSelfSignUp() throws Exception {
         var body = "{\"email\":\"new@example.test\",\"displayName\":\"New\",\"password\":\"correct-horse\"}";
 
