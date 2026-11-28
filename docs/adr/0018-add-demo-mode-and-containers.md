@@ -1,6 +1,6 @@
 # ADR 0018: Add Demo Mode And A Containerized Runtime
 
-- Status: Accepted
+- Status: Accepted; the demo reset described here was removed by SS-094 because it could erase real data
 - Date: 2026-11-27
 - Decision makers: Samska (human owner) with AI implementation support
 - Related: [SS-074 (#144)](https://github.com/Samska/samska-sandbox/issues/144), [ADR 0017](0017-harden-the-public-demo.md)

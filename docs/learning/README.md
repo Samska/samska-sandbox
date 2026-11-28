@@ -81,6 +81,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-097-admin-order-status.md](ss-097-admin-order-status.md) | Storing changes as events, and keeping a side effect correct with one transaction and a row lock. |
 | [ss-095-remove-self-sign-up.md](ss-095-remove-self-sign-up.md) | Removing an attack surface instead of guarding it, and why roles outlive sign-up. |
 | [ss-091-plain-copy.md](ss-091-plain-copy.md) | Error messages as interface, and stale messages as defects. |
+| [ss-094-remove-demo-reset.md](ss-094-remove-demo-reset.md) | Retiring a capability when its context changes, and nginx header inheritance. |
 | [ss-081-demo-sample-products.md](ss-081-demo-sample-products.md) | Idempotent seeding of demo data and why it must not overwrite existing data. |
 | [ss-080-web-dns-resolver.md](ss-080-web-dns-resolver.md) | Why the web image must use the platform's DNS resolver, and how it was verified. |
 | [ss-065-cart-persistence.md](ss-065-cart-persistence.md) | Transactional update contract for a mutable aggregate, row-lock serialization of a business revision, domain rules kept out of the store, and snapshot rows without a foreign key. |

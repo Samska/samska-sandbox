@@ -16,13 +16,3 @@ export async function readDemoMode(): Promise<boolean> {
     return false;
   }
 }
-
-export async function resetDemoData(): Promise<boolean> {
-  try {
-    const response = await apiFetch("/api/admin/demo/reset", { method: "POST" });
-
-    return response.status === 204;
-  } catch {
-    return false;
-  }
-}

@@ -11,7 +11,7 @@ This guide runs the hosted demo: a synthetic-data store that anyone may use, so 
 The stack supports two access modes, chosen only by configuration:
 
 - **Private (default).** `DEMO_ACCESS=private`: Caddy puts the whole site, API included, behind a username and password. Nobody sees the store without it. Use this until the owner has validated the release on the server.
-- **Public demo.** `DEMO_ACCESS=public` and `SAMSKA_DEMO_ENABLED=true`: the site opens to everyone with the Reset button, and `SAMSKA_DEMO_RESET_CRON="0 0 4 * * *"` resets the data every day at 04:00.
+- **Public demo.** `DEMO_ACCESS=public` and `SAMSKA_DEMO_ENABLED=true`: the site opens to everyone. There is no data reset: the application never erases Orders, accounts or stock by itself (SS-094 removed the reset).
 
 To switch, edit `.env.demo` and run `deploy/deploy.sh`. The administrator account and the application's own sign-in work the same in both modes; the private password is an extra gate in front, not a replacement.
 
@@ -37,7 +37,7 @@ On Railway the project has three services, all built from this repository's Dock
 | `SPRING_DATASOURCE_USERNAME` | `${{Postgres.PGUSER}}` |
 | `SPRING_DATASOURCE_PASSWORD` | `${{Postgres.PGPASSWORD}}` |
 | `SAMSKA_ADMIN_EMAIL`, `SAMSKA_ADMIN_PASSWORD` | The administrator account; the password has at least 12 characters. |
-| `SAMSKA_DEMO_ENABLED`, `SAMSKA_DEMO_RESET_CRON` | `false` and `-` while private; `true` and for example `0 0 4 * * *` for the public demo. |
+| `SAMSKA_DEMO_ENABLED` | `false` while private; `true` only changes the wording the web shows. `SAMSKA_DEMO_RESET_CRON` is no longer read and can be deleted. |
 | `SAMSKA_DEMO_SEED_PRODUCTS` | Optional: `true` creates the sample Products when the catalog is empty (see [Demo mode](#demo-mode)). |
 
 `web`:
@@ -60,7 +60,7 @@ Generate the hash on your own machine, never put the plain password in a variabl
 
 ### Public demo later
 
-Switching modes is configuration only: set `WEB_ACCESS=none` on `web` and `SAMSKA_DEMO_ENABLED=true` (and optionally the reset cron) on `backend`, then redeploy both. Setting `WEB_ACCESS=private` again closes the site.
+Switching modes is configuration only: set `WEB_ACCESS=none` on `web` and `SAMSKA_DEMO_ENABLED=true` on `backend`, then redeploy both. Setting `WEB_ACCESS=private` again closes the site.
 
 ### Notes
 
@@ -96,7 +96,7 @@ Switching modes is configuration only: set `WEB_ACCESS=none` on `web` and `SAMSK
 
 ## Demo mode
 
-`SAMSKA_DEMO_ENABLED=true` (set by the Compose file) enables **Reset demo data** on the Operations screen. A reset removes every Order, Payment attempt, Cart and customer account, restores stock to 25 and signs everyone else out; Products and the administrator stay. Set `SAMSKA_DEMO_RESET_CRON` to a Spring cron expression, for example `0 0 4 * * *`, to reset automatically. Set `SAMSKA_DEMO_SEED_PRODUCTS=true` to keep a fixed example catalog of 18 synthetic Products (each with a Bench illustration): at every start-up the backend creates the samples that are missing by name and never changes a Product that exists. They are Products, so a reset keeps them (a reset sets every stock level back to 25); a sample the administrator deletes returns at the next start-up unless the variable is turned off.
+There is no reset. Set `SAMSKA_DEMO_SEED_PRODUCTS=true` to create the fixed example catalog of 18 synthetic Products (each with a Bench illustration) when the backend starts; missing samples are added by name and existing Products are never changed, so changes made by the administrator are never overwritten (deleting every Product and restarting the backend creates the samples again).
 
 ## Operating notes
 
