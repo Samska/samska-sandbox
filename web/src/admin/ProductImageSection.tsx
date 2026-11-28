@@ -181,7 +181,7 @@ function stateText({
   }
 
   if (product === null) {
-    return "No image yet. The Market shows the monogram fallback.";
+    return "No image yet. The Market shows a placeholder.";
   }
 
   if (product.uploadedMediaId !== null) {
@@ -189,7 +189,7 @@ function stateText({
   }
 
   if (product.mediaKey === null) {
-    return "No image yet. The Market shows the monogram fallback.";
+    return "No image yet. The Market shows a placeholder.";
   }
 
   return hasCuratedMedia(product.mediaKey)
@@ -199,10 +199,10 @@ function stateText({
 
 function removalFallback(product: ProductResponse): string {
   if (product.mediaKey === null) {
-    return "the monogram fallback";
+    return "a placeholder";
   }
 
   return hasCuratedMedia(product.mediaKey)
     ? `the curated image "${product.mediaKey}"`
-    : `the monogram fallback because media key "${product.mediaKey}" has no matching local asset`;
+    : `a placeholder because media key "${product.mediaKey}" has no matching local asset`;
 }

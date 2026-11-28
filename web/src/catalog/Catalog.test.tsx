@@ -406,6 +406,7 @@ describe("Catalog product search", () => {
     render(<Catalog />);
 
     const input = await screen.findByLabelText("Search Products by name");
+    expect(input).toHaveAttribute("placeholder", "Search by name");
     fireEvent.change(input, { target: { value: "   " } });
 
     expect(input).toHaveValue("   ");

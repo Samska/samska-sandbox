@@ -77,7 +77,7 @@ test.describe("First Order journey in a real browser", () => {
 
     // Approval alone must not create an Order.
     await expect(
-      page.getByRole("heading", { name: "Simulated payment approved", level: 1 })
+      page.getByRole("heading", { name: "Payment approved", level: 1 })
     ).toBeFocused();
     expect(tracker.paymentPosts()).toBe(1);
     expect(tracker.orderPosts()).toBe(0);
@@ -100,7 +100,7 @@ test.describe("First Order journey in a real browser", () => {
     // Reload recovers the approved attempt through reads only.
     await page.reload();
     await expect(
-      page.getByRole("heading", { name: "Simulated payment approved", level: 1 })
+      page.getByRole("heading", { name: "Payment approved", level: 1 })
     ).toBeVisible();
     await expect(page.getByText(`${product.name} × 3`)).toBeVisible();
     await expect(page.locator("#payment-result dd")).toHaveText("$37.50");
@@ -120,7 +120,7 @@ test.describe("First Order journey in a real browser", () => {
       const coldTracker = trackTransactionalRequests(coldAttemptPage);
       await coldAttemptPage.goto(attemptUrl);
       await expect(
-        coldAttemptPage.getByRole("heading", { name: "Simulated payment approved", level: 1 })
+        coldAttemptPage.getByRole("heading", { name: "Payment approved", level: 1 })
       ).toBeVisible();
       await expect(coldAttemptPage.getByText(`${product.name} × 3`)).toBeVisible();
       await expect(coldAttemptPage.getByText("$12.50 each")).toBeVisible();
@@ -143,7 +143,7 @@ test.describe("First Order journey in a real browser", () => {
 
     await page.goto(attemptUrl);
     await expect(
-      page.getByRole("heading", { name: "Simulated payment approved", level: 1 })
+      page.getByRole("heading", { name: "Payment approved", level: 1 })
     ).toBeVisible();
     await expect(page.getByText(`${product.name} × 3`)).toBeVisible();
     await expect(page.locator("#payment-result dd")).toHaveText("$37.50");
@@ -262,9 +262,9 @@ test.describe("First Order journey in a real browser", () => {
     const attemptId = attemptUrl.split("/").at(-1) ?? "";
 
     await expect(
-      page.getByRole("heading", { name: "Simulated payment declined", level: 1 })
+      page.getByRole("heading", { name: "Payment declined", level: 1 })
     ).toBeFocused();
-    await expect(page.getByText("No payment was made for this attempt.")).toBeVisible();
+    await expect(page.getByText("No payment was made. You can try again with your current Cart.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Try again with the current Cart" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Create Order" })).toHaveCount(0);
 
@@ -282,7 +282,7 @@ test.describe("First Order journey in a real browser", () => {
     // and the recovered record equals the captured original in full.
     await page.reload();
     await expect(
-      page.getByRole("heading", { name: "Simulated payment declined", level: 1 })
+      page.getByRole("heading", { name: "Payment declined", level: 1 })
     ).toBeVisible();
     await expect(page.getByRole("button", { name: "Create Order" })).toHaveCount(0);
     const recoveredDeclined = (await (await fetchPaymentAttempt(request, attemptId)).json()) as PaymentAttemptDto;
@@ -297,7 +297,7 @@ test.describe("First Order journey in a real browser", () => {
       const coldTracker = trackTransactionalRequests(coldPage);
       await coldPage.goto(attemptUrl);
       await expect(
-        coldPage.getByRole("heading", { name: "Simulated payment declined", level: 1 })
+        coldPage.getByRole("heading", { name: "Payment declined", level: 1 })
       ).toBeVisible();
       await expect(coldPage.getByText("$8.25 each")).toBeVisible();
       await expect(coldPage.locator("#payment-result dd")).toHaveText("$8.25");
