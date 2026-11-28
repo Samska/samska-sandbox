@@ -90,6 +90,7 @@ export default function ProductBrowse({
               <input
                 {...control}
                 type="search"
+                placeholder="Search by name"
                 value={searchTerm}
                 onChange={(event) => onSearchTermChange(event.target.value)}
                 ref={registerSearchInput}

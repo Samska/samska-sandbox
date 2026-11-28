@@ -1,34 +1,33 @@
-export const checkingJourneyMessage = "Checking this journey...";
+export const checkingJourneyMessage = "Checking your payment...";
 
-export const unavailableReferenceMessage = "We couldn't confirm a result for this reference.";
+export const unavailableReferenceMessage = "We couldn't find a result for this payment.";
 
 export const unavailableReferenceNote =
-  "Orders persist across backend restarts. Simulated payment attempts may not. A failed lookup does " +
-  "not prove an Order was deleted or never created.";
+  "A failed lookup does not mean your Order was lost or never created.";
 
-export const lookupFailedMessage = "We couldn't check this reference. Try again.";
+export const lookupFailedMessage = "We couldn't check this payment. Try again.";
 
 export const unconfirmedPaymentPrimary =
-  "Payment result is unconfirmed. Check this attempt before trying again.";
+  "We couldn't confirm the payment result. Check it before trying again.";
 
 export const paymentInProgressNote =
   "This request is not cancelled if you leave this page. You can return through the Resume payment link.";
 
 export const awaitingOrderMessage =
-  "An approved payment attempt is awaiting its Order. Create the Order or stop following this " +
-  "reference before starting another payment.";
+  "Your approved payment is waiting for its Order. Create the Order or dismiss this payment " +
+  "before starting another.";
 
 export const unresolvedReferenceMessage =
-  "A previous payment attempt reference is unresolved. Open it to check the result or stop " +
-  "following it before starting another payment.";
+  "A previous payment is not finished. Open it to check the result or dismiss it " +
+  "before starting another.";
 
 export const abandonWarning =
-  "Stop following this reference? Any request already sent may still complete. This does not " +
-  "cancel a request or delete a record.";
+  "Dismiss this payment? A request already sent may still complete. This does not " +
+  "cancel the payment or delete anything.";
 
-export const abandonConfirmLabel = "Stop following";
+export const abandonConfirmLabel = "Dismiss";
 
-export const keepReferenceLabel = "Keep reference";
+export const keepReferenceLabel = "Keep it";
 
 export const referenceForgottenMessage =
-  "Reference forgotten in this browser. Backend records are unchanged.";
+  "Payment dismissed in this browser. Your records are unchanged.";

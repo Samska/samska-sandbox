@@ -864,7 +864,7 @@ export default function Catalog() {
           if (payment.attemptId === attemptId && payment.status === "approved" &&
               payment.cartRevision === attempt.cartRevision) {
             patchOrderOp(attemptId, {
-              error: "No Order was found. The approved attempt is confirmed. You may explicitly create an Order with the same attempt ID.",
+              error: "No Order was found for this payment. You can try creating it again.",
               retryReady: true,
               uncertain: true
             });

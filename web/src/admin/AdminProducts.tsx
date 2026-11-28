@@ -272,8 +272,8 @@ function imageStateLabel(product: ProductResponse): string {
   }
 
   return hasCuratedMedia(product.mediaKey)
-    ? "Curated image"
-    : "Monogram (media key has no local asset)";
+    ? "Catalog image"
+    : "Placeholder (image file not found)";
 }
 
 function DeleteConfirmation({

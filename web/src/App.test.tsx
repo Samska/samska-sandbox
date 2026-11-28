@@ -197,7 +197,7 @@ describe("App", () => {
 
     expect(
       await screen.findByRole("heading", {
-        name: "We couldn't confirm a result for this reference.",
+        name: "We couldn't find a result for this payment.",
         level: 1
       })
     ).toBeInTheDocument();

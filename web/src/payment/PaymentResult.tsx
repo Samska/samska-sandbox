@@ -38,10 +38,10 @@ export default function PaymentResult({
   const isApproved = attempt.status === "approved";
   const heading =
     attempt.status === "approved"
-      ? "Simulated payment approved"
+      ? "Payment approved"
       : attempt.status === "declined"
-        ? "Simulated payment declined"
-        : "Simulated payment could not complete";
+        ? "Payment declined"
+        : "Payment could not complete";
 
   return (
     <section
@@ -64,14 +64,13 @@ export default function PaymentResult({
           </h1>
           {isApproved ? (
             <p className="max-w-prose text-muted">
-              A simulated decision was recorded for the captured Cart revision below. No real
-              payment was made. {onViewOrder ? "An Order for this attempt has already been recorded." :
-                orderRetryReady ? "No Order was found and the approved attempt is confirmed. You may explicitly retry with the same ID." :
-                  orderUnconfirmed ? "Order creation is unconfirmed; check the result before trying again." : "No Order has been created."}
+              This is a demo: no real payment was made. {onViewOrder ? "You already have an Order for this payment." :
+                orderRetryReady ? "No Order was found for this payment. You can try creating it again." :
+                  orderUnconfirmed ? "We couldn't confirm the Order. Check the result before trying again." : "Create your Order to finish."}
             </p>
           ) : (
             <p className="max-w-prose text-muted">
-              No payment was made for this attempt. You can try again with the current Cart.
+              No payment was made. You can try again with your current Cart.
             </p>
           )}
         </div>
@@ -100,7 +99,7 @@ export default function PaymentResult({
           ))}
         </ul>
         <dl className="flex items-baseline justify-between gap-4 rounded-sm bg-surface-muted px-4 py-3.5">
-          <dt className="text-sm font-bold uppercase tracking-[0.12em] text-muted">Captured total</dt>
+          <dt className="text-sm font-bold uppercase tracking-[0.12em] text-muted">Total</dt>
           <dd className="m-0 text-2xl font-extrabold tracking-[-0.02em] text-ink">
             {formatAmount(attempt.total)}
           </dd>
@@ -109,14 +108,14 @@ export default function PaymentResult({
         {isApproved && onCreateOrder && !onViewOrder ? (
           <div className="grid gap-3 rounded-sm border-[1.5px] border-ink px-4 py-4" aria-busy={orderPending}>
             <h2 className="text-lg text-ink">Create an Order</h2>
-            <p className="text-sm text-muted">This action records the frozen simulated payment items and total. Your Cart is emptied once the Order is created.</p>
+            <p className="text-sm text-muted">Creating the Order saves these items and the total. Your Cart is emptied once the Order is created.</p>
             {orderPending ? <StatusMessage tone="pending">Checking Order...</StatusMessage> : null}
             {orderError ? <StatusMessage tone="error">{orderError}</StatusMessage> : null}
             {orderUnconfirmed && !orderRetryReady && onCheckOrder ? (
               <Button disabled={orderPending} onClick={onCheckOrder}>Check Order result</Button>
             ) : null}
             <Button disabled={orderPending || orderBlocked || (orderUnconfirmed && !orderRetryReady)} onClick={onCreateOrder}>
-              {orderRetryReady ? "Create Order with same attempt" : "Create Order"}
+              {orderRetryReady ? "Try creating the Order again" : "Create Order"}
             </Button>
           </div>
         ) : null}
