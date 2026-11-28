@@ -23,7 +23,7 @@ frontend package's `0.1.0` are build metadata, not the product release version.
 
 ## Live Demo
 
-A public demo runs on Railway: <https://store.samska.dev>. Everything in it is synthetic and no payment is real. The demo data is reset daily, so orders you place are temporary.
+A public demo runs on Railway: <https://store.samska.dev>. Everything in it is synthetic and no payment is real. The example catalog of 18 Products is fixed and is never reset; orders you place may be cleared when the owner resets the demo.
 
 A short tour:
 

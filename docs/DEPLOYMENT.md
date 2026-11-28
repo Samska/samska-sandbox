@@ -96,7 +96,7 @@ Switching modes is configuration only: set `WEB_ACCESS=none` on `web` and `SAMSK
 
 ## Demo mode
 
-`SAMSKA_DEMO_ENABLED=true` (set by the Compose file) enables **Reset demo data** on the Operations screen. A reset removes every Order, Payment attempt, Cart and customer account, restores stock to 25 and signs everyone else out; Products and the administrator stay. Set `SAMSKA_DEMO_RESET_CRON` to a Spring cron expression, for example `0 0 4 * * *`, to reset automatically. Set `SAMSKA_DEMO_SEED_PRODUCTS=true` to create six synthetic sample Products (each with a Bench illustration) when the backend starts with an empty catalog; they are Products, so the reset keeps them, and nothing is created while the catalog has Products, so changes made by the administrator are never overwritten (deleting every Product and restarting the backend creates the samples again).
+`SAMSKA_DEMO_ENABLED=true` (set by the Compose file) enables **Reset demo data** on the Operations screen. A reset removes every Order, Payment attempt, Cart and customer account, restores stock to 25 and signs everyone else out; Products and the administrator stay. Set `SAMSKA_DEMO_RESET_CRON` to a Spring cron expression, for example `0 0 4 * * *`, to reset automatically. Set `SAMSKA_DEMO_SEED_PRODUCTS=true` to keep a fixed example catalog of 18 synthetic Products (each with a Bench illustration): at every start-up the backend creates the samples that are missing by name and never changes a Product that exists. They are Products, so a reset keeps them (a reset sets every stock level back to 25); a sample the administrator deletes returns at the next start-up unless the variable is turned off.
 
 ## Operating notes
 
