@@ -30,7 +30,7 @@ bounded local media upload, a Cart boundary persisted in PostgreSQL, an editable
 view over the current Cart with a simulated payment flow, and a separate Admin
 Product-management surface. Order is a separate boundary that copies approved
 simulated-payment data on an explicit action and persists the immutable Order in
-PostgreSQL; it does not change the Cart. The journey is attempt-addressed:
+PostgreSQL and, once a new Order is stored, empties the account's Cart. The journey is attempt-addressed:
 `/checkout` hosts the editable Cart and `/checkout/attempts/{attemptId}` recovers
 the simulated payment result or Order confirmation through lookup APIs after a
 full-page reload, direct entry, or history navigation, without a router

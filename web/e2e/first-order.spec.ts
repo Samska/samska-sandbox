@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { authStatePath } from "./session";
+import { authStatePath, xsrfHeaders } from "./session";
 import {
   clearCart,
   createProduct,
@@ -177,20 +177,15 @@ test.describe("First Order journey in a real browser", () => {
     expect(orderById.status()).toBe(200);
     expect((await orderById.json()) as OrderDto).toEqual(capturedOrder);
 
-    // Order creation never clears the live Cart.
-    await page.getByRole("button", { name: "Back to Checkout" }).click();
-    await expect(page.getByRole("heading", { name: "Checkout", level: 1 })).toBeVisible();
-    await expect(page.locator("#checkout dd")).toHaveText("62.50");
-    await expect(page.getByRole("spinbutton", { name: `Quantity for ${product.name}`, exact: true })).toHaveValue("5");
-
-    // After Order creation, change the live Cart again through the UI: the Cart
-    // must move while the frozen Order stays untouched.
-    const postOrderQuantity = page.getByRole("spinbutton", { name: `Quantity for ${product.name}`, exact: true });
-    await postOrderQuantity.fill("7");
-    await postOrderQuantity.press("Enter");
-    await expect(page.getByText("Cart updated.")).toBeVisible();
-    await expect(page.locator("#checkout dd")).toHaveText("87.50");
-    await expect(postOrderQuantity).toHaveValue("7");
+    // Creating the Order empties the live Cart; a new Cart change leaves the frozen Order untouched.
+    const emptiedCart = await getCart(request);
+    expect(emptiedCart.items).toHaveLength(0);
+    expect(emptiedCart.total).toBe(0);
+    const refilled = await request.post("/api/cart/items", {
+      data: { productId: product.id, quantity: 7 },
+      headers: await xsrfHeaders(request)
+    });
+    expect(refilled.status()).toBe(200);
     const changedCart = await getCart(request);
     expect(changedCart.total).toBe(87.5);
     expect(changedCart.items[0]).toMatchObject({ productId: product.id, quantity: 7, lineSubtotal: 87.5 });

@@ -1,6 +1,6 @@
 # ADR 0007: Adopt Attempt-Addressed Browser Recovery for the First Order Journey
 
-- Status: Accepted
+- Status: Accepted; the rule that Order creation never clears the live Cart is superseded by SS-086, which empties the Cart when a new Order is stored
 - Date: 2026-10-06
 - Decision makers: Samska (human owner) with AI implementation support
 - Related: [SS-039](https://github.com/Samska/samska-sandbox/issues/69), [ADR 0005](0005-adopt-payment-attempt-store-with-cart-revision.md), [ADR 0006](0006-adopt-order-owned-in-memory-store.md), [Architecture](../ARCHITECTURE.md), [Security](../SECURITY.md), [Testing](../TESTING.md), [Product](../PRODUCT.md)

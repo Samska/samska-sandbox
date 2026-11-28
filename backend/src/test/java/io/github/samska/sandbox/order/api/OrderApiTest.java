@@ -33,7 +33,7 @@ class OrderApiTest extends OrderDatabaseTestSupport {
     }
 
     @Test
-    void createsFromApprovedSnapshotAndReplaysByAttemptAfterCartEdits() throws Exception {
+    void createsFromApprovedSnapshotEmptiesTheCartAndReplaysByAttempt() throws Exception {
         var product = createProduct();
         var revision = addToCart(product);
         payment(ATTEMPT, revision, "approve");
@@ -48,10 +48,9 @@ class OrderApiTest extends OrderDatabaseTestSupport {
                 .andReturn().getResponse().getContentAsString();
         String id = JsonPath.read(first, "$.orderId");
 
-        mvc.perform(patch("/api/cart/items/" + product).contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"quantity\":5}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items[0].quantity").value(5));
+        mvc.perform(get("/api/cart")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.items").isEmpty());
+        addToCart(product);
         mvc.perform(get("/api/orders/{orderId}", id)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(25.00));
         mvc.perform(get("/api/orders/payment-attempts/{id}", ATTEMPT)).andExpect(status().isOk())
@@ -60,6 +59,8 @@ class OrderApiTest extends OrderDatabaseTestSupport {
                         .content("{\"paymentAttemptId\":\"" + ATTEMPT + "\"}"))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         assertThat(replay).isEqualTo(first);
+        mvc.perform(get("/api/cart")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].productId").value(product));
     }
 
     @Test
