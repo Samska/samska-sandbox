@@ -124,14 +124,13 @@ describe("Operations screen", () => {
 
     await screen.findByText("Orders, last hour");
     expect(screen.queryByRole("button", { name: "Reset demo data" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("note", { name: "Public demo notice" })).not.toBeInTheDocument();
   });
 
-  it("shows the demo notice and resets only after a second confirmation", async () => {
+  it("resets only after a second confirmation", async () => {
     let calls = 0;
     open(admin, () => json(200, snapshot({ ordersLastHour: ++calls })), true);
 
-    expect(await screen.findByRole("note", { name: "Public demo notice" })).toHaveTextContent("synthetic data");
+    expect(screen.queryByRole("note", { name: "Public demo notice" })).not.toBeInTheDocument();
     fireEvent.click(await screen.findByRole("button", { name: "Reset demo data" }));
     expect(calls).toBe(1);
     fireEvent.click(screen.getByRole("button", { name: "Confirm reset" }));

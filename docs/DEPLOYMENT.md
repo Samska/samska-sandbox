@@ -11,7 +11,7 @@ This guide runs the hosted demo: a synthetic-data store that anyone may use, so 
 The stack supports two access modes, chosen only by configuration:
 
 - **Private (default).** `DEMO_ACCESS=private`: Caddy puts the whole site, API included, behind a username and password. Nobody sees the store without it. Use this until the owner has validated the release on the server.
-- **Public demo.** `DEMO_ACCESS=public` and `SAMSKA_DEMO_ENABLED=true`: the site opens to everyone with the demo banner and the Reset button, and `SAMSKA_DEMO_RESET_CRON="0 0 4 * * *"` resets the data every day at 04:00.
+- **Public demo.** `DEMO_ACCESS=public` and `SAMSKA_DEMO_ENABLED=true`: the site opens to everyone with the Reset button, and `SAMSKA_DEMO_RESET_CRON="0 0 4 * * *"` resets the data every day at 04:00.
 
 To switch, edit `.env.demo` and run `deploy/deploy.sh`. The administrator account and the application's own sign-in work the same in both modes; the private password is an extra gate in front, not a replacement.
 
@@ -96,7 +96,7 @@ Switching modes is configuration only: set `WEB_ACCESS=none` on `web` and `SAMSK
 
 ## Demo mode
 
-`SAMSKA_DEMO_ENABLED=true` (set by the Compose file) shows a banner on every page and enables **Reset demo data** on the Operations screen. A reset removes every Order, Payment attempt, Cart and customer account, restores stock to 25 and signs everyone else out; Products and the administrator stay. Set `SAMSKA_DEMO_RESET_CRON` to a Spring cron expression, for example `0 0 4 * * *`, to reset automatically. Set `SAMSKA_DEMO_SEED_PRODUCTS=true` to create six synthetic sample Products (each with a Bench illustration) when the backend starts with an empty catalog; they are Products, so the reset keeps them, and nothing is created while the catalog has Products, so changes made by the administrator are never overwritten (deleting every Product and restarting the backend creates the samples again).
+`SAMSKA_DEMO_ENABLED=true` (set by the Compose file) enables **Reset demo data** on the Operations screen. A reset removes every Order, Payment attempt, Cart and customer account, restores stock to 25 and signs everyone else out; Products and the administrator stay. Set `SAMSKA_DEMO_RESET_CRON` to a Spring cron expression, for example `0 0 4 * * *`, to reset automatically. Set `SAMSKA_DEMO_SEED_PRODUCTS=true` to create six synthetic sample Products (each with a Bench illustration) when the backend starts with an empty catalog; they are Products, so the reset keeps them, and nothing is created while the catalog has Products, so changes made by the administrator are never overwritten (deleting every Product and restarting the backend creates the samples again).
 
 ## Operating notes
 

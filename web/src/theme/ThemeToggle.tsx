@@ -26,7 +26,7 @@ export default function ThemeToggle({ inverted = false }: { inverted?: boolean }
     <div
       role="group"
       aria-label="Theme"
-      className={`inline-flex overflow-hidden rounded-sm border-[1.5px] ${inverted ? "border-canvas" : "border-ink"}`}
+      className={`inline-flex w-full overflow-hidden min-[40rem]:w-auto rounded-sm border-[1.5px] ${inverted ? "border-canvas" : "border-ink"}`}
     >
       {themePreferences.map((option) => (
         <button
@@ -34,7 +34,7 @@ export default function ThemeToggle({ inverted = false }: { inverted?: boolean }
           type="button"
           aria-pressed={preference === option}
           onClick={() => choose(option)}
-          className={`min-h-9 px-2.5 max-[34rem]:px-1.5 font-mono text-[0.7rem] font-semibold uppercase tracking-[0.06em] ${preference === option ? pressed : idle}`}
+          className={`min-h-11 flex-1 px-2.5 min-[40rem]:min-h-9 min-[40rem]:flex-none font-mono text-[0.7rem] font-semibold uppercase tracking-[0.06em] ${preference === option ? pressed : idle}`}
         >
           {labels[option]}
         </button>

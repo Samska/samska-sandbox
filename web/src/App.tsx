@@ -7,7 +7,7 @@ import AccountPage, { accountPath } from "./auth/AccountPage";
 import { useAuth, type AuthState } from "./auth/AuthContext";
 import Button from "./ui/Button";
 import StatusMessage from "./ui/StatusMessage";
-import DemoBanner from "./demo/DemoBanner";
+import HeaderMenu from "./ui/HeaderMenu";
 import ThemeToggle from "./theme/ThemeToggle";
 import OperationsPage, { operationsPath } from "./operations/OperationsPage";
 import OrdersPage, { ordersPath } from "./orders/OrdersPage";
@@ -50,7 +50,6 @@ export default function App() {
       >
         Skip to main content
       </a>
-      <DemoBanner />
       <header className="sticky top-0 z-20 border-b-2 border-ink bg-canvas/95 backdrop-blur-sm">
         <div className="mx-auto flex min-h-[3.75rem] w-[min(100%-2.5rem,76rem)] flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1 sm:gap-x-6">
           <a
@@ -73,7 +72,7 @@ export default function App() {
               STORE
             </span>
           </a>
-          <nav aria-label="Primary" className="flex flex-wrap items-center justify-end gap-0.5 sm:gap-1">
+          <HeaderMenu label="Primary">
             <a
               className={navLinkClassName(isStorefront)}
               href="/"
@@ -100,10 +99,10 @@ export default function App() {
               </a>
             ) : null}
             <AccountControls state={auth.state} onSignOut={auth.signOut} isCurrent={path === accountPath} />
-            <span className="ml-1 sm:ml-2">
+            <span className="mt-2 min-[40rem]:ml-2 min-[40rem]:mt-0">
               <ThemeToggle />
             </span>
-          </nav>
+          </HeaderMenu>
         </div>
       </header>
       <main
@@ -146,7 +145,6 @@ function AdminShell({
       >
         Skip to main content
       </a>
-      <DemoBanner />
       <header className="sticky top-0 z-20 border-b-2 border-ink bg-ink text-canvas">
         <div className="mx-auto flex min-h-[3.75rem] w-[min(100%-2.5rem,76rem)] flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1 sm:gap-x-6">
           <a className="inline-flex items-center gap-2.5 text-canvas no-underline" href={adminProductsPath} aria-label="Samska Admin home">
@@ -155,7 +153,7 @@ function AdminShell({
               ADMIN
             </span>
           </a>
-          <nav aria-label="Admin" className="flex flex-wrap items-center gap-0.5 sm:gap-1">
+          <HeaderMenu label="Admin" inverted>
             <a className={adminNavClassName(inProducts)} href={adminProductsPath} aria-current={inProducts ? "page" : undefined}>
               Products
             </a>
@@ -167,7 +165,7 @@ function AdminShell({
             </a>
             {auth.status === "signed-in" ? (
               <Button
-                className="max-[34rem]:px-2"
+                className="max-[39.99rem]:order-last max-[39.99rem]:mt-2 max-[39.99rem]:min-h-12 max-[39.99rem]:w-full"
                 variant="secondary"
                 size="sm"
                 onClick={() => void onSignOut().then(() => window.location.assign("/"))}
@@ -175,10 +173,10 @@ function AdminShell({
                 Sign out
               </Button>
             ) : null}
-            <span className="ml-1 sm:ml-2">
+            <span className="mt-2 min-[40rem]:ml-2 min-[40rem]:mt-0">
               <ThemeToggle inverted />
             </span>
-          </nav>
+          </HeaderMenu>
         </div>
       </header>
       <main
@@ -193,7 +191,7 @@ function AdminShell({
 }
 
 function adminNavClassName(isCurrent: boolean): string {
-  return `rounded-sm border-[1.5px] px-2 py-2.5 font-mono text-[0.8rem] font-medium uppercase tracking-[0.06em] no-underline sm:px-3 ${
+  return `flex min-h-12 items-center rounded-sm border-[1.5px] px-3 font-mono text-[0.8rem] font-medium uppercase tracking-[0.06em] no-underline min-[40rem]:inline-flex min-[40rem]:min-h-0 min-[40rem]:py-2.5 ${
     isCurrent ? "border-canvas bg-canvas text-ink" : "border-transparent text-canvas hover:border-canvas"
   }`;
 }
@@ -213,7 +211,7 @@ function AccountControls({
         <span className="max-w-[10rem] truncate px-2 font-mono text-[0.75rem] text-muted max-[40rem]:hidden">
           {state.account.displayName}
         </span>
-        <Button className="max-[34rem]:px-2" variant="secondary" size="sm" onClick={() => void onSignOut().then(() => window.location.assign("/"))}>
+        <Button className="max-[39.99rem]:order-last max-[39.99rem]:mt-2 max-[39.99rem]:min-h-12 max-[39.99rem]:w-full" variant="secondary" size="sm" onClick={() => void onSignOut().then(() => window.location.assign("/"))}>
           Sign out
         </Button>
       </>
@@ -329,7 +327,7 @@ function decodePathSegment(segment: string): string | null {
 }
 
 function navLinkClassName(isCurrent: boolean): string {
-  return `rounded-sm border-[1.5px] px-2 py-2.5 font-mono text-[0.8rem] font-medium uppercase tracking-[0.06em] no-underline sm:px-3 ${
+  return `flex min-h-12 items-center rounded-sm border-[1.5px] px-3 font-mono text-[0.8rem] font-medium uppercase tracking-[0.06em] no-underline min-[40rem]:inline-flex min-[40rem]:min-h-0 min-[40rem]:py-2.5 ${
     isCurrent
       ? "border-ink bg-ink text-canvas"
       : "border-transparent text-ink hover:border-ink"

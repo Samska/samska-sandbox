@@ -1,9 +1,9 @@
-# SS-082: Illustrations For The Sample Products
+# SS-084: Illustrations For The Sample Products
 
 - Status: Active
 - Work date: 2026-11-28
 - Last reviewed: 2026-11-28
-- Work item: [SS-082 (#165)](https://github.com/Samska/samska-sandbox/issues/165)
+- Work item: [SS-084 (#165)](https://github.com/Samska/samska-sandbox/issues/165)
 - Pull request: See the Issue
 - ADRs: None
 - Canonical documentation: [Design](../design/samska-store/README.md)

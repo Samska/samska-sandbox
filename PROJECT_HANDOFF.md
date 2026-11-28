@@ -4,7 +4,7 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
-## SS-082 — Illustrations for the sample Products (#165, v1.0.0)
+## SS-084 — Illustrations for the sample Products (#165, v1.0.0)
 
 - Build: six owner-approved Bench illustrations ([prototype](docs/design/samska-store/prototypes/product-art.html)) rendered inline from `art-*` media keys; the sample seed uses them and moves earlier, unedited samples to them at start-up. The three old photos stay available as media keys.
 
