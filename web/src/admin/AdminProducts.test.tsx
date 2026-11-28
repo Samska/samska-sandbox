@@ -86,6 +86,19 @@ describe("AdminProducts", () => {
     expect(screen.queryByLabelText("Description")).not.toBeInTheDocument();
   });
 
+  it("shows a search hint and keeps price, stock and actions in one compact row", async () => {
+    stubFetch({ list: () => Promise.resolve(response(200, [{ ...tote, stock: 3 }])) });
+    render(<AdminProducts />);
+
+    await screen.findByText(tote.name);
+    expect(screen.getByLabelText("Search Products by name")).toHaveAttribute("placeholder", "Search by name");
+    const row = screen.getByText(tote.name).closest("li") as HTMLElement;
+    expect(within(row).getByText("3 left")).toBeInTheDocument();
+    expect(within(row).getByText("$12.50")).toBeInTheDocument();
+    expect(row.innerHTML).toContain("grid-cols-[3rem_minmax(0,1fr)]");
+    expect(within(row).getByRole("link", { name: `Edit ${tote.name}` })).toBeInTheDocument();
+  });
+
   it("filters Products by name case-insensitively and clears the search", async () => {
     stubFetch({ list: () => Promise.resolve(response(200, [tote, pourOver])) });
     render(<AdminProducts />);
