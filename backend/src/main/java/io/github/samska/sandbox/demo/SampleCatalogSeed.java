@@ -15,8 +15,7 @@ import io.github.samska.sandbox.inventory.application.Inventory;
 
 /**
  * Gives a hosted demo a fixed example catalog of synthetic Products. It runs only when
- * {@code samska.demo.seed-products} is true and never changes a Product that already exists. The demo reset does
- * not touch Products, so the catalog is permanent.
+ * {@code samska.demo.seed-products} is true and never changes a Product that already exists.
  */
 @Component
 class SampleCatalogSeed implements ApplicationRunner {

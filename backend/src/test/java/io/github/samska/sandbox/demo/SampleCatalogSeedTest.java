@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SampleCatalogSeedTest {
 
     @Test
-    void seedsTheFixedCatalogOnceAndTheDemoResetKeepsIt() throws Exception {
+    void seedsTheFixedCatalogOnce() throws Exception {
         try (var app = EnforcedApplication.start("--samska.demo.enabled=true", "--samska.demo.seed-products=true")) {
             var seed = app.context().getBean(SampleCatalogSeed.class);
 
@@ -23,14 +23,6 @@ class SampleCatalogSeedTest {
             assertThat((int) JsonPath.read(products.body(), "$.length()")).isEqualTo(18);
             assertThat((String) JsonPath.read(products.body(), "$[0].mediaKey")).isEqualTo("art-tote");
             assertThat((int) JsonPath.read(products.body(), "$[0].stock")).isEqualTo(25);
-
-            var admin = app.client();
-            assertThat(admin.post("/api/auth/login",
-                    "{\"email\":\"" + ADMIN_EMAIL + "\",\"password\":\"" + ADMIN_PASSWORD + "\"}").status())
-                    .isEqualTo(200);
-            assertThat(admin.post("/api/admin/demo/reset", null).status()).isEqualTo(204);
-
-            assertThat((int) JsonPath.read(app.client().get("/api/products").body(), "$.length()")).isEqualTo(18);
         }
     }
 

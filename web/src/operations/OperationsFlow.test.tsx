@@ -36,7 +36,7 @@ const snapshot = (over: Partial<OperationsSnapshot> = {}): OperationsSnapshot =>
   ...over
 });
 
-function open(account: unknown, operations: () => Response, demo = false, onReset?: () => Response) {
+function open(account: unknown, operations: () => Response, demo = false) {
   vi.stubGlobal(
     "fetch",
     vi.fn((input: RequestInfo | URL) => {
@@ -44,7 +44,6 @@ function open(account: unknown, operations: () => Response, demo = false, onRese
       if (path === "/api/auth/me") return Promise.resolve(json(200, account));
       if (path === "/api/admin/operations") return Promise.resolve(operations());
       if (path === "/api/config") return Promise.resolve(json(200, { demo }));
-      if (path === "/api/admin/demo/reset") return Promise.resolve(onReset ? onReset() : new Response(null, { status: 204 }));
       return Promise.resolve(json(200, []));
     })
   );
@@ -119,32 +118,10 @@ describe("Operations screen", () => {
     expect(screen.queryByRole("link", { name: "Market" })).not.toBeInTheDocument();
   });
 
-  it("offers no reset outside demo mode", async () => {
-    open(admin, () => json(200, snapshot()));
+  it("has no reset control, even in demo mode", async () => {
+    open(admin, () => json(200, snapshot()), true);
 
     await screen.findByText("Orders, last hour");
-    expect(screen.queryByRole("button", { name: "Reset demo data" })).not.toBeInTheDocument();
-  });
-
-  it("resets only after a second confirmation", async () => {
-    let calls = 0;
-    open(admin, () => json(200, snapshot({ ordersLastHour: ++calls })), true);
-
-    expect(screen.queryByRole("note", { name: "Public demo notice" })).not.toBeInTheDocument();
-    fireEvent.click(await screen.findByRole("button", { name: "Reset demo data" }));
-    expect(calls).toBe(1);
-    fireEvent.click(screen.getByRole("button", { name: "Confirm reset" }));
-
-    expect(await screen.findByText("Demo data was reset.")).toBeInTheDocument();
-    expect(calls).toBe(2);
-  });
-
-  it("says when the reset failed", async () => {
-    open(admin, () => json(200, snapshot()), true, () => json(500, {}));
-
-    fireEvent.click(await screen.findByRole("button", { name: "Reset demo data" }));
-    fireEvent.click(screen.getByRole("button", { name: "Confirm reset" }));
-
-    expect(await screen.findByText("The reset failed. Try again.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /reset/i })).not.toBeInTheDocument();
   });
 });

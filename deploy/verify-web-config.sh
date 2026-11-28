@@ -60,6 +60,12 @@ PORT=9090 start_web -e WEB_ACCESS=none -e PORT=9090
 check "open mode on a custom PORT: site" 200 "$(code "localhost:$PORT_ON_HOST/")"
 check "open mode: API proxied" 404 "$(code "localhost:$PORT_ON_HOST/api/x")"
 
+# Browsers must keep using HTTPS: every kind of response carries HSTS (a location with its own add_header drops the inherited ones).
+hsts() { curl -sI "$@" | tr -d '\r' | grep -ci '^strict-transport-security: max-age=31536000'; }
+check "open mode: HSTS on the site" 1 "$(hsts "localhost:$PORT_ON_HOST/")"
+check "open mode: HSTS on the API" 1 "$(hsts "localhost:$PORT_ON_HOST/api/x")"
+check "open mode: HSTS on fonts" 1 "$(hsts "localhost:$PORT_ON_HOST/fonts/x.woff2")"
+
 # Self-hosted fonts are served from this origin, cached, and a missing one is a 404 rather than the SPA page.
 check "open mode: font file" 200 "$(code "localhost:$PORT_ON_HOST/fonts/x.woff2")"
 check "open mode: font cache header" "max-age=2592000" "$(curl -sI "localhost:$PORT_ON_HOST/fonts/x.woff2" | tr -d '\r' | sed -n 's/^[Cc]ache-[Cc]ontrol: public, //p')"
