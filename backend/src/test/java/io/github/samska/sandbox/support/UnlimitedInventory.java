@@ -28,11 +28,7 @@ public final class UnlimitedInventory implements Inventory {
     }
 
     @Override
-    public void reserve(UUID attemptId, List<StockLine> lines) {
-    }
-
-    @Override
-    public void consume(UUID attemptId, List<StockLine> lines) {
+    public void consume(List<StockLine> lines) {
     }
 
     @Override

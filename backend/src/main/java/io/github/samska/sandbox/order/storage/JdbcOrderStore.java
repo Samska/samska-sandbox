@@ -15,16 +15,14 @@ import io.github.samska.sandbox.inventory.application.Inventory;
 import io.github.samska.sandbox.order.Order;
 import io.github.samska.sandbox.order.OrderItem;
 import io.github.samska.sandbox.order.OrderSummary;
+import io.github.samska.sandbox.order.application.CartSnapshotProvider;
 import io.github.samska.sandbox.order.application.OrderOutOfStockException;
-import io.github.samska.sandbox.order.application.OrderPaymentNotApprovedException;
 import io.github.samska.sandbox.order.application.OrderResult;
 import io.github.samska.sandbox.order.application.OrderStore;
-import io.github.samska.sandbox.payment.PaymentStatus;
-import io.github.samska.sandbox.payment.application.PaymentAttempts;
 
 public class JdbcOrderStore implements OrderStore {
 
-    private static final String ORDER_COLUMNS = "order_id, order_number, payment_attempt_id, cart_revision, total";
+    private static final String ORDER_COLUMNS = "order_id, order_number, request_id, cart_revision, total";
 
     private static final String SUMMARY_SELECT = """
             SELECT o.order_id, o.order_number, o.created_at, o.total,
@@ -32,60 +30,58 @@ public class JdbcOrderStore implements OrderStore {
             FROM orders o""";
 
     private final JdbcClient jdbc;
-    private final PaymentAttempts attempts;
     private final CurrentAccount currentAccount;
     private final Inventory inventory;
 
-    public JdbcOrderStore(
-            JdbcClient jdbc, PaymentAttempts attempts, CurrentAccount currentAccount, Inventory inventory) {
+    public JdbcOrderStore(JdbcClient jdbc, CurrentAccount currentAccount, Inventory inventory) {
         this.jdbc = jdbc;
-        this.attempts = attempts;
         this.currentAccount = currentAccount;
         this.inventory = inventory;
     }
 
     @Override
     @Transactional
-    public OrderResult create(UUID attemptId) {
-        if (attemptId == null) {
-            throw new IllegalArgumentException("Payment attempt ID is required");
+    public OrderResult create(UUID requestId, long cartRevision, CartSnapshotProvider cartSnapshotProvider) {
+        if (requestId == null) {
+            throw new IllegalArgumentException("Request ID is required");
         }
 
-        var existing = findByPaymentAttemptId(attemptId);
+        var existing = findByRequestId(requestId);
         if (existing.isPresent()) {
             return new OrderResult(existing.get(), false);
         }
 
-        // Directional dependency: Order reads Payment through its owned contract; Payment never calls Order.
-        var attempt = attempts.getAttempt(attemptId);
-        if (attempt.status() != PaymentStatus.APPROVED) {
-            throw new OrderPaymentNotApprovedException();
+        // Checks the revision at read time; the snapshot is frozen into the Order.
+        var snapshot = cartSnapshotProvider.capture(cartRevision);
+        if (snapshot.items().isEmpty()) {
+            throw new IllegalArgumentException("An Order cannot be placed from an empty Cart");
         }
 
         var orderId = UUID.randomUUID();
         var inserted = jdbc.sql("""
-                        INSERT INTO orders (order_id, account_id, payment_attempt_id, cart_revision, total)
-                        VALUES (:orderId, :accountId, :attemptId, :cartRevision, :total)
-                        ON CONFLICT (payment_attempt_id) DO NOTHING
+                        INSERT INTO orders (order_id, account_id, request_id, cart_revision, total)
+                        VALUES (:orderId, :accountId, :requestId, :cartRevision, :total)
+                        ON CONFLICT (request_id) DO NOTHING
                         RETURNING order_number
                         """)
                 .param("orderId", orderId)
                 .param("accountId", currentAccount.id())
-                .param("attemptId", attemptId)
-                .param("cartRevision", attempt.cartRevision())
-                .param("total", attempt.total())
+                .param("requestId", requestId)
+                .param("cartRevision", cartRevision)
+                .param("total", snapshot.total())
                 .query((resultSet, rowNumber) -> resultSet.getLong("order_number"))
                 .optional();
 
         if (inserted.isEmpty()) {
             // A concurrent transaction won the unique constraint. Its commit happened before this
             // statement resolved, so the winning Order is visible under READ COMMITTED.
-            return new OrderResult(findByPaymentAttemptId(attemptId)
-                    .orElseThrow(() -> new IllegalStateException("Concurrent Order insert was not visible")), false);
+            // When it is not visible to this account, the id belongs to another account: refused, not revealed.
+            return new OrderResult(findByRequestId(requestId)
+                    .orElseThrow(() -> new IllegalArgumentException("Request ID is already in use")), false);
         }
 
-        var items = attempt.items().stream()
-                .map(item -> new OrderItem(item.productId(), item.name(), item.unitPrice(),
+        var items = snapshot.items().stream()
+                .map(item -> new OrderItem(item.product().value(), item.name(), item.unitPrice(),
                         item.quantity().value(), item.lineSubtotal()))
                 .toList();
 
@@ -110,7 +106,7 @@ public class JdbcOrderStore implements OrderStore {
 
         // Same transaction as the Order: when the units are gone, no Order is recorded.
         try {
-            inventory.consume(attemptId, items.stream()
+            inventory.consume(items.stream()
                     .map(item -> new StockLine(item.productId(), item.quantity()))
                     .toList());
         } catch (InsufficientStockException exception) {
@@ -118,7 +114,7 @@ public class JdbcOrderStore implements OrderStore {
         }
 
         return new OrderResult(
-                new Order(orderId, inserted.get(), attemptId, attempt.cartRevision(), items, attempt.total()), true);
+                new Order(orderId, inserted.get(), requestId, cartRevision, items, snapshot.total()), true);
     }
 
     @Override
@@ -127,10 +123,9 @@ public class JdbcOrderStore implements OrderStore {
         return findOrder("order_id", orderId);
     }
 
-    @Override
     @Transactional(readOnly = true)
-    public Optional<Order> findByPaymentAttemptId(UUID attemptId) {
-        return findOrder("payment_attempt_id", attemptId);
+    Optional<Order> findByRequestId(UUID requestId) {
+        return findOrder("request_id", requestId);
     }
 
     @Override
@@ -176,7 +171,7 @@ public class JdbcOrderStore implements OrderStore {
                 .query((resultSet, rowNumber) -> new OrderRow(
                         resultSet.getObject("order_id", UUID.class),
                         resultSet.getLong("order_number"),
-                        resultSet.getObject("payment_attempt_id", UUID.class),
+                        resultSet.getObject("request_id", UUID.class),
                         resultSet.getLong("cart_revision"),
                         resultSet.getBigDecimal("total")))
                 .optional()
@@ -203,13 +198,13 @@ public class JdbcOrderStore implements OrderStore {
             throw new IllegalStateException("Order has no items: " + row.orderId());
         }
 
-        return new Order(row.orderId(), row.orderNumber(), row.paymentAttemptId(), row.cartRevision(), items, row.total());
+        return new Order(row.orderId(), row.orderNumber(), row.requestId(), row.cartRevision(), items, row.total());
     }
 
     private record OrderRow(
             UUID orderId,
             long orderNumber,
-            UUID paymentAttemptId,
+            UUID requestId,
             long cartRevision,
             BigDecimal total) {
     }

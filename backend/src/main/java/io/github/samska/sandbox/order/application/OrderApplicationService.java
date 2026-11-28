@@ -25,11 +25,14 @@ public class OrderApplicationService {
         this.carts = carts;
     }
 
-    public OrderResult create(UUID paymentAttemptId) {
-        if (paymentAttemptId == null) {
-            throw new IllegalArgumentException("Payment attempt ID is required");
+    public OrderResult create(UUID requestId, Long cartRevision) {
+        if (requestId == null) {
+            throw new IllegalArgumentException("Request ID is required");
         }
-        var result = store.create(paymentAttemptId);
+        if (cartRevision == null || cartRevision < 0) {
+            throw new IllegalArgumentException("Cart revision is required");
+        }
+        var result = store.create(requestId, cartRevision, carts::captureSnapshot);
         if (result.created()) {
             emptyCart();
         }
@@ -47,10 +50,6 @@ public class OrderApplicationService {
 
     public Order getById(UUID orderId) {
         return store.findById(orderId).orElseThrow(OrderNotFoundException::new);
-    }
-
-    public Order getByPaymentAttemptId(UUID attemptId) {
-        return store.findByPaymentAttemptId(attemptId).orElseThrow(OrderNotFoundException::new);
     }
 
     public List<OrderSummary> history() {

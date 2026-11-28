@@ -50,7 +50,7 @@ The design does not add authentication, roles, Order history, shipping, billing,
 
 - Issue: [SS-056 / #108](https://github.com/Samska/samska-sandbox/issues/108)
 - Pull request: None
-- Relevant source files: [Catalog.tsx](../../web/src/catalog/Catalog.tsx), [AttemptSurface.tsx](../../web/src/journey/AttemptSurface.tsx), [AdminProducts.tsx](../../web/src/admin/AdminProducts.tsx), [AdminProductCreate.tsx](../../web/src/admin/AdminProductCreate.tsx), [AdminProductEdit.tsx](../../web/src/admin/AdminProductEdit.tsx), [ProductImageSection.tsx](../../web/src/admin/ProductImageSection.tsx), [App.tsx](../../web/src/App.tsx), [NotFound.tsx](../../web/src/NotFound.tsx)
+- Relevant source files: [Catalog.tsx](../../web/src/catalog/Catalog.tsx), `AttemptSurface.tsx` (removed in SS-099), [AdminProducts.tsx](../../web/src/admin/AdminProducts.tsx), [AdminProductCreate.tsx](../../web/src/admin/AdminProductCreate.tsx), [AdminProductEdit.tsx](../../web/src/admin/AdminProductEdit.tsx), [ProductImageSection.tsx](../../web/src/admin/ProductImageSection.tsx), [App.tsx](../../web/src/App.tsx), [NotFound.tsx](../../web/src/NotFound.tsx)
 - ADRs: None
 - Canonical documentation: [Design record](../design/samska-store/README.md), [AI governance](../AI-GOVERNANCE.md), [Testing](../TESTING.md)
 

@@ -104,7 +104,7 @@ There is no reset. Set `SAMSKA_DEMO_SEED_PRODUCTS=true` to create the fixed exam
 - The database volume `demo-postgres-data` persists until `docker compose ... down -v`; a dump is the safe copy.
 - Caddy keeps its certificates in the `caddy-data` volume. Do not delete it, because Let's Encrypt limits how many certificates a domain can request.
 - The web container trusts the client address only from the private Compose network, where Caddy sets it, so the rate limiter sees each visitor.
-- Real data and real payments are never appropriate. See the [Threat Model](THREAT-MODEL.md) and [Security](SECURITY.md).
+- Real data is never appropriate, and no payment exists. See the [Threat Model](THREAT-MODEL.md) and [Security](SECURITY.md).
 
 ## Verification
 

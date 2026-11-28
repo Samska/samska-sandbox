@@ -15,7 +15,6 @@ import io.github.samska.sandbox.support.OrderDatabaseTestSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -24,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class OrderApiTest extends OrderDatabaseTestSupport {
 
-    private static final String ATTEMPT = "aaaaaaaa-1111-1111-1111-111111111111";
+    private static final String REQUEST = "aaaaaaaa-1111-1111-1111-111111111111";
     private MockMvc mvc;
 
     @BeforeEach
@@ -33,14 +32,12 @@ class OrderApiTest extends OrderDatabaseTestSupport {
     }
 
     @Test
-    void createsFromApprovedSnapshotEmptiesTheCartAndReplaysByAttempt() throws Exception {
+    void placesTheOrderFromTheCartEmptiesItAndReplaysByRequest() throws Exception {
         var product = createProduct();
         var revision = addToCart(product);
-        payment(ATTEMPT, revision, "approve");
-        var first = mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"paymentAttemptId\":\"" + ATTEMPT + "\"}"))
+        var first = mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON).content(body(REQUEST, revision)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.paymentAttemptId").value(ATTEMPT))
+                .andExpect(jsonPath("$.orderNumber").value(org.hamcrest.Matchers.matchesPattern("SK-\\d{6}")))
                 .andExpect(jsonPath("$.cartRevision").value(revision))
                 .andExpect(jsonPath("$.items[0].productId").value(product))
                 .andExpect(jsonPath("$.items[0].name").value("Canvas Tote"))
@@ -53,10 +50,7 @@ class OrderApiTest extends OrderDatabaseTestSupport {
         addToCart(product);
         mvc.perform(get("/api/orders/{orderId}", id)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(25.00));
-        mvc.perform(get("/api/orders/payment-attempts/{id}", ATTEMPT)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.orderId").value(id));
-        var replay = mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"paymentAttemptId\":\"" + ATTEMPT + "\"}"))
+        var replay = mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON).content(body(REQUEST, revision)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         assertThat(replay).isEqualTo(first);
         mvc.perform(get("/api/cart")).andExpect(status().isOk())
@@ -64,24 +58,29 @@ class OrderApiTest extends OrderDatabaseTestSupport {
     }
 
     @Test
-    void refusesUnknownDeclinedAndMalformedRequests() throws Exception {
-        mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"paymentAttemptId\":\"" + ATTEMPT + "\"}"))
-                .andExpect(status().isNotFound());
-        mvc.perform(get("/api/orders/payment-attempts/{id}", ATTEMPT)).andExpect(status().isNotFound());
-        mvc.perform(get("/api/orders/{id}", ATTEMPT)).andExpect(status().isNotFound());
+    void refusesAnEmptyChangedOrMalformedRequestAndStoresNothing() throws Exception {
+        mvc.perform(get("/api/orders/{id}", REQUEST)).andExpect(status().isNotFound());
         mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isBadRequest());
         mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"paymentAttemptId\":\"invalid\"}"))
+                        .content("{\"requestId\":\"invalid\",\"cartRevision\":0}"))
+                .andExpect(status().isBadRequest());
+        mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"requestId\":\"" + REQUEST + "\"}"))
                 .andExpect(status().isBadRequest());
         mvc.perform(get("/api/orders/not-a-uuid")).andExpect(status().isBadRequest());
+        // An empty Cart has nothing to order.
+        mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON).content(body(REQUEST, 0)))
+                .andExpect(status().isBadRequest());
 
         var revision = addToCart(createProduct());
-        payment(ATTEMPT, revision, "decline");
-        mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"paymentAttemptId\":\"" + ATTEMPT + "\"}"))
-                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("payment-not-approved"));
+        mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON).content(body(REQUEST, revision - 1)))
+                .andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("cart-changed"));
+        mvc.perform(get("/api/cart")).andExpect(jsonPath("$.items[0].quantity").value(2));
+    }
+
+    private static String body(String requestId, long revision) {
+        return "{\"requestId\":\"" + requestId + "\",\"cartRevision\":" + revision + "}";
     }
 
     private String createProduct() throws Exception {
@@ -96,12 +95,5 @@ class OrderApiTest extends OrderDatabaseTestSupport {
                         .content("{\"productId\":\"" + product + "\",\"quantity\":2}"))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         return ((Number) JsonPath.read(json, "$.revision")).longValue();
-    }
-
-    private void payment(String id, long revision, String scenario) throws Exception {
-        mvc.perform(post("/api/payment-attempts").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"attemptId\":\"" + id + "\",\"cartRevision\":" + revision
-                                + ",\"scenario\":\"" + scenario + "\"}"))
-                .andExpect(status().isCreated());
     }
 }

@@ -14,7 +14,7 @@ import OperationsPage, { operationsPath } from "./operations/OperationsPage";
 import OrdersPage, { ordersPath } from "./orders/OrdersPage";
 import TrackingPage from "./orders/TrackingPage";
 import NotFound from "./NotFound";
-import { attemptIdForPath, checkoutPath, marketPath, usePath } from "./journey/routes";
+import { checkoutPath, marketPath, usePath } from "./journey/routes";
 
 const adminProductsPath = "/admin/products";
 const adminProductNewPath = "/admin/products/new";
@@ -28,7 +28,7 @@ export default function App() {
     auth.state.status === "local" ||
     (auth.state.status === "signed-in" && auth.state.account.role === "ADMIN");
   const isMarket = path === marketPath;
-  const isStorefront = isMarket || path === checkoutPath || attemptIdForPath(path) !== null;
+  const isStorefront = isMarket || path === checkoutPath;
   const isOrders = path === ordersPath || path.startsWith(`${ordersPath}/`);
   const isAdmin =
     path === adminProductsPath || path.startsWith(`${adminProductsPath}/`);
@@ -243,7 +243,7 @@ function renderSurface(path: string, auth: AuthState) {
     return <AccountPage />;
   }
 
-  const isCheckout = path === checkoutPath || attemptIdForPath(path) !== null;
+  const isCheckout = path === checkoutPath;
   const orderMatch = orderTrackingPattern.exec(path);
   const isOrdersPath = path === ordersPath || orderMatch !== null;
   const isOperationsPath = path === operationsPath;
@@ -297,7 +297,7 @@ function renderSurface(path: string, auth: AuthState) {
     );
   }
 
-  if (path === marketPath || path === checkoutPath || attemptIdForPath(path) !== null) {
+  if (path === marketPath || path === checkoutPath) {
     return <Catalog />;
   }
 

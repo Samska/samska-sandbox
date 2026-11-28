@@ -25,8 +25,6 @@ public class OperationsService {
     public OperationsSnapshot snapshot() {
         var now = clock.instant();
         var counts = store.counts(now);
-        long attempts = counts.approved() + counts.declined() + counts.failed();
-        Double approvalRate = attempts == 0 ? null : (double) counts.approved() / attempts;
         long requests = metrics.requests();
         long errors = metrics.serverErrors();
         Double errorRate = requests == 0 ? null : (double) errors / requests;
@@ -35,7 +33,6 @@ public class OperationsService {
                 new ServiceHealth("Application", true, 0),
                 new ServiceHealth("Database", ping >= 0, Math.max(ping, 0)));
         return new OperationsSnapshot(now, counts.ordersLastHour(), counts.ordersLast24Hours(),
-                counts.approved(), counts.declined(), counts.failed(), approvalRate,
                 metrics.checkoutP95Millis(), metrics.checkoutSamples(), requests, errors, errorRate, services);
     }
 }

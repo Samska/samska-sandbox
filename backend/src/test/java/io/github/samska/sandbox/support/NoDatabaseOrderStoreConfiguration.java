@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Bean;
 
 import io.github.samska.sandbox.order.Order;
 import io.github.samska.sandbox.order.OrderSummary;
+import io.github.samska.sandbox.order.application.CartSnapshotProvider;
 import io.github.samska.sandbox.order.application.OrderResult;
 import io.github.samska.sandbox.order.application.OrderStore;
 import io.github.samska.sandbox.shipping.OrderStatus;
@@ -24,17 +25,12 @@ public class NoDatabaseOrderStoreConfiguration {
         return new OrderStore() {
 
             @Override
-            public OrderResult create(UUID paymentAttemptId) {
+            public OrderResult create(UUID requestId, long cartRevision, CartSnapshotProvider cartSnapshotProvider) {
                 throw new UnsupportedOperationException("Order persistence is not available in this test");
             }
 
             @Override
             public Optional<Order> findById(UUID orderId) {
-                throw new UnsupportedOperationException("Order persistence is not available in this test");
-            }
-
-            @Override
-            public Optional<Order> findByPaymentAttemptId(UUID paymentAttemptId) {
                 throw new UnsupportedOperationException("Order persistence is not available in this test");
             }
 

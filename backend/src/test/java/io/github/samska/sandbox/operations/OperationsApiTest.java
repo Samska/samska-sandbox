@@ -39,18 +39,12 @@ class OperationsApiTest {
         return app.customer("ops-" + UUID.randomUUID() + "@samska.test");
     }
 
-    private static String shop(Client client, String productId, String scenario, boolean order) throws Exception {
+    private static void shop(Client client, String productId) throws Exception {
         var cart = client.post("/api/cart/items", "{\"productId\":\"" + productId + "\",\"quantity\":1}");
         int revision = JsonPath.read(cart.body(), "$.revision");
-        var attempt = UUID.randomUUID();
-        var reply = client.post("/api/payment-attempts", "{\"attemptId\":\"" + attempt + "\",\"cartRevision\":"
-                + revision + ",\"scenario\":\"" + scenario + "\"}");
+        var reply = client.post("/api/orders", "{\"requestId\":\"" + UUID.randomUUID()
+                + "\",\"cartRevision\":" + revision + "}");
         assertThat(reply.status()).as(reply.body()).isEqualTo(201);
-        if (order) {
-            assertThat(client.post("/api/orders", "{\"paymentAttemptId\":\"" + attempt + "\"}").status())
-                    .isEqualTo(201);
-        }
-        return attempt.toString();
     }
 
     @Test
@@ -61,28 +55,22 @@ class OperationsApiTest {
     }
 
     @Test
-    void figuresFollowRealOrdersAndPaymentAttempts() throws Exception {
+    void figuresFollowRealOrders() throws Exception {
         var admin = admin();
         var created = admin.post("/api/products",
                 "{\"name\":\"Ops " + UUID.randomUUID() + "\",\"description\":\"Synthetic\",\"price\":5,\"stock\":50}");
         String product = JsonPath.read(created.body(), "$.id");
         var before = admin.get("/api/admin/operations").body();
         int ordersBefore = JsonPath.read(before, "$.ordersLastHour");
-        int approvedBefore = JsonPath.read(before, "$.approvedAttempts");
-        int declinedBefore = JsonPath.read(before, "$.declinedAttempts");
 
         var shopper = customer();
-        shop(shopper, product, "approve", true);
+        shop(shopper, product);
         var other = customer();
-        shop(other, product, "decline", false);
+        shop(other, product);
 
         var after = admin.get("/api/admin/operations").body();
-        assertThat((int) JsonPath.read(after, "$.ordersLastHour")).isEqualTo(ordersBefore + 1);
-        assertThat((int) JsonPath.read(after, "$.ordersLast24Hours")).isGreaterThanOrEqualTo(ordersBefore + 1);
-        assertThat((int) JsonPath.read(after, "$.approvedAttempts")).isEqualTo(approvedBefore + 1);
-        assertThat((int) JsonPath.read(after, "$.declinedAttempts")).isEqualTo(declinedBefore + 1);
-        double rate = JsonPath.read(after, "$.approvalRate");
-        assertThat(rate).isBetween(0.0, 1.0);
+        assertThat((int) JsonPath.read(after, "$.ordersLastHour")).isEqualTo(ordersBefore + 2);
+        assertThat((int) JsonPath.read(after, "$.ordersLast24Hours")).isGreaterThanOrEqualTo(ordersBefore + 2);
         assertThat((int) JsonPath.read(after, "$.checkoutSamples")).isGreaterThanOrEqualTo(2);
         assertThat((double) JsonPath.read(after, "$.checkoutP95Millis")).isGreaterThan(0.0);
         assertThat((int) JsonPath.read(after, "$.requests")).isGreaterThan(0);

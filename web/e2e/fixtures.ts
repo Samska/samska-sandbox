@@ -21,25 +21,15 @@ export interface CartDto {
   revision: number;
 }
 
-export interface PaymentAttemptDto {
-  attemptId: string;
-  status: "approved" | "declined" | "failed";
-  cartRevision: number;
-  items: CartItemDto[];
-  total: number;
-}
-
 export interface OrderDto {
   orderId: string;
   orderNumber: string;
-  paymentAttemptId: string;
   cartRevision: number;
   items: CartItemDto[];
   total: number;
 }
 
 export interface TransactionalRequestCounts {
-  paymentPosts: () => number;
   orderPosts: () => number;
 }
 
@@ -85,14 +75,6 @@ export async function clearCart(request: APIRequestContext): Promise<CartDto> {
   return cart;
 }
 
-export function fetchPaymentAttempt(request: APIRequestContext, attemptId: string) {
-  return request.get(`/api/payment-attempts/${encodeURIComponent(attemptId)}`);
-}
-
-export function fetchOrderByAttempt(request: APIRequestContext, attemptId: string) {
-  return request.get(`/api/orders/payment-attempts/${encodeURIComponent(attemptId)}`);
-}
-
 export function fetchOrderById(request: APIRequestContext, orderId: string) {
   return request.get(`/api/orders/${encodeURIComponent(orderId)}`);
 }
@@ -100,7 +82,6 @@ export function fetchOrderById(request: APIRequestContext, orderId: string) {
 // Observes only browser-dispatched transactional requests. Fixture traffic uses
 // the separate request context and is deliberately not counted here.
 export function trackTransactionalRequests(page: Page): TransactionalRequestCounts {
-  const paymentPosts: string[] = [];
   const orderPosts: string[] = [];
 
   page.on("request", (request) => {
@@ -110,23 +91,17 @@ export function trackTransactionalRequests(page: Page): TransactionalRequestCoun
 
     const path = new URL(request.url()).pathname;
 
-    if (path === "/api/payment-attempts") {
-      paymentPosts.push(request.url());
-    }
-
     if (path === "/api/orders") {
       orderPosts.push(request.url());
     }
   });
 
   return {
-    paymentPosts: () => paymentPosts.length,
     orderPosts: () => orderPosts.length
   };
 }
 
-// Creates an approved simulated payment and its Order for the signed-in account through the existing
-// APIs, so tests about Order history do not repeat the whole browser journey.
+// Places an Order for the signed-in account through the existing APIs, so tests about Order history do not repeat the whole browser journey.
 export async function createOrderViaApi(
   request: APIRequestContext,
   productId: string,
@@ -137,14 +112,10 @@ export async function createOrderViaApi(
   expect(added.status(), "add to cart").toBe(200);
   const cart = (await added.json()) as CartDto;
 
-  const attemptId = crypto.randomUUID();
-  const attempt = await request.post("/api/payment-attempts", {
-    data: { attemptId, cartRevision: cart.revision, scenario: "approve" },
+  const order = await request.post("/api/orders", {
+    data: { requestId: crypto.randomUUID(), cartRevision: cart.revision },
     headers
   });
-  expect(attempt.status(), "approve payment").toBe(201);
-
-  const order = await request.post("/api/orders", { data: { paymentAttemptId: attemptId }, headers });
-  expect(order.status(), "create order").toBe(201);
+  expect(order.status(), "place order").toBe(201);
   return (await order.json()) as OrderDto;
 }

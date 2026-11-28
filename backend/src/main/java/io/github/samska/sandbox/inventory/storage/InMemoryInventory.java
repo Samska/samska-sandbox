@@ -12,8 +12,8 @@ import io.github.samska.sandbox.inventory.application.InsufficientStockException
 import io.github.samska.sandbox.inventory.application.Inventory;
 
 /**
- * Test double for the {@code no-database} profile. Reservations are not modelled: it checks and
- * decrements stock directly, which is enough for the Catalog and Cart API suites.
+ * Test double for the {@code no-database} profile. It checks and decrements stock directly,
+ * which is enough for the Catalog and Cart API suites.
  */
 public class InMemoryInventory implements Inventory {
 
@@ -45,18 +45,13 @@ public class InMemoryInventory implements Inventory {
     }
 
     @Override
-    public synchronized void reserve(UUID attemptId, List<StockLine> lines) {
+    public synchronized void consume(List<StockLine> lines) {
         for (var line : lines) {
             var units = onHand.getOrDefault(line.productId(), 0);
             if (units < line.quantity()) {
                 throw new InsufficientStockException(line.productId(), units);
             }
         }
-    }
-
-    @Override
-    public synchronized void consume(UUID attemptId, List<StockLine> lines) {
-        reserve(attemptId, lines);
         for (var line : lines) {
             onHand.merge(line.productId(), -line.quantity(), Integer::sum);
         }

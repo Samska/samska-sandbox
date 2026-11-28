@@ -4,6 +4,11 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-099 — Remove the simulated payment (#189, v1.0.0)
+
+- Build: Checkout has one "Place order" step and every Order is approved directly ([ADR 0021](docs/adr/0021-remove-the-simulated-payment.md)); `POST /api/orders` takes a `requestId` and the reviewed `cartRevision`; the Payment module, its tables, stock reservations, the "Payment not finished / Resume payment" notice and the attempt URLs are removed (migration `V11`); the Operations screen drops the approval rate; the footer no longer says data resets on restart.
+- State: takes effect when `backend` and `web` redeploy from `release/1.0`; the migration drops the Payment data.
+
 ## SS-094 — Remove the demo reset (#191, v1.0.0)
 
 - Build: the reset endpoint, scheduled reset, session registry and the Operations control are gone (the application can no longer erase Orders, accounts or stock); footer text corrected; every web response carries HSTS. Found in the second pre-1.0 review.

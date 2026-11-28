@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class FirstOrderJourneyApiTest extends OrderDatabaseTestSupport {
 
-    private static final String ATTEMPT = "aaaaaaaa-1111-1111-1111-111111111111";
+    private static final String REQUEST = "aaaaaaaa-1111-1111-1111-111111111111";
     private MockMvc mvc;
 
     @BeforeEach
@@ -40,18 +40,9 @@ class FirstOrderJourneyApiTest extends OrderDatabaseTestSupport {
 
         assertThat(reviewedRevision).isEqualTo(firstRevision + 1);
 
-        mvc.perform(post("/api/payment-attempts").contentType(MediaType.APPLICATION_JSON)
-                        .content(initiateBody(ATTEMPT, reviewedRevision, "approve")))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.status").value("approved"))
-                .andExpect(jsonPath("$.cartRevision").value(reviewedRevision))
-                .andExpect(jsonPath("$.items[0].quantity").value(3))
-                .andExpect(jsonPath("$.total").value(37.50));
-
         var createdOrder = mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"paymentAttemptId\":\"" + ATTEMPT + "\"}"))
+                        .content(orderBody(REQUEST, reviewedRevision)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.paymentAttemptId").value(ATTEMPT))
                 .andExpect(jsonPath("$.cartRevision").value(reviewedRevision))
                 .andExpect(jsonPath("$.items[0].productId").value(productId))
                 .andExpect(jsonPath("$.items[0].name").value("Canvas Tote"))
@@ -65,15 +56,8 @@ class FirstOrderJourneyApiTest extends OrderDatabaseTestSupport {
         mvc.perform(get("/api/orders/{orderId}", orderId)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.total").value(37.50));
 
-        mvc.perform(get("/api/orders/payment-attempts/{attemptId}", ATTEMPT)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.orderId").value(orderId));
-
-        mvc.perform(get("/api/payment-attempts/{attemptId}", ATTEMPT)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.status").value("approved"))
-                .andExpect(jsonPath("$.total").value(37.50));
-
         var replay = mvc.perform(post("/api/orders").contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"paymentAttemptId\":\"" + ATTEMPT + "\"}"))
+                        .content(orderBody(REQUEST, reviewedRevision)))
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         assertThat(replay).isEqualTo(createdOrder);
 
@@ -114,8 +98,7 @@ class FirstOrderJourneyApiTest extends OrderDatabaseTestSupport {
         return ((Number) JsonPath.read(json, "$.revision")).longValue();
     }
 
-    private static String initiateBody(String attemptId, long cartRevision, String scenario) {
-        return "{\"attemptId\":\"" + attemptId + "\",\"cartRevision\":" + cartRevision
-                + ",\"scenario\":\"" + scenario + "\"}";
+    private static String orderBody(String requestId, long cartRevision) {
+        return "{\"requestId\":\"" + requestId + "\",\"cartRevision\":" + cartRevision + "}";
     }
 }
