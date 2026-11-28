@@ -50,14 +50,14 @@ describe("ProductBrowse (Bench catalog)", () => {
     expect(cards).toHaveLength(2);
     const first = within(cards[0]);
     expect(first.getByRole("heading", { name: "Arc Table Lamp", level: 3 })).toBeInTheDocument();
-    expect(first.getByText("129.00")).toBeInTheDocument();
+    expect(first.getByText("$129.00")).toBeInTheDocument();
     expect(cards[0].textContent).toMatch(/No\. \d{4}/);
   });
 
   it("renders compact rows: a small stage and the price beside the name, not a full-width hero", () => {
     renderBrowse();
     const row = screen.getAllByRole("listitem")[1];
-    const price = within(row).getByText("68.00");
+    const price = within(row).getByText("$68.00");
 
     expect(price.className).toContain("font-mono");
     expect(price.closest("p")?.className).not.toContain("absolute");

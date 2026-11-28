@@ -61,7 +61,7 @@ test.describe("First Order journey in a real browser", () => {
     await drawerQuantity.fill("3");
     await drawerQuantity.press("Enter");
     await expect(page.getByText("Cart updated.")).toBeVisible();
-    await expect(cartDialog.locator("dd")).toHaveText("37.50");
+    await expect(cartDialog.locator("dd")).toHaveText("$37.50");
 
     // Checkout: heading focus, explicit approve outcome, transactional click.
     await cartDialog.getByRole("button", { name: "Checkout" }).click();
@@ -95,7 +95,7 @@ test.describe("First Order journey in a real browser", () => {
       lineSubtotal: 37.5
     });
     await expect(page.getByText(`${product.name} × 3`)).toBeVisible();
-    await expect(page.locator("#payment-result dd")).toHaveText("37.50");
+    await expect(page.locator("#payment-result dd")).toHaveText("$37.50");
 
     // Reload recovers the approved attempt through reads only.
     await page.reload();
@@ -103,7 +103,7 @@ test.describe("First Order journey in a real browser", () => {
       page.getByRole("heading", { name: "Simulated payment approved", level: 1 })
     ).toBeVisible();
     await expect(page.getByText(`${product.name} × 3`)).toBeVisible();
-    await expect(page.locator("#payment-result dd")).toHaveText("37.50");
+    await expect(page.locator("#payment-result dd")).toHaveText("$37.50");
     expect(tracker.paymentPosts()).toBe(1);
     expect(tracker.orderPosts()).toBe(0);
     expect((await fetchOrderByAttempt(request, attemptId)).status()).toBe(404);
@@ -123,8 +123,8 @@ test.describe("First Order journey in a real browser", () => {
         coldAttemptPage.getByRole("heading", { name: "Simulated payment approved", level: 1 })
       ).toBeVisible();
       await expect(coldAttemptPage.getByText(`${product.name} × 3`)).toBeVisible();
-      await expect(coldAttemptPage.getByText("12.50 each")).toBeVisible();
-      await expect(coldAttemptPage.locator("#payment-result dd")).toHaveText("37.50");
+      await expect(coldAttemptPage.getByText("$12.50 each")).toBeVisible();
+      await expect(coldAttemptPage.locator("#payment-result dd")).toHaveText("$37.50");
       const coldAttemptRecord = (await (await fetchPaymentAttempt(request, attemptId)).json()) as PaymentAttemptDto;
       expect(coldAttemptRecord).toEqual(capturedAttempt);
       expect(coldTracker.paymentPosts() + coldTracker.orderPosts()).toBe(0);
@@ -139,14 +139,14 @@ test.describe("First Order journey in a real browser", () => {
     await checkoutQuantity.fill("5");
     await checkoutQuantity.press("Enter");
     await expect(page.getByText("Cart updated.")).toBeVisible();
-    await expect(page.locator("#checkout dd")).toHaveText("62.50");
+    await expect(page.locator("#checkout dd")).toHaveText("$62.50");
 
     await page.goto(attemptUrl);
     await expect(
       page.getByRole("heading", { name: "Simulated payment approved", level: 1 })
     ).toBeVisible();
     await expect(page.getByText(`${product.name} × 3`)).toBeVisible();
-    await expect(page.locator("#payment-result dd")).toHaveText("37.50");
+    await expect(page.locator("#payment-result dd")).toHaveText("$37.50");
     const unchangedAttempt = (await (await fetchPaymentAttempt(request, attemptId)).json()) as PaymentAttemptDto;
     expect(unchangedAttempt).toEqual(capturedAttempt);
 
@@ -173,7 +173,7 @@ test.describe("First Order journey in a real browser", () => {
     expect(capturedOrder.cartRevision).toBe(capturedAttempt.cartRevision);
     expect(capturedOrder.total).toBe(37.5);
     expect(capturedOrder.items[0]).toMatchObject({ productId: product.id, quantity: 3, lineSubtotal: 37.5 });
-    await expect(page.getByText("Order total: 37.50")).toBeVisible();
+    await expect(page.getByText("Order total: $37.50")).toBeVisible();
 
     const orderById = await fetchOrderById(request, orderId);
     expect(orderById.status()).toBe(200);
@@ -199,15 +199,15 @@ test.describe("First Order journey in a real browser", () => {
     await expect(page.getByRole("heading", { name: "Order created", level: 1 })).toBeVisible();
     await expect(page.getByLabel(`Order number ${orderNumber}`)).toBeVisible();
     await expect(page.getByText(product.name)).toBeVisible();
-    await expect(page.getByText("× 3 · 12.50 each")).toBeVisible();
-    await expect(page.getByText("Order total: 37.50")).toBeVisible();
+    await expect(page.getByText("× 3 · $12.50 each")).toBeVisible();
+    await expect(page.getByText("Order total: $37.50")).toBeVisible();
     expect((await (await fetchOrderByAttempt(request, attemptId)).json()) as OrderDto).toEqual(capturedOrder);
     expect((await (await fetchOrderById(request, orderId)).json()) as OrderDto).toEqual(capturedOrder);
 
     await page.reload();
     await expect(page.getByRole("heading", { name: "Order created", level: 1 })).toBeVisible();
     await expect(page.getByLabel(`Order number ${orderNumber}`)).toBeVisible();
-    await expect(page.getByText("Order total: 37.50")).toBeVisible();
+    await expect(page.getByText("Order total: $37.50")).toBeVisible();
     expect((await (await fetchOrderByAttempt(request, attemptId)).json()) as OrderDto).toEqual(capturedOrder);
 
     const coldOrderContext = await browser.newContext({ storageState: authStatePath });
@@ -217,8 +217,8 @@ test.describe("First Order journey in a real browser", () => {
       await coldOrderPage.goto(attemptUrl);
       await expect(coldOrderPage.getByRole("heading", { name: "Order created", level: 1 })).toBeVisible();
       await expect(coldOrderPage.getByLabel(`Order number ${orderNumber}`)).toBeVisible();
-      await expect(coldOrderPage.getByText("× 3 · 12.50 each")).toBeVisible();
-      await expect(coldOrderPage.getByText("Order total: 37.50")).toBeVisible();
+      await expect(coldOrderPage.getByText("× 3 · $12.50 each")).toBeVisible();
+      await expect(coldOrderPage.getByText("Order total: $37.50")).toBeVisible();
       expect((await (await fetchOrderByAttempt(request, attemptId)).json()) as OrderDto).toEqual(capturedOrder);
       expect(coldOrderTracker.paymentPosts() + coldOrderTracker.orderPosts()).toBe(0);
     } finally {
@@ -228,10 +228,10 @@ test.describe("First Order journey in a real browser", () => {
     // Back/Forward history traversal stays read-only and keeps the frozen data.
     await page.goBack();
     await expect(page.getByRole("heading", { name: "Checkout", level: 1 })).toBeVisible();
-    await expect(page.locator("#checkout dd")).toHaveText("87.50");
+    await expect(page.locator("#checkout dd")).toHaveText("$87.50");
     await page.goForward();
     await expect(page.getByRole("heading", { name: "Order created", level: 1 })).toBeVisible();
-    await expect(page.getByText("Order total: 37.50")).toBeVisible();
+    await expect(page.getByText("Order total: $37.50")).toBeVisible();
     expect((await (await fetchOrderByAttempt(request, attemptId)).json()) as OrderDto).toEqual(capturedOrder);
 
     expect(tracker.paymentPosts(), "exactly one browser payment POST across the journey").toBe(1);
@@ -299,8 +299,8 @@ test.describe("First Order journey in a real browser", () => {
       await expect(
         coldPage.getByRole("heading", { name: "Simulated payment declined", level: 1 })
       ).toBeVisible();
-      await expect(coldPage.getByText("8.25 each")).toBeVisible();
-      await expect(coldPage.locator("#payment-result dd")).toHaveText("8.25");
+      await expect(coldPage.getByText("$8.25 each")).toBeVisible();
+      await expect(coldPage.locator("#payment-result dd")).toHaveText("$8.25");
       await expect(coldPage.getByRole("button", { name: "Create Order" })).toHaveCount(0);
       expect((await (await fetchPaymentAttempt(request, attemptId)).json()) as PaymentAttemptDto).toEqual(capturedDeclinedAttempt);
       expect(coldTracker.paymentPosts() + coldTracker.orderPosts()).toBe(0);

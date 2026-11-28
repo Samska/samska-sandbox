@@ -103,7 +103,7 @@ test.describe("Bench identity in a real browser", () => {
 
     await expect(card).toBeVisible();
     await expect(card).toContainText(/No\. \d{4}/);
-    await expect(card.getByText("42.00")).toBeVisible();
+    await expect(card.getByText("$42.00")).toBeVisible();
 
     const button = card.getByRole("button", { name: `Add ${product.name} to Cart` });
     const style = await button.evaluate((node) => {

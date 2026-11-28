@@ -43,9 +43,9 @@ describe("PaymentResult", () => {
     expect(heading).toHaveFocus();
     expect(screen.getByRole("heading", { name: "Captured items", level: 2 })).toBeInTheDocument();
     expect(screen.getByText("Canvas Tote × 2")).toBeInTheDocument();
-    expect(screen.getByText("25.00")).toBeInTheDocument();
+    expect(screen.getByText("$25.00")).toBeInTheDocument();
     expect(screen.getByText("Pour-Over Set × 1")).toBeInTheDocument();
-    expect(screen.getByText("Captured total").parentElement).toHaveTextContent("93.50");
+    expect(screen.getByText("Captured total").parentElement).toHaveTextContent("$93.50");
     expect(screen.getByText(/No real payment was made/i)).toBeInTheDocument();
     expect(screen.getByText(/No Order has been created/i)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Try again with the current Cart" })).not.toBeInTheDocument();

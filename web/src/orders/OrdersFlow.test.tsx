@@ -81,7 +81,7 @@ describe("Order history", () => {
     expect(rows).toHaveLength(2);
     expect(within(rows[0]).getByText("SK-000128")).toBeInTheDocument();
     expect(within(rows[0]).getByText("Packed")).toBeInTheDocument();
-    expect(within(rows[0]).getByText("312.50")).toBeInTheDocument();
+    expect(within(rows[0]).getByText("$312.50")).toBeInTheDocument();
     expect(within(rows[1]).getByText("Delivered")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Track order SK-000128" })).toHaveAttribute("href", `/orders/${orderId}`);
     expect(within(screen.getByRole("navigation", { name: "Primary" })).getByRole("link", { name: "Orders" })).toHaveAttribute(

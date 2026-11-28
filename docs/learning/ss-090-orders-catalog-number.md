@@ -1,9 +1,9 @@
-# SS-088: Compact Market List And A Human Order Number
+# SS-090: Compact Market List And A Human Order Number
 
 - Status: Active
 - Work date: 2026-11-28
 - Last reviewed: 2026-11-28
-- Work item: SS-088 (see the Issue linked from the pull request); design in [SS-085 (#168)](https://github.com/Samska/samska-sandbox/issues/168)
+- Work item: [SS-090 (#176)](https://github.com/Samska/samska-sandbox/issues/176); design in [SS-085 (#168)](https://github.com/Samska/samska-sandbox/issues/168)
 - Pull request: See the Issue
 - ADRs: None
 - Canonical documentation: [Design](../design/samska-store/README.md), [Architecture](../ARCHITECTURE.md)
