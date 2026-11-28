@@ -54,15 +54,12 @@ describe("ProductBrowse (Bench catalog)", () => {
     expect(cards[0].textContent).toMatch(/No\. \d{4}/);
   });
 
-  it("renders compact rows: a small stage and the price beside the name, not a full-width hero", () => {
+  it("keeps the price inside the object stage, not as a separate row", () => {
     renderBrowse();
-    const row = screen.getAllByRole("listitem")[1];
-    const price = within(row).getByText("$68.00");
+    const price = screen.getByText("$68.00");
 
-    expect(price.className).toContain("font-mono");
-    expect(price.closest("p")?.className).not.toContain("absolute");
-    expect(row.className).toContain("grid-cols-[5.5rem_minmax(0,1fr)]");
-    expect(row.querySelector(".aspect-square")).toBeNull();
+    expect(price.closest("p")?.className).toContain("rounded-full");
+    expect(price.closest("p")?.className).toContain("absolute");
   });
 
   it("keeps the accessible names tests and screen readers rely on", () => {

@@ -54,7 +54,7 @@ Status: **Implemented for owner local validation (2026-11-27). The owner approve
 Status: **Owner-approved (2026-11-28, project thread: "Eu aprovo"). Applied in SS-090. Design only until built.**
 
 - Source of truth: [prototypes/catalog-orders.html](prototypes/catalog-orders.html), same Bench tokens as `bench.html`. A bar at the top switches screen and theme; checked at 390 and 1280 px in light and dark with no horizontal overflow.
-- Market list: compact horizontal object rows (88 px stage, name, price, stock tag, one line of description, Details and Add to cart) instead of full-width cards.
+- Market list: compact horizontal object rows (88 px stage, name, price, stock tag, one line of description, Details and Add to cart) instead of full-width cards. **Owner correction (2026-11-28): this compact row is for the Admin product list only; the Market keeps its original large cards.** The prototype still shows it on the Market screen.
 - Payment-resume notice: replaces the "View latest journey / Forget latest reference" box. It shows only while the last payment attempt is unfinished, with "Resume payment" and "Dismiss"; it is hidden once the attempt finished.
 - Orders: slips on mobile, aligned one-line rows from 768 px; no table and no horizontal scroll.
 - Order created and Order number: the customer sees a sequential number such as `SK-000128` with a Copy button instead of a UUID. Recommended storage: keep the UUID as the primary key and in URLs, add a unique `order_number` column filled from a database sequence (Flyway migration, back-filled in creation order), and render it with a prefix and six digits.
