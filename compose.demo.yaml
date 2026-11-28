@@ -1,0 +1,76 @@
+name: samska-demo
+
+# Hosted-demo stack: Caddy (TLS), web, backend (prod profile) and PostgreSQL. Only Caddy publishes ports.
+# Copy .env.demo.example to .env.demo, fill the values, then:
+#   docker compose --env-file .env.demo -f compose.demo.yaml up --build -d
+services:
+  postgres:
+    image: postgres:18-trixie
+    environment:
+      POSTGRES_DB: samska
+      POSTGRES_USER: samska_demo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
+    volumes:
+      - demo-postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -p 5432 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: backend
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/samska?connectTimeout=5&socketTimeout=10&loginTimeout=5
+      SPRING_DATASOURCE_USERNAME: samska_demo
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?}
+      SAMSKA_ADMIN_EMAIL: ${SAMSKA_ADMIN_EMAIL:?}
+      SAMSKA_ADMIN_PASSWORD: ${SAMSKA_ADMIN_PASSWORD:?}
+      SAMSKA_DEMO_ENABLED: ${SAMSKA_DEMO_ENABLED:-false}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/8080 && printf \"GET /actuator/health HTTP/1.0\\r\\n\\r\\n\" >&3 && grep -q UP <&3'"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+  web:
+    build:
+      context: web
+    environment:
+      # Caddy is the gate here (private mode lives in the Caddyfile), so nginx does not ask for a password.
+      WEB_ACCESS: none
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    environment:
+      DEMO_DOMAIN: ${DEMO_DOMAIN:?}
+      DEMO_ACCESS_USER: ${DEMO_ACCESS_USER:-visitor}
+      DEMO_ACCESS_HASH: ${DEMO_ACCESS_HASH:-}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile.${DEMO_ACCESS:-private}:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      - web
+    restart: unless-stopped
+
+volumes:
+  demo-postgres-data:
+  caddy-data:
+  caddy-config:

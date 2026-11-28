@@ -25,8 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class OrderPersistenceRestartTest {
 
-    private static final UUID ATTEMPT = UUID.fromString("aaaaaaaa-1111-1111-1111-111111111111");
-    private static final UUID UNORDERED_ATTEMPT = UUID.fromString("bbbbbbbb-2222-2222-2222-222222222222");
+    private static final UUID REQUEST = UUID.fromString("aaaaaaaa-1111-1111-1111-111111111111");
+    private static final UUID LATE_REQUEST = UUID.fromString("bbbbbbbb-2222-2222-2222-222222222222");
     private static final long CART_REVISION = 2;
     private static final String TOTAL = "49.75";
     private static final HttpClient HTTP = HttpClient.newBuilder()
@@ -41,9 +41,9 @@ class OrderPersistenceRestartTest {
         String created;
 
         try (var first = startApplication()) {
-            first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE order_items, orders");
+            first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE order_items, order_status_events, orders");
             first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE cart_items, cart CASCADE");
-            first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE payment_attempt_items, payment_attempts");
+            first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE product_media, products CASCADE");
             var base = baseUri(first);
 
             firstProductId = id(post(base, "/api/products", productBody("Canvas Tote", "12.50"), 201));
@@ -52,48 +52,39 @@ class OrderPersistenceRestartTest {
             assertThat(addToCart(base, firstProductId, 2)).isEqualTo(1);
             assertThat(addToCart(base, secondProductId, 3)).isEqualTo(CART_REVISION);
 
-            post(base, "/api/payment-attempts", attemptBody(ATTEMPT, CART_REVISION, "approve"), 201);
-
-            created = post(base, "/api/orders", orderBody(ATTEMPT), 201);
+            created = post(base, "/api/orders", orderBody(REQUEST, CART_REVISION), 201);
             orderId = read(created, "$.orderId");
             assertOrder(created, orderId, firstProductId, secondProductId);
 
-            // Bump the revision so the second attempt is approved and deliberately left unordered.
-            assertThat(addToCart(base, firstProductId, 1)).isEqualTo(CART_REVISION + 1);
-            post(base, "/api/payment-attempts", attemptBody(UNORDERED_ATTEMPT, CART_REVISION + 1, "approve"), 201);
+            // Placing the Order emptied the Cart (one more revision); refill it and leave it unordered.
+            assertThat(addToCart(base, firstProductId, 1)).isEqualTo(CART_REVISION + 2);
         }
 
         try (var second = startApplication()) {
             var base = baseUri(second);
 
-            // Products are process-local and now gone; the Order must not depend on the stored Payment attempt.
+            // The Order must not depend on live Product data.
             var byId = get(base, "/api/orders/" + orderId, 200);
-            var byAttempt = get(base, "/api/orders/payment-attempts/" + ATTEMPT, 200);
-            assertThat(byAttempt).isEqualTo(byId);
             assertOrder(byId, orderId, firstProductId, secondProductId);
 
             // Replay is served from the stored Order, so it returns 200 and inserts nothing.
-            var replay = post(base, "/api/orders", orderBody(ATTEMPT), 200);
+            var replay = post(base, "/api/orders", orderBody(REQUEST, CART_REVISION), 200);
             assertThat(read(replay, "$.orderId")).isEqualTo(orderId);
             assertOrder(replay, orderId, firstProductId, secondProductId);
 
-            // This attempt was approved before restart but never ordered: it has no Order yet. Payment
-            // attempts are durable, so it can still be ordered after the restart.
-            get(base, "/api/orders/payment-attempts/" + UNORDERED_ATTEMPT, 404);
-            var late = post(base, "/api/orders", orderBody(UNORDERED_ATTEMPT), 201);
-            assertThat(read(late, "$.paymentAttemptId")).isEqualTo(UNORDERED_ATTEMPT.toString());
+            // The Cart was refilled before the restart and is durable, so it can still be ordered afterwards.
+            var late = post(base, "/api/orders", orderBody(LATE_REQUEST, CART_REVISION + 2), 201);
             assertThat(read(late, "$.orderId")).isNotEqualTo(orderId);
 
             var jdbc = second.getBean(JdbcTemplate.class);
             assertThat(jdbc.queryForObject("SELECT count(*) FROM orders", Long.class)).isEqualTo(2);
-            assertThat(jdbc.queryForObject("SELECT count(*) FROM order_items", Long.class)).isEqualTo(4);
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM order_items", Long.class)).isEqualTo(3);
         }
     }
 
     private static void assertOrder(
             String body, String orderId, String firstProductId, String secondProductId) {
         assertThat(read(body, "$.orderId")).isEqualTo(orderId);
-        assertThat(read(body, "$.paymentAttemptId")).isEqualTo(ATTEMPT.toString());
         assertThat(((Number) JsonPath.read(body, "$.cartRevision")).longValue()).isEqualTo(CART_REVISION);
         assertDecimal(JsonPath.read(body, "$.total"), TOTAL);
 
@@ -135,13 +126,8 @@ class OrderPersistenceRestartTest {
         return "{\"name\":\"" + name + "\",\"description\":\"Synthetic test product\",\"price\":" + price + "}";
     }
 
-    private static String attemptBody(UUID attemptId, long cartRevision, String scenario) {
-        return "{\"attemptId\":\"" + attemptId + "\",\"cartRevision\":" + cartRevision
-                + ",\"scenario\":\"" + scenario + "\"}";
-    }
-
-    private static String orderBody(UUID attemptId) {
-        return "{\"paymentAttemptId\":\"" + attemptId + "\"}";
+    private static String orderBody(UUID requestId, long cartRevision) {
+        return "{\"requestId\":\"" + requestId + "\",\"cartRevision\":" + cartRevision + "}";
     }
 
     private static String post(URI base, String path, String body, int expectedStatus) throws Exception {

@@ -1,258 +1,156 @@
-# Samska Sandbox
+# Samska Store
 
+[![CI](https://github.com/Samska/samska-sandbox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Samska/samska-sandbox/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 
-Samska Sandbox is a public engineering sandbox for practicing software
-architecture, quality, security, delivery, and operational engineering through
-a fictional commerce domain. It is non-commercial, and the source code is
-licensed under the [Apache License 2.0](LICENSE).
+A personal storefront built end to end as an engineering practice project:
+a React and TypeScript web app over a Spring Boot modular monolith with
+PostgreSQL, a designed visual identity, automated tests at every layer, and a
+containerized deployment on Railway.
 
-## Current Milestone
+**Live:** <https://store.samska.dev>
 
-- **Latest release:** [`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0) (published 2026-10-15)
-- **Current stage:** `v0.1.0` released; SS-038, SS-044, SS-045, SS-046, SS-049, SS-051, SS-052, SS-053, SS-054, and SS-055 are complete and merged. Candidate 03 and SS-053 Batch 1 were owner-approved in Penpot for the reviewed catalog, current-interface shell, and Market; SS-054 Batch 2 received qualified first-version visual acceptance and was completed through Issue #104 and PR #105; SS-055 Batch 3 received owner-reported visual acceptance “Parece ok” and was completed through Issue #106 and PR #107. SS-056 Batch 4 (Order, Admin, and fallbacks) is owner-reported visually approved at its named version with the exact answer “Eu aprovo” (2026-10-29); the seven-file documentation is approved and commit/push is authorized. After successful push, the separate PR creation decision is the next gate. The accepted designs contain provisional illustrations, and the production UI is not rebranded.
-- **Next planned work:** separate PR creation decision after the authorized SS-056 commit/push. Merge, application/browser Human Verification, and production adoption remain separate future decisions; the next product capability remains unselected.
+Visitors can browse the catalog and open any product. The store has a single
+user, its owner, who signs in to shop and to run the Admin area. There is no
+sign-up, every Order is approved at checkout, and nothing is charged. All data
+is synthetic.
 
-[View the live Samska Sandbox Project](https://github.com/users/Samska/projects/1)
+The repository is called `samska-sandbox` because it is also a place to
+practice software architecture, quality, security, delivery, and operations
+with documented decisions. The source is licensed under the
+[Apache License 2.0](LICENSE) and is non-commercial.
 
-The product release exists: `v0.1.0 — First Order` is published from commit
-`23cebe2e08912d22f7364ad9f20198f9c92d2241` as a source-only release with
-GitHub-generated source archives and no additional assets. See the
-[v0.1.0 release notes](docs/releases/v0.1.0.md) and
-[Releasing](docs/RELEASING.md). The backend's `0.1.0-SNAPSHOT` and the private
-frontend package's `0.1.0` are build metadata, not the product release version.
+## Screenshots
 
-## Purpose And Scope
+| Desktop, light | Desktop, dark |
+| --- | --- |
+| ![Market on desktop in light mode](docs/images/market-desktop-light.png) | ![Market on desktop in dark mode](docs/images/market-desktop-dark.png) |
 
-Samska Sandbox uses a fictional catalog and order journey to demonstrate
-evidence-driven engineering. The current application contains a Java/Spring
-Boot backend, a React/TypeScript frontend, a Catalog boundary for Products with
-bounded local media upload, a Cart boundary persisted in PostgreSQL, an editable Checkout
-view over the current Cart with a simulated payment flow, and a separate Admin
-Product-management surface. Order is a separate boundary that copies approved
-simulated-payment data on an explicit action and persists the immutable Order in
-PostgreSQL; it does not change the Cart. The journey is attempt-addressed:
-`/checkout` hosts the editable Cart and `/checkout/attempts/{attemptId}` recovers
-the simulated payment result or Order confirmation through lookup APIs after a
-full-page reload, direct entry, or history navigation, without a router
-dependency. Orders, the Cart, and Payment attempts survive a backend restart; Products and
-media remain process-local.
-
-AI agents are implementation tools operating under repository-defined
-governance. Humans own requirements, architecture, decisions, review,
-validation, learning, and risk.
-
-## Current Capabilities
-
-| Capability | Status | Current boundary |
+| Product detail | Mobile, light | Mobile, dark with the Cart open |
 | --- | --- | --- |
-| Product domain model | Implemented | Framework-independent Catalog rules and identity. |
-| Catalog API | Implemented | Product creation, collection browsing, retrieval by identity, full update, and deletion with a `409` Cart conflict refusal. |
-| Market UI | Implemented | Product-oriented browsing, detail view, Cart selection, and the customer storefront shell at `/`. |
-| Product Discovery | Implemented | Product descriptions with a selectable detail view, local product media with a monogram fallback, Add to Cart, and a return to browsing. |
-| Shopping Cart | Implemented | Cart contents, quantity changes, removal, and server-calculated totals; the single current Cart and its revision are persisted in PostgreSQL and survive restart. |
-| Product UX Foundation | Implemented | Commerce-oriented shell, responsive Product browsing, integrated Cart presentation, and accessible feedback. |
-| Product Storefront UX/UI | Implemented | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged. |
-| Market Product-name search | Implemented | Case- and accent-insensitive substring filter on `Product.name` in the Market; term is held in `Catalog` while mounted, never written to the URL/history/storage/logs, and never sent to the API (`GET /api/products` is unchanged); Admin keeps its accent-sensitive filter by decision. |
-| Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource or identity exists; payment initiation captures the immutable revision-checked snapshot. |
-| Payment Simulator | Implemented | An explicit local-demo outcome over a revision-checked immutable Cart snapshot; Payment owns identified attempts with UUID replay, GET reconciliation, one approval per unchanged Cart revision, persisted in PostgreSQL with no attempt cap. Approval alone creates no Order or real payment; attempts are lost on restart. |
-| Order creation | Implemented | Explicit creation from an approved attempt; immutable copied lines and total persisted with the Order in PostgreSQL; same-attempt replay and GET reconciliation survive restart; the former 32-Order process-local cap is removed. |
-| First Order journey | Implemented | Attempt-addressed `/checkout` and `/checkout/attempts/{attemptId}` surfaces recover the simulated payment result or Order confirmation through lookup APIs after reload, direct entry, and history; route reads are GET-only with pending-operation and stale-response guards; a recovered result does not require the live Cart, the live Cart is never cleared, and one `sessionStorage` reference is only a discovery hint. |
-| Admin Catalog Management | Implemented | Compact management list at `/admin/products` with case-insensitive name search, thumbnails, Edit links, and delete confirmation; dedicated `/admin/products/new` and `/admin/products/{id}/edit` forms with staged image selection; Admin paths are navigation only, not access control. |
-| Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in bounded backend process memory; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
-| Backend and frontend automated tests | Implemented | Unit, component, type-check, and build verification. |
-| Structured CI test reporting | Implemented | Named backend/frontend Check Runs, summaries, annotations, and XML artifacts. |
-| Automated browser E2E | Implemented | Two Chromium Playwright tests against the real frontend, Vite proxy, and a fresh exclusively owned backend: First Order success with reload/direct-entry recovery, frozen data, explicit Order creation, and keyboard/focus checks, plus a declined outcome without an Order path; serialized execution, synthetic fixtures through existing APIs, diagnostics on failure. |
-| PostgreSQL | Implemented for Orders | Required local Compose runtime with JDBC, Flyway migration, and database health; persists Orders and items only. |
-| Deployment | Planned | No deployment exists; interactive browser checks and real-browser accessibility remain Human Verification concerns. |
+| ![Product detail on desktop](docs/images/product-desktop-light.png) | ![Market on a phone in light mode](docs/images/market-mobile-light.png) | ![Cart drawer on a phone in dark mode](docs/images/cart-mobile-dark.png) |
+
+_Captured from the real web app with example catalog data._
+
+## What It Does
+
+- **Market.** Browse a fixed example catalog of 18 products with original
+  "Bench" illustrations, search by name, open a product, and see stock states
+  such as "2 left" and "Sold out".
+- **Cart and Checkout.** A Cart drawer and an editable Checkout with a single
+  "Place order" step. A repeated request returns the same Order, so a retry
+  after an unconfirmed response never places two.
+- **Orders.** Order history and tracking. The owner sets each Order's status
+  by hand in Admin.
+- **Admin.** A separate area for products (create, edit, delete, image upload,
+  stock) and orders, plus an Operations screen with request metrics.
+- **Light and dark.** An Auto, Light and Dark theme switch, responsive from
+  390 px up, with keyboard and focus handling covered by tests.
+
+## Tech Stack
+
+| Area | Technology |
+| --- | --- |
+| Backend | Java 25, Spring Boot 4.1, Maven Wrapper, JDBC, Flyway |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS v4 (no router or state library) |
+| Database | PostgreSQL 18 |
+| Testing | JUnit, Spring MockMvc, Testcontainers, Vitest, React Testing Library, Playwright (Chromium) |
+| Delivery | Docker images, nginx, Railway, GitHub Actions |
+| Security | CodeQL, GitGuardian, secret scanning, rate limiting, security headers, CSRF protection |
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    User[User / browser] --> UI[React / TypeScript<br/>Market, Admin, Cart,<br/>Checkout, Payment, and Order UI]
-    UI --> Adapter[Feature API adapters]
-    Adapter --> Proxy[Vite development<br/>/api proxy]
-    Proxy --> HTTP[Spring Boot<br/>Catalog, Cart, Payment,<br/>and Order HTTP APIs]
-    HTTP --> App[Catalog, Cart, Payment, and Order<br/>applications plus Product/Cart<br/>deletion coordination]
-    App --> Domain[Product domain]
-    App --> Store[ProductStore boundary]
-    Store --> Memory[InMemoryProductStore<br/>process-local<br/>Product + uploaded media]
-    App --> Cart[Cart aggregate]
-    Cart --> CartMemory[InMemoryCartStore<br/>single current Cart]
-    App --> Payment[Payment application<br/>revision-checked snapshots,<br/>replay, and approvals]
-    Payment --> Cart
-    App --> Order[Order application<br/>immutable records and<br/>attempt replay]
-    Order --> Payment
-    Order --> Jdbc[JdbcOrderStore<br/>transactional write and replay]
-    Jdbc --> Postgres[(PostgreSQL<br/>Flyway-managed orders and items)]
-```
-
-The Vite proxy is for local development only. Product data, including
-uploaded Product media, is held in process memory and is lost when the backend
-restarts. The current Cart is stored in PostgreSQL; a Cart line keeps its own
-name and price snapshot, so it outlives a Product that was lost on restart. Uploaded media is validated, dimension-checked, and re-encoded as JPEG
-before storage, is limited to one image per Product, and is served only for the
-Product's current media ID; rejection leaves the Product and its current image
-unchanged. Checkout is a frontend
-review of the current Cart; payment initiation captures an immutable,
-revision-checked Cart snapshot owned by the Payment attempt store, persisted in
-PostgreSQL, which replays identical submissions by attempt ID. Approval alone creates no Order; an explicit action copies the
-approved frozen attempt into an immutable Order persisted with its items in
-PostgreSQL. The First Order journey is attempt-addressed: after a reload or
-direct entry, the attempt URL resolves the Payment result or Order through
-read-only lookups, never by resending a request, and a result cannot be
-confirmed by only a missing record. A saved attempt URL still recovers a stored
-Order after the backend restarts, even though the source Payment attempt is
-gone. No real payment, credentials, or provider is involved. The Admin surface
-is a separate frontend route over the same Catalog API, and `/admin/products`
-provides no access control. Product deletion is refused with `409` while the
-Product is in the current Cart through a process-local coordination lock that
-covers the HTTP add-to-Cart and delete-Product paths. PostgreSQL is required for
-backend startup and stores Orders, items, the current Cart, and Payment attempts; Products and media
-remain process-local.
-
-## Engineering Practices
-
-- Modular-monolith backend direction with explicit business boundaries.
-- Short-lived branches, focused pull requests, and squash-only merges.
-- Risk-based backend, frontend, repository, and security verification.
-- Independent CI jobs with structured test-result publication.
-- Immutable GitHub Action pins and least-privilege workflow permissions.
-- CodeQL and GitGuardian checks remain separate from application CI.
-- ADRs record significant, durable architecture decisions.
-- Agent, human, and CI verification evidence remain distinct.
-
-## CI And Security
+The backend is a modular monolith: one deployable with explicit business
+boundaries ([ADR 0001](docs/adr/0001-adopt-modular-monolith.md)).
 
 ```mermaid
 flowchart LR
-    PR[Pull Request] --> CI[CI workflow]
-    CI --> Repo[Repository validation]
-    CI --> Backend[Backend build / test / reporting]
-    CI --> Frontend[Frontend typecheck / test / build / reporting]
-    CI --> E2E[Browser E2E / Playwright Chromium]
-    PR --> CodeQL[CodeQL]
-    PR --> GG[GitGuardian Security Checks]
+    Browser[Browser] --> Web[nginx<br/>static React app,<br/>CSP, /api proxy]
+    Web --> API[Spring Boot API]
+    subgraph Monolith[Backend modules]
+        Catalog[Catalog<br/>products and media]
+        Cart[Cart]
+        Order[Order<br/>immutable records,<br/>request replay]
+        Inventory[Inventory<br/>stock]
+        Shipping[Order status<br/>events and tracking]
+        Account[Account and security<br/>sessions, roles]
+        Ops[Operations<br/>metrics]
+    end
+    API --> Monolith
+    Monolith --> DB[(PostgreSQL<br/>Flyway migrations)]
 ```
 
-The `CI` workflow contains four independent jobs. The Browser E2E job starts its own backend and Vite servers, runs the two Playwright/Chromium journey tests, and uploads traces, screenshots, and reports only when the run fails. CodeQL is GitHub-managed
-and currently analyzes GitHub Actions, Java/Kotlin, and JavaScript/TypeScript.
-GitGuardian remains a separate secret-related check. Secret scanning and push
-protection are repository controls documented in [GitHub controls](docs/GITHUB.md).
+Key decisions, each with an ADR in [docs/adr](docs/adr/README.md):
 
-## Technology Overview
+- Orders copy the reviewed Cart snapshot, take stock and empty the Cart in one
+  transaction, and are idempotent by a client-generated request ID.
+- Sessions are server-side with CSRF protection; the Admin API requires the
+  administrator role on the server, not only in the interface.
+- The web image configures nginx at start-up from environment variables, so the
+  same image runs locally, on a VPS and on Railway
+  ([ADR 0020](docs/adr/0020-run-on-railway-with-environment-driven-web-image.md)).
 
-| Area | Current technology |
-| --- | --- |
-| Backend | Java 25, Spring Boot 4.1.1, Maven Wrapper |
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS v4 |
-| Testing | JUnit/Surefire, Spring MockMvc, Testcontainers PostgreSQL, Vitest, React Testing Library, Playwright (Chromium) |
-| Local infrastructure | PostgreSQL 18 via Docker Compose, required for the backend and Order persistence |
-| CI/CD | GitHub Actions, structured JUnit reporting, immutable Action pins |
-| Security | CodeQL, GitGuardian, GitHub secret protection controls |
-| AI-assisted engineering | Repository-governed coding agents with human ownership |
+More detail is in [Architecture](docs/ARCHITECTURE.md) and the
+[Threat Model](docs/THREAT-MODEL.md).
 
-Future technologies such as Redis, RabbitMQ, OpenTelemetry, Terraform, and
-deployment platforms are not current stack components.
+## Run Locally
 
-## Roadmap And Next Work
-
-The Product Storefront UX/UI refinement (SS-031) is complete and merged through
-PR #52. Checkout (SS-032) is implemented as an editable live view of the current
-Cart. Admin Catalog Management (SS-033) is complete and merged through PR #56.
-Product Media Upload (SS-034) is complete and merged through PR #58. Payment
-Simulator (SS-036) provides explicit simulated payment outcomes over a
-revision-checked immutable Cart snapshot owned by a bounded process-local attempt
-store. Order creation (SS-037) is implemented and merged through PR #67; the
-owner observed the main browser flow, while API replay, uncertain-response
-recovery, and accessibility checks remain unobserved for SS-037 itself. The
-First Order journey (SS-039) is complete and merged through PR #70: `/checkout`
-and attempt-addressed result surfaces recover approved snapshots and frozen
-Orders after reload, direct entry, and history with GET-only reconciliation,
-explicit abandonment, and no Cart clearing. The `v0.1.0` release is published
-(SS-040 preparation and SS-041 dependency remediation complete;
-[`v0.1.0 — First Order`](https://github.com/Samska/samska-sandbox/releases/tag/v0.1.0),
-2026-10-15). SS-042 — the minimal real-browser First Order regression suite
-using Playwright/Chromium — is complete and merged through PR #78 (squash
-`eb829cc`, merged 2026-10-15). SS-044 — Market Product-name search (#81) —
-is complete and merged through PR #82 (squash `8b32000`, merged 2026-10-15):
-a local, case- and accent-insensitive substring filter on `Product.name`;
-term lives in `Catalog` while mounted, never reaches the URL, history,
-storage, logs, or API; Admin keeps its accent-sensitive filter by decision.
-SS-045 (#84) introduced versioned agent role instructions under `docs/agents/`
-and merged through PR #85 (squash `54b9afc`, merged 2026-10-16). Those mandatory
-role requirements were superseded as active requirements on 2026-10-27; the
-historical files remain at commit `4ec11f8`, and the portable rules now live in
-`AGENTS.md` and AI Engineering Governance. SS-046 (#87) remains historical
-adoption evidence. SS-049 (#95) is complete and merged through PR #96:
-PostgreSQL persistence for Orders and items, with JDBC and Flyway, the Order
-capacity guard removed, and Products, media, Cart, and Payment attempts still
-process-local. SS-051 (#98) is complete and merged through PR #99 (squash
-`db9047b`, merged 2026-10-27): it removes the mandatory Orchestrator, role
-hierarchy, specialist catalogue, and Maestri adapter, and establishes a bounded
-engineering loop without changing application behavior. SS-052 (#100) is
-complete and merged through PR #101, and SS-053 (#102) is complete and merged
-through PR #103. Candidate 03 (`revn 32`) is owner-approved for the reviewed
-catalog at 1440 and 390, foundations, and components, with provisional
-illustrations. SS-053 Batch 1 extends that direction to the current-interface
-shell and functional Market and is owner-approved at `revn 52`. SS-054 Batch 2
-adds the Product detail and Cart drawer designs at `revn 78`, received qualified
-first-version visual acceptance, and was completed through Issue #104 and merged
-PR #105. SS-055 Batch 3 adds the Checkout and simulated Payment designs at
-`revn 96`, including the approved minimal payment-attempt recovery surface;
-received owner-reported visual acceptance “Parece ok”; and was completed through
-Issue #106 and merged PR #107. SS-056 Batch 4 adds the Order/recovery, Admin
-list/create/edit, and not-found/fallback designs at its named review version;
-the owner reported visual approval “Eu aprovo” (2026-10-29); the seven-file
-documentation is approved and commit/push is authorized. After successful push,
-the separate PR creation decision is the next gate. Future photographic assets
-and later screens remain subject to review. The production UI is not rebranded; application
-implementation and production adoption require separate authorization. The next
-product capability remains unselected and no identifier is reserved. The SS-038
-Human Verification pilot retained concise scenarios as an optional practice for
-relevant flows; its documentation-only PR #94 is merged and Issue #64 is closed;
-it is not part of SS-042. Authentication and authorization remain deferred until
-after the local MVP but are mandatory before any hosted environment;
-`/admin/products` is navigation and not an access-control boundary, and the
-simulated-payment endpoints are unauthenticated and local-only. Future
-capabilities receive an SS identifier only when their GitHub Issue is created;
-the roadmap does not reserve future identifiers.
-
-See the [roadmap](docs/ROADMAP.md) for product direction and the [live Project](https://github.com/users/Samska/projects/1)
-for execution state.
-
-## Local Development
-
-Install the repository's Java 25 and Node 24.20.0 prerequisites, start local
-PostgreSQL, and export its password, then install frontend dependencies and
-start the application:
+Requirements: Java 25, Node 24.20.0, and Docker for PostgreSQL.
 
 ```bash
 cp .env.example .env
 # set POSTGRES_PASSWORD in .env
 export POSTGRES_PASSWORD='the-same-disposable-value'
 docker compose up -d --wait
-cd web
-npm ci --ignore-scripts
-cd ..
+cd web && npm ci --ignore-scripts && cd ..
 ./scripts/dev.sh
 ```
 
-The launcher starts Spring Boot and Vite; PostgreSQL is required for backend
-startup and Order persistence. See [Local Development](docs/LOCAL-DEVELOPMENT.md)
-for setup, verification, troubleshooting, and shutdown.
+The launcher starts the backend on port 8080 and Vite on port 5173. See
+[Local Development](docs/LOCAL-DEVELOPMENT.md) for the owner account, sample
+products, troubleshooting and shutdown.
+
+## Tests And CI
+
+```bash
+cd backend && ./mvnw verify        # unit, API and PostgreSQL integration tests
+cd web && npm run typecheck && npm test
+cd web && npm run test:e2e         # Playwright, starts its own servers
+```
+
+Every pull request runs independent CI jobs (repository validation,
+container images, backend, frontend, and browser E2E) with structured test
+reports, next to CodeQL and GitGuardian. The strategy and what each layer does
+and does not prove are in [Testing](docs/TESTING.md).
+
+## Deployment
+
+The public site runs on Railway as three services built from this repository:
+`web` (nginx and the React app), `backend` and PostgreSQL. Only `web` is
+public; the backend is reachable over Railway's private network. The same
+images also run on a VPS with Docker Compose and Caddy. Steps, variables and
+the private-first mode are in [Deployment](docs/DEPLOYMENT.md).
 
 ## Documentation
 
-- [Product direction](docs/PRODUCT.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Testing strategy](docs/TESTING.md)
-- [Security engineering](docs/SECURITY.md)
-- [GitHub controls](docs/GITHUB.md)
-- [Releasing](docs/RELEASING.md)
-- [AI engineering governance](docs/AI-GOVERNANCE.md)
+- [Product](docs/PRODUCT.md), [Roadmap](docs/ROADMAP.md) and [release notes](docs/releases/v1.0.0.md)
+- [Architecture](docs/ARCHITECTURE.md) and [ADRs](docs/adr/README.md)
+- [Design system and prototypes](docs/design/samska-store/README.md)
+- [Testing](docs/TESTING.md), [Security](docs/SECURITY.md) and [Threat Model](docs/THREAT-MODEL.md)
+- [Local Development](docs/LOCAL-DEVELOPMENT.md), [Deployment](docs/DEPLOYMENT.md) and [Releasing](docs/RELEASING.md)
 - [Engineering Learning Journal](docs/learning/README.md)
-- [Architecture Decision Records](docs/adr/README.md)
-- [Contributing](CONTRIBUTING.md)
-- [Security reporting](SECURITY.md)
+- [Contributing](CONTRIBUTING.md) and [Security reporting](SECURITY.md)
+
+## How The Project Is Run
+
+Work is tracked as `SS-NNN` Issues in the
+[Samska Sandbox Project](https://github.com/users/Samska/projects/1) and lands
+through short-lived branches and squash-merged pull requests. Each pull
+request records what was verified by the author, by a human and by CI.
+Interface work starts from an owner-approved HTML prototype under
+[docs/design](docs/design/samska-store/README.md).
+
+AI coding agents are used as implementation tools under the repository rules in
+[AGENTS.md](AGENTS.md) and [AI Engineering Governance](docs/AI-GOVERNANCE.md).
+The owner decides scope, architecture and merges, and reviews every change.
+Project state at a glance: [PROJECT_HANDOFF.md](PROJECT_HANDOFF.md).

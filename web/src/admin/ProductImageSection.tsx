@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ProductResponse } from "../catalog/catalogApi";
 import ProductMedia from "../catalog/ProductMedia";
-import { curatedMediaSource } from "../catalog/mediaCatalog";
+import { hasCuratedMedia } from "../catalog/mediaCatalog";
 import Button from "../ui/Button";
 import FormField from "../ui/FormField";
 
@@ -181,7 +181,7 @@ function stateText({
   }
 
   if (product === null) {
-    return "No image yet. The Market shows the monogram fallback.";
+    return "No image yet. The Market shows a placeholder.";
   }
 
   if (product.uploadedMediaId !== null) {
@@ -189,20 +189,20 @@ function stateText({
   }
 
   if (product.mediaKey === null) {
-    return "No image yet. The Market shows the monogram fallback.";
+    return "No image yet. The Market shows a placeholder.";
   }
 
-  return curatedMediaSource(product.mediaKey) !== undefined
+  return hasCuratedMedia(product.mediaKey)
     ? `This is the current curated image "${product.mediaKey}".`
     : `Media key "${product.mediaKey}" has no matching local asset; the monogram is shown.`;
 }
 
 function removalFallback(product: ProductResponse): string {
   if (product.mediaKey === null) {
-    return "the monogram fallback";
+    return "a placeholder";
   }
 
-  return curatedMediaSource(product.mediaKey) !== undefined
+  return hasCuratedMedia(product.mediaKey)
     ? `the curated image "${product.mediaKey}"`
-    : `the monogram fallback because media key "${product.mediaKey}" has no matching local asset`;
+    : `a placeholder because media key "${product.mediaKey}" has no matching local asset`;
 }

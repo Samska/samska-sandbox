@@ -25,14 +25,9 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<OrderResponse> create(@RequestBody CreateOrderRequest request) {
-        var result = orders.create(request.paymentAttemptId());
+        var result = orders.create(request.requestId(), request.cartRevision());
         return ResponseEntity.status(result.created() ? HttpStatus.CREATED : HttpStatus.OK)
                 .body(OrderResponse.from(result.order()));
-    }
-
-    @GetMapping("/payment-attempts/{paymentAttemptId}")
-    public OrderResponse byAttempt(@PathVariable UUID paymentAttemptId) {
-        return OrderResponse.from(orders.getByPaymentAttemptId(paymentAttemptId));
     }
 
     @GetMapping("/{orderId}")

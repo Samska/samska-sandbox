@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import io.github.samska.sandbox.catalog.Product;
@@ -19,7 +20,9 @@ import io.github.samska.sandbox.catalog.application.ProductSnapshot;
 import io.github.samska.sandbox.catalog.application.ProductStore;
 import io.github.samska.sandbox.catalog.application.UploadedMedia;
 
+/** Process-local store used by the {@code no-database} test profile and pure unit tests. */
 @Component
+@Profile("no-database")
 public class InMemoryProductStore implements ProductStore {
 
     private final long maxTotalMediaBytes;

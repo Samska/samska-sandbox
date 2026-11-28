@@ -4,6 +4,126 @@ Compact, current-state handoff notes. Each entry records only confirmed state ch
 
 Update rule: this snapshot must be updated in the same change when project state, durable decisions, active work, or the next step changes. It must not be updated for routine per-Issue progress, transient branch or working-tree details, or every completed Issue; completed work stays condensed to durable outcomes, and superseded details are removed. It is a project snapshot, not a per-Issue work log or conversation archive.
 
+## SS-099 — Remove the simulated payment (#189, v1.0.0)
+
+- Build: Checkout has one "Place order" step and every Order is approved directly ([ADR 0021](docs/adr/0021-remove-the-simulated-payment.md)); `POST /api/orders` takes a `requestId` and the reviewed `cartRevision`; the Payment module, its tables, stock reservations, the "Payment not finished / Resume payment" notice and the attempt URLs are removed (migration `V11`); the Operations screen drops the approval rate; the footer no longer says data resets on restart.
+- State: takes effect when `backend` and `web` redeploy from `release/1.0`; the migration drops the Payment data.
+
+## SS-094 — Remove the demo reset (#191, v1.0.0)
+
+- Build: the reset endpoint, scheduled reset, session registry and the Operations control are gone (the application can no longer erase Orders, accounts or stock); footer text corrected; every web response carries HSTS. Found in the second pre-1.0 review.
+- State: remove `SAMSKA_DEMO_RESET_CRON` from Railway; the variable is no longer read, but until this ships the old service would still reset.
+
+## SS-098 — Fixed example catalog (#197, v1.0.0)
+
+- Build: 18 sample Products with owner-approved Bench illustrations (`art-*` keys, inline SVG); with `SAMSKA_DEMO_SEED_PRODUCTS=true` the backend adds the missing samples by name at start-up and never changes existing Products. The README no longer says the demo data resets daily.
+
+## SS-097 — Administrator sets Order status (#196, v1.0.0)
+
+- Build: the administrator sets each Order's status (Placed, Packed, Shipped, Delivered, Cancelled) from a new Admin Orders screen; each change is a row in `order_status_events` (`V12`), customers see the real timeline, and cancelling returns the stock. The simulated courier and `samska.shipping.*` are removed ([ADR 0022](docs/adr/0022-administrator-sets-order-status.md), supersedes ADR 0014). Design approved by the owner on 2026-11-28 (`docs/design/samska-store/prototypes/admin-orders.html`).
+- Next step: merge into `release/1.0` when CI is green.
+
+## SS-088 — Self-hosted fonts, favicon and metadata (#174, v1.0.0)
+
+- Build: Archivo and IBM Plex Mono are served from `/fonts/` (the production CSP blocked the Google Fonts stylesheet, so the hosted site used fallback fonts); favicon, description and Open Graph text added; `deploy/verify-web-config.sh` checks font serving. Found in the pre-1.0 review.
+- State: takes effect when `web` redeploys from `release/1.0`.
+
+## SS-087 — Currency symbol (#172, v1.0.0)
+
+- Build: every price shows `$` through the shared `formatAmount`; the design README records that this supersedes the "no currency symbol" assumption. Found in the pre-1.0 review.
+
+## SS-086 — Empty the Cart on Order (#170, v1.0.0)
+
+- Build: a newly created Order empties the account's Cart (replays do not); the web refreshes the Cart after creation; ADR 0007's "never clears the Cart" is superseded. Found in the pre-1.0 review.
+
+## SS-084 — Illustrations for the sample Products (#165, v1.0.0)
+
+- Build: six owner-approved Bench illustrations ([prototype](docs/design/samska-store/prototypes/product-art.html)) rendered inline from `art-*` media keys; the sample seed uses them and moves earlier, unedited samples to them at start-up. The three old photos stay available as media keys.
+
+## SS-081 — Sample Products for the hosted demo (#158, v1.0.0)
+
+- Build: `SAMSKA_DEMO_SEED_PRODUCTS=true` creates six synthetic Products when the catalog is empty; the demo reset keeps Products, so they survive the daily reset (test included).
+- State: set the variable (and `SAMSKA_DEMO_RESET_CRON`) on the Railway `backend` after merge.
+
+## SS-080 — Web resolver fix for Railway (#156, v1.0.0)
+
+- Build: the first Railway deployment answered `502` on `/api` because nginx used Docker's `127.0.0.11` resolver; the web image now sets `NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1` so it uses the container's DNS server; `deploy/verify-web-config.sh` checks it.
+- State: takes effect when `web` redeploys from `release/1.0`.
+
+## SS-079 — Backend image fix and image builds in CI (#154, v1.0.0)
+
+- Build: the backend image installs `unzip` (the Maven wrapper failed its checksum without it) and sets `mvnw` executable; CI builds both images; first-deployment notes added to [Deployment](docs/DEPLOYMENT.md).
+- State: the Railway `web` service is up in private mode; the backend deploys once this is merged on `release/1.0`.
+
+## SS-078 — Theme switch (#151, v1.0.0)
+
+- Build: Auto, Light and Dark control in both headers; the choice pins `data-theme`, is remembered in the browser and applied before first paint by `web/public/theme-init.js`. The Bench prototype header carries the same control. Requested by the owner while validating `release/1.0`.
+
+## SS-077 — Empty-state design fix (#149, v1.0.0)
+
+- Build: shared `EmptyState` (Bench dashed outline, centred, icon, action) used by the Admin list, Cart and Checkout; the outdated "no access control" sentence is gone from the Admin header and README. Found by the owner while validating `release/1.0`.
+- Gap: Market and orders empty states stay left-aligned; recorded in the learning note.
+
+## SS-076 — Railway deployment (#148, v1.0.0)
+
+- Build: the web image renders nginx at start-up from `PORT`, `API_UPSTREAM` and the container's DNS server, applies private mode itself (`WEB_ACCESS`, fails closed) and exposes `/healthz`; the backend honours `PORT`; `railway.json` per service; Railway guide in [Deployment](docs/DEPLOYMENT.md) ([ADR 0020](docs/adr/0020-run-on-railway-with-environment-driven-web-image.md)). The VPS guide stays as an alternative.
+- Not verified until the first deployment: the Railway builds, the private-network name and the client-address ranges.
+
+## SS-075 — Admin area and VPS setup (#146, v1.0.0)
+
+- Build: separate Admin shell for `/admin/*`, administrator sign-in lands in Admin, Caddy TLS service, trusted client-address chain, `deploy/` scripts (deploy, backup, restore), VPS guide ([ADR 0019](docs/adr/0019-separate-admin-area-and-terminate-tls-with-caddy.md)).
+- Owner input needed to host: VPS (Ubuntu 24.04, 2 vCPU, 4 GB), domain with DNS access, SSH key access, `.env.demo` secrets; see [Deployment](docs/DEPLOYMENT.md).
+- Design gap: no Admin shell screen in the Bench prototype; recorded in the ADR.
+
+## SS-074 — Demo mode and containers (#144, v1.0.0 part 2)
+
+- Build: `GET /api/config`, administrator-only demo reset (optional cron), demo banner, backend and web images, `compose.demo.yaml`, [Deployment](docs/DEPLOYMENT.md), [v1.0.0 release notes](docs/releases/v1.0.0.md) ([ADR 0018](docs/adr/0018-add-demo-mode-and-containers.md)).
+- State: v1.0.0 is prepared on `release/1.0`; nothing is merged into `main` and no tag exists. Next step: the owner validates `release/1.0` locally and authorizes one merge into `main` plus the `v1.0.0` tag.
+
+## SS-073 — Security hardening (#142, v1.0.0 part 1)
+
+- Build: per-client rate limiting, API security headers, `prod` profile with secure cookies and a startup guard, [Threat Model](docs/THREAT-MODEL.md) ([ADR 0017](docs/adr/0017-harden-the-public-demo.md)).
+- Agent Verification: `RateLimiterTest`, `HardeningApiTest`, `SecureCookieApiTest`, `ProductionGuardTest`, full suites.
+- Next step: SS-074 demo banner, reset, container and release notes.
+
+## SS-072 — Operations (#140, v0.6.0)
+
+- Build: `GET /api/admin/operations` (administrators only), `X-Request-Id` correlation with one structured log line per API request, `payment_attempts.created_at` (`V9`), Operations screen at `/admin/operations` ([ADR 0016](docs/adr/0016-observe-requests-with-correlation-ids.md)).
+- Design gap: the Bench "Store health" layout has loading, empty and error states added in the same language; recorded here.
+- Agent Verification: `OperationsApiTest`, `RequestMetricsTest`, web tests, typecheck, Playwright.
+- Next step: v1.0.0 Secured Public Demo.
+
+## SS-071 — Inventory (#138, v0.5.0)
+
+- Build: `inventory` module (`V8`), Product `stock`, Cart limit, reserve on approved Payment and consume on Order, `409 out-of-stock` ([ADR 0015](docs/adr/0015-add-inventory-with-reservations.md)); web stock badge, disabled Add, admin Stock field.
+- Design gap: the Bench prototype has no stock field or sold-out state; the web follows the Bench tokens.
+- Agent Verification: backend suites including `JdbcInventoryTest` and `InventoryApiTest`, web tests, typecheck, Playwright.
+- Next step: v0.6.0 Operations.
+
+## SS-070 — Order history and tracking (#135, v0.4.0)
+
+- Build: `GET /api/orders` and `GET /api/orders/{id}/shipment`, `orders.created_at` (`V7`), `shipping` module with derived shipments ([ADR 0014](docs/adr/0014-derive-simulated-shipments.md)); web Orders and tracking screens from the Bench design, Track link on the Order result.
+- Agent Verification: backend suites including `ShipmentTest` and `OrderTrackingApiTest`, 284 web tests, typecheck, 15 Playwright tests.
+- Next step: v0.5.0 Inventory.
+
+## SS-069 — Accounts and sessions (#133, v0.3.0)
+
+- Build on `release/1.0`: `account` module, Spring Security sessions with cookie-to-header CSRF, per-account Cart, Payment attempts and Orders (`V5`, `V6`), `ADMIN` role for Product writes, administrator from `samska.admin.*`, web account screen and shell gating ([ADR 0013](docs/adr/0013-adopt-account-sessions-and-ownership.md)).
+- Agent Verification: backend `verify` green including `AccountSecurityApiTest` (8 tests), 273 web tests, typecheck, 13 Playwright tests signed in and signed out.
+- Next step: v0.4.0 Order History and Tracking.
+
+## SS-068 — Release plan to v1.0.0 (#132)
+
+- Owner request (2026-11-27): define releases in the Roadmap and deliver everything up to v1.0.0, contacting him only when 1.0 is ready. Plan in [Roadmap](docs/ROADMAP.md) and [ADR 0012](docs/adr/0012-adopt-release-plan-to-v1.md): v0.2.0 Durable Store, v0.3.0 Accounts, v0.4.0 Order History and Tracking, v0.5.0 Inventory, v0.6.0 Operations, v1.0.0 Secured Public Demo. Caching, messaging, React Native and IaC move beyond 1.0.
+- Workflow decision (owner, 2026-11-27, "Ótimo"): integration branch `release/1.0`; each feature is a small pull request with tests and green CI merged into it by the agent; `main` changes only when the owner validates `release/1.0` locally and authorizes one merge and the `v1.0.0` tag. CI runs on pull requests targeting `release/1.0`.
+- Next step: build v0.3.0 Accounts.
+
+## SS-067 — Persist the Catalog in PostgreSQL (#130)
+
+- Build: Products and uploaded media are stored in PostgreSQL (`V4__create_catalog.sql`, `JdbcProductStore`, [ADR 0011](docs/adr/0011-adopt-postgresql-catalog-persistence.md)), completing the persistence sequence of ADRs 0008 to 0010. Listings keep insertion order and carry media IDs without image bytes; the aggregate media budget is enforced transactionally. New `503 catalog-store-unavailable`. API shapes and `web/` are unchanged.
+- Boundary change: no application state is process-local any more outside the `no-database` test profile; the earlier "Products and media are lost on restart" statements are superseded.
+- Next step: owner review and merge authorization.
+
 ## SS-064 — Bench applied to the web application (#124)
 
 - Owner approved the Bench identity and asked for implementation while away (2026-11-27). `web/` now uses the Bench tokens, fonts and components on every existing screen; "Next · design only" screens are not built. Backend and routes are unchanged. The branch is based on the SS-063 branch, so [PR #123](https://github.com/Samska/samska-sandbox/pull/123) merges first.

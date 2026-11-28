@@ -30,3 +30,5 @@ coverage/
 # Generated test reports.
 web/test-results/
 web/playwright-report/
+web/.auth/
+backups/

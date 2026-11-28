@@ -69,7 +69,7 @@ describe("AdminProducts", () => {
     );
 
     const toteRow = screen.getByText(tote.name).closest("li") as HTMLElement;
-    expect(within(toteRow).getByText("12.50")).toBeInTheDocument();
+    expect(within(toteRow).getByText("$12.50")).toBeInTheDocument();
     expect(within(toteRow).getByText("No image")).toBeInTheDocument();
     expect(within(toteRow).getByRole("link", { name: `Edit ${tote.name}` })).toHaveAttribute(
       "href",
@@ -78,12 +78,25 @@ describe("AdminProducts", () => {
     expect(within(toteRow).getByRole("button", { name: `Delete ${tote.name}` })).toBeInTheDocument();
 
     const pourOverRow = screen.getByText(pourOver.name).closest("li") as HTMLElement;
-    expect(within(pourOverRow).getByText("Curated image")).toBeInTheDocument();
+    expect(within(pourOverRow).getByText("Catalog image")).toBeInTheDocument();
     expect(within(pourOverRow).queryByText(/mediaKey|uploadedMediaId/)).not.toBeInTheDocument();
 
     expect(screen.queryByRole("form")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Name")).not.toBeInTheDocument();
     expect(screen.queryByLabelText("Description")).not.toBeInTheDocument();
+  });
+
+  it("shows a search hint and keeps price, stock and actions in one compact row", async () => {
+    stubFetch({ list: () => Promise.resolve(response(200, [{ ...tote, stock: 3 }])) });
+    render(<AdminProducts />);
+
+    await screen.findByText(tote.name);
+    expect(screen.getByLabelText("Search Products by name")).toHaveAttribute("placeholder", "Search by name");
+    const row = screen.getByText(tote.name).closest("li") as HTMLElement;
+    expect(within(row).getByText("3 left")).toBeInTheDocument();
+    expect(within(row).getByText("$12.50")).toBeInTheDocument();
+    expect(row.innerHTML).toContain("grid-cols-[3rem_minmax(0,1fr)]");
+    expect(within(row).getByRole("link", { name: `Edit ${tote.name}` })).toBeInTheDocument();
   });
 
   it("filters Products by name case-insensitively and clears the search", async () => {
@@ -112,6 +125,10 @@ describe("AdminProducts", () => {
 
     expect(await screen.findByText("No Products exist yet.")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Create Product" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Create the first Product" })).toHaveAttribute(
+      "href",
+      "/admin/products/new"
+    );
     expect(screen.queryByText(/no products match/i)).not.toBeInTheDocument();
   });
 

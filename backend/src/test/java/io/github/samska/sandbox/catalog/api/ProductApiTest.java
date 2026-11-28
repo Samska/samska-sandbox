@@ -59,7 +59,7 @@ class ProductApiTest {
                                 """))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.*", hasSize(6)))
+                .andExpect(jsonPath("$.*", hasSize(7)))
                 .andExpect(jsonPath("$.id").isString())
                 .andExpect(jsonPath("$.name").value("Canvas Tote"))
                 .andExpect(jsonPath("$.description").value("A sturdy everyday tote."))
@@ -76,7 +76,7 @@ class ProductApiTest {
         mockMvc.perform(get("/api/products/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.*", hasSize(6)))
+                .andExpect(jsonPath("$.*", hasSize(7)))
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.name").value("Canvas Tote"))
                 .andExpect(jsonPath("$.description").value("A sturdy everyday tote."))
@@ -104,7 +104,7 @@ class ProductApiTest {
                                 }
                                 """))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.*", hasSize(6)))
+                .andExpect(jsonPath("$.*", hasSize(7)))
                 .andExpect(jsonPath("$.mediaKey").value("canvas-market-tote"));
     }
 
@@ -211,7 +211,7 @@ class ProductApiTest {
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.*", hasSize(6)))
+                .andExpect(jsonPath("$.*", hasSize(7)))
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.name").value("Canvas Market Tote"))
                 .andExpect(jsonPath("$.description").value("A roomier everyday tote."))
@@ -611,7 +611,7 @@ class ProductApiTest {
     private String uploadMedia(String productId, byte[] jpeg) throws Exception {
         var result = mockMvc.perform(mediaUpload(productId, "photo.jpg", "image/jpeg", jpeg))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.*", hasSize(6)))
+                .andExpect(jsonPath("$.*", hasSize(7)))
                 .andExpect(jsonPath("$.uploadedMediaId").isString())
                 .andReturn();
 

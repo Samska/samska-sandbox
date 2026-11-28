@@ -1,8 +1,10 @@
+import { apiFetch } from "../http";
 export interface CreateProductRequest {
   name: string;
   description: string;
   price: number;
   mediaKey: string | null;
+  stock?: number;
 }
 
 export interface ProductResponse {
@@ -12,6 +14,8 @@ export interface ProductResponse {
   price: number;
   mediaKey: string | null;
   uploadedMediaId: string | null;
+  /** Units a customer can still buy; absent in responses from older servers. */
+  stock?: number;
 }
 
 export type CatalogApiErrorKind =
@@ -79,7 +83,7 @@ export async function listProducts(): Promise<ProductResponse[]> {
   let response: Response;
 
   try {
-    response = await fetch("/api/products");
+    response = await apiFetch("/api/products");
   } catch {
     throw new CatalogApiError("network");
   }
@@ -107,7 +111,7 @@ async function requestWithoutBody(path: string, method: string): Promise<void> {
   let response: Response;
 
   try {
-    response = await fetch(path, { method });
+    response = await apiFetch(path, { method });
   } catch {
     throw new CatalogApiError("network");
   }
@@ -125,7 +129,7 @@ async function requestProduct(
   let response: Response;
 
   try {
-    response = await fetch(path, options);
+    response = await apiFetch(path, options);
   } catch {
     throw new CatalogApiError("network");
   }
@@ -204,8 +208,11 @@ function isProductResponse(value: unknown): value is ProductResponse {
   const product = value as Record<string, unknown>;
   const keys = Object.keys(product);
 
+  const hasStock = keys.includes("stock");
+
   return (
-    keys.length === 6 &&
+    keys.length === (hasStock ? 7 : 6) &&
+    (!hasStock || (Number.isInteger(product.stock) && (product.stock as number) >= 0)) &&
     keys.includes("id") &&
     keys.includes("name") &&
     keys.includes("description") &&

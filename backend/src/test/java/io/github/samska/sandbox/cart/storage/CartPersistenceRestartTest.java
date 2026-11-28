@@ -35,9 +35,9 @@ class CartPersistenceRestartTest {
 
         try (var first = startApplication()) {
             var jdbc = first.getBean(JdbcTemplate.class);
-            jdbc.execute("TRUNCATE TABLE order_items, orders");
+            jdbc.execute("TRUNCATE TABLE order_items, order_status_events, orders");
             jdbc.execute("TRUNCATE TABLE cart_items, cart CASCADE");
-            jdbc.execute("TRUNCATE TABLE payment_attempt_items, payment_attempts");
+            jdbc.execute("TRUNCATE TABLE product_media, products CASCADE");
             var base = baseUri(first);
 
             toteId = JsonPath.read(send(base, "POST", "/api/products", productBody("Canvas Tote", "12.50"), 201), "$.id");
@@ -52,14 +52,15 @@ class CartPersistenceRestartTest {
         try (var second = startApplication()) {
             var base = baseUri(second);
 
-            // Products are process-local and gone; the Cart snapshot carries its own name and price.
-            send(base, "GET", "/api/products/" + toteId, null, 404);
+            // Products are durable too, and the Cart line keeps its own name and price snapshot.
+            send(base, "GET", "/api/products/" + toteId, null, 200);
             assertCart(send(base, "GET", "/api/cart", null, 200), toteId, mugId, 3, "58.00");
 
             // The restored revision continues instead of restarting at zero.
             var afterRemoval = send(base, "DELETE", "/api/cart/items/" + toteId, null, 200);
             assertThat(((Number) JsonPath.read(afterRemoval, "$.revision")).longValue()).isEqualTo(4);
-            // A vanished Product cannot be added again, and the stored Cart is unchanged by the rejection.
+            // A Product that is no longer in the Cart can be deleted again.
+            send(base, "DELETE", "/api/products/" + toteId, null, 204);
             send(base, "POST", "/api/cart/items", item(toteId, 1), 404);
 
             var jdbc = second.getBean(JdbcTemplate.class);

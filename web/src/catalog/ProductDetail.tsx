@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
+import StockBadge, { isSoldOut } from "./StockBadge";
 import type { ProductResponse } from "./catalogApi";
 import ProductMedia from "./ProductMedia";
 import Button from "../ui/Button";
@@ -29,8 +30,8 @@ export default function ProductDetail({
       className="grid min-w-0 gap-5 overflow-hidden rounded-sm border-[1.5px] border-ink bg-surface shadow-card"
       aria-labelledby="product-detail-heading"
     >
-      <div className="flex items-center justify-between gap-4 border-b-[1.5px] border-ink px-5 py-3">
-        <Button variant="quiet" size="sm" onClick={onBack}>
+      <div className="flex items-center justify-between gap-3 border-b-[1.5px] border-ink px-4 py-3 min-[30rem]:gap-4 min-[30rem]:px-5">
+        <Button className="whitespace-nowrap" variant="quiet" size="sm" onClick={onBack}>
           <span aria-hidden="true">&#8592;</span> Back to Products
         </Button>
         {cartTrigger}
@@ -64,13 +65,16 @@ export default function ProductDetail({
               {formatAmount(product.price)}
             </span>
           </div>
+          <div>
+            <StockBadge product={product} />
+          </div>
           <Button
             className="w-full"
             onClick={() => void onAdd(product)}
-            disabled={isCartPending}
+            disabled={isCartPending || isSoldOut(product)}
             aria-label={`Add ${product.name} to Cart`}
           >
-            Add to Cart
+            {isSoldOut(product) ? "Sold out" : "Add to Cart"}
           </Button>
         </div>
       </div>

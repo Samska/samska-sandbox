@@ -16,7 +16,7 @@ Status: **Owner-approved approach and Vitrine direction (2026-11-27). Design app
 - Issue: [SS-057 / #110](https://github.com/Samska/samska-sandbox/issues/110)
 - Owner decision (2026-11-27, project thread): approved HTML prototypes and tokens versioned in this repository as the design source, replacing Penpot, and approved the Vitrine direction with the exact answer “Eu aprovo os dois pontos.”
 - Source of truth: [prototypes/vitrine.html](prototypes/vitrine.html), a single self-contained file that opens in a browser with no build step, and [prototypes/vitrine.tokens.json](prototypes/vitrine.tokens.json). Fonts load from Google Fonts with system fallbacks; everything else is inline.
-- Screens: Market with search and sort, Product detail, Cart drawer, Checkout, simulated Payment (approved, declined, pending), Order, and Admin (list, create, edit, image upload). Light and dark themes; checked at 1280 and 390 px widths.
+- Screens: Market with search and sort, Product detail, Cart drawer, Checkout, simulated Payment (approved, declined, pending), Order, and Admin (list, create, edit, image upload). Light and dark themes with an Auto/Light/Dark control in the header (added in SS-078); checked at 1280 and 390 px widths.
 - Direction change from SS-052 to SS-056: cool grey-blue canvas with cobalt and a yellow highlight instead of sand and teal; Bricolage Grotesque with Inter instead of Fraunces; large color-block product tiles instead of bordered cards; persistent header search; Cart as a side drawer; one-page Checkout with a three-step rail.
 - Design before build (SS-062, 2026-11-27): a feature is not built until its prototype is approved here; the Issue links the prototype path and revision, and approval happens on the pull request that adds or revises it.
 - Workflow: a design change is a revision of the HTML file in a pull request. Review the rendered file locally; the diff reviews the code and tokens. No external design tool is required.
@@ -48,6 +48,17 @@ Status: **Implemented for owner local validation (2026-11-27). The owner approve
 - Not applied: screens marked "Next · design only" in the prototype. The cart keeps its "Cart" wording in the app; "Slip" stays a prototype idea until the owner decides.
 - Deviations from the prototype: the catalog number is derived from the Product id because Products have no catalog number yet; the fallback stage uses a monogram because there are no illustrations; the success text color was darkened from `#0d7a3f` to `#0b6b37` in the app, the prototype and the tokens to reach 4.5:1 on its surface (found by the new contrast test).
 - Verification: unit and component tests, a contrast test over the token pairs, and Playwright checks at 1280 and 390 px in light and dark, as described in [TESTING.md](../../TESTING.md).
+
+## SS-085 — Market list, payment-resume notice, Orders and Order number (for owner review)
+
+Status: **Owner-approved (2026-11-28, project thread: "Eu aprovo"). Applied in SS-090. Design only until built.**
+
+- Source of truth: [prototypes/catalog-orders.html](prototypes/catalog-orders.html), same Bench tokens as `bench.html`. A bar at the top switches screen and theme; checked at 390 and 1280 px in light and dark with no horizontal overflow.
+- Market list: compact horizontal object rows (88 px stage, name, price, stock tag, one line of description, Details and Add to cart) instead of full-width cards. **Owner correction (2026-11-28): this compact row is for the Admin product list only; the Market keeps its original large cards.** The prototype still shows it on the Market screen.
+- Payment-resume notice: replaces the "View latest journey / Forget latest reference" box. It shows only while the last payment attempt is unfinished, with "Resume payment" and "Dismiss"; it is hidden once the attempt finished.
+- Orders: slips on mobile, aligned one-line rows from 768 px; no table and no horizontal scroll.
+- Order created and Order number: the customer sees a sequential number such as `SK-000128` with a Copy button instead of a UUID. Recommended storage: keep the UUID as the primary key and in URLs, add a unique `order_number` column filled from a database sequence (Flyway migration, back-filled in creation order), and render it with a prefix and six digits.
+- Not changed: `web/` code and backend behavior. Building this needs its own approved Issue.
 
 ## SS-053 — Current-interface Batch 1 (owner-approved, revn 52)
 
@@ -379,3 +390,31 @@ This approval/status update is mechanical; it does not restart or alter the revi
 Historical pre-merge instruction; completed by [Issue #100](https://github.com/Samska/samska-sandbox/issues/100) and [PR #101](https://github.com/Samska/samska-sandbox/pull/101).
 
 Owner visual approval and owner human engineering approval of the documentation are recorded. Scoped commit/push to `feat/ss-052-samska-store-design` is authorized. Native backup is not exported; it is optional and non-blocking for SS-052. Commit and push the approved documentation, then stop for a separate PR creation decision. Do not create another candidate, open a pull request, merge, close the Issue, delete, or clean up.
+
+## SS-084 — Illustrations for the sample Products
+
+Status: **Approved by the owner in the project thread (2026-11-27) and implemented.**
+
+- Issue: [SS-084 / #165](https://github.com/Samska/samska-sandbox/issues/165)
+- Why: the three photos on the sample Products did not look like the Bench identity, and three samples had no image.
+- Source of truth: [prototypes/product-art.html](prototypes/product-art.html): six original illustrations (tote, pour-over set, workbench, apron, camp mug, serving board) on Bench stages with the 25% grid and catalog number; ink linework and one signal color, so light and dark follow the theme tokens.
+- Implemented in `web/src/catalog/productArt.ts` (drawings keyed `art-*`) and `ProductMedia`; uploaded images still take precedence.
+
+## SS-087 — Currency symbol
+
+The earlier prototypes show amounts without a currency symbol. On 2026-11-27 the owner approved adding one after the pre-1.0 review: the application shows US dollars (`$12.50`) everywhere prices appear; form inputs keep plain numbers. The prototypes stay as the historical record.
+
+## SS-098 — Fixed example catalog
+
+Status: **Approved by the owner in the project thread (2026-11-27) and implemented.**
+
+- Issue: [SS-098 / #197](https://github.com/Samska/samska-sandbox/issues/197)
+- Source of truth: [prototypes/product-art.html](prototypes/product-art.html) now holds 18 illustrations (the six of SS-084 plus arc lamp, vessel, throw, desk clock, hand plane, tape measure, journal, rucksack, planter, wall shelf, kettle and stool), in the same style and tokens.
+
+## SS-097 — Admin Orders and real tracking (owner-approved)
+
+Status: **Owner-approved (2026-11-28, "Aprovado"). Design approval only.**
+
+- Issue: [SS-097 / #196](https://github.com/Samska/samska-sandbox/issues/196)
+- Prototype: [prototypes/admin-orders.html](prototypes/admin-orders.html), in Bench: an Admin Orders list with status filter chips and a status select with an Update button per Order, and a customer tracking page that shows a timeline of the real status changes.
+- Built with one difference from the prototype: the tracking page shows the timeline without the Items card, because the tracking response carries no items.

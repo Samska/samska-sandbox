@@ -29,8 +29,7 @@ function renderReview(overrides: Partial<Parameters<typeof CheckoutReview>[0]> =
   const onUpdateQuantity = vi.fn().mockResolvedValue(undefined);
   const onRemoveItem = vi.fn().mockResolvedValue(undefined);
   const onRetry = vi.fn();
-  const onSimulatePayment = vi.fn().mockResolvedValue(undefined);
-  const onViewAttempt = vi.fn();
+  const onPlaceOrder = vi.fn().mockResolvedValue(undefined);
   const result = render(
     <CheckoutReview
       cart={cart}
@@ -40,17 +39,14 @@ function renderReview(overrides: Partial<Parameters<typeof CheckoutReview>[0]> =
       isPending={false}
       error={null}
       onRetry={onRetry}
-      paymentPending={false}
-      paymentError={null}
-      paymentBlocked={false}
-      blockedPaymentMessage={null}
-      onViewAttempt={onViewAttempt}
-      onSimulatePayment={onSimulatePayment}
+      orderPending={false}
+      orderError={null}
+      onPlaceOrder={onPlaceOrder}
       {...overrides}
     />
   );
 
-  return { ...result, onBack, onUpdateQuantity, onRemoveItem, onRetry, onSimulatePayment, onViewAttempt };
+  return { ...result, onBack, onUpdateQuantity, onRemoveItem, onRetry, onPlaceOrder };
 }
 
 describe("CheckoutReview", () => {
@@ -63,12 +59,11 @@ describe("CheckoutReview", () => {
     expect(screen.getByRole("button", { name: "Decrease quantity for Canvas Tote" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Increase quantity for Canvas Tote" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Remove Canvas Tote" })).toBeInTheDocument();
-    expect(screen.getByText("12.50 each")).toBeInTheDocument();
-    expect(screen.getByText("25.00")).toBeInTheDocument();
-    expect(screen.getByText("68.50 each")).toBeInTheDocument();
-    expect(screen.getByText("68.50")).toBeInTheDocument();
-    expect(screen.getByText("Total").parentElement).toHaveTextContent("93.50");
-    expect(screen.queryByText(/\$/)).not.toBeInTheDocument();
+    expect(screen.getByText("$12.50 each")).toBeInTheDocument();
+    expect(screen.getByText("$25.00")).toBeInTheDocument();
+    expect(screen.getByText("$68.50 each")).toBeInTheDocument();
+    expect(screen.getByText("$68.50")).toBeInTheDocument();
+    expect(screen.getByText("Total").parentElement).toHaveTextContent("$93.50");
   });
 
   it("calls the existing Cart handlers for direct edits", () => {
@@ -89,53 +84,38 @@ describe("CheckoutReview", () => {
     expect(screen.queryByRole("spinbutton")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Remove/ })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Back to Market" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Simulate payment" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Place order" })).not.toBeInTheDocument();
   });
 
-  it("simulates payment with the selected demo outcome", () => {
-    const { onSimulatePayment } = renderReview();
+  it("places the order with one step and no payment controls", () => {
+    const { onPlaceOrder } = renderReview();
 
-    expect(screen.getByLabelText("Demo outcome")).toHaveValue("approve");
-    expect(screen.getByText(/no real payment is made/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText("Demo outcome")).not.toBeInTheDocument();
+    expect(screen.queryByText(/payment/i)).not.toBeInTheDocument();
 
-    fireEvent.change(screen.getByLabelText("Demo outcome"), { target: { value: "decline" } });
-    fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
+    fireEvent.click(screen.getByRole("button", { name: "Place order" }));
 
-    expect(onSimulatePayment).toHaveBeenCalledWith("decline");
+    expect(onPlaceOrder).toHaveBeenCalledTimes(1);
   });
 
-  it("disables payment and Cart editing while a simulated payment is pending", () => {
-    renderReview({ paymentPending: true });
+  it("disables placing the order and Cart editing while the order is being placed", () => {
+    renderReview({ orderPending: true });
 
-    expect(screen.getByRole("button", { name: "Simulate payment" })).toBeDisabled();
-    expect(screen.getByLabelText("Demo outcome")).toBeDisabled();
-    expect(screen.getByRole("status")).toHaveTextContent("Simulating payment...");
+    expect(screen.getByRole("button", { name: "Place order" })).toBeDisabled();
+    expect(screen.getByRole("status")).toHaveTextContent("Placing your order...");
     expect(screen.getByLabelText("Quantity for Canvas Tote")).toBeDisabled();
     expect(screen.getByRole("button", { name: "Remove Canvas Tote" })).toBeDisabled();
   });
 
-  it("shows the blocked journey notice with a View attempt action", () => {
-    const { onViewAttempt } = renderReview({
-      paymentBlocked: true,
-      blockedPaymentMessage: "Payment result is unconfirmed. Check this attempt before trying again."
-    });
+  it("shows an order error and keeps Place order available for a retry", () => {
+    renderReview({ orderError: "We couldn't confirm whether your Order was placed." });
 
-    expect(screen.getByRole("alert")).toHaveTextContent("Payment result is unconfirmed.");
-
-    fireEvent.click(screen.getByRole("button", { name: "View attempt" }));
-
-    expect(onViewAttempt).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole("alert")).toHaveTextContent("We couldn't confirm whether your Order was placed.");
+    expect(screen.getByRole("button", { name: "Place order" })).toBeEnabled();
   });
 
-  it("blocks initiation while a reference is unresolved and offers the attempt surface", () => {
-    renderReview({ paymentBlocked: true });
-
-    expect(screen.getByRole("button", { name: "Simulate payment" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "View attempt" })).toBeEnabled();
-  });
-
-  it("allows leaving the Checkout surface while a simulated payment is pending", () => {
-    const { onBack } = renderReview({ paymentPending: true });
+  it("allows leaving the Checkout surface while an order is being placed", () => {
+    const { onBack } = renderReview({ orderPending: true });
 
     const back = screen.getByRole("button", { name: "Back to Market" });
     expect(back).toBeEnabled();
@@ -143,10 +123,10 @@ describe("CheckoutReview", () => {
     expect(onBack).toHaveBeenCalledTimes(1);
   });
 
-  it("blocks initiation while the Cart is in an error state", () => {
+  it("blocks placing the order while the Cart is in an error state", () => {
     renderReview({ error: "The Cart service failed. Try again." });
 
-    expect(screen.getByRole("button", { name: "Simulate payment" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Place order" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Reload Cart" })).toBeInTheDocument();
   });
 

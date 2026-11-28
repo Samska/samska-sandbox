@@ -23,7 +23,7 @@ describe("App", () => {
     stubFetch();
     render(<App />);
 
-    expect(screen.getByRole("link", { name: "Samska Sandbox home" })).toHaveAttribute("href", "/");
+    expect(screen.getByRole("link", { name: "Samska Store home" })).toHaveAttribute("href", "/");
     expect(screen.getByRole("link", { name: "Skip to main content" })).toBeInTheDocument();
     expect(await screen.findByRole("heading", { name: "Products", level: 1 })).toBeInTheDocument();
 
@@ -42,7 +42,7 @@ describe("App", () => {
     render(<App />);
     await screen.findByRole("heading", { name: "Products", level: 1 });
 
-    const home = screen.getByRole("link", { name: "Samska Sandbox home" });
+    const home = screen.getByRole("link", { name: "Samska Store home" });
     expect(home.querySelector("svg")).toHaveAttribute("aria-hidden", "true");
     expect(home).toHaveTextContent("Samska");
     expect(home.textContent).toContain("STORE");
@@ -68,14 +68,12 @@ describe("App", () => {
       await screen.findByRole("heading", { name: "Product management", level: 1 })
     ).toBeInTheDocument();
 
-    const navigation = screen.getByRole("navigation", { name: "Primary" });
-    expect(within(navigation).getByRole("link", { name: "Admin" })).toHaveAttribute(
-      "aria-current",
-      "page"
-    );
-    expect(within(navigation).getByRole("link", { name: "Market" })).not.toHaveAttribute(
-      "aria-current"
-    );
+    const navigation = screen.getByRole("navigation", { name: "Admin" });
+    expect(within(navigation).getByRole("link", { name: "Products" })).toHaveAttribute("aria-current", "page");
+    expect(within(navigation).getByRole("link", { name: "Operations" })).not.toHaveAttribute("aria-current");
+    expect(within(navigation).getByRole("link", { name: "View store" })).toHaveAttribute("href", "/");
+    // The Admin area carries no storefront navigation.
+    expect(screen.queryByRole("navigation", { name: "Primary" })).not.toBeInTheDocument();
   });
 
   it("renders a distinct not-found surface for unknown paths", () => {
@@ -113,11 +111,8 @@ describe("App", () => {
     ).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Products", level: 1 })).not.toBeInTheDocument();
 
-    const navigation = screen.getByRole("navigation", { name: "Primary" });
-    expect(within(navigation).getByRole("link", { name: "Admin" })).toHaveAttribute(
-      "aria-current",
-      "page"
-    );
+    const navigation = screen.getByRole("navigation", { name: "Admin" });
+    expect(within(navigation).getByRole("link", { name: "Products" })).toHaveAttribute("aria-current", "page");
   });
 
   it("renders the dedicated edit form at /admin/products/{id}/edit", async () => {
@@ -179,37 +174,8 @@ describe("App", () => {
     );
   });
 
-  it("renders attempt recovery for an unknown reference at its URL", async () => {
-    const id = "aaaaaaaa-1111-1111-1111-111111111111";
-    window.history.replaceState({}, "", `/checkout/attempts/${id}`);
-    vi.stubGlobal(
-      "fetch",
-      vi.fn((input: RequestInfo | URL) => {
-        const path = String(input);
-
-        if (path === "/api/products") {
-          return Promise.resolve(response(200, []));
-        }
-
-        if (path === "/api/cart") {
-          return Promise.resolve(response(200, { items: [], total: 0, revision: 0 }));
-        }
-
-        return Promise.resolve(response(404));
-      })
-    );
-    render(<App />);
-
-    expect(
-      await screen.findByRole("heading", {
-        name: "We couldn't confirm a result for this reference.",
-        level: 1
-      })
-    ).toBeInTheDocument();
-  });
-
-  it("keeps malformed attempt references on the not-found surface", () => {
-    window.history.replaceState({}, "", "/checkout/attempts/not-a-uuid");
+  it("keeps the retired attempt URLs on the not-found surface", () => {
+    window.history.replaceState({}, "", "/checkout/attempts/aaaaaaaa-1111-1111-1111-111111111111");
     stubFetch();
     render(<App />);
 

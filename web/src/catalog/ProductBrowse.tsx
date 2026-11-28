@@ -1,4 +1,5 @@
 import { useRef, type ReactNode } from "react";
+import StockBadge, { isSoldOut } from "./StockBadge";
 import type { ProductResponse } from "./catalogApi";
 import ProductMedia from "./ProductMedia";
 import Button from "../ui/Button";
@@ -89,6 +90,7 @@ export default function ProductBrowse({
               <input
                 {...control}
                 type="search"
+                placeholder="Search by name"
                 value={searchTerm}
                 onChange={(event) => onSearchTermChange(event.target.value)}
                 ref={registerSearchInput}
@@ -146,6 +148,9 @@ export default function ProductBrowse({
             >
               <div className="relative">
                 <ProductMedia product={product} variant="card" />
+                <span className="absolute right-3 top-3">
+                  <StockBadge product={product} />
+                </span>
                 <p className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full border-[1.5px] border-ink bg-surface px-3 py-1 font-mono text-sm font-semibold text-ink">
                   <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full border-[1.5px] border-ink" />
                   {formatAmount(product.price)}
@@ -173,10 +178,10 @@ export default function ProductBrowse({
                   size="sm"
                   className="flex-1"
                   onClick={() => void onAdd(product)}
-                  disabled={isCartPending}
+                  disabled={isCartPending || isSoldOut(product)}
                   aria-label={`Add ${product.name} to Cart`}
                 >
-                  Add to Cart
+                  {isSoldOut(product) ? "Sold out" : "Add to Cart"}
                 </Button>
               </div>
             </li>

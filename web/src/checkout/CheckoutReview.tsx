@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import type { CartResponse } from "../cart/cartApi";
 import CartItemRow from "../cart/CartItemRow";
 import { formatAmount } from "../formatAmount";
-import { unconfirmedPaymentPrimary } from "../journey/messages";
-import type { PaymentScenario } from "../payment/paymentApi";
 import Button from "../ui/Button";
 import StatusMessage from "../ui/StatusMessage";
+import EmptyState, { EmptyNote, EmptyTitle, emptyActionClassName } from "../ui/EmptyState";
 
 type MutationIntent = {
   kind: "quantity" | "remove";
@@ -23,12 +22,9 @@ export default function CheckoutReview({
   isPending,
   error,
   onRetry,
-  paymentPending,
-  paymentError,
-  paymentBlocked,
-  blockedPaymentMessage,
-  onViewAttempt,
-  onSimulatePayment
+  orderPending,
+  orderError,
+  onPlaceOrder
 }: {
   cart: CartResponse;
   onBack: () => void;
@@ -37,20 +33,16 @@ export default function CheckoutReview({
   isPending: boolean;
   error: string | null;
   onRetry: () => void;
-  paymentPending: boolean;
-  paymentError: string | null;
-  paymentBlocked: boolean;
-  blockedPaymentMessage: string | null;
-  onViewAttempt?: () => void;
-  onSimulatePayment: (scenario: PaymentScenario) => Promise<void>;
+  orderPending: boolean;
+  orderError: string | null;
+  onPlaceOrder: () => Promise<void>;
 }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const emptyStateRef = useRef<HTMLHeadingElement>(null);
   const mutationIntentRef = useRef<MutationIntent | null>(null);
-  const [scenario, setScenario] = useState<PaymentScenario>("approve");
-  const controlsDisabled = isPending || paymentPending;
+  const controlsDisabled = isPending || orderPending;
 
   useEffect(() => {
     headingRef.current?.focus();
@@ -167,33 +159,17 @@ export default function CheckoutReview({
             </Button>
           </div>
         ) : null}
-        {paymentError !== null ? <StatusMessage tone="error">{paymentError}</StatusMessage> : null}
-        {paymentBlocked ? (
-          <div className="grid gap-3">
-            <StatusMessage tone="error">
-              {blockedPaymentMessage ?? unconfirmedPaymentPrimary}
-            </StatusMessage>
-            {onViewAttempt ? (
-              <Button onClick={onViewAttempt} disabled={controlsDisabled}>
-                View attempt
-              </Button>
-            ) : null}
-          </div>
-        ) : null}
+        {orderError !== null ? <StatusMessage tone="error">{orderError}</StatusMessage> : null}
         {cart.items.length === 0 ? (
-          <div className="grid gap-2 rounded-sm bg-surface-muted px-4 py-5">
-            <h2
-              id="checkout-empty-heading"
-              ref={emptyStateRef}
-              tabIndex={-1}
-              className="font-bold text-ink"
-            >
+          <EmptyState>
+            <EmptyTitle as="h2" id="checkout-empty-heading" ref={emptyStateRef} tabIndex={-1}>
               Your Cart is empty.
-            </h2>
-            <p className="text-sm text-muted">
-              Add a Product from the Market to continue to Checkout.
-            </p>
-          </div>
+            </EmptyTitle>
+            <EmptyNote>Add a Product from the Market to continue to Checkout.</EmptyNote>
+            <a className={emptyActionClassName} href="/">
+              Browse the Market
+            </a>
+          </EmptyState>
         ) : (
           <>
             <h2 id="checkout-items-heading" className="text-lg leading-[1.15] text-ink">
@@ -220,40 +196,10 @@ export default function CheckoutReview({
                 {formatAmount(cart.total)}
               </dd>
             </dl>
-            <div className="grid gap-3 rounded-sm border-[1.5px] border-ink px-4 py-4">
-              <h2 id="checkout-payment-heading" className="text-lg leading-[1.15] text-ink">
-                Simulated payment
-              </h2>
-              <p className="max-w-prose text-sm text-muted">
-                This is a local simulation. No real payment is made and no card or personal
-                information should be entered. Creating an Order is a separate explicit step.
-              </p>
-              <div className="grid gap-1">
-                <label htmlFor="checkout-payment-scenario" className="text-sm font-bold text-ink">
-                  Demo outcome
-                </label>
-                <select
-                  id="checkout-payment-scenario"
-                  value={scenario}
-                  onChange={(event) => setScenario(event.target.value as PaymentScenario)}
-                  disabled={controlsDisabled}
-                  className="h-11 rounded-sm border-[1.5px] border-ink bg-surface px-3 font-bold text-ink"
-                >
-                  <option value="approve">Approve</option>
-                  <option value="decline">Decline</option>
-                  <option value="temporary-failure">Temporary failure</option>
-                </select>
-              </div>
-              {paymentPending ? (
-                <StatusMessage tone="pending">Simulating payment...</StatusMessage>
-              ) : null}
-              <Button
-                onClick={() => void onSimulatePayment(scenario)}
-                disabled={controlsDisabled || error !== null || paymentBlocked}
-              >
-                Simulate payment
-              </Button>
-            </div>
+            {orderPending ? <StatusMessage tone="pending">Placing your order...</StatusMessage> : null}
+            <Button onClick={() => void onPlaceOrder()} disabled={controlsDisabled || error !== null}>
+              Place order
+            </Button>
           </>
         )}
       </div>

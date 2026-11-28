@@ -42,3 +42,27 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 [ADR 0009: Adopt PostgreSQL Persistence for the Cart](0009-adopt-postgresql-cart-persistence.md) records the second persistence slice: the single current Cart and its revision, the row-locked transactional `update`, the missing Product reference, and why Payment attempts follow.
 
 [ADR 0010: Adopt PostgreSQL Persistence for Payment Attempts](0010-adopt-postgresql-payment-attempt-persistence.md) records the third persistence slice: durable attempts and frozen snapshots, the partial unique index for one approval per Cart revision, race handling without aborted transactions, and removal of the 32-attempt cap for the database-backed store.
+
+[ADR 0011: Adopt PostgreSQL Persistence for the Catalog](0011-adopt-postgresql-catalog-persistence.md) records the final persistence slice: Products and uploaded media in PostgreSQL, insertion-ordered listings, media IDs without bytes in lists, and the transactional aggregate media budget. It supersedes the in-memory storage consequences of ADR 0004.
+
+[ADR 0012: Adopt a Release Plan From v0.2.0 To v1.0.0](0012-adopt-release-plan-to-v1.md) records the six releases to v1.0.0, why caching, messaging and React Native move beyond 1.0, and that accounts precede per-person data.
+
+[ADR 0013: Adopt Server-Side Sessions And Per-Account Ownership](0013-adopt-account-sessions-and-ownership.md) records the account module, in-memory sessions, cookie-to-header CSRF, the `CurrentAccount` ownership port, role rules, and the administrator bootstrap.
+
+[ADR 0014: Derive Simulated Shipments From The Order And The Clock](0014-derive-simulated-shipments.md) (superseded by ADR 0022) records the `shipping` module, derived rather than stored shipment state, the injected clock, and deterministic delays.
+
+[ADR 0015: Add Inventory With Reservations In The Payment Transaction](0015-add-inventory-with-reservations.md) records the `inventory` module, reserve on approval and consume on Order, expiry, and ordered row locks.
+
+[ADR 0016: Observe Requests With Correlation IDs And Micrometer Meters](0016-observe-requests-with-correlation-ids.md) records the request filter, in-process meters, SQL-derived business figures, and the admin-only Operations endpoint.
+
+[ADR 0017: Harden The Public Demo In The Application And The Production Profile](0017-harden-the-public-demo.md) records the rate limiter, API headers, the `prod` profile and the startup guard.
+
+[ADR 0018: Add Demo Mode And A Containerized Runtime](0018-add-demo-mode-and-containers.md) records demo mode, the administrator reset, the nginx web image and the hosted-demo Compose stack.
+
+[ADR 0019: Separate The Admin Area And Terminate TLS With Caddy](0019-separate-admin-area-and-terminate-tls-with-caddy.md) records the Admin shell, role-based sign-in destination, and the Caddy-fronted VPS stack.
+
+[ADR 0020: Run On Railway With An Environment-Driven Web Image](0020-run-on-railway-with-environment-driven-web-image.md) records the Railway service layout, the start-up rendered nginx configuration and the private mode moved into the web image.
+
+[ADR 0021: Remove The Simulated Payment And Place The Order Directly](0021-remove-the-simulated-payment.md) records the removal of the Payment module, the request-ID idempotency of Order placement, the end of stock reservations and the single Place order step; it supersedes ADRs 0005 and 0010 and parts of 0006, 0007 and 0015.
+
+[ADR 0022: The Administrator Sets Order Status And It Is Stored As Events](0022-administrator-sets-order-status.md) records the stored status events, the administrator endpoints, corrections allowed and cancelling as final with stock returned, and the removal of the simulated courier.

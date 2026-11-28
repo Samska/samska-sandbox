@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { adminEmail, adminPassword, authStatePath } from "./e2e/session";
 
 const webHost = "127.0.0.1";
 const webPort = 5173;
@@ -30,6 +31,7 @@ export default defineConfig({
   outputDir: "test-results",
   use: {
     baseURL: webUrl,
+    storageState: authStatePath,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "off"
@@ -46,6 +48,11 @@ export default defineConfig({
       command: backendCommand,
       cwd: "../backend",
       url: backendHealthUrl,
+      env: {
+        SAMSKA_ADMIN_EMAIL: adminEmail,
+        SAMSKA_ADMIN_PASSWORD: adminPassword,
+        SAMSKA_RATELIMIT_ENABLED: "false"
+      },
       timeout: 300_000,
       reuseExistingServer: false,
       stdout: "pipe",

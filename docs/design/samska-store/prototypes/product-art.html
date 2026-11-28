@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Samska Store: sample Product art (Bench)</title>
+<style>
+/* Prototype for the six sample Products of the hosted demo. Original geometric illustrations in the Bench identity
+   (docs/design/samska-store/prototypes/bench.html): ink linework, one signal orange-red, specimen stages with a
+   25% grid, registration marks and a catalog number. Colors come from the same tokens, so light and dark follow the theme. */
+:root {
+  --ground: #e4e7e4; --paper: #f7f8f5; --ink: #111518; --muted: #5a6560; --rule: #111518; --hair: #b8beb9; --signal: #ff4a1c;
+  --stage-1: #c3d6c9; --stage-2: #f0d9a0; --stage-3: #bcd0e4; --stage-4: #d9c6e4;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --display: "Archivo", "Arial Narrow", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #0e1114; --paper: #171b1f; --ink: #eef0ec; --muted: #98a39d; --rule: #eef0ec; --hair: #343c43; --signal: #ff5a2e;
+    --stage-1: #3a4d41; --stage-2: #5a4c26; --stage-3: #34475a; --stage-4: #4a3d57;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #0e1114; --paper: #171b1f; --ink: #eef0ec; --muted: #98a39d; --rule: #eef0ec; --hair: #343c43; --signal: #ff5a2e;
+  --stage-1: #3a4d41; --stage-2: #5a4c26; --stage-3: #34475a; --stage-4: #4a3d57;
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 16px; background: var(--ground); color: var(--ink); font-family: var(--display); }
+h1 { margin: 0 0 4px; font-size: 1.6rem; font-weight: 900; font-stretch: 75%; text-transform: uppercase; line-height: .95; }
+.note { margin: 0 0 16px; font-family: var(--mono); font-size: .75rem; color: var(--muted); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; max-width: 1100px; }
+.card { background: var(--paper); border: 1.5px solid var(--rule); border-radius: 6px; box-shadow: 0 .25rem 0 var(--ink); padding: 8px; }
+.stage { position: relative; aspect-ratio: 1; border: 1.5px solid var(--rule); border-radius: 6px; overflow: hidden;
+  background-image: linear-gradient(color-mix(in srgb, var(--ink) 14%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--ink) 14%, transparent) 1px, transparent 1px);
+  background-size: 25% 25%; }
+.s1 { background-color: var(--stage-1); } .s2 { background-color: var(--stage-2); } .s3 { background-color: var(--stage-3); } .s4 { background-color: var(--stage-4); }
+.stage svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.no { position: absolute; left: 8px; top: 8px; z-index: 2; font-family: var(--mono); font-size: .65rem; background: var(--paper); border: 1.5px solid var(--rule); padding: 0 5px; border-radius: 3px; }
+.name { margin: 10px 2px 2px; font-weight: 900; font-stretch: 75%; text-transform: uppercase; font-size: 1rem; line-height: 1; }
+.price { margin: 0 2px; font-family: var(--mono); font-size: .8rem; color: var(--muted); }
+</style>
+</head>
+<body>
+<h1>Sample Product art</h1>
+<p class="note">Eighteen original illustrations (SS-098 extends the six of SS-084) in the Bench style. Theme follows the system; add ?theme=dark or ?theme=light to force it.</p>
+<div class="grid" id="grid"></div>
+<script>
+const t = new URLSearchParams(location.search).get("theme");
+if (t) document.documentElement.dataset.theme = t;
+const I = "var(--rule)", P = "var(--paper)", S = "var(--signal)";
+const ART = {
+  "tote": `
+    <ellipse cx="200" cy="352" rx="118" ry="12" fill="${I}" opacity=".16"/>
+    <path d="M142 150c-6-84 110-84 116 0" fill="none" stroke="${I}" stroke-width="13" stroke-linecap="round"/>
+    <path d="M100 150h200l16 196H84z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M100 150h200v26H98z" fill="${I}"/>
+    <path d="M94 238h212M91 262h218" stroke="${I}" stroke-width="5"/>
+    <rect x="146" y="282" width="108" height="48" fill="${S}" stroke="${I}" stroke-width="5"/>
+    <path d="M166 306h68" stroke="${I}" stroke-width="6" stroke-linecap="round"/>`,
+  "pour-over": `
+    <ellipse cx="200" cy="354" rx="140" ry="12" fill="${I}" opacity=".16"/>
+    <path d="M118 270h92l-8 76h-76z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <rect x="127" y="300" width="74" height="12" fill="${S}"/>
+    <path d="M210 284c36-8 38 42 0 36" fill="none" stroke="${I}" stroke-width="9"/>
+    <path d="M222 188h122l-26 -22h-70z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M232 192h104l-28 98h-48z" fill="${I}"/>
+    <rect x="252" y="290" width="64" height="12" fill="${I}"/>
+    <rect x="236" y="302" width="96" height="44" fill="${P}" stroke="${I}" stroke-width="5"/>
+    <circle cx="284" cy="244" r="12" fill="${S}"/>
+    <path d="M96 232c-14-18 14-24 0-44M130 232c-14-18 14-24 0-44" fill="none" stroke="${I}" stroke-width="4" stroke-linecap="round"/>`,
+  "workbench": `
+    <ellipse cx="200" cy="356" rx="160" ry="12" fill="${I}" opacity=".16"/>
+    <rect x="44" y="176" width="312" height="34" rx="4" fill="${S}" stroke="${I}" stroke-width="5"/>
+    <rect x="68" y="210" width="24" height="142" fill="${I}"/>
+    <rect x="308" y="210" width="24" height="142" fill="${I}"/>
+    <rect x="68" y="276" width="264" height="14" fill="${I}"/>
+    <rect x="104" y="226" width="92" height="42" fill="${P}" stroke="${I}" stroke-width="5"/>
+    <circle cx="150" cy="247" r="7" fill="${I}"/>
+    <rect x="292" y="132" width="30" height="44" fill="${I}"/>
+    <rect x="270" y="150" width="22" height="10" fill="${I}"/>
+    <path d="M106 176v-52h14v52M130 176v-34h14v34" stroke="${I}" stroke-width="5" fill="${P}"/>
+    <path d="M178 176l56-34 8 14-52 36z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>`,
+  "linen-apron": `
+    <ellipse cx="200" cy="360" rx="108" ry="10" fill="${I}" opacity=".16"/>
+    <path d="M150 66c0-26 100-26 100 0l-18 80h-64z" fill="none" stroke="${I}" stroke-width="8" stroke-linejoin="round"/>
+    <path d="M150 112h100l12 62 40 176H98l40-176z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M122 190h156" stroke="${I}" stroke-width="5"/>
+    <rect x="134" y="242" width="132" height="66" fill="none" stroke="${I}" stroke-width="5"/>
+    <path d="M200 242v66" stroke="${I}" stroke-width="5"/>
+    <path d="M122 190c-34 6-50 28-62 56M278 190c34 6 50 28 62 56" fill="none" stroke="${I}" stroke-width="8" stroke-linecap="round"/>
+    <rect x="150" y="150" width="100" height="14" fill="${S}"/>`,
+  "camp-mug": `
+    <ellipse cx="200" cy="356" rx="104" ry="12" fill="${I}" opacity=".16"/>
+    <path d="M126 150h148l-10 188c0 12-8 16-18 16h-92c-10 0-18-4-18-16z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M274 190c58-8 58 90-4 82" fill="none" stroke="${I}" stroke-width="14" stroke-linecap="round"/>
+    <rect x="120" y="136" width="160" height="22" rx="6" fill="${I}"/>
+    <rect x="132" y="228" width="136" height="38" fill="${S}"/>
+    <path d="M170 100c-14-16 14-22 0-40M206 100c-14-16 14-22 0-40M242 100c-14-16 14-22 0-40" fill="none" stroke="${I}" stroke-width="5" stroke-linecap="round"/>`,
+  "serving-board": `
+    <ellipse cx="200" cy="352" rx="150" ry="10" fill="${I}" opacity=".16"/>
+    <path d="M60 120h190a22 22 0 0 1 22 22v26h66a18 18 0 0 1 18 18v20a18 18 0 0 1-18 18h-66v26a22 22 0 0 1-22 22H60a22 22 0 0 1-22-22V142a22 22 0 0 1 22-22z" fill="${I}" transform="translate(0 12)"/>
+    <path d="M60 120h190a22 22 0 0 1 22 22v26h66a18 18 0 0 1 18 18v20a18 18 0 0 1-18 18h-66v26a22 22 0 0 1-22 22H60a22 22 0 0 1-22-22V142a22 22 0 0 1 22-22z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <circle cx="328" cy="206" r="10" fill="${I}"/>
+    <path d="M62 150h190M62 178h150M62 262h190M62 290h120" stroke="${I}" stroke-width="3" opacity=".3" stroke-linecap="round"/>
+    <path d="M84 250l58-72 58 72z" fill="${S}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <circle cx="122" cy="232" r="5" fill="${P}" stroke="${I}" stroke-width="3"/>
+    <circle cx="226" cy="214" r="17" fill="${I}"/>
+    <circle cx="212" cy="260" r="13" fill="${P}" stroke="${I}" stroke-width="5"/>
+    <circle cx="212" cy="260" r="5" fill="${I}"/>`,
+  "arc-lamp": `
+    <ellipse cx="200" cy="352" rx="110" ry="10" fill="${I}" opacity=".16"/>
+    <rect x="104" y="328" width="132" height="20" rx="6" fill="${I}"/>
+    <path d="M170 328C170 200 200 140 290 120" fill="none" stroke="${I}" stroke-width="12" stroke-linecap="round"/>
+    <path d="M262 86l86 42-30 56z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <circle cx="316" cy="196" r="12" fill="${S}"/>
+    <path d="M296 214l-8 36M320 218l4 38M342 208l20 30" stroke="${S}" stroke-width="5" stroke-linecap="round"/>`,
+  "terra-vessel": `
+    <ellipse cx="200" cy="354" rx="112" ry="10" fill="${I}" opacity=".16"/>
+    <path d="M200 112C196 60 170 44 150 40M200 112c4-52 30-72 56-72M200 112c-6-30 8-54 26-64" fill="none" stroke="${I}" stroke-width="5" stroke-linecap="round"/>
+    <circle cx="150" cy="40" r="9" fill="${S}"/><circle cx="256" cy="40" r="9" fill="${S}"/><circle cx="226" cy="48" r="9" fill="${S}"/>
+    <path d="M160 112h80v30c62 28 82 98 54 160-18 38-56 50-94 50s-76-12-94-50c-28-62-8-132 54-160z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <rect x="152" y="104" width="96" height="16" rx="6" fill="${I}"/>
+    <path d="M110 250c60 20 120 20 180 0" fill="none" stroke="${S}" stroke-width="16"/>
+    <circle cx="160" cy="300" r="7" fill="${I}"/><circle cx="196" cy="316" r="7" fill="${I}"/><circle cx="234" cy="300" r="7" fill="${I}"/>`,
+  "linen-throw": `
+    <ellipse cx="200" cy="352" rx="150" ry="10" fill="${I}" opacity=".16"/>
+    <rect x="70" y="268" width="260" height="68" rx="6" fill="${P}" stroke="${I}" stroke-width="5"/>
+    <path d="M70 292h260M70 314h260" stroke="${I}" stroke-width="4"/>
+    <rect x="84" y="200" width="244" height="68" rx="6" fill="${S}" stroke="${I}" stroke-width="5"/>
+    <rect x="70" y="132" width="260" height="68" rx="6" fill="${P}" stroke="${I}" stroke-width="5"/>
+    <path d="M70 156h260M70 178h260" stroke="${I}" stroke-width="4"/>
+    <path d="M330 140v52M338 140v52M346 140v52M330 276v52M338 276v52M346 276v52" stroke="${I}" stroke-width="4" stroke-linecap="round"/>`,
+  "desk-clock": `
+    <ellipse cx="200" cy="356" rx="100" ry="10" fill="${I}" opacity=".16"/>
+    <path d="M140 284l-26 66M260 284l26 66" stroke="${I}" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="200" cy="188" r="108" fill="${P}" stroke="${I}" stroke-width="6"/>
+    <circle cx="200" cy="188" r="90" fill="none" stroke="${I}" stroke-width="2" opacity=".4"/>
+    <path d="M200 98v18M200 260v18M110 188h18M272 188h18" stroke="${I}" stroke-width="6" stroke-linecap="round"/>
+    <path d="M200 188v-62" stroke="${I}" stroke-width="8" stroke-linecap="round"/>
+    <path d="M200 188l48 28" stroke="${S}" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="200" cy="188" r="10" fill="${I}"/>`,
+  "hand-plane": `
+    <ellipse cx="200" cy="352" rx="160" ry="10" fill="${I}" opacity=".16"/>
+    <rect x="44" y="290" width="312" height="40" rx="6" fill="${I}"/>
+    <path d="M60 290v-76h280v76z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <circle cx="324" cy="190" r="24" fill="${S}" stroke="${I}" stroke-width="5"/>
+    <path d="M82 214c0-58 76-58 76 0" fill="none" stroke="${I}" stroke-width="14" stroke-linecap="round"/>
+    <path d="M190 214l44-72 24 14-36 58z" fill="${I}"/>
+    <rect x="180" y="248" width="58" height="12" fill="${S}"/>
+    <path d="M250 336c26-30 56 2 28 22" fill="none" stroke="${I}" stroke-width="4" stroke-linecap="round"/>`,
+  "tape-measure": `
+    <ellipse cx="200" cy="354" rx="150" ry="10" fill="${I}" opacity=".16"/>
+    <rect x="196" y="286" width="160" height="32" fill="${P}" stroke="${I}" stroke-width="5"/>
+    <path d="M222 286v14M248 286v14M274 286v14M300 286v14M326 286v14" stroke="${I}" stroke-width="3"/>
+    <rect x="340" y="280" width="22" height="44" fill="${I}"/>
+    <circle cx="170" cy="190" r="108" fill="${S}" stroke="${I}" stroke-width="6"/>
+    <circle cx="170" cy="190" r="58" fill="${P}" stroke="${I}" stroke-width="5"/>
+    <circle cx="170" cy="190" r="12" fill="${I}"/>
+    <path d="M110 112l22 22" stroke="${I}" stroke-width="6" stroke-linecap="round"/>`,
+  "journal": `
+    <ellipse cx="200" cy="356" rx="110" ry="10" fill="${I}" opacity=".16"/>
+    <rect x="124" y="88" width="184" height="264" rx="10" fill="${P}" stroke="${I}" stroke-width="5"/>
+    <rect x="104" y="72" width="184" height="264" rx="10" fill="${I}"/>
+    <rect x="248" y="72" width="22" height="264" fill="${S}"/>
+    <rect x="130" y="126" width="94" height="60" fill="${P}"/>
+    <path d="M144 148h66M144 166h42" stroke="${I}" stroke-width="5" stroke-linecap="round"/>
+    <path d="M126 72v264" stroke="${P}" stroke-width="3" opacity=".5"/>`,
+  "rucksack": `
+    <ellipse cx="200" cy="356" rx="118" ry="10" fill="${I}" opacity=".16"/>
+    <path d="M168 110c0-36 64-36 64 0" fill="none" stroke="${I}" stroke-width="10" stroke-linecap="round"/>
+    <path d="M108 200c-26 20-26 100 0 120M292 200c26 20 26 100 0 120" fill="none" stroke="${I}" stroke-width="9" stroke-linecap="round"/>
+    <rect x="108" y="108" width="184" height="240" rx="40" fill="${P}" stroke="${I}" stroke-width="5"/>
+    <path d="M108 150c0-46 184-46 184 0v54H108z" fill="${I}"/>
+    <rect x="184" y="182" width="32" height="46" rx="4" fill="${S}" stroke="${I}" stroke-width="5"/>
+    <rect x="138" y="250" width="124" height="70" rx="14" fill="none" stroke="${I}" stroke-width="5"/>
+    <path d="M138 272h124" stroke="${I}" stroke-width="4"/>`,
+  "planter": `
+    <ellipse cx="200" cy="354" rx="100" ry="10" fill="${I}" opacity=".16"/>
+    <path d="M200 218V112" stroke="${I}" stroke-width="5" stroke-linecap="round"/>
+    <path d="M200 190c-42-10-72-52-60-88 42 8 62 46 60 88z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M200 168c38-8 66-40 58-74-38 4-58 36-58 74z" fill="${S}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M128 244h144l-18 106H146z" fill="${S}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <rect x="116" y="216" width="168" height="32" rx="6" fill="${P}" stroke="${I}" stroke-width="5"/>
+    <path d="M150 284h100" stroke="${I}" stroke-width="4" opacity=".5"/>`,
+  "wall-shelf": `
+    <ellipse cx="200" cy="352" rx="150" ry="8" fill="${I}" opacity=".16"/>
+    <path d="M96 276v60l62-60zM304 276v60l-62-60z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <rect x="56" y="250" width="288" height="28" rx="4" fill="${I}"/>
+    <rect x="80" y="196" width="84" height="28" fill="${S}" stroke="${I}" stroke-width="5"/>
+    <rect x="88" y="168" width="68" height="28" fill="${P}" stroke="${I}" stroke-width="5"/>
+    <rect x="96" y="140" width="52" height="28" fill="${I}"/>
+    <path d="M244 250l8-46h50l8 46z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M277 204c-20-30-10-52 0-64 10 12 20 34 0 64z" fill="${S}" stroke="${I}" stroke-width="4" stroke-linejoin="round"/>`,
+  "kettle": `
+    <ellipse cx="200" cy="352" rx="130" ry="10" fill="${I}" opacity=".16"/>
+    <path d="M150 168c-34-64 8-100 50-100s84 36 50 100" fill="none" stroke="${I}" stroke-width="10" stroke-linecap="round"/>
+    <path d="M286 268l56-72 14 10-52 82z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M108 340c-14-92 12-176 92-176s106 84 92 176z" fill="${P}" stroke="${I}" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M111 296h178l4 -26h-186z" fill="${S}"/>
+    <rect x="150" y="150" width="100" height="18" rx="6" fill="${I}"/>
+    <circle cx="200" cy="138" r="12" fill="${S}" stroke="${I}" stroke-width="4"/>`,
+  "stool": `
+    <ellipse cx="200" cy="356" rx="130" ry="10" fill="${I}" opacity=".16"/>
+    <path d="M130 214l-38 136M270 214l38 136M200 226V352" stroke="${I}" stroke-width="13" stroke-linecap="round"/>
+    <path d="M112 292h176" stroke="${I}" stroke-width="7"/>
+    <path d="M96 168v26c0 18 46 28 104 28s104-10 104-28v-26" fill="${S}" stroke="${I}" stroke-width="5"/>
+    <ellipse cx="200" cy="168" rx="104" ry="28" fill="${P}" stroke="${I}" stroke-width="5"/>
+    <ellipse cx="200" cy="168" rx="56" ry="12" fill="none" stroke="${I}" stroke-width="3" opacity=".4"/>`
+};
+const ITEMS = [
+  { key: "tote", no: "0101", name: "Canvas Market Tote", price: "29.90", stage: 3 },
+  { key: "pour-over", no: "0102", name: "Stoneware Pour-Over Set", price: "64.00", stage: 4 },
+  { key: "workbench", no: "0103", name: "Workshop Workbench", price: "489.00", stage: 1 },
+  { key: "linen-apron", no: "0104", name: "Linen Apron", price: "34.50", stage: 2 },
+  { key: "camp-mug", no: "0105", name: "Enamel Camp Mug", price: "12.00", stage: 1 },
+  { key: "serving-board", no: "0106", name: "Walnut Serving Board", price: "58.00", stage: 2 },
+  { key: "arc-lamp", no: "0107", name: "Arc Table Lamp", price: "129.00", stage: 2 },
+  { key: "terra-vessel", no: "0108", name: "Terra Vessel", price: "68.00", stage: 1 },
+  { key: "linen-throw", no: "0109", name: "Linen Throw", price: "54.50", stage: 4 },
+  { key: "desk-clock", no: "0110", name: "Desk Clock", price: "46.00", stage: 2 },
+  { key: "hand-plane", no: "0111", name: "Beech Hand Plane", price: "84.00", stage: 1 },
+  { key: "tape-measure", no: "0112", name: "Steel Tape Measure", price: "18.00", stage: 3 },
+  { key: "journal", no: "0113", name: "Bound Journal", price: "22.00", stage: 4 },
+  { key: "rucksack", no: "0114", name: "Canvas Rucksack", price: "96.00", stage: 3 },
+  { key: "planter", no: "0115", name: "Clay Planter", price: "26.00", stage: 2 },
+  { key: "wall-shelf", no: "0116", name: "Oak Wall Shelf", price: "72.00", stage: 1 },
+  { key: "kettle", no: "0117", name: "Enamel Kettle", price: "48.00", stage: 4 },
+  { key: "stool", no: "0118", name: "Round Stool", price: "88.00", stage: 2 }
+];
+document.getElementById("grid").innerHTML = ITEMS.map(p => `
+  <div class="card">
+    <div class="stage s${p.stage}"><span class="no">No. ${p.no}</span>
+      <svg viewBox="0 0 400 400" role="img" aria-label="${p.name} illustration">${ART[p.key]}</svg></div>
+    <p class="name">${p.name}</p><p class="price">${p.price}</p>
+  </div>`).join("");
+</script>
+</body>
+</html>

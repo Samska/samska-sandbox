@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import io.github.samska.sandbox.cart.CartRevisionMismatchException;
 import io.github.samska.sandbox.order.application.OrderNotFoundException;
-import io.github.samska.sandbox.order.application.OrderPaymentNotApprovedException;
-import io.github.samska.sandbox.payment.application.PaymentAttemptNotFoundException;
+import io.github.samska.sandbox.order.application.OrderOutOfStockException;
 
 @RestControllerAdvice(assignableTypes = OrderController.class)
 public class OrderApiExceptionHandler {
@@ -21,14 +21,19 @@ public class OrderApiExceptionHandler {
         return ResponseEntity.badRequest().build();
     }
 
-    @ExceptionHandler({OrderNotFoundException.class, PaymentAttemptNotFoundException.class})
+    @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<Void> notFound() {
         return ResponseEntity.notFound().build();
     }
 
-    @ExceptionHandler(OrderPaymentNotApprovedException.class)
-    public ResponseEntity<ErrorResponse> notApproved() {
-        return ResponseEntity.status(409).body(new ErrorResponse("payment-not-approved"));
+    @ExceptionHandler(CartRevisionMismatchException.class)
+    public ResponseEntity<ErrorResponse> cartChanged() {
+        return ResponseEntity.status(409).body(new ErrorResponse("cart-changed"));
+    }
+
+    @ExceptionHandler(OrderOutOfStockException.class)
+    public ResponseEntity<ErrorResponse> outOfStock() {
+        return ResponseEntity.status(409).body(new ErrorResponse("out-of-stock"));
     }
 
     @ExceptionHandler({DataAccessResourceFailureException.class, TransactionException.class})

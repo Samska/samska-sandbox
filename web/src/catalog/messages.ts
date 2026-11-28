@@ -19,6 +19,12 @@ export function cartErrorMessage(error: unknown): string {
       return "The Product or Cart item was not found.";
     }
 
+    if (error.kind === "out-of-stock") {
+      return error.available === 0 || error.available === null
+        ? "That Product is sold out."
+        : `Only ${error.available} left in stock. Lower the quantity.`;
+    }
+
     if (error.kind === "network") {
       return "The Cart service could not be reached. Try again.";
     }

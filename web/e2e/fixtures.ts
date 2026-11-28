@@ -1,4 +1,5 @@
 import { expect, type APIRequestContext, type Page } from "@playwright/test";
+import { xsrfHeaders } from "./session";
 
 export interface ProductFixture {
   id: string;
@@ -20,24 +21,15 @@ export interface CartDto {
   revision: number;
 }
 
-export interface PaymentAttemptDto {
-  attemptId: string;
-  status: "approved" | "declined" | "failed";
-  cartRevision: number;
-  items: CartItemDto[];
-  total: number;
-}
-
 export interface OrderDto {
   orderId: string;
-  paymentAttemptId: string;
+  orderNumber: string;
   cartRevision: number;
   items: CartItemDto[];
   total: number;
 }
 
 export interface TransactionalRequestCounts {
-  paymentPosts: () => number;
   orderPosts: () => number;
 }
 
@@ -50,7 +42,8 @@ export async function createProduct(
   price: number
 ): Promise<ProductFixture> {
   const response = await request.post("/api/products", {
-    data: { name, description: `Synthetic E2E fixture for ${name}`, price }
+    data: { name, description: `Synthetic E2E fixture for ${name}`, price },
+    headers: await xsrfHeaders(request)
   });
 
   expect(response.status(), `create product ${name}`).toBe(201);
@@ -65,27 +58,21 @@ export async function getCart(request: APIRequestContext): Promise<CartDto> {
   return (await response.json()) as CartDto;
 }
 
-// The backend keeps one shared process-local Cart, so tests start from an empty
+// The signed-in account keeps one Cart across tests, so they start from an empty
 // Cart using the existing Cart API. No application reset endpoint is added.
 export async function clearCart(request: APIRequestContext): Promise<CartDto> {
   const initial = await getCart(request);
 
   for (const item of initial.items) {
-    const response = await request.delete(`/api/cart/items/${encodeURIComponent(item.productId)}`);
+    const response = await request.delete(`/api/cart/items/${encodeURIComponent(item.productId)}`, {
+      headers: await xsrfHeaders(request)
+    });
     expect(response.status(), `remove ${item.productId} from cart`).toBe(200);
   }
 
   const cart = await getCart(request);
   expect(cart.items, "cart is empty before the test starts").toHaveLength(0);
   return cart;
-}
-
-export function fetchPaymentAttempt(request: APIRequestContext, attemptId: string) {
-  return request.get(`/api/payment-attempts/${encodeURIComponent(attemptId)}`);
-}
-
-export function fetchOrderByAttempt(request: APIRequestContext, attemptId: string) {
-  return request.get(`/api/orders/payment-attempts/${encodeURIComponent(attemptId)}`);
 }
 
 export function fetchOrderById(request: APIRequestContext, orderId: string) {
@@ -95,7 +82,6 @@ export function fetchOrderById(request: APIRequestContext, orderId: string) {
 // Observes only browser-dispatched transactional requests. Fixture traffic uses
 // the separate request context and is deliberately not counted here.
 export function trackTransactionalRequests(page: Page): TransactionalRequestCounts {
-  const paymentPosts: string[] = [];
   const orderPosts: string[] = [];
 
   page.on("request", (request) => {
@@ -105,17 +91,31 @@ export function trackTransactionalRequests(page: Page): TransactionalRequestCoun
 
     const path = new URL(request.url()).pathname;
 
-    if (path === "/api/payment-attempts") {
-      paymentPosts.push(request.url());
-    }
-
     if (path === "/api/orders") {
       orderPosts.push(request.url());
     }
   });
 
   return {
-    paymentPosts: () => paymentPosts.length,
     orderPosts: () => orderPosts.length
   };
+}
+
+// Places an Order for the signed-in account through the existing APIs, so tests about Order history do not repeat the whole browser journey.
+export async function createOrderViaApi(
+  request: APIRequestContext,
+  productId: string,
+  quantity: number
+): Promise<OrderDto> {
+  const headers = await xsrfHeaders(request);
+  const added = await request.post("/api/cart/items", { data: { productId, quantity }, headers });
+  expect(added.status(), "add to cart").toBe(200);
+  const cart = (await added.json()) as CartDto;
+
+  const order = await request.post("/api/orders", {
+    data: { requestId: crypto.randomUUID(), cartRevision: cart.revision },
+    headers
+  });
+  expect(order.status(), "place order").toBe(201);
+  return (await order.json()) as OrderDto;
 }

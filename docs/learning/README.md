@@ -60,7 +60,32 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-037-order-creation.md](ss-037-order-creation.md) | Order ownership, value copies, one Order per approved attempt, replay before capacity, and honest two-lookup reconciliation. |
 | [ss-038-bdd-human-verification-pilot.md](ss-038-bdd-human-verification-pilot.md) | Optional scenario-based evidence, scenarios as plans versus evidence, expected/actual separation, blocked attempts versus product failures, same-revision payment sequencing, and owner review of agent evidence. |
 | [ss-039-first-order-journey.md](ss-039-first-order-journey.md) | Attempt-addressed URL recovery, GET-only reconciliation, pending-operation guards, stale-response invalidation, honest absence, and explicit abandonment. |
+| [ss-067-catalog-persistence.md](ss-067-catalog-persistence.md) | Stable list ordering with an identity column, IDs instead of bytes in lists, advisory-lock serialization of an aggregate budget, and snapshots without foreign keys. |
 | [ss-066-payment-persistence.md](ss-066-payment-persistence.md) | Constraint-enforced invariants with a partial unique index, reading the winner of a race, frozen snapshot rows, and dropping a memory-only limit. |
+| [ss-069-accounts-and-sessions.md](ss-069-accounts-and-sessions.md) | Server-side sessions, cookie-to-header CSRF, ownership as a port, 404 over 403, and uniform sign-in failures. |
+| [ss-070-derived-state.md](ss-070-derived-state.md) | Derived versus stored state, an injected clock for deterministic tests, and stable pseudo-randomness from an identifier. |
+| [ss-071-inventory-reservations.md](ss-071-inventory-reservations.md) | Reserving then consuming stock in one transaction, ordered row locks, and expiry without a scheduler. |
+| [ss-072-observability.md](ss-072-observability.md) | Correlation IDs, MDC, structured request logs, Micrometer meters, and reporting honest "no data" figures. |
+| [ss-073-rate-limiting-and-hardening.md](ss-073-rate-limiting-and-hardening.md) | Fixed-window rate limiting, why lockout can backfire, fail-closed production configuration, and a threat model. |
+| [ss-074-demo-mode-and-containers.md](ss-074-demo-mode-and-containers.md) | Multi-stage images, trusting a reverse proxy, and a safe synthetic-data reset. |
+| [ss-075-admin-area-and-vps.md](ss-075-admin-area-and-vps.md) | Interface versus server authorization, TLS termination with a reverse proxy, and tested backups. |
+| [ss-076-railway-deployment.md](ss-076-railway-deployment.md) | Configuring one image by environment, failing closed, and what a platform's proxy changes about client addresses. |
+| [ss-077-empty-state-design-fix.md](ss-077-empty-state-design-fix.md) | Prototype fidelity in the running app and one shared component for a repeated pattern. |
+| [ss-078-theme-switch.md](ss-078-theme-switch.md) | Layering a user theme override over the system preference, flash-free loading under a strict CSP, and failure-tolerant storage. |
+| [ss-079-image-build-in-ci.md](ss-079-image-build-in-ci.md) | Why deployment artifacts are built in CI, and the Maven wrapper's dependency on `unzip`. |
+| [ss-098-sample-catalog.md](ss-098-sample-catalog.md) | Idempotent seeding by natural key, and permanent example data. |
+| [ss-084-product-art.md](ss-084-product-art.md) | Theme-aware inline SVG, and a safe data migration in a seed. |
+| [ss-090-orders-catalog-number.md](ss-090-orders-catalog-number.md) | A customer-facing number beside a UUID key, and migrating a populated table. |
+| [ss-086-clear-cart-on-order.md](ss-086-clear-cart-on-order.md) | Side effects after a commit, idempotent replays, and changing a documented decision. |
+| [ss-088-self-hosted-fonts.md](ss-088-self-hosted-fonts.md) | Content-Security-Policy against third-party fonts, subsetting, and cache lifetimes. |
+| [ss-097-admin-order-status.md](ss-097-admin-order-status.md) | Storing changes as events, and keeping a side effect correct with one transaction and a row lock. |
+| [ss-095-remove-self-sign-up.md](ss-095-remove-self-sign-up.md) | Removing an attack surface instead of guarding it, and why roles outlive sign-up. |
+| [ss-091-plain-copy.md](ss-091-plain-copy.md) | Error messages as interface, and stale messages as defects. |
+| [ss-099-remove-payment-simulation.md](ss-099-remove-payment-simulation.md) | Removing a feature with its support code, and keeping the idempotency key. |
+| [ss-102-csrf-never-disabled.md](ss-102-csrf-never-disabled.md) | Keeping test-only security relaxations out of production code. |
+| [ss-094-remove-demo-reset.md](ss-094-remove-demo-reset.md) | Retiring a capability when its context changes, and nginx header inheritance. |
+| [ss-081-demo-sample-products.md](ss-081-demo-sample-products.md) | Idempotent seeding of demo data and why it must not overwrite existing data. |
+| [ss-080-web-dns-resolver.md](ss-080-web-dns-resolver.md) | Why the web image must use the platform's DNS resolver, and how it was verified. |
 | [ss-065-cart-persistence.md](ss-065-cart-persistence.md) | Transactional update contract for a mutable aggregate, row-lock serialization of a business revision, domain rules kept out of the store, and snapshot rows without a foreign key. |
 | [ss-049-order-persistence.md](ss-049-order-persistence.md) | Port-first PostgreSQL persistence, unique-key idempotency, transaction rollback versus lost responses, restart evidence, and bounded database-failure behavior. |
 | [ss-040-release-preparation.md](ss-040-release-preparation.md) | Release preparation versus publication, annotated immutable tags, source-only releases, build metadata versus product version, and exposure-based dependency triage. |

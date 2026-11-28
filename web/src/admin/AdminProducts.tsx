@@ -6,12 +6,14 @@ import {
   type ProductResponse
 } from "../catalog/catalogApi";
 import ProductMedia from "../catalog/ProductMedia";
-import { curatedMediaSource } from "../catalog/mediaCatalog";
+import StockBadge from "../catalog/StockBadge";
+import { hasCuratedMedia } from "../catalog/mediaCatalog";
 import { formatAmount } from "../formatAmount";
 import Button from "../ui/Button";
 import FormField from "../ui/FormField";
 import StatusMessage from "../ui/StatusMessage";
 import { adminDeleteErrorMessage, adminLoadErrorMessage, adminRefreshErrorMessage } from "./messages";
+import EmptyState, { EmptyNote, EmptyTitle, emptyActionClassName } from "../ui/EmptyState";
 
 type FocusTarget =
   | { kind: "delete-button"; productId: string }
@@ -129,8 +131,7 @@ export default function AdminProducts() {
             Product management
           </h1>
           <p className="max-w-prose text-muted">
-            Find, edit, and delete Products. This local surface is navigation only and has no access
-            control; the Market and Admin share the same Catalog.
+            Find, edit, and delete Products. The Market and Admin share the same Catalog.
           </p>
         </div>
         <a
@@ -163,6 +164,7 @@ export default function AdminProducts() {
               <input
                 {...control}
                 type="search"
+                placeholder="Search by name"
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
                 disabled={isBusy}
@@ -191,37 +193,41 @@ export default function AdminProducts() {
           </div>
         ) : null}
         {!isLoading && loadError === null && products.length === 0 ? (
-          <div className="grid gap-2 rounded-sm bg-surface-muted px-4 py-5">
-            <p className="font-bold text-ink">No Products exist yet.</p>
-            <p className="text-sm text-muted">
-              Use Create Product to add the first Product to the Catalog.
-            </p>
-          </div>
+          <EmptyState>
+            <EmptyTitle>No Products exist yet.</EmptyTitle>
+            <EmptyNote>Use Create Product to add the first Product to the Catalog.</EmptyNote>
+            <a className={emptyActionClassName} href="/admin/products/new">
+              Create the first Product
+            </a>
+          </EmptyState>
         ) : null}
         {!isLoading && loadError === null && products.length > 0 && visibleProducts.length === 0 ? (
-          <div className="grid gap-2 rounded-sm bg-surface-muted px-4 py-5">
-            <p className="font-bold text-ink">
-              No Products match &ldquo;{searchTerm.trim()}&rdquo;.
-            </p>
-            <p className="text-sm text-muted">Clear the search to see the full Product list.</p>
-          </div>
+          <EmptyState>
+            <EmptyTitle>No Products match &ldquo;{searchTerm.trim()}&rdquo;.</EmptyTitle>
+            <EmptyNote>Clear the search to see the full Product list.</EmptyNote>
+          </EmptyState>
         ) : null}
         {!isLoading && loadError === null && visibleProducts.length > 0 ? (
           <ul className="grid list-none gap-2 p-0 m-0">
             {visibleProducts.map((product) => (
               <li key={product.id} className="rounded-sm border-[1.5px] border-ink bg-surface">
-                <div className="grid gap-3 p-3 min-[40rem]:min-h-16 min-[40rem]:grid-cols-[auto_minmax(0,1fr)_auto_auto] min-[40rem]:items-center min-[40rem]:gap-4">
-                  <ProductMedia product={product} variant="thumbnail" />
+                <div className="grid grid-cols-[3rem_minmax(0,1fr)] items-start gap-x-3 gap-y-1.5 p-3 min-[40rem]:min-h-16 min-[40rem]:grid-cols-[auto_minmax(0,1fr)_auto_auto] min-[40rem]:items-center min-[40rem]:gap-4">
+                  <div className="row-span-3 min-[40rem]:row-span-1">
+                    <ProductMedia product={product} variant="thumbnail" />
+                  </div>
                   <div className="grid min-w-0 gap-0.5">
                     <h3 className="truncate text-base font-extrabold leading-snug tracking-[-0.01em] text-ink">
                       {product.name}
                     </h3>
                     <p className="text-sm text-muted">{imageStateLabel(product)}</p>
                   </div>
-                  <p className="text-base font-extrabold tracking-[-0.01em] text-ink">
-                    {formatAmount(product.price)}
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                    <p className="font-mono text-[0.95rem] font-semibold text-ink">
+                      {formatAmount(product.price)}
+                    </p>
+                    <StockBadge product={product} />
+                  </div>
+                  <div className="col-start-2 flex flex-wrap items-center gap-2 min-[40rem]:col-start-auto">
                     <a
                       id={`admin-edit-${product.id}`}
                       className="inline-flex min-h-10 items-center justify-center rounded-sm border-[1.5px] border-ink bg-surface px-3 font-mono text-[0.75rem] font-semibold uppercase tracking-[0.06em] text-ink no-underline hover:bg-ink hover:text-canvas"
@@ -272,9 +278,9 @@ function imageStateLabel(product: ProductResponse): string {
     return "No image";
   }
 
-  return curatedMediaSource(product.mediaKey) !== undefined
-    ? "Curated image"
-    : "Monogram (media key has no local asset)";
+  return hasCuratedMedia(product.mediaKey)
+    ? "Catalog image"
+    : "Placeholder (image file not found)";
 }
 
 function DeleteConfirmation({

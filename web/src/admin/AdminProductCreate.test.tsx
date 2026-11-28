@@ -95,7 +95,8 @@ describe("AdminProductCreate", () => {
         name: created.name,
         description: created.description,
         price: 12.5,
-        mediaKey: null
+        mediaKey: null,
+        stock: 25
       })
     });
     expect(fetchMock.mock.calls.some(([input]) => String(input).includes("/media"))).toBe(false);

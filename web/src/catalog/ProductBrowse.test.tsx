@@ -50,13 +50,13 @@ describe("ProductBrowse (Bench catalog)", () => {
     expect(cards).toHaveLength(2);
     const first = within(cards[0]);
     expect(first.getByRole("heading", { name: "Arc Table Lamp", level: 3 })).toBeInTheDocument();
-    expect(first.getByText("129.00")).toBeInTheDocument();
+    expect(first.getByText("$129.00")).toBeInTheDocument();
     expect(cards[0].textContent).toMatch(/No\. \d{4}/);
   });
 
   it("keeps the price inside the object stage, not as a separate row", () => {
     renderBrowse();
-    const price = screen.getByText("68.00");
+    const price = screen.getByText("$68.00");
 
     expect(price.closest("p")?.className).toContain("rounded-full");
     expect(price.closest("p")?.className).toContain("absolute");
@@ -99,5 +99,21 @@ describe("ProductBrowse (Bench catalog)", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Could not load Products.");
     screen.getByRole("button", { name: "Retry Products" }).click();
     expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows stock badges and disables Add for a sold-out Product", () => {
+    renderBrowse({
+      products: [
+        { ...products[0], stock: 0 },
+        { ...products[1], stock: 3 },
+        { ...products[1], id: "33333333-3333-3333-3333-333333333333", name: "Plenty", stock: 40 }
+      ]
+    });
+
+    expect(screen.getByText("Sold out", { selector: "span" })).toBeInTheDocument();
+    expect(screen.getByText("3 left")).toBeInTheDocument();
+    expect(screen.getByText("In stock")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Add Arc Table Lamp to Cart" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Add Terra Vessel to Cart" })).toBeEnabled();
   });
 });

@@ -1,0 +1,13 @@
+# Private mode: the whole site, API included, sits behind HTTP basic authentication until the owner
+# opens it to the public. DEMO_ACCESS_HASH is a bcrypt hash made with `caddy hash-password`.
+{$DEMO_DOMAIN} {
+	encode zstd gzip
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+	basic_auth {
+		{$DEMO_ACCESS_USER} {$DEMO_ACCESS_HASH}
+	}
+	reverse_proxy web:8080
+}
