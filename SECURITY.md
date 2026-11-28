@@ -18,7 +18,7 @@ The project will acknowledge reports, assess severity and scope, and coordinate 
 ## Contributor Expectations
 
 - Never commit secrets, credentials, private keys, access tokens, real connection strings, or real customer data.
-- Do not add real payment processing. Payments in this project are simulated.
+- Do not add real payment processing. There is no payment in this project: Orders are approved directly and nothing is charged.
 - Use synthetic data for all public or shared environments.
 - Do not expose privileged debug, simulation, chaos, or infrastructure controls anonymously.
 - Treat dependencies, deployment configuration, APIs, logs, and data handling as security-relevant changes.

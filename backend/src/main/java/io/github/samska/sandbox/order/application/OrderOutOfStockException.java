@@ -2,7 +2,7 @@ package io.github.samska.sandbox.order.application;
 
 import java.util.UUID;
 
-/** The units of an approved attempt are no longer free (its hold expired and the stock was sold). */
+/** The units in the Cart are no longer in stock. */
 public final class OrderOutOfStockException extends RuntimeException {
 
     private final UUID productId;

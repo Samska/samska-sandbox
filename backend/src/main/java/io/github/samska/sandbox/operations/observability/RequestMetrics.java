@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * In-process request figures, kept in Micrometer meters: {@code samska.requests}, {@code samska.requests.errors}
- * and {@code samska.checkout.duration} (the Payment attempt request, with a 95th percentile over about 15 minutes).
+ * and {@code samska.checkout.duration} (the Order placement request, with a 95th percentile over about 15 minutes).
  */
 @Component
 public class RequestMetrics {
@@ -28,7 +28,7 @@ public class RequestMetrics {
         this.serverErrors = Counter.builder("samska.requests.errors")
                 .description("API requests that ended in a 5xx status").register(registry);
         this.checkout = Timer.builder("samska.checkout.duration")
-                .description("Duration of Payment attempt requests")
+                .description("Duration of Order placement requests")
                 .publishPercentiles(0.95)
                 .distributionStatisticExpiry(Duration.ofMinutes(15))
                 .distributionStatisticBufferLength(3)
@@ -40,7 +40,7 @@ public class RequestMetrics {
         if (status >= 500) {
             serverErrors.increment();
         }
-        if ("POST".equals(method) && "/api/payment-attempts".equals(path)) {
+        if ("POST".equals(method) && "/api/orders".equals(path)) {
             checkout.record(nanos, TimeUnit.NANOSECONDS);
         }
     }

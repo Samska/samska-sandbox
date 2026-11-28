@@ -68,15 +68,6 @@ class CartApiUnavailableTest {
     }
 
     @Test
-    void paymentInitiationReturnsTheStableUnavailableCode() throws Exception {
-        mvc.perform(post("/api/payment-attempts").contentType("application/json")
-                        .content("{\"attemptId\":\"" + UUID.randomUUID()
-                                + "\",\"cartRevision\":0,\"scenario\":\"approve\"}"))
-                .andExpect(status().isServiceUnavailable())
-                .andExpect(jsonPath("$.code").value("payment-store-unavailable"));
-    }
-
-    @Test
     void productDeletionReturnsTheStableUnavailableCodeAndKeepsTheProduct() throws Exception {
         var productId = createProduct();
 

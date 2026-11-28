@@ -10,10 +10,6 @@ export interface OperationsSnapshot {
   generatedAt: string;
   ordersLastHour: number;
   ordersLast24Hours: number;
-  approvedAttempts: number;
-  declinedAttempts: number;
-  failedAttempts: number;
-  approvalRate: number | null;
   checkoutP95Millis: number | null;
   checkoutSamples: number;
   requests: number;
@@ -34,9 +30,6 @@ export class OperationsApiError extends Error {
 const countKeys = [
   "ordersLastHour",
   "ordersLast24Hours",
-  "approvedAttempts",
-  "declinedAttempts",
-  "failedAttempts",
   "checkoutSamples",
   "requests",
   "serverErrors"
@@ -88,7 +81,6 @@ function isSnapshot(value: unknown): value is OperationsSnapshot {
   return (
     typeof record.generatedAt === "string" &&
     countKeys.every((key) => typeof record[key] === "number" && Number.isFinite(record[key])) &&
-    isNumberOrNull(record.approvalRate) &&
     isNumberOrNull(record.checkoutP95Millis) &&
     isNumberOrNull(record.errorRate) &&
     Array.isArray(record.services) &&

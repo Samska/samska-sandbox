@@ -9,11 +9,13 @@ import io.github.samska.sandbox.order.OrderSummary;
 
 public interface OrderStore {
 
-    OrderResult create(UUID paymentAttemptId);
+    /**
+     * Places an Order from the Cart snapshot, taking the stock in the same transaction. A request id that
+     * already has an Order returns that Order unchanged.
+     */
+    OrderResult create(UUID requestId, long cartRevision, CartSnapshotProvider cartSnapshotProvider);
 
     Optional<Order> findById(UUID orderId);
-
-    Optional<Order> findByPaymentAttemptId(UUID paymentAttemptId);
 
     /** The signed-in account's Orders, newest first. */
     List<OrderSummary> listForCurrentAccount();

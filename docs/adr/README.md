@@ -62,3 +62,5 @@ The first accepted decision is [ADR 0001: Adopt a Modular Monolith for v0.1](000
 [ADR 0019: Separate The Admin Area And Terminate TLS With Caddy](0019-separate-admin-area-and-terminate-tls-with-caddy.md) records the Admin shell, role-based sign-in destination, and the Caddy-fronted VPS stack.
 
 [ADR 0020: Run On Railway With An Environment-Driven Web Image](0020-run-on-railway-with-environment-driven-web-image.md) records the Railway service layout, the start-up rendered nginx configuration and the private mode moved into the web image.
+
+[ADR 0021: Remove The Simulated Payment And Place The Order Directly](0021-remove-the-simulated-payment.md) records the removal of the Payment module, the request-ID idempotency of Order placement, the end of stock reservations and the single Place order step; it supersedes ADRs 0005 and 0010 and parts of 0006, 0007 and 0015.

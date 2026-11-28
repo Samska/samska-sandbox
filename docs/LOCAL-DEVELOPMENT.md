@@ -4,7 +4,7 @@
 
 This is the canonical guide for configuring, running, verifying, stopping, and troubleshooting Samska Sandbox locally. It describes the repository's current state; it is not deployment guidance.
 
-The core Catalog, Cart, Payment, and Order application uses a Java/Spring Boot backend and a React/Vite frontend. Products, uploaded Product media, the current Cart, simulated payment attempts, Orders and their items are all persisted in PostgreSQL and survive a backend restart; `docker compose down -v` removes them. PostgreSQL is required for backend startup; Docker Compose provides the local runtime.
+The core Catalog, Cart, and Order application uses a Java/Spring Boot backend and a React/Vite frontend. Products, uploaded Product media, the current Cart, Orders and their items are all persisted in PostgreSQL and survive a backend restart; `docker compose down -v` removes them. PostgreSQL is required for backend startup; Docker Compose provides the local runtime.
 
 ## Prerequisites
 
@@ -115,8 +115,7 @@ Browser
       -> Spring Boot (default 8080)
         -> JdbcProductStore (Products and uploaded media, PostgreSQL)
         -> JdbcCartStore (PostgreSQL)
-        -> JdbcPaymentStore (simulated attempts, PostgreSQL)
-        -> JdbcOrderStore (Orders and items copied from approved attempts)
+        -> JdbcOrderStore (Orders and items copied from the Cart)
              -> Flyway-managed PostgreSQL schema
 
 PostgreSQL (127.0.0.1:${POSTGRES_HOST_PORT:-5432})
@@ -165,11 +164,9 @@ The Admin surface accepts one JPEG image per Product. The limits are a 3 MiB mul
 
 Uploaded images are runtime data: they are not committed to the repository, are not curated assets under `web/public/media/`, and are stored with their Product in PostgreSQL and are removed with it. Do not add uploaded images to the repository or to `ATTRIBUTION.md`.
 
-## Simulated Payment
+## Placing An Order
 
-Checkout offers a demo outcome selector (Approve, Decline, or Temporary failure) and a Simulate payment action. The backend captures an immutable, revision-checked snapshot of the current Cart and records a simulated decision in bounded process memory. Repeating the same attempt ID returns the stored result; one Cart revision can hold at most one approval; a changed Cart since the reviewed revision is refused with `409 cart-changed`; and the store retains at most 32 attempts. When the store is full, new attempts return `503 attempt-capacity-exceeded` without evicting existing results; restarting the backend resets the simulator, which also clears Products and the Cart, so recreate synthetic data and review Checkout again.
-
-Payment simulation is local-only: no real payment is processed, no credentials or card data are accepted, and no Order is created. The endpoints and scenario selector are unauthenticated and must not be exposed as a hosted capability. Attempts, captured snapshots, and duplicate protection are lost on backend restart, and a lookup of an attempt from a previous process returns `404`, requiring a new explicit initiation.
+Checkout has one step: **Place order**. The browser sends a request ID and the Cart revision it showed; the backend captures an immutable, revision-checked snapshot of the current Cart, stores the Order and its items, takes the stock and empties the Cart in the same request. There is no payment and no demo outcome: every Order is approved directly, and nothing is charged. Repeating the same request ID returns the stored Order with `200` instead of `201`; a Cart that changed since the reviewed revision is refused with `409 cart-changed`; items that are no longer in stock are refused with `409 out-of-stock`. The simulated payment of SS-036 was removed in SS-099 ([ADR 0021](adr/0021-remove-the-simulated-payment.md)).
 
 ## URLs and Ports
 
@@ -178,7 +175,7 @@ Payment simulation is local-only: no real payment is processed, no credentials o
 | Spring Boot | `http://localhost:8080` | Default port; no repository override exists. |
 | Health endpoint | `http://localhost:8080/actuator/health` | The only intentionally exposed Actuator endpoint. |
 | Vite development server | `http://localhost:5173` when available | Check Vite startup output for the actual port. |
-| Frontend routes | `/` (Market), `/checkout` (editable Checkout), `/checkout/attempts/{attemptId}` (Payment result and Order confirmation), `/admin/products` (Admin list), `/admin/products/new` (create), `/admin/products/{id}/edit` (edit) | Served by Vite for direct entry and reload; the attempt route recovers results through read-only API lookups. Other paths render the in-app not-found view. Not an access-control boundary. |
+| Frontend routes | `/` (Market), `/checkout` (editable Checkout), `/admin/products` (Admin list), `/admin/products/new` (create), `/admin/products/{id}/edit` (edit) | Served by Vite for direct entry and reload; the Order confirmation is shown in `/checkout` itself. Other paths render the in-app not-found view. Not an access-control boundary. |
 | PostgreSQL | `127.0.0.1:${POSTGRES_HOST_PORT:-5432}` | Required persistence; loopback only. |
 
 ## Runtime and Manual Verification
@@ -186,9 +183,9 @@ Payment simulation is local-only: no real payment is processed, no credentials o
 1. Start the backend and confirm the health response reports `UP`.
 2. Start the frontend, open its reported URL, create a synthetic Product from `/admin/products/new` (optionally selecting a JPEG before Create), edit it from `/admin/products`, browse it in the Market, add it to the Cart, update its quantity, remove it, and then delete the Product from the Admin list. Adding a Product to the Cart and then attempting to delete it must report the `409` Cart conflict until it is removed from the Cart.
 3. On `/admin/products/{id}/edit`, select a replacement JPEG or stage removal, then Save. The Market card and the Product detail view must reflect the change; replacing must serve the new image and stop serving the previous one, and removing must reveal the curated image or the monogram fallback. A rejected file (non-JPEG, over-limit, or malformed) must report that the details were saved while the image was not, and the current image must be unchanged.
-4. Stop and restart the backend, then try the same Product ID again. It must still be found, and its uploaded image must still be served. Any earlier simulated payment attempt must still be returned by `GET /api/payment-attempts/{attemptId}` with the same decision and frozen items. The current Cart, with its items and revision, must still be returned by `GET /api/cart`. A previously created Order must remain retrievable by its Order ID and by its original payment-attempt ID.
-5. In Checkout, initiate a simulated payment. Selecting Decline or Temporary failure must state that no payment was made and offer another attempt; approving must state that no real payment was made and no Order was created. Editing the Cart, then attempting payment again after a Cart change, must refresh the displayed Cart instead of deciding on stale values. Stopping and restarting the backend must clear the Cart and attempts.
-6. After an approval, reload the `/checkout/attempts/{attemptId}` page: the approved captured snapshot must be recovered from the API, not resent. Create the Order explicitly, reload again, and the frozen Order must remain retrievable. Save the attempt URL, stop and restart only the backend, and load that URL again: the frozen Order must still render even though the Payment attempt is gone. An unknown attempt URL must show that the result cannot be confirmed; a missing record must never be presented as proof that the backend restarted. The live Cart must remain editable after Order creation.
+4. Stop and restart the backend, then try the same Product ID again. It must still be found, and its uploaded image must still be served. The current Cart, with its items and revision, must still be returned by `GET /api/cart`. A previously created Order must remain retrievable by its Order ID.
+5. In Checkout, press Place order. The Order number must be shown, the Cart must be empty and the Order must appear in Orders. Editing the Cart in another tab and then pressing Place order must refresh the displayed Cart instead of ordering stale values.
+6. After placing an Order, reload the page and open it from Orders: the frozen Order must remain retrievable by its ID. Stop and restart only the backend and open it again: it must still be there. There must be no payment, demo outcome or "Resume payment" notice anywhere.
 7. Use `docker compose ps` and the migration log to verify PostgreSQL and Flyway startup independently. While PostgreSQL is stopped, Order requests must return `503` with `order-store-unavailable` rather than hanging; record whether they recover after PostgreSQL restarts without restarting the backend. The roughly five-second observation is the Hikari connection-acquisition bound; `socketTimeout` is ten seconds, so a mid-query failure can take longer.
 
 These checks demonstrate current runtime behavior. A healthy PostgreSQL container does not by itself prove Order persistence; the restart, lookup, and outage checks above do.
@@ -201,14 +198,14 @@ Required owner checks:
 
 R1 and R2 are automated in `OrderPersistenceRestartTest`. The owner checks below are spot-checks of the observable journey, not a request to repeat the full automated matrix.
 
-- **R1 — restart reads.** Create a multi-item Order from an approved simulated payment; stop and start only the backend. GET by Order ID and by payment-attempt ID must both return `200` with the same Order ID, attempt ID, Cart revision, item order, names, unit prices, quantities, line subtotals, and total.
-- **R2 — replay and row set.** POST the same attempt after restart. It must return `200`, not `201`, with the same Order ID. SQL must show exactly one Order row and one item set. A pre-restart approved attempt with no Order must return `404`.
-- **R3 — saved URL.** Open the saved `/checkout/attempts/{attemptId}` URL after the restart. The frozen Order must render while Market and Checkout show empty state; reload and Back/Forward must remain stable, and no request may mutate state.
-- **R4 — outage and revised copy.** Stop PostgreSQL. Health must be `503`/down; Order GET and POST must return `503 order-store-unavailable` within the connection-acquisition bound; the UI must show the existing unconfirmed/check-result state, not claim no Order exists. Database counts must be unchanged. Confirm the revised helper copy (“Orders persist across backend restarts. Simulated payment attempts may not. A failed lookup does not prove an Order was deleted or never created.”) is visible and accurate in this state.
+- **R1 — restart reads.** Place a multi-item Order; stop and start only the backend. GET by Order ID must return `200` with the same Order ID, Cart revision, item order, names, unit prices, quantities, line subtotals, and total.
+- **R2 — replay and row set.** POST the same request ID after restart. It must return `200`, not `201`, with the same Order ID. SQL must show exactly one Order row and one item set. A Cart filled before the restart must still be there and can be ordered afterwards.
+- **R3 — saved URL.** Open the saved `/orders/{orderId}` URL after the restart. The frozen Order must render while Market and Checkout show empty state; reload and Back/Forward must remain stable, and no request may mutate state.
+- **R4 — outage and revised copy.** Stop PostgreSQL. Health must be `503`/down; Order GET and POST must return `503 order-store-unavailable` within the connection-acquisition bound; the UI must show the existing unconfirmed/check-result state, not claim no Order exists. Database counts must be unchanged. The UI must say it could not confirm the Order and offer Place order again, which cannot place it twice.
 - **R5 — recovery.** Start PostgreSQL without restarting the backend. Health and Order reads/replay must succeed; record the observation, or record that a backend restart was required.
-- **R6 — scope.** Confirm Products, uploaded media, the Cart, Payment attempts, and the Order are all still present after the backend restart.
+- **R6 — scope.** Confirm Products, uploaded media, the Cart, and the Order are all still present after the backend restart.
 
-Optional coverage, not required for acceptance: browser E2E for the saved URL and outage message; an automated real-PostgreSQL outage stop/start; an explicit data-integrity `500` test; and a Flyway history assertion. The HTTP multi-item restart, replay, row-count, and unordered-attempt checks are automated; R1 and R2 are their owner spot-checks.
+Optional coverage, not required for acceptance: browser E2E for the saved URL and outage message; an automated real-PostgreSQL outage stop/start; an explicit data-integrity `500` test; and a Flyway history assertion. The HTTP multi-item restart, replay, and row-count checks are automated; R1 and R2 are their owner spot-checks.
 
 Verification status (2026-10-26): owner-reported browser checks covered restart visibility, saved-URL recovery, outage feedback and revised helper visibility, **Try again** recovery, recovery without backend restart, and empty Catalog/Cart. SQL row counts, concurrency tests, HTTP replay assertions, and media checks were not owner-executed; they remain automated/Agent Verification only. No CI Verification is claimed.
 
@@ -236,7 +233,7 @@ git diff --check
 
 ## Browser End-to-End Tests (Playwright)
 
-`web/e2e/` contains two Chromium Playwright tests that drive the real frontend through the Vite proxy against a fresh Spring Boot backend: the First Order success journey (Cart, Checkout, explicit simulated approval, attempt-addressed recovery after reload and direct entry, explicit Order creation, frozen data after live Cart changes, and keyboard/focus checks) and a declined outcome that exposes no Order path.
+`web/e2e/` contains Chromium Playwright tests that drive the real frontend through the Vite proxy against a fresh Spring Boot backend. The First Order test covers Cart, Checkout with one Place order step, the frozen Order after live Cart changes, the Order history and tracking, and keyboard/focus checks.
 
 Prepare once per machine. Start PostgreSQL and export its password before running from `web/`:
 
@@ -253,7 +250,7 @@ What the runner does and expects:
 
 - `playwright.config.ts` starts its own backend (`mvnw.cmd`/`./mvnw` `spring-boot:run` from `backend/`) and its own Vite server on `127.0.0.1:5173` with `--strictPort`. `JAVA_HOME` remains the authoritative JDK selection on Windows.
 - If `8080` or `5173` is already in use, the run refuses to start with an explicit `already used` error and never stops the existing owner. Stop the other process yourself and retry.
-- Each invocation owns a fresh backend process: Products, Orders, Payment attempts and the single current Cart persist in PostgreSQL across runs; the tests use unique attempt IDs, do not require an empty Orders table, and clear the Cart through the existing Cart API before each test.
+- Each invocation owns a fresh backend process: Products, Orders and the single current Cart persist in PostgreSQL across runs; the tests use unique request IDs, do not require an empty Orders table, and clear the Cart through the existing Cart API before each test.
 - Tests run serially (one worker, no retries) and clear the shared Cart through the existing Cart API before each test; no application reset endpoint exists or is added.
 - On failure, traces and screenshots are written under `web/test-results/`, and the HTML report under `web/playwright-report/` (`npx playwright show-report`); open a recorded trace with `npx playwright show-trace test-results/<test-directory>/trace.zip`. Both directories are ignored by Git, so local failure artifacts are review material and CI uploads them only when the run fails. Owned-server output is printed to the terminal and appears in the CI job log; it is not written into those artifact directories. Inspect failure artifacts before rerunning the suite: every new run cleans `web/test-results/` and overwrites `web/playwright-report/`, so a preserved copy of any diagnostics you want to keep must live outside those directories.
 - Run a subset with `npm run test:e2e -- e2e/first-order.spec.ts` and watch locally with `npx playwright test --headed`.
@@ -280,7 +277,7 @@ taskkill //PID <verified-pid> //T //F
 
 ## Shutdown and Reset
 
-Use `Ctrl+C` in the launcher terminal to stop both application processes, or use `Ctrl+C` in each manual backend/frontend terminal to stop that process. Stopping the backend keeps Products, uploaded media, Orders, Payment attempts and the current Cart in PostgreSQL.
+Use `Ctrl+C` in the launcher terminal to stop both application processes, or use `Ctrl+C` in each manual backend/frontend terminal to stop that process. Stopping the backend keeps Products, uploaded media, Orders and the current Cart in PostgreSQL.
 
 Run these from the repository root to manage PostgreSQL:
 
@@ -290,7 +287,7 @@ docker compose down
 docker compose down -v
 ```
 
-`docker compose stop` stops containers and retains containers and the named volume. `docker compose down` removes Compose containers and network but retains the named volume, so Orders survive it. `docker compose down -v` also removes named volumes and destructively deletes local PostgreSQL data, including all Orders. Product, Cart, and payment-attempt data exist only in backend process memory and are unaffected by these commands except through loss of the backend process.
+`docker compose stop` stops containers and retains containers and the named volume. `docker compose down` removes Compose containers and network but retains the named volume, so Orders survive it. `docker compose down -v` also removes named volumes and destructively deletes local PostgreSQL data, including all Orders. The Cart is stored in PostgreSQL too, so it is also removed by `down -v`.
 
 ## Focused Troubleshooting
 

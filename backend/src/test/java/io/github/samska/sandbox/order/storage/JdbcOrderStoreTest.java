@@ -2,41 +2,32 @@ package io.github.samska.sandbox.order.storage;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Primary;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import javax.sql.DataSource;
 
+import io.github.samska.sandbox.cart.CartItem;
+import io.github.samska.sandbox.cart.CartRevisionMismatchException;
+import io.github.samska.sandbox.cart.CartSnapshot;
 import io.github.samska.sandbox.cart.ProductReference;
 import io.github.samska.sandbox.cart.Quantity;
 import io.github.samska.sandbox.order.Order;
 import io.github.samska.sandbox.order.OrderItem;
-import io.github.samska.sandbox.order.application.OrderPaymentNotApprovedException;
+import io.github.samska.sandbox.order.application.CartSnapshotProvider;
+import io.github.samska.sandbox.order.application.OrderOutOfStockException;
 import io.github.samska.sandbox.order.application.OrderResult;
 import io.github.samska.sandbox.order.application.OrderStore;
-import io.github.samska.sandbox.payment.PaymentAttempt;
-import io.github.samska.sandbox.payment.PaymentAttemptItem;
-import io.github.samska.sandbox.payment.PaymentScenario;
-import io.github.samska.sandbox.payment.application.PaymentAttemptNotFoundException;
-import io.github.samska.sandbox.payment.application.PaymentAttempts;
 import io.github.samska.sandbox.support.OrderDatabaseTestSupport;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -44,7 +35,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
-@Import(JdbcOrderStoreTest.AttemptsConfiguration.class)
 class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
 
     private static final UUID PRODUCT = UUID.fromString("11111111-1111-1111-1111-111111111111");
@@ -55,29 +45,21 @@ class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
     private OrderStore store;
 
     @Autowired
-    private ControlledAttempts attempts;
-
-    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private DataSource dataSource;
 
-    @BeforeEach
-    void resetAttempts() {
-        attempts.reset();
-    }
-
     @Test
     void roundTripsTheImmutableOrderAndItemsWithObservableMonetaryValues() {
-        attempts.put(FIRST, attempt(FIRST, PaymentScenario.APPROVE, "Canvas Tote", "12.5", 2, "25.00"));
+        var cart = cart("Canvas Tote", "12.5", 2, "25.00");
 
-        var created = store.create(FIRST);
+        var created = store.create(FIRST, 1, cart);
 
         assertThat(created.created()).isTrue();
-        assertThat(store.create(FIRST).created()).isFalse();
+        assertThat(store.create(FIRST, 1, cart).created()).isFalse();
         assertThat(store.findById(created.order().orderId())).contains(created.order());
-        assertThat(store.findByPaymentAttemptId(FIRST)).contains(created.order());
+        assertThat(created.order().requestId()).isEqualTo(FIRST);
         assertThat(created.order().cartRevision()).isEqualTo(1);
         assertThat(created.order().total()).isEqualByComparingTo("25.00");
         assertThat(created.order().items()).singleElement().satisfies(item -> {
@@ -92,15 +74,27 @@ class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
     }
 
     @Test
-    void numbersOrdersInCreationOrderWithAFriendlyDisplayForm() {
-        attempts.put(FIRST, attempt(FIRST, PaymentScenario.APPROVE, "Canvas Tote", "12.50", 1, "12.50"));
-        attempts.put(SECOND, attempt(SECOND, PaymentScenario.APPROVE, "Canvas Tote", "12.50", 1, "12.50"));
+    void replaysAnExistingRequestWithoutReadingTheCartAgain() {
+        var created = store.create(FIRST, 1, cart("Canvas Tote", "12.50", 1, "12.50")).order();
 
-        var first = store.create(FIRST).order();
-        var second = store.create(SECOND).order();
+        CartSnapshotProvider emptiedCart = revision -> {
+            throw new CartRevisionMismatchException(revision, revision + 1);
+        };
+        var replay = store.create(FIRST, 1, emptiedCart);
+
+        assertThat(replay.created()).isFalse();
+        assertThat(replay.order()).isEqualTo(created);
+    }
+
+    @Test
+    void numbersOrdersInCreationOrderWithAFriendlyDisplayForm() {
+        var cart = cart("Canvas Tote", "12.50", 1, "12.50");
+
+        var first = store.create(FIRST, 1, cart).order();
+        var second = store.create(SECOND, 1, cart).order();
 
         assertThat(second.orderNumber()).isGreaterThan(first.orderNumber());
-        assertThat(store.create(FIRST).order().orderNumber()).isEqualTo(first.orderNumber());
+        assertThat(store.create(FIRST, 1, cart).order().orderNumber()).isEqualTo(first.orderNumber());
         assertThat(store.findSummary(second.orderId())).get()
                 .extracting(summary -> summary.orderNumber()).isEqualTo(second.orderNumber());
         assertThat(store.listForCurrentAccount()).extracting(summary -> summary.orderNumber())
@@ -110,13 +104,12 @@ class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
 
     @Test
     void preservesItemOrderForMultiItemOrders() {
-        attempts.put(FIRST, new PaymentAttempt(FIRST, 1, PaymentScenario.APPROVE,
-                List.of(
-                        item("First item", "10.00", 1, "10.00"),
-                        item("Second item", "20.00", 1, "20.00")),
-                new BigDecimal("30.00")));
+        var snapshot = new CartSnapshot(List.of(
+                cartItem(PRODUCT, "First item", "10.00", 1),
+                cartItem(UUID.fromString("22222222-2222-2222-2222-222222222222"), "Second item", "20.00", 1)),
+                new BigDecimal("30.00"), 1);
 
-        var created = store.create(FIRST).order();
+        var created = store.create(FIRST, 1, revision -> snapshot).order();
         var reloaded = store.findById(created.orderId()).orElseThrow();
 
         assertThat(created.items()).extracting(OrderItem::name)
@@ -127,19 +120,45 @@ class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
     }
 
     @Test
-    void refusesMissingOrNonApprovedAttemptsWithoutStoringAnOrder() {
-        attempts.put(SECOND, attempt(SECOND, PaymentScenario.DECLINE, "Canvas Tote", "12.50", 2, "25.00"));
+    void refusesAnEmptyCartOrAChangedCartWithoutStoringAnOrder() {
+        var empty = new CartSnapshot(List.of(), BigDecimal.ZERO, 0);
+        CartSnapshotProvider changed = revision -> {
+            throw new CartRevisionMismatchException(revision, revision + 1);
+        };
 
-        assertThatExceptionOfType(OrderPaymentNotApprovedException.class).isThrownBy(() -> store.create(SECOND));
-        assertThatExceptionOfType(PaymentAttemptNotFoundException.class).isThrownBy(() -> store.create(FIRST));
-        assertThat(store.findByPaymentAttemptId(SECOND)).isEmpty();
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> store.create(FIRST, 0, revision -> empty));
+        assertThatExceptionOfType(CartRevisionMismatchException.class)
+                .isThrownBy(() -> store.create(FIRST, 1, changed));
         assertThat(count("orders")).isZero();
     }
 
     @Test
-    void serializesConcurrentCreatesForOneAttemptIntoOneOrder() throws Exception {
-        attempts.put(FIRST, attempt(FIRST, PaymentScenario.APPROVE, "Canvas Tote", "12.50", 2, "25.00"));
-        attempts.synchronizeLookups(2);
+    void takesTheStockAndRefusesTheOrderWhenTheUnitsAreGone() {
+        var stocked = cart("Canvas Tote", "12.50", 1000, "12500.00");
+
+        assertThat(store.create(FIRST, 1, stocked).created()).isTrue();
+        assertThat(stock()).isZero();
+
+        assertThatExceptionOfType(OrderOutOfStockException.class)
+                .isThrownBy(() -> store.create(SECOND, 1, cart("Canvas Tote", "12.50", 1, "12.50")));
+        assertThat(count("orders")).isEqualTo(1);
+        assertThat(count("order_items")).isEqualTo(1);
+        assertThat(stock()).isZero();
+    }
+
+    @Test
+    void serializesConcurrentCreatesForOneRequestIntoOneOrder() throws Exception {
+        var barrier = new CyclicBarrier(2);
+        var snapshot = snapshot("Canvas Tote", "12.50", 2, "25.00");
+        CartSnapshotProvider synchronizedCart = revision -> {
+            try {
+                barrier.await(5, TimeUnit.SECONDS);
+            } catch (Exception exception) {
+                throw new IllegalStateException("Timed out synchronizing Cart reads", exception);
+            }
+            return snapshot;
+        };
         var start = new CountDownLatch(1);
         var executor = Executors.newFixedThreadPool(2);
 
@@ -154,11 +173,11 @@ class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
             try {
                 var first = executor.submit(() -> {
                     start.await(5, TimeUnit.SECONDS);
-                    return store.create(FIRST);
+                    return store.create(FIRST, 1, synchronizedCart);
                 });
                 var second = executor.submit(() -> {
                     start.await(5, TimeUnit.SECONDS);
-                    return store.create(FIRST);
+                    return store.create(FIRST, 1, synchronizedCart);
                 });
                 start.countDown();
                 Thread.sleep(250);
@@ -169,6 +188,7 @@ class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
                 assertThat(results.get(0).order().orderId()).isEqualTo(results.get(1).order().orderId());
                 assertThat(count("orders")).isEqualTo(1);
                 assertThat(count("order_items")).isEqualTo(1);
+                assertThat(stock()).isEqualTo(998);
             } finally {
                 executor.shutdownNow();
             }
@@ -177,19 +197,20 @@ class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
 
     @Test
     void rollsBackTheOrderWhenAnItemInsertFails() {
-        attempts.put(FIRST, attempt(FIRST, PaymentScenario.APPROVE, "ROLLBACK_SENTINEL", "12.50", 2, "25.00"));
+        var cart = cart("ROLLBACK_SENTINEL", "12.50", 2, "25.00");
         jdbcTemplate.execute(
                 "ALTER TABLE order_items ADD CONSTRAINT test_rollback_sentinel CHECK (name <> 'ROLLBACK_SENTINEL')");
 
         try {
-            assertThatThrownBy(() -> store.create(FIRST)).isInstanceOf(DataIntegrityViolationException.class);
+            assertThatThrownBy(() -> store.create(FIRST, 1, cart)).isInstanceOf(DataIntegrityViolationException.class);
             assertThat(count("orders")).isZero();
             assertThat(count("order_items")).isZero();
+            assertThat(stock()).isEqualTo(1000);
         } finally {
             jdbcTemplate.execute("ALTER TABLE order_items DROP CONSTRAINT test_rollback_sentinel");
         }
 
-        var retried = store.create(FIRST);
+        var retried = store.create(FIRST, 1, cart);
         assertThat(retried.created()).isTrue();
         assertThat(count("orders")).isEqualTo(1);
         assertThat(count("order_items")).isEqualTo(1);
@@ -197,52 +218,27 @@ class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
 
     @Test
     void returnsTheCommittedOrderWhenTheCallerObservesFailureAfterCommit() {
-        attempts.put(FIRST, attempt(FIRST, PaymentScenario.APPROVE, "Canvas Tote", "12.50", 2, "25.00"));
+        var cart = cart("Canvas Tote", "12.50", 2, "25.00");
 
-        OrderStore losingResponse = new OrderStore() {
-            @Override
-            public OrderResult create(UUID paymentAttemptId) {
-                store.create(paymentAttemptId);
-                throw new DataAccessResourceFailureException("response lost after commit");
-            }
+        assertThatThrownBy(() -> {
+            store.create(FIRST, 1, cart);
+            throw new DataAccessResourceFailureException("response lost after commit");
+        }).isInstanceOf(DataAccessResourceFailureException.class);
 
-            @Override
-            public Optional<Order> findById(UUID orderId) {
-                return store.findById(orderId);
-            }
-
-            @Override
-            public Optional<Order> findByPaymentAttemptId(UUID paymentAttemptId) {
-                return store.findByPaymentAttemptId(paymentAttemptId);
-            }
-
-            @Override
-            public java.util.List<io.github.samska.sandbox.order.OrderSummary> listForCurrentAccount() {
-                return store.listForCurrentAccount();
-            }
-
-            @Override
-            public Optional<io.github.samska.sandbox.order.OrderSummary> findSummary(UUID orderId) {
-                return store.findSummary(orderId);
-            }
-        };
-
-        assertThatThrownBy(() -> losingResponse.create(FIRST))
-                .isInstanceOf(DataAccessResourceFailureException.class);
-
-        var retried = store.create(FIRST);
+        var retried = store.create(FIRST, 1, cart);
         assertThat(retried.created()).isFalse();
-        assertThat(retried.order().paymentAttemptId()).isEqualTo(FIRST);
+        assertThat(retried.order().requestId()).isEqualTo(FIRST);
         assertThat(count("orders")).isEqualTo(1);
         assertThat(count("order_items")).isEqualTo(1);
+        assertThat(stock()).isEqualTo(998);
     }
 
     @Test
     void createsMoreThanThirtyTwoOrdersWithoutAnAdmissionLimit() {
+        var cart = cart("Canvas Tote", "12.50", 1, "12.50");
         for (int index = 0; index < 33; index++) {
-            var attemptId = UUID.nameUUIDFromBytes(("attempt-" + index).getBytes());
-            attempts.put(attemptId, attempt(attemptId, PaymentScenario.APPROVE, "Canvas Tote", "12.50", 1, "12.50"));
-            assertThat(store.create(attemptId).created()).isTrue();
+            var requestId = UUID.nameUUIDFromBytes(("request-" + index).getBytes());
+            assertThat(store.create(requestId, 1, cart).created()).isTrue();
         }
 
         assertThat(count("orders")).isEqualTo(33);
@@ -253,62 +249,21 @@ class JdbcOrderStoreTest extends OrderDatabaseTestSupport {
         return jdbcTemplate.queryForObject("SELECT count(*) FROM " + table, Long.class);
     }
 
-    private static PaymentAttempt attempt(
-            UUID attemptId, PaymentScenario scenario, String name, String unitPrice, int quantity, String lineSubtotal) {
-        return new PaymentAttempt(attemptId, 1, scenario,
-                List.of(item(name, unitPrice, quantity, lineSubtotal)),
-                new BigDecimal(lineSubtotal));
+    private long stock() {
+        return jdbcTemplate.queryForObject("SELECT on_hand FROM stock_levels WHERE product_id = ?", Long.class, PRODUCT);
     }
 
-    private static PaymentAttemptItem item(String name, String unitPrice, int quantity, String lineSubtotal) {
-        return new PaymentAttemptItem(new ProductReference(PRODUCT), name,
-                new BigDecimal(unitPrice), new Quantity(quantity), new BigDecimal(lineSubtotal));
+    private static CartSnapshotProvider cart(String name, String unitPrice, int quantity, String lineSubtotal) {
+        var snapshot = snapshot(name, unitPrice, quantity, lineSubtotal);
+        return revision -> snapshot;
     }
 
-    @TestConfiguration(proxyBeanMethods = false)
-    static class AttemptsConfiguration {
-
-        @Bean
-        @Primary
-        ControlledAttempts controlledAttempts() {
-            return new ControlledAttempts();
-        }
+    private static CartSnapshot snapshot(String name, String unitPrice, int quantity, String lineSubtotal) {
+        return new CartSnapshot(List.of(cartItem(PRODUCT, name, unitPrice, quantity)),
+                new BigDecimal(lineSubtotal), 1);
     }
 
-    static class ControlledAttempts implements PaymentAttempts {
-
-        private final Map<UUID, PaymentAttempt> attempts = new ConcurrentHashMap<>();
-        private volatile CyclicBarrier lookupBarrier;
-
-        void reset() {
-            attempts.clear();
-            lookupBarrier = null;
-        }
-
-        void put(UUID id, PaymentAttempt attempt) {
-            attempts.put(id, attempt);
-        }
-
-        void synchronizeLookups(int parties) {
-            lookupBarrier = new CyclicBarrier(parties);
-        }
-
-        @Override
-        public PaymentAttempt getAttempt(UUID attemptId) {
-            var attempt = attempts.get(attemptId);
-            if (attempt == null) {
-                throw new PaymentAttemptNotFoundException(attemptId);
-            }
-
-            var barrier = lookupBarrier;
-            if (barrier != null) {
-                try {
-                    barrier.await(5, TimeUnit.SECONDS);
-                } catch (Exception exception) {
-                    throw new IllegalStateException("Timed out synchronizing Payment lookups", exception);
-                }
-            }
-            return attempt;
-        }
+    private static CartItem cartItem(UUID product, String name, String unitPrice, int quantity) {
+        return new CartItem(new ProductReference(product), name, new BigDecimal(unitPrice), new Quantity(quantity));
     }
 }

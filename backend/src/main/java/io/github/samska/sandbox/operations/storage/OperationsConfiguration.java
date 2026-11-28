@@ -26,7 +26,7 @@ public class OperationsConfiguration {
         return new OperationsStore() {
             @Override
             public Counts counts(Instant now) {
-                return new Counts(0, 0, 0, 0, 0);
+                return new Counts(0, 0);
             }
 
             @Override

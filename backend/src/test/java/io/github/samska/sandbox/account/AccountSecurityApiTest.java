@@ -49,14 +49,13 @@ class AccountSecurityApiTest {
     }
 
     @Test
-    void anonymousVisitorsBrowseButCannotUseCartPaymentsOrOrders() throws Exception {
+    void anonymousVisitorsBrowseButCannotUseCartOrOrders() throws Exception {
         var visitor = app.client();
 
         assertThat(visitor.get("/api/products").status()).isEqualTo(200);
         assertThat(visitor.get("/actuator/health").status()).isEqualTo(200);
         assertThat(visitor.get("/api/auth/me").status()).isEqualTo(204);
         assertThat(visitor.get("/api/cart").status()).isEqualTo(401);
-        assertThat(visitor.get("/api/payment-attempts/" + UUID.randomUUID()).status()).isEqualTo(401);
         assertThat(visitor.get("/api/orders/" + UUID.randomUUID()).status()).isEqualTo(401);
         assertThat(visitor.post("/api/products", "{}").status()).isEqualTo(401);
         assertThat(visitor.get("/actuator/env").status()).isIn(401, 403, 404);
@@ -71,10 +70,8 @@ class AccountSecurityApiTest {
                 .isEqualTo(401);
         assertThat(visitor.put("/api/cart/items/" + id, "{\"quantity\":2}").status()).isEqualTo(401);
         assertThat(visitor.delete("/api/cart/items/" + id).status()).isEqualTo(401);
-        assertThat(visitor.post("/api/payment-attempts",
-                "{\"attemptId\":\"" + id + "\",\"cartRevision\":0,\"scenario\":\"approve\"}").status())
+        assertThat(visitor.post("/api/orders", "{\"requestId\":\"" + id + "\",\"cartRevision\":0}").status())
                 .isEqualTo(401);
-        assertThat(visitor.post("/api/orders", "{\"paymentAttemptId\":\"" + id + "\"}").status()).isEqualTo(401);
         assertThat(visitor.get("/api/orders").status()).isEqualTo(401);
     }
 
@@ -163,7 +160,7 @@ class AccountSecurityApiTest {
     }
 
     @Test
-    void eachAccountOwnsItsCartAttemptsAndOrders() throws Exception {
+    void eachAccountOwnsItsCartAndOrders() throws Exception {
         var product = createProduct(admin(), "Shared Mug");
         var first = customer("first@example.test");
         var second = customer("second@example.test");
@@ -173,24 +170,20 @@ class AccountSecurityApiTest {
         int revision = JsonPath.read(added.body(), "$.revision");
         assertThat((Object) JsonPath.read(second.get("/api/cart").body(), "$.items")).asList().isEmpty();
 
-        var attemptId = UUID.randomUUID();
-        var attempt = first.post("/api/payment-attempts",
-                "{\"attemptId\":\"" + attemptId + "\",\"cartRevision\":" + revision + ",\"scenario\":\"approve\"}");
-        assertThat(attempt.status()).as(attempt.body()).isEqualTo(201);
-        assertThat(second.get("/api/payment-attempts/" + attemptId).status()).isEqualTo(404);
-        assertThat(second.post("/api/orders", "{\"paymentAttemptId\":\"" + attemptId + "\"}").status())
-                .isEqualTo(404);
-        // Another account cannot take over an attempt ID; it is refused without confirming it exists.
-        assertThat(second.post("/api/payment-attempts",
-                "{\"attemptId\":\"" + attemptId + "\",\"cartRevision\":0,\"scenario\":\"approve\"}").status())
-                .isIn(400, 409);
+        var requestId = UUID.randomUUID();
+        // Another account cannot place an Order from a Cart that is not its own.
+        assertThat(second.post("/api/orders", "{\"requestId\":\"" + requestId + "\",\"cartRevision\":" + revision + "}")
+                .status()).isIn(400, 409);
 
-        var order = first.post("/api/orders", "{\"paymentAttemptId\":\"" + attemptId + "\"}");
+        var order = first.post("/api/orders", "{\"requestId\":\"" + requestId + "\",\"cartRevision\":" + revision + "}");
         assertThat(order.status()).isEqualTo(201);
         String orderId = JsonPath.read(order.body(), "$.orderId");
         assertThat(first.get("/api/orders/" + orderId).status()).isEqualTo(200);
         assertThat(second.get("/api/orders/" + orderId).status()).isEqualTo(404);
-        assertThat(second.get("/api/orders/payment-attempts/" + attemptId).status()).isEqualTo(404);
+        // Nor can it take over the first account's request id: it is refused without confirming it exists.
+        second.post("/api/cart/items", "{\"productId\":\"" + product + "\",\"quantity\":1}");
+        assertThat(second.post("/api/orders", "{\"requestId\":\"" + requestId + "\",\"cartRevision\":1}").status())
+                .isEqualTo(400);
         assertThat(admin().get("/api/orders/" + orderId).status()).isEqualTo(404);
     }
 

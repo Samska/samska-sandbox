@@ -3,7 +3,7 @@ package io.github.samska.sandbox.account;
 import java.util.UUID;
 
 /**
- * The owner of the request being served. Cart, Payment and Order read it to scope their state; they do
+ * The owner of the request being served. Cart and Order read it to scope their state; they do
  * not know how the owner was authenticated.
  */
 public interface CurrentAccount {

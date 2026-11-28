@@ -46,7 +46,7 @@ export default function OrderResult({ order, onBackToMarket, onBackToCheckout }:
         <p className="flex justify-between gap-4 border-t-[1.5px] border-ink pt-2.5 text-lg font-bold">
           Order total: {formatAmount(order.total)}
         </p>
-        <p className="text-sm text-muted">This is a demo: no real payment was made. Your Cart was emptied.</p>
+        <p className="text-sm text-muted">This is a demo: nothing was charged. Your Cart was emptied.</p>
         <div className="flex flex-wrap items-center gap-3">
           <a
             className="inline-flex min-h-11 items-center justify-center rounded-sm border-[1.5px] border-ink bg-brand px-4 font-mono text-[0.8rem] font-semibold uppercase tracking-[0.06em] text-on-brand no-underline shadow-[0_3px_0_var(--color-ink)]"

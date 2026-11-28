@@ -20,10 +20,6 @@ const snapshot = (over: Partial<OperationsSnapshot> = {}): OperationsSnapshot =>
   generatedAt: "2026-11-27T10:43:00Z",
   ordersLastHour: 4,
   ordersLast24Hours: 31,
-  approvedAttempts: 30,
-  declinedAttempts: 8,
-  failedAttempts: 2,
-  approvalRate: 0.75,
   checkoutP95Millis: 182.4,
   checkoutSamples: 40,
   requests: 500,
@@ -60,9 +56,7 @@ describe("Operations screen", () => {
     open(admin, () => json(200, snapshot()));
 
     expect(await screen.findByRole("heading", { name: "Store health", level: 1 })).toBeInTheDocument();
-    expect(await screen.findByText("75.0%")).toBeInTheDocument();
-    expect(screen.getByText("31 in the last 24 hours")).toBeInTheDocument();
-    expect(screen.getByText("30 approved, 8 declined, 2 failed")).toBeInTheDocument();
+    expect(await screen.findByText("31 in the last 24 hours")).toBeInTheDocument();
     expect(screen.getByText("182 ms")).toBeInTheDocument();
     expect(screen.getByText("1.0%")).toBeInTheDocument();
     expect(screen.getByText("5 of 500 requests ended in a 5xx status")).toBeInTheDocument();
@@ -73,13 +67,12 @@ describe("Operations screen", () => {
 
   it("says there is no data yet instead of showing zeros for rates", async () => {
     open(admin, () =>
-      json(200, snapshot({ approvalRate: null, checkoutP95Millis: null, checkoutSamples: 0, errorRate: null, requests: 0, approvedAttempts: 0, declinedAttempts: 0, failedAttempts: 0 }))
+      json(200, snapshot({ checkoutP95Millis: null, checkoutSamples: 0, errorRate: null, requests: 0 }))
     );
 
-    expect(await screen.findByText("No payment attempts in the last 24 hours")).toBeInTheDocument();
-    expect(screen.getByText("No checkout requests since start")).toBeInTheDocument();
+    expect(await screen.findByText("No checkout requests since start")).toBeInTheDocument();
     expect(screen.getByText("No requests since start")).toBeInTheDocument();
-    expect(screen.getAllByText("No data yet")).toHaveLength(3);
+    expect(screen.getAllByText("No data yet")).toHaveLength(2);
   });
 
   it("reloads the figures on Refresh", async () => {
