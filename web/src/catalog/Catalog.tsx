@@ -162,6 +162,11 @@ export default function Catalog() {
   }
 
   function openCart() {
+    if (anonymous) {
+      navigateTo("/account");
+      return;
+    }
+
     setIsCartOpen(true);
   }
 
