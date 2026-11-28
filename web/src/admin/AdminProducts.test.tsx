@@ -69,7 +69,7 @@ describe("AdminProducts", () => {
     );
 
     const toteRow = screen.getByText(tote.name).closest("li") as HTMLElement;
-    expect(within(toteRow).getByText("12.50")).toBeInTheDocument();
+    expect(within(toteRow).getByText("$12.50")).toBeInTheDocument();
     expect(within(toteRow).getByText("No image")).toBeInTheDocument();
     expect(within(toteRow).getByRole("link", { name: `Edit ${tote.name}` })).toHaveAttribute(
       "href",

@@ -78,7 +78,7 @@ describe("Order creation from a confirmed approved payment", () => {
     await waitFor(() => expect(heading).toHaveFocus());
     expect(screen.getByText(/No real payment was made/)).toBeInTheDocument();
     expect(screen.getByText(/Your Cart was emptied/)).toBeInTheDocument();
-    expect(screen.getByText(/Order total: 25.00/)).toBeInTheDocument();
+    expect(screen.getByText(/Order total: \$25.00/)).toBeInTheDocument();
     expect(window.location.pathname).toBe(`/checkout/attempts/${approvedAttemptId}`);
 
     const posts = fetchMock.mock.calls.filter(([path, options]) => path === "/api/orders" && options?.method === "POST");
@@ -246,7 +246,7 @@ describe("Order creation from a confirmed approved payment", () => {
     window.dispatchEvent(new PopStateEvent("popstate"));
 
     expect(await screen.findByRole("heading", { name: "Order created", level: 1 })).toBeInTheDocument();
-    expect(screen.getByText(/Order total: 25.00/)).toBeInTheDocument();
+    expect(screen.getByText(/Order total: \$25.00/)).toBeInTheDocument();
     expect(
       fetchMock.mock.calls.filter(([path, options]) => path === "/api/orders" && options?.method === "POST")
     ).toHaveLength(1);
