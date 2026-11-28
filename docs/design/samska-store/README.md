@@ -403,3 +403,10 @@ Status: **Approved by the owner in the project thread (2026-11-27) and implement
 ## SS-087 — Currency symbol
 
 The earlier prototypes show amounts without a currency symbol. On 2026-11-27 the owner approved adding one after the pre-1.0 review: the application shows US dollars (`$12.50`) everywhere prices appear; form inputs keep plain numbers. The prototypes stay as the historical record.
+
+## SS-098 — Fixed example catalog
+
+Status: **Approved by the owner in the project thread (2026-11-27) and implemented.**
+
+- Issue: [SS-098 / #197](https://github.com/Samska/samska-sandbox/issues/197)
+- Source of truth: [prototypes/product-art.html](prototypes/product-art.html) now holds 18 illustrations (the six of SS-084 plus arc lamp, vessel, throw, desk clock, hand plane, tape measure, journal, rucksack, planter, wall shelf, kettle and stool), in the same style and tokens.
