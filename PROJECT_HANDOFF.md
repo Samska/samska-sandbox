@@ -18,6 +18,11 @@ Update rule: this snapshot must be updated in the same change when project state
 
 - Build: 18 sample Products with owner-approved Bench illustrations (`art-*` keys, inline SVG); with `SAMSKA_DEMO_SEED_PRODUCTS=true` the backend adds the missing samples by name at start-up and never changes existing Products. The README no longer says the demo data resets daily.
 
+## SS-097 — Administrator sets Order status (#196, v1.0.0)
+
+- Build: the administrator sets each Order's status (Placed, Packed, Shipped, Delivered, Cancelled) from a new Admin Orders screen; each change is a row in `order_status_events` (`V12`), customers see the real timeline, and cancelling returns the stock. The simulated courier and `samska.shipping.*` are removed ([ADR 0022](docs/adr/0022-administrator-sets-order-status.md), supersedes ADR 0014). Design approved by the owner on 2026-11-28 (`docs/design/samska-store/prototypes/admin-orders.html`).
+- Next step: merge into `release/1.0` when CI is green.
+
 ## SS-088 — Self-hosted fonts, favicon and metadata (#174, v1.0.0)
 
 - Build: Archivo and IBM Plex Mono are served from `/fonts/` (the production CSP blocked the Google Fonts stylesheet, so the hosted site used fallback fonts); favicon, description and Open Graph text added; `deploy/verify-web-config.sh` checks font serving. Found in the pre-1.0 review.

@@ -1,6 +1,8 @@
 import { apiFetch } from "../http";
 
-export type ShipmentStatus = "PROCESSING" | "PACKED" | "IN_TRANSIT" | "DELAYED" | "DELIVERED";
+export type ShipmentStatus = "PLACED" | "PACKED" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+
+export const shipmentStatuses: readonly ShipmentStatus[] = ["PLACED", "PACKED", "SHIPPED", "DELIVERED", "CANCELLED"];
 
 export interface OrderHistoryEntry {
   orderId: string;
@@ -12,19 +14,16 @@ export interface OrderHistoryEntry {
 }
 
 export interface ShipmentStep {
-  code: "ORDER_CREATED" | "PACKED" | "LEFT_WAREHOUSE" | "OUT_FOR_DELIVERY" | "DELIVERED";
-  at: string;
+  code: ShipmentStatus;
+  /** When the step happened; null while it is still to come. */
+  at: string | null;
   done: boolean;
 }
 
 export interface Shipment {
   orderId: string;
   orderNumber: string;
-  trackingCode: string;
-  courier: string;
   status: ShipmentStatus;
-  delayed: boolean;
-  estimatedDelivery: string;
   steps: ShipmentStep[];
 }
 
@@ -39,7 +38,7 @@ export class OrdersApiError extends Error {
   }
 }
 
-const statuses: readonly string[] = ["PROCESSING", "PACKED", "IN_TRANSIT", "DELAYED", "DELIVERED"];
+const statuses: readonly string[] = shipmentStatuses;
 
 export async function listOrders(): Promise<OrderHistoryEntry[]> {
   const payload = await read("/api/orders");
@@ -107,15 +106,16 @@ function isShipment(value: unknown): value is Shipment {
     isRecord(value) &&
     typeof value.orderId === "string" &&
     typeof value.orderNumber === "string" &&
-    typeof value.trackingCode === "string" &&
-    typeof value.courier === "string" &&
     typeof value.status === "string" &&
     statuses.includes(value.status) &&
-    typeof value.delayed === "boolean" &&
-    typeof value.estimatedDelivery === "string" &&
     Array.isArray(value.steps) &&
     value.steps.every(
-      (step) => isRecord(step) && typeof step.code === "string" && typeof step.at === "string" && typeof step.done === "boolean"
+      (step) =>
+        isRecord(step) &&
+        typeof step.code === "string" &&
+        statuses.includes(step.code) &&
+        (typeof step.at === "string" || step.at === null) &&
+        typeof step.done === "boolean"
     )
   );
 }

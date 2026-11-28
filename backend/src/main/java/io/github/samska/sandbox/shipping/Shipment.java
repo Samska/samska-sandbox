@@ -1,66 +1,37 @@
 package io.github.samska.sandbox.shipping;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import io.github.samska.sandbox.order.Order;
 
 /**
- * A simulated shipment. It is derived from the Order's creation time and the current time, so there is
- * no stored state to keep in sync; the same inputs always give the same shipment.
+ * An Order's tracking: its current status and a timeline of what happened, followed by the steps still
+ * to come. The status comes from what the administrator recorded, never from the clock.
  */
-public record Shipment(
-        UUID orderId,
-        String orderNumber,
-        String trackingCode,
-        String courier,
-        ShipmentStatus status,
-        boolean delayed,
-        Instant estimatedDelivery,
-        List<ShipmentStep> steps) {
+public record Shipment(UUID orderId, String orderNumber, OrderStatus status, List<ShipmentStep> steps) {
 
-    public static final String COURIER = "Simulated Express";
+    /**
+     * @param placedAt when the Order was created
+     * @param changes the recorded status changes, oldest first
+     */
+    public static Shipment of(UUID orderId, long orderNumber, Instant placedAt, List<StatusChange> changes) {
+        var steps = new ArrayList<ShipmentStep>();
+        steps.add(new ShipmentStep(OrderStatus.PLACED.name(), placedAt, true));
+        changes.forEach(change -> steps.add(new ShipmentStep(change.status().name(), change.at(), true)));
 
-    public static Shipment of(UUID orderId, long orderNumber, Instant createdAt, Instant now, ShippingPolicy policy) {
-        var delayed = isDelayed(orderId);
-        var extra = delayed ? policy.delay() : java.time.Duration.ZERO;
-
-        var packed = createdAt.plus(policy.packedAfter());
-        var left = createdAt.plus(policy.leftWarehouseAfter());
-        var out = createdAt.plus(policy.outForDeliveryAfter()).plus(extra);
-        var delivered = createdAt.plus(policy.deliveredAfter()).plus(extra);
-
-        var steps = List.of(
-                new ShipmentStep("ORDER_CREATED", createdAt, true),
-                new ShipmentStep("PACKED", packed, !now.isBefore(packed)),
-                new ShipmentStep("LEFT_WAREHOUSE", left, !now.isBefore(left)),
-                new ShipmentStep("OUT_FOR_DELIVERY", out, !now.isBefore(out)),
-                new ShipmentStep("DELIVERED", delivered, !now.isBefore(delivered)));
-
-        ShipmentStatus status;
-        if (!now.isBefore(delivered)) {
-            status = ShipmentStatus.DELIVERED;
-        } else if (!now.isBefore(left)) {
-            // Past the warehouse, a delayed shipment reports the delay until it is delivered.
-            status = delayed ? ShipmentStatus.DELAYED : ShipmentStatus.IN_TRANSIT;
-        } else if (!now.isBefore(packed)) {
-            status = ShipmentStatus.PACKED;
-        } else {
-            status = ShipmentStatus.PROCESSING;
+        var status = changes.isEmpty() ? OrderStatus.PLACED : changes.get(changes.size() - 1).status();
+        if (!status.isFinal()) {
+            var reached = OrderStatus.PATH.indexOf(status);
+            OrderStatus.PATH.subList(reached + 1, OrderStatus.PATH.size())
+                    .forEach(next -> steps.add(new ShipmentStep(next.name(), null, false)));
         }
-
-        return new Shipment(orderId, Order.displayNumber(orderNumber), trackingCode(orderId), COURIER, status, delayed,
-                delivered, steps);
+        return new Shipment(orderId, Order.displayNumber(orderNumber), status, List.copyOf(steps));
     }
 
-    /** About one Order in five is delayed, chosen from the Order ID so it is stable. */
-    public static boolean isDelayed(UUID orderId) {
-        return Math.floorMod(orderId.getLeastSignificantBits(), 5L) == 0;
-    }
-
-    public static String trackingCode(UUID orderId) {
-        var hex = orderId.toString().replace("-", "").toUpperCase(java.util.Locale.ROOT);
-        return "SK-" + hex.substring(8, 12) + "-" + hex.substring(12, 14);
+    /** One recorded change of status. */
+    public record StatusChange(OrderStatus status, Instant at) {
     }
 }

@@ -55,17 +55,12 @@ const entry = (over: Partial<OrderHistoryEntry> = {}): OrderHistoryEntry => ({
 const shipment = (over: Partial<Shipment> = {}): Shipment => ({
   orderId,
   orderNumber: "SK-000128",
-  trackingCode: "SK-1B2C-4D",
-  courier: "Simulated Express",
-  status: "IN_TRANSIT",
-  delayed: false,
-  estimatedDelivery: "2026-11-27T11:43:00Z",
+  status: "SHIPPED",
   steps: [
-    { code: "ORDER_CREATED", at: "2026-11-27T10:43:00Z", done: true },
+    { code: "PLACED", at: "2026-11-27T10:43:00Z", done: true },
     { code: "PACKED", at: "2026-11-27T10:45:00Z", done: true },
-    { code: "LEFT_WAREHOUSE", at: "2026-11-27T10:53:00Z", done: true },
-    { code: "OUT_FOR_DELIVERY", at: "2026-11-27T11:13:00Z", done: false },
-    { code: "DELIVERED", at: "2026-11-27T11:43:00Z", done: false }
+    { code: "SHIPPED", at: "2026-11-27T10:53:00Z", done: true },
+    { code: "DELIVERED", at: null, done: false }
   ],
   ...over
 });
@@ -120,34 +115,42 @@ describe("Order history", () => {
 });
 
 describe("Delivery tracking", () => {
-  it("shows an in-transit shipment with progress and the estimate", async () => {
+  it("shows the real status with the time of each step and what is still to come", async () => {
     stub({ [`/api/orders/${orderId}/shipment`]: () => json(200, shipment()) });
     open(`/orders/${orderId}`);
 
     expect(await screen.findByRole("heading", { name: "On its way", level: 1 })).toBeInTheDocument();
-    expect(screen.getByText(/Tracking SK-1B2C-4D/)).toBeInTheDocument();
-    const steps = screen.getAllByRole("listitem");
-    expect(steps).toHaveLength(5);
+    const steps = within(screen.getByRole("list", { name: "Order history" })).getAllByRole("listitem");
+    expect(steps).toHaveLength(4);
+    expect(within(steps[2]).getByText("Shipped")).toBeInTheDocument();
     expect(within(steps[2]).getByText("(done)")).toBeInTheDocument();
     expect(within(steps[3]).getByText("(not yet)")).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: /Delivery route/ })).toBeInTheDocument();
+    expect(within(steps[3]).queryByText(/Nov/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/simulated/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/courier|Tracking SK/i)).not.toBeInTheDocument();
   });
 
-  it("announces a delay with the new estimate", async () => {
-    stub({ [`/api/orders/${orderId}/shipment`]: () => json(200, shipment({ status: "DELAYED", delayed: true })) });
+  it("shows a cancelled order with its history and nothing to come", async () => {
+    stub({
+      [`/api/orders/${orderId}/shipment`]: () =>
+        json(200, shipment({ status: "CANCELLED", steps: [
+          { code: "PLACED", at: "2026-11-27T10:43:00Z", done: true },
+          { code: "CANCELLED", at: "2026-11-27T12:00:00Z", done: true }
+        ] }))
+    });
     open(`/orders/${orderId}`);
 
-    expect(await screen.findByRole("heading", { name: "Running late", level: 1 })).toBeInTheDocument();
-    expect(screen.getByRole("status")).toHaveTextContent("The courier reports a delay. New estimate:");
+    expect(await screen.findByRole("heading", { name: "Cancelled", level: 1 })).toBeInTheDocument();
+    expect(screen.queryByText("(not yet)")).not.toBeInTheDocument();
   });
 
-  it("shows a delivered shipment", async () => {
-    const done = shipment().steps.map((step) => ({ ...step, done: true }));
+  it("shows a delivered order", async () => {
+    const done = shipment().steps.map((step) => ({ ...step, at: step.at ?? "2026-11-28T09:00:00Z", done: true }));
     stub({ [`/api/orders/${orderId}/shipment`]: () => json(200, shipment({ status: "DELIVERED", steps: done })) });
     open(`/orders/${orderId}`);
 
     expect(await screen.findByRole("heading", { name: "Delivered", level: 1 })).toBeInTheDocument();
-    expect(screen.queryByText(/Estimate/)).not.toBeInTheDocument();
+    expect(screen.queryByText("(not yet)")).not.toBeInTheDocument();
   });
 
   it("checks again on request", async () => {
@@ -178,7 +181,7 @@ describe("Delivery tracking", () => {
 describe("shipment text", () => {
   it("maps statuses to tones and formats times", () => {
     expect(statusTone("DELIVERED")).toBe("success");
-    expect(statusTone("DELAYED")).toBe("error");
+    expect(statusTone("CANCELLED")).toBe("error");
     expect(statusTone("PACKED")).toBe("pending");
     expect(formatWhen("not a date")).toBe("not a date");
     expect(formatWhen("2026-11-27T10:43:00Z")).toMatch(/27 Nov/);

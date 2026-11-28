@@ -41,7 +41,7 @@ class OrderPersistenceRestartTest {
         String created;
 
         try (var first = startApplication()) {
-            first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE order_items, orders");
+            first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE order_items, order_status_events, orders");
             first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE cart_items, cart CASCADE");
             first.getBean(JdbcTemplate.class).execute("TRUNCATE TABLE product_media, products CASCADE");
             var base = baseUri(first);

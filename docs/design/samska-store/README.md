@@ -410,3 +410,11 @@ Status: **Approved by the owner in the project thread (2026-11-27) and implement
 
 - Issue: [SS-098 / #197](https://github.com/Samska/samska-sandbox/issues/197)
 - Source of truth: [prototypes/product-art.html](prototypes/product-art.html) now holds 18 illustrations (the six of SS-084 plus arc lamp, vessel, throw, desk clock, hand plane, tape measure, journal, rucksack, planter, wall shelf, kettle and stool), in the same style and tokens.
+
+## SS-097 — Admin Orders and real tracking (owner-approved)
+
+Status: **Owner-approved (2026-11-28, "Aprovado"). Design approval only.**
+
+- Issue: [SS-097 / #196](https://github.com/Samska/samska-sandbox/issues/196)
+- Prototype: [prototypes/admin-orders.html](prototypes/admin-orders.html), in Bench: an Admin Orders list with status filter chips and a status select with an Update button per Order, and a customer tracking page that shows a timeline of the real status changes.
+- Built with one difference from the prototype: the tracking page shows the timeline without the Items card, because the tracking response carries no items.

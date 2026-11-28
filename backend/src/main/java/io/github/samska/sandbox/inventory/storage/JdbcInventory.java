@@ -85,6 +85,18 @@ public class JdbcInventory implements Inventory {
         }
     }
 
+    @Override
+    @Transactional
+    public void restock(List<StockLine> lines) {
+        for (var line : sorted(lines)) {
+            jdbc.sql("UPDATE stock_levels SET on_hand = LEAST(on_hand + :quantity, :max) WHERE product_id = :id")
+                    .param("quantity", line.quantity())
+                    .param("max", MAX_ON_HAND)
+                    .param("id", line.productId())
+                    .update();
+        }
+    }
+
     private static List<StockLine> sorted(List<StockLine> lines) {
         return lines.stream().sorted(Comparator.comparing(StockLine::productId)).toList();
     }

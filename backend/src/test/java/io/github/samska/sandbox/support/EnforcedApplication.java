@@ -54,7 +54,7 @@ public final class EnforcedApplication implements AutoCloseable {
                 .run(arguments.toArray(String[]::new));
         var app = new EnforcedApplication(context);
         var jdbc = context.getBean(JdbcTemplate.class);
-        jdbc.execute("TRUNCATE TABLE order_items, orders");
+        jdbc.execute("TRUNCATE TABLE order_items, order_status_events, orders");
         jdbc.execute("TRUNCATE TABLE cart_items, cart CASCADE");
         jdbc.execute("TRUNCATE TABLE product_media, products CASCADE");
         jdbc.execute("DELETE FROM accounts WHERE email <> '" + ADMIN_EMAIL + "'");

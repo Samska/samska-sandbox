@@ -30,4 +30,8 @@ public final class UnlimitedInventory implements Inventory {
     @Override
     public void consume(List<StockLine> lines) {
     }
+
+    @Override
+    public void restock(List<StockLine> lines) {
+    }
 }

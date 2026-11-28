@@ -1,27 +1,28 @@
-import type { ShipmentStatus, ShipmentStep } from "./ordersApi";
+import type { ShipmentStatus } from "./ordersApi";
 
 export const statusLabel: Record<ShipmentStatus, string> = {
-  PROCESSING: "Processing",
+  PLACED: "Placed",
   PACKED: "Packed",
-  IN_TRANSIT: "In transit",
-  DELAYED: "Delayed",
-  DELIVERED: "Delivered"
+  SHIPPED: "Shipped",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled"
 };
 
 export const statusHeadline: Record<ShipmentStatus, string> = {
-  PROCESSING: "Getting ready",
+  PLACED: "Order placed",
   PACKED: "Packed",
-  IN_TRANSIT: "On its way",
-  DELAYED: "Running late",
-  DELIVERED: "Delivered"
+  SHIPPED: "On its way",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled"
 };
 
-export const stepLabel: Record<ShipmentStep["code"], string> = {
-  ORDER_CREATED: "Order created",
+/** The timeline names each step the way the store reports it. */
+export const stepLabel: Record<ShipmentStatus, string> = {
+  PLACED: "Order placed",
   PACKED: "Packed",
-  LEFT_WAREHOUSE: "Left the warehouse",
-  OUT_FOR_DELIVERY: "Out for delivery",
-  DELIVERED: "Delivered"
+  SHIPPED: "Shipped",
+  DELIVERED: "Delivered",
+  CANCELLED: "Cancelled"
 };
 
 const formatter = new Intl.DateTimeFormat("en-GB", {
@@ -41,6 +42,6 @@ export type StatusTone = "success" | "pending" | "error";
 
 export function statusTone(status: ShipmentStatus): StatusTone {
   if (status === "DELIVERED") return "success";
-  if (status === "DELAYED") return "error";
+  if (status === "CANCELLED") return "error";
   return "pending";
 }
