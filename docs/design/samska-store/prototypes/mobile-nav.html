@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Samska Bench — Mobile navigation</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Mobile navigation for the Bench identity (SS-083). Below 40rem the header keeps only the brand and a Menu button;
+   links, account and theme move into a panel under the header. Same tokens as bench.html. */
+:root { --ground:#e4e7e4; --paper:#f7f8f5; --ink:#111518; --muted:#5a6560; --hair:#b8beb9; --signal:#ff4a1c; --focus:#0a58ff; --display:"Archivo","Arial Narrow",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace; --r:6px; }
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--ground:#0e1114;--paper:#171b1f;--ink:#eef0ec;--muted:#98a39d;--hair:#343c43;--signal:#ff5a2e;--focus:#7aa6ff;color-scheme:dark}}
+:root[data-theme="dark"]{--ground:#0e1114;--paper:#171b1f;--ink:#eef0ec;--muted:#98a39d;--hair:#343c43;--signal:#ff5a2e;--focus:#7aa6ff;color-scheme:dark}
+*{box-sizing:border-box} [hidden]{display:none!important}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--display);line-height:1.5}
+button{font:inherit;color:inherit;cursor:pointer} a{color:inherit}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.proto{display:flex;gap:8px;flex-wrap:wrap;padding:8px 16px;background:var(--paper);border-bottom:1.5px dashed var(--ink);font-family:var(--mono);font-size:.7rem}
+.proto button{border:1.5px solid var(--ink);background:transparent;border-radius:var(--r);padding:4px 8px}
+.proto button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+header{position:sticky;top:0;z-index:10;background:var(--ground);border-bottom:1.5px solid var(--ink)}
+header.admin{background:var(--ink);color:var(--ground)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:60px;padding:0 16px}
+.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none}
+.brand svg{width:32px;height:32px}
+.brand b{font-weight:900;font-stretch:125%;font-size:1.3rem;letter-spacing:.02em;text-transform:uppercase}
+.brand small{font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;border:1.5px solid currentColor;padding:1px 5px;border-radius:3px;align-self:flex-start}
+.menu-btn{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1.5px solid currentColor;border-radius:var(--r);background:transparent;font-family:var(--mono);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+.menu-btn svg{width:18px;height:18px}
+.panel{border-top:1.5px solid currentColor;background:var(--paper);color:var(--ink);padding:8px 16px 16px;display:grid;gap:4px}
+header.admin .panel{background:#171b1f;color:#eef0ec}
+.panel a,.panel .out{display:flex;align-items:center;min-height:48px;padding:0 12px;border:1.5px solid transparent;border-radius:var(--r);font-family:var(--mono);font-size:.9rem;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;background:transparent;text-align:left}
+.panel a[aria-current="page"]{background:var(--ink);color:var(--ground)}
+header.admin .panel a[aria-current="page"]{background:#eef0ec;color:#111518}
+.panel hr{border:0;border-top:1.5px solid var(--hair);margin:8px 0;width:100%}
+.panel .out{border-color:currentColor;justify-content:center;font-weight:600}
+.theme{display:grid;grid-template-columns:repeat(3,1fr);border:1.5px solid currentColor;border-radius:var(--r);overflow:hidden}
+.theme button{min-height:44px;border:0;background:transparent;font-family:var(--mono);font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.theme button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+header.admin .theme button[aria-pressed="true"]{background:#eef0ec;color:#111518}
+.lbl{font-family:var(--mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;opacity:.7;padding:0 12px}
+main{padding:24px 16px}
+h1{margin:0;font-weight:900;font-stretch:75%;text-transform:uppercase;font-size:3rem;line-height:.95}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="proto" role="group" aria-label="Prototype controls">
+  <button data-shell="store" aria-pressed="true">Store</button><button data-shell="admin" aria-pressed="false">Admin</button>
+  <button data-open="1" aria-pressed="false">Menu open</button>
+  <button data-th="system" aria-pressed="true">Auto</button><button data-th="light" aria-pressed="false">Light</button><button data-th="dark" aria-pressed="false">Dark</button>
+</div>
+<header id="hdr">
+  <div class="bar">
+    <a class="brand" href="#" id="brand"></a>
+    <button class="menu-btn" id="mb" aria-expanded="false" aria-controls="panel">
+      <svg viewBox="0 0 18 18" aria-hidden="true"><path id="ico" d="M2 5h14M2 9h14M2 13h14" stroke="currentColor" stroke-width="2" fill="none"/></svg><span id="mt">Menu</span>
+    </button>
+  </div>
+  <nav class="panel" id="panel" aria-label="Primary" hidden></nav>
+</header>
+<main id="main"></main>
+<script>
+const $=s=>document.querySelector(s);
+const logo='<svg viewBox="0 0 34 34" aria-hidden="true"><circle cx="17" cy="17" r="15" fill="none" stroke="currentColor" stroke-width="2.5"/><circle cx="17" cy="17" r="7" fill="var(--signal)" stroke="currentColor" stroke-width="2"/><path d="M17 0v6M17 28v6M0 17h6M28 17h6" stroke="currentColor" stroke-width="2"/></svg>';
+let shell="store",open=false,theme="system";
+function theme_(){return `<span class="lbl">Theme</span><div class="theme" role="group" aria-label="Theme">${["system","light","dark"].map(t=>`<button data-th="${t}" aria-pressed="${theme===t}">${{system:"Auto",light:"Light",dark:"Dark"}[t]}</button>`).join("")}</div>`}
+function render(){
+  const admin=shell==="admin";
+  $("#hdr").className=admin?"admin":"";
+  $("#brand").innerHTML=admin?'<b>Samska</b><small>ADMIN</small>':logo+'<b>Samska</b>';
+  $("#mb").setAttribute("aria-expanded",open);$("#mt").textContent=open?"Close":"Menu";
+  $("#ico").setAttribute("d",open?"M3 3l12 12M15 3L3 15":"M2 5h14M2 9h14M2 13h14");
+  $("#panel").hidden=!open;
+  $("#panel").innerHTML=(admin?
+   '<a href="#" aria-current="page">Products</a><a href="#">Operations</a><a href="#">View store</a>':
+   '<a href="#" aria-current="page">Market</a><a href="#">Admin</a><a href="#">Orders</a>')+'<hr>'+theme_()+'<hr><button class="out">Sign out</button>';
+  $("#main").innerHTML=admin?'<p class="eyebrow">Admin</p><h1>Product management</h1>':'<p class="eyebrow">Catalog</p><h1>Products</h1>';
+  document.querySelectorAll(".proto [data-shell]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.shell===shell));
+  document.querySelectorAll(".proto [data-th]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.th===theme));
+  $("[data-open]").setAttribute("aria-pressed",open);
+  if(theme==="system")document.documentElement.removeAttribute("data-theme");else document.documentElement.dataset.theme=theme;
+}
+document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;
+ if(b.id==="mb"||b.dataset.open)open=!open;else if(b.dataset.shell)shell=b.dataset.shell;else if(b.dataset.th)theme=b.dataset.th;else return;render()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&open){open=false;render();$("#mb").focus()}});
+render();
+</script>
+</body>
+</html>
