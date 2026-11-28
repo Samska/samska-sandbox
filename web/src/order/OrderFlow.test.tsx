@@ -53,7 +53,7 @@ async function approve() {
   fireEvent.click(screen.getByRole("button", { name: "Checkout" }));
   await screen.findByRole("heading", { name: "Checkout", level: 1 });
   fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
-  await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
+  await screen.findByRole("heading", { name: "Payment approved", level: 1 });
 }
 
 function attemptIdFromPath(): string {
@@ -76,7 +76,7 @@ describe("Order creation from a confirmed approved payment", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
     const heading = await screen.findByRole("heading", { name: "Order created", level: 1 });
     await waitFor(() => expect(heading).toHaveFocus());
-    expect(screen.getByText(/No real payment was made/)).toBeInTheDocument();
+    expect(screen.getByText(/no real payment was made/)).toBeInTheDocument();
     expect(screen.getByText(/Your Cart was emptied/)).toBeInTheDocument();
     expect(screen.getByText(/Order total: \$25.00/)).toBeInTheDocument();
     expect(window.location.pathname).toBe(`/checkout/attempts/${approvedAttemptId}`);
@@ -114,7 +114,7 @@ describe("Order creation from a confirmed approved payment", () => {
     const fetchMock = setup({ post: () => Promise.reject(new Error("lost")) });
     await approve();
     fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("could not confirm whether an Order was created");
+    expect(await screen.findByRole("alert")).toHaveTextContent("couldn't confirm whether your Order was created");
     expect(screen.getByRole("button", { name: "Create Order" })).toBeDisabled();
 
     fireEvent.click(screen.getByRole("button", { name: "Back to Market" }));
@@ -132,7 +132,7 @@ describe("Order creation from a confirmed approved payment", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
     await screen.findByRole("button", { name: "Check Order result" });
     fireEvent.click(screen.getByRole("button", { name: "Check Order result" }));
-    expect(await screen.findByRole("button", { name: "Create Order with same attempt" })).toBeEnabled();
+    expect(await screen.findByRole("button", { name: "Try creating the Order again" })).toBeEnabled();
     expect(fetchMock.mock.calls.some(([path]) => String(path).startsWith("/api/payment-attempts/"))).toBe(true);
     expect(fetchMock.mock.calls.filter(([path]) => path === "/api/orders")).toHaveLength(1);
   });
@@ -147,7 +147,7 @@ describe("Order creation from a confirmed approved payment", () => {
     await approve();
     fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
     fireEvent.click(await screen.findByRole("button", { name: "Check Order result" }));
-    fireEvent.click(await screen.findByRole("button", { name: "Create Order with same attempt" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Try creating the Order again" }));
     expect(await screen.findByRole("heading", { name: "Order created", level: 1 })).toBeInTheDocument();
     const posts = fetchMock.mock.calls.filter(([path]) => path === "/api/orders");
     expect(posts).toHaveLength(2);
@@ -160,9 +160,9 @@ describe("Order creation from a confirmed approved payment", () => {
     await approve();
     fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
     fireEvent.click(await screen.findByRole("button", { name: "Check Order result" }));
-    expect(await screen.findByText(/approved payment attempt cannot be confirmed/)).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Create Order with same attempt" })).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Stop following this reference" })).toBeInTheDocument();
+    expect(await screen.findByText(/can't find an approved payment for this Order/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Try creating the Order again" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Dismiss this payment" })).toBeInTheDocument();
     expect(fetchMock.mock.calls.filter(([path]) => path === "/api/orders")).toHaveLength(1);
   });
 
@@ -177,7 +177,7 @@ describe("Order creation from a confirmed approved payment", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Check Order result" }));
 
     expect(
-      await screen.findByRole("heading", { name: "Simulated payment declined", level: 1 })
+      await screen.findByRole("heading", { name: "Payment declined", level: 1 })
     ).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Create Order" })).not.toBeInTheDocument();
     expect(fetchMock.mock.calls.filter(([path]) => path === "/api/orders")).toHaveLength(1);
@@ -200,7 +200,7 @@ describe("Order creation from a confirmed approved payment", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Back to Checkout" }));
     await screen.findByRole("heading", { name: "Checkout", level: 1 });
-    expect(screen.getByRole("alert")).toHaveTextContent("awaiting its Order");
+    expect(screen.getByRole("alert")).toHaveTextContent("waiting for its Order");
     const simulate = screen.getByRole("button", { name: "Simulate payment" });
     expect(simulate).toBeDisabled();
 
@@ -222,9 +222,9 @@ describe("Order creation from a confirmed approved payment", () => {
     await screen.findByRole("heading", { name: "Checkout", level: 1 });
 
     fireEvent.click(screen.getByRole("button", { name: "View attempt" }));
-    fireEvent.click(await screen.findByRole("button", { name: "Stop following this reference" }));
-    expect(screen.getByText(/does not cancel a request or delete a record/i)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Stop following" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Dismiss this payment" }));
+    expect(screen.getByText(/does not cancel the payment or delete anything/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
 
     await waitFor(() => expect(window.location.pathname).toBe("/checkout"));
     expect(window.sessionStorage.getItem("samska.latest-payment-attempt")).toBeNull();
@@ -295,7 +295,7 @@ describe("Order creation from a confirmed approved payment", () => {
     window.dispatchEvent(new PopStateEvent("popstate"));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "could not confirm whether an Order was created"
+      "couldn't confirm whether your Order was created"
     );
     expect(screen.getByRole("button", { name: "Create Order" })).toBeDisabled();
     fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
@@ -354,12 +354,12 @@ describe("Order creation from a confirmed approved payment", () => {
     const simulate = await screen.findByRole("button", { name: "Simulate payment" });
     await waitFor(() => expect(simulate).toBeEnabled());
     fireEvent.click(simulate);
-    await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
+    await screen.findByRole("heading", { name: "Payment approved", level: 1 });
     const attemptA = attemptIdFromPath();
 
     fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "could not confirm whether an Order was created"
+      "couldn't confirm whether your Order was created"
     );
     expect(aOrderPosts).toBe(1);
 
@@ -368,7 +368,7 @@ describe("Order creation from a confirmed approved payment", () => {
 
     await waitFor(() =>
       expect(
-        screen.getByRole("heading", { name: "Simulated payment approved", level: 1 })
+        screen.getByRole("heading", { name: "Payment approved", level: 1 })
       ).toBeInTheDocument()
     );
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
@@ -383,7 +383,7 @@ describe("Order creation from a confirmed approved payment", () => {
     window.dispatchEvent(new PopStateEvent("popstate"));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "could not confirm whether an Order was created"
+      "couldn't confirm whether your Order was created"
     );
     expect(screen.getByRole("button", { name: "Check Order result" })).toBeEnabled();
     expect(screen.getByRole("button", { name: "Create Order" })).toBeDisabled();
@@ -442,7 +442,7 @@ describe("Order creation from a confirmed approved payment", () => {
     const simulate = await screen.findByRole("button", { name: "Simulate payment" });
     await waitFor(() => expect(simulate).toBeEnabled());
     fireEvent.click(simulate);
-    await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
+    await screen.findByRole("heading", { name: "Payment approved", level: 1 });
     const attemptA = attemptIdFromPath();
     fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
     expect(await screen.findByRole("status")).toHaveTextContent("Checking Order...");
@@ -451,7 +451,7 @@ describe("Order creation from a confirmed approved payment", () => {
     window.dispatchEvent(new PopStateEvent("popstate"));
     await waitFor(() =>
       expect(
-        screen.getByRole("heading", { name: "Simulated payment approved", level: 1 })
+        screen.getByRole("heading", { name: "Payment approved", level: 1 })
       ).toBeInTheDocument()
     );
     const createForB = screen.getByRole("button", { name: "Create Order" });
@@ -463,14 +463,14 @@ describe("Order creation from a confirmed approved payment", () => {
     window.dispatchEvent(new PopStateEvent("popstate"));
     await waitFor(() =>
       expect(
-        screen.getByRole("heading", { name: "Simulated payment approved", level: 1 })
+        screen.getByRole("heading", { name: "Payment approved", level: 1 })
       ).toBeInTheDocument()
     );
     expect(screen.getByRole("status")).toHaveTextContent("Checking Order...");
     const createForA = screen.getByRole("button", { name: "Create Order" });
     expect(createForA).toBeDisabled();
     fireEvent.click(createForA);
-    const abandonForA = screen.getByRole("button", { name: "Stop following this reference" });
+    const abandonForA = screen.getByRole("button", { name: "Dismiss this payment" });
     expect(abandonForA).toBeDisabled();
     fireEvent.click(abandonForA);
     expect(
@@ -554,7 +554,7 @@ describe("Order creation from a confirmed approved payment", () => {
     const simulate = await screen.findByRole("button", { name: "Simulate payment" });
     await waitFor(() => expect(simulate).toBeEnabled());
     fireEvent.click(simulate);
-    await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
+    await screen.findByRole("heading", { name: "Payment approved", level: 1 });
     const attemptA = attemptIdFromPath();
     fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
     expect(await screen.findByRole("status")).toHaveTextContent("Checking Order...");
@@ -563,7 +563,7 @@ describe("Order creation from a confirmed approved payment", () => {
     window.dispatchEvent(new PopStateEvent("popstate"));
     await waitFor(() =>
       expect(
-        screen.getByRole("heading", { name: "Simulated payment approved", level: 1 })
+        screen.getByRole("heading", { name: "Payment approved", level: 1 })
       ).toBeInTheDocument()
     );
     fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
@@ -583,7 +583,7 @@ describe("Order creation from a confirmed approved payment", () => {
     });
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "could not confirm whether an Order was created"
+      "couldn't confirm whether your Order was created"
     );
     expect(screen.getByRole("button", { name: "Create Order" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Check Order result" })).toBeEnabled();

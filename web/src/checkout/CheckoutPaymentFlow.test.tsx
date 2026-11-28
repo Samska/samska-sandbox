@@ -156,11 +156,11 @@ describe("Checkout simulated payment flow", () => {
     await enterCheckout();
     fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
 
-    const heading = await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
+    const heading = await screen.findByRole("heading", { name: "Payment approved", level: 1 });
     await waitFor(() => expect(heading).toHaveFocus());
-    expect(screen.getByText(/No real payment was made/i)).toBeInTheDocument();
-    expect(screen.getByText(/No Order has been created/i)).toBeInTheDocument();
-    expect(screen.getByText("Captured total").parentElement).toHaveTextContent("25.00");
+    expect(screen.getByText(/no real payment was made/i)).toBeInTheDocument();
+    expect(screen.getByText(/Create your Order to finish/i)).toBeInTheDocument();
+    expect(screen.getByText("Total").parentElement).toHaveTextContent("25.00");
 
     const body = paymentRequestBody(fetchMock);
     expect(body.cartRevision).toBe(1);
@@ -189,7 +189,7 @@ describe("Checkout simulated payment flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
 
     expect(
-      await screen.findByRole("heading", { name: "Simulated payment declined", level: 1 })
+      await screen.findByRole("heading", { name: "Payment declined", level: 1 })
     ).toBeInTheDocument();
     expect(paymentRequestBody(fetchMock).scenario).toBe("decline");
 
@@ -211,21 +211,21 @@ describe("Checkout simulated payment flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
 
     const uncertainHeading = await screen.findByRole("heading", {
-      name: "Payment result is unconfirmed. Check this attempt before trying again.",
+      name: "We couldn't confirm the payment result. Check it before trying again.",
       level: 1
     });
     expect(uncertainHeading).toBeInTheDocument();
     expect(
-      screen.queryByRole("heading", { name: "Simulated payment approved", level: 1 })
+      screen.queryByRole("heading", { name: "Payment approved", level: 1 })
     ).not.toBeInTheDocument();
 
     const attemptId = paymentRequestBody(fetchMock).attemptId;
     expect(window.location.pathname).toBe(`/checkout/attempts/${attemptId}`);
     expect(countPaymentLookups(fetchMock)).toBe(0);
 
-    fireEvent.click(screen.getByRole("button", { name: "Check this attempt" }));
+    fireEvent.click(screen.getByRole("button", { name: "Check this payment" }));
 
-    const heading = await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
+    const heading = await screen.findByRole("heading", { name: "Payment approved", level: 1 });
     await waitFor(() => expect(heading).toHaveFocus());
 
     expect(String(latestPaymentLookup(fetchMock)?.[0])).toBe(`/api/payment-attempts/${attemptId}`);
@@ -248,20 +248,20 @@ describe("Checkout simulated payment flow", () => {
     await enterCheckout();
     fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
     await screen.findByRole("heading", {
-      name: "Payment result is unconfirmed. Check this attempt before trying again.",
+      name: "We couldn't confirm the payment result. Check it before trying again.",
       level: 1
     });
 
-    fireEvent.click(screen.getByRole("button", { name: "Check this attempt" }));
+    fireEvent.click(screen.getByRole("button", { name: "Check this payment" }));
 
     expect(
       await screen.findByRole("heading", {
-        name: "We couldn't confirm a result for this reference.",
+        name: "We couldn't find a result for this payment.",
         level: 1
       })
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/does not prove an Order was deleted or never created/i)
+      screen.getByText(/does not mean your Order was lost or never created/i)
     ).toBeInTheDocument();
 
     const attemptId = paymentRequestBody(fetchMock).attemptId;
@@ -277,14 +277,14 @@ describe("Checkout simulated payment flow", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "View attempt" }));
     await screen.findByRole("heading", {
-      name: "We couldn't confirm a result for this reference.",
+      name: "We couldn't find a result for this payment.",
       level: 1
     });
     expect(window.location.pathname).toBe(`/checkout/attempts/${attemptId}`);
 
-    fireEvent.click(screen.getByRole("button", { name: "Stop following this reference" }));
-    expect(screen.getByText(/does not cancel a request or delete a record/i)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Stop following" }));
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss this payment" }));
+    expect(screen.getByText(/does not cancel the payment or delete anything/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
 
     await waitFor(() => expect(window.location.pathname).toBe("/checkout"));
     expect(window.sessionStorage.getItem("samska.latest-payment-attempt")).toBeNull();
@@ -306,12 +306,12 @@ describe("Checkout simulated payment flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "The Cart changed since you reviewed it."
+      "Your Cart changed since you reviewed it."
     );
     await waitFor(() => expect(window.location.pathname).toBe("/checkout"));
     expect(window.sessionStorage.getItem("samska.latest-payment-attempt")).toBeNull();
     expect(
-      screen.queryByRole("heading", { level: 1, name: /Simulated payment/ })
+      screen.queryByRole("heading", { level: 1, name: /Payment (approved|declined)/ })
     ).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Simulate payment" })).toBeEnabled();
   });
@@ -330,7 +330,7 @@ describe("Checkout simulated payment flow", () => {
     await enterCheckout();
     fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
 
-    const heading = await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
+    const heading = await screen.findByRole("heading", { name: "Payment approved", level: 1 });
     await waitFor(() => expect(heading).toHaveFocus());
     expect(screen.getByText("Canvas Tote × 2")).toBeInTheDocument();
 
@@ -356,10 +356,10 @@ describe("Checkout simulated payment flow", () => {
     await enterCheckout();
     fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
 
-    expect(await screen.findByRole("alert")).toHaveTextContent("Payment simulator is full");
-    expect(screen.getByText(/Restart the local backend/)).toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent("The payment demo is busy right now");
+    expect(screen.getByText(/Try again in a moment/)).toBeInTheDocument();
     expect(
-      screen.queryByRole("heading", { level: 1, name: /Simulated payment/ })
+      screen.queryByRole("heading", { level: 1, name: /Payment (approved|declined)/ })
     ).not.toBeInTheDocument();
     expect(window.location.pathname).toBe("/checkout");
     expect(countPaymentLookups(fetchMock)).toBe(0);
@@ -396,7 +396,7 @@ describe("Checkout simulated payment flow", () => {
     resolvePayment(response(201, declinedAttempt));
 
     expect(
-      await screen.findByRole("heading", { name: "Simulated payment declined", level: 1 })
+      await screen.findByRole("heading", { name: "Payment declined", level: 1 })
     ).toBeInTheDocument();
     expect(countPaymentPosts(fetchMock)).toBe(1);
     expect(countPaymentLookups(fetchMock)).toBe(0);
@@ -418,7 +418,7 @@ describe("Checkout simulated payment flow", () => {
     fireEvent.click(screen.getByRole("button", { name: "Simulate payment" }));
 
     await screen.findByRole("heading", {
-      name: "Payment result is unconfirmed. Check this attempt before trying again.",
+      name: "We couldn't confirm the payment result. Check it before trying again.",
       level: 1
     });
     const attemptId = paymentRequestBody(fetchMock).attemptId;
@@ -429,24 +429,24 @@ describe("Checkout simulated payment flow", () => {
     fireEvent.click(screen.getByRole("link", { name: "Resume payment" }));
     expect(
       await screen.findByRole("heading", {
-        name: "Payment result is unconfirmed. Check this attempt before trying again.",
+        name: "We couldn't confirm the payment result. Check it before trying again.",
         level: 1
       })
     ).toBeInTheDocument();
     expect(countPaymentPosts(fetchMock)).toBe(1);
     expect(countPaymentLookups(fetchMock)).toBe(0);
 
-    fireEvent.click(screen.getByRole("button", { name: "Check this attempt" }));
+    fireEvent.click(screen.getByRole("button", { name: "Check this payment" }));
 
     expect(
-      await screen.findByRole("heading", { name: "We couldn't check this reference. Try again.", level: 1 })
+      await screen.findByRole("heading", { name: "We couldn't check this payment. Try again.", level: 1 })
     ).toBeInTheDocument();
     expect(countPaymentPosts(fetchMock)).toBe(1);
 
     resultUnavailable = false;
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
 
-    await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
+    await screen.findByRole("heading", { name: "Payment approved", level: 1 });
     expect(countPaymentPosts(fetchMock)).toBe(1);
     expect(String(latestPaymentLookup(fetchMock)?.[0])).toBe(`/api/payment-attempts/${attemptId}`);
   });
@@ -478,7 +478,7 @@ describe("Checkout simulated payment flow", () => {
 
     fireEvent.click(reloadedSimulate);
 
-    await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
+    await screen.findByRole("heading", { name: "Payment approved", level: 1 });
     expect(countPaymentPosts(fetchMock)).toBe(1);
   });
 });

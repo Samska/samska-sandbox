@@ -39,15 +39,15 @@ describe("PaymentResult", () => {
   it("presents the frozen captured items, total, and no-Order disclaimer for approval", () => {
     const { onBackToCheckout } = renderResult();
 
-    const heading = screen.getByRole("heading", { name: "Simulated payment approved", level: 1 });
+    const heading = screen.getByRole("heading", { name: "Payment approved", level: 1 });
     expect(heading).toHaveFocus();
     expect(screen.getByRole("heading", { name: "Captured items", level: 2 })).toBeInTheDocument();
     expect(screen.getByText("Canvas Tote × 2")).toBeInTheDocument();
     expect(screen.getByText("$25.00")).toBeInTheDocument();
     expect(screen.getByText("Pour-Over Set × 1")).toBeInTheDocument();
-    expect(screen.getByText("Captured total").parentElement).toHaveTextContent("$93.50");
-    expect(screen.getByText(/No real payment was made/i)).toBeInTheDocument();
-    expect(screen.getByText(/No Order has been created/i)).toBeInTheDocument();
+    expect(screen.getByText("Total").parentElement).toHaveTextContent("$93.50");
+    expect(screen.getByText(/no real payment was made/i)).toBeInTheDocument();
+    expect(screen.getByText(/Create your Order to finish/i)).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Try again with the current Cart" })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Back to Checkout" }));
@@ -59,8 +59,8 @@ describe("PaymentResult", () => {
       attempt: { ...attempt, status: "declined" }
     });
 
-    expect(screen.getByRole("heading", { name: "Simulated payment declined", level: 1 })).toBeInTheDocument();
-    expect(screen.getByText(/No payment was made for this attempt/i)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Payment declined", level: 1 })).toBeInTheDocument();
+    expect(screen.getByText(/No payment was made\. You can try again/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Back to Checkout" })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Try again with the current Cart" }));
@@ -71,7 +71,7 @@ describe("PaymentResult", () => {
     renderResult({ attempt: { ...attempt, status: "failed" } });
 
     expect(
-      screen.getByRole("heading", { name: "Simulated payment could not complete", level: 1 })
+      screen.getByRole("heading", { name: "Payment could not complete", level: 1 })
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Try again with the current Cart" })).toBeInTheDocument();
     expect(screen.queryByText(/approved/i)).not.toBeInTheDocument();

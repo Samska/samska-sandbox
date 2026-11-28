@@ -132,7 +132,7 @@ function AttemptPendingCard({
       aria-busy="true"
     >
       <p className="font-mono text-[0.75rem] font-medium uppercase tracking-[0.14em] text-muted">
-        Payment attempt
+        Payment
       </p>
       <h1
         id="attempt-pending-heading"
@@ -196,7 +196,7 @@ function RecoveryCard({
       aria-busy={isChecking}
     >
       <p className="font-mono text-[0.75rem] font-medium uppercase tracking-[0.14em] text-muted">
-        Payment attempt
+        Payment
       </p>
       <h1
         id="attempt-recovery-heading"
@@ -207,13 +207,13 @@ function RecoveryCard({
         {primaryMessage}
       </h1>
       {isChecking ? (
-        <StatusMessage tone="pending">Checking this journey...</StatusMessage>
+        <StatusMessage tone="pending">Checking your payment...</StatusMessage>
       ) : (
         <p className="max-w-prose text-muted">{unavailableReferenceNote}</p>
       )}
       <div className="flex flex-wrap gap-3">
         {!isChecking && paymentUncertain && recoveryStatus === "idle" ? (
-          <Button onClick={onCheckPayment}>Check this attempt</Button>
+          <Button onClick={onCheckPayment}>Check this payment</Button>
         ) : null}
         {!isChecking && (recoveryStatus === "unavailable" || recoveryStatus === "error") ? (
           <Button onClick={onRetryRecovery}>Try again</Button>
@@ -275,7 +275,7 @@ function AbandonControl({
   if (!confirming) {
     return (
       <Button variant="quiet" onClick={requestConfirm} disabled={pending}>
-        Stop following this reference
+        Dismiss this payment
       </Button>
     );
   }

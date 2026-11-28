@@ -116,10 +116,10 @@ describe("CheckoutReview", () => {
   it("shows the blocked journey notice with a View attempt action", () => {
     const { onViewAttempt } = renderReview({
       paymentBlocked: true,
-      blockedPaymentMessage: "Payment result is unconfirmed. Check this attempt before trying again."
+      blockedPaymentMessage: "We couldn't confirm the payment result. Check it before trying again."
     });
 
-    expect(screen.getByRole("alert")).toHaveTextContent("Payment result is unconfirmed.");
+    expect(screen.getByRole("alert")).toHaveTextContent("We couldn't confirm the payment result.");
 
     fireEvent.click(screen.getByRole("button", { name: "View attempt" }));
 

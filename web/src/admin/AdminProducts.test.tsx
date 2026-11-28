@@ -78,7 +78,7 @@ describe("AdminProducts", () => {
     expect(within(toteRow).getByRole("button", { name: `Delete ${tote.name}` })).toBeInTheDocument();
 
     const pourOverRow = screen.getByText(pourOver.name).closest("li") as HTMLElement;
-    expect(within(pourOverRow).getByText("Curated image")).toBeInTheDocument();
+    expect(within(pourOverRow).getByText("Catalog image")).toBeInTheDocument();
     expect(within(pourOverRow).queryByText(/mediaKey|uploadedMediaId/)).not.toBeInTheDocument();
 
     expect(screen.queryByRole("form")).not.toBeInTheDocument();

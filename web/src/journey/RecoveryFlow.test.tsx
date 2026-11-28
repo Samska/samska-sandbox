@@ -97,7 +97,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     });
 
     expect(
-      await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 })
+      await screen.findByRole("heading", { name: "Payment approved", level: 1 })
     ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Create Order" }));
@@ -120,7 +120,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     });
 
     expect(
-      await screen.findByRole("heading", { name: "Simulated payment declined", level: 1 })
+      await screen.findByRole("heading", { name: "Payment declined", level: 1 })
     ).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Create Order" })).not.toBeInTheDocument();
   });
@@ -140,15 +140,15 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
 
     expect(
       await screen.findByRole("heading", {
-        name: "We couldn't confirm a result for this reference.",
+        name: "We couldn't find a result for this payment.",
         level: 1
       })
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/does not prove an order was deleted or never created/i)
+      screen.getByText(/does not mean your order was lost or never created/i)
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Try again" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Stop following this reference" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Dismiss this payment" })).toBeInTheDocument();
 
     const posts = recordedFetch().mock.calls.filter(([, options]) => options?.method === "POST");
     expect(posts).toHaveLength(0);
@@ -172,13 +172,13 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     });
 
     expect(
-      await screen.findByRole("heading", { name: "We couldn't check this reference. Try again.", level: 1 })
+      await screen.findByRole("heading", { name: "We couldn't check this payment. Try again.", level: 1 })
     ).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
 
     expect(
-      await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 })
+      await screen.findByRole("heading", { name: "Payment approved", level: 1 })
     ).toBeInTheDocument();
     expect(orderCalls).toBe(2);
     expect(recordedFetch().mock.calls.filter(([, options]) => options?.method === "POST")).toHaveLength(0);
@@ -195,7 +195,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     });
 
     expect(
-      await screen.findByRole("heading", { name: "We couldn't check this reference. Try again.", level: 1 })
+      await screen.findByRole("heading", { name: "We couldn't check this payment. Try again.", level: 1 })
     ).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Order created", level: 1 })).not.toBeInTheDocument();
   });
@@ -243,7 +243,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Simulate payment" }));
 
     expect(
-      await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 })
+      await screen.findByRole("heading", { name: "Payment approved", level: 1 })
     ).toBeInTheDocument();
     expect(window.location.pathname.startsWith("/checkout/attempts/")).toBe(true);
   });
@@ -261,7 +261,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
       throw new Error(`Unexpected fetch: ${path}`);
     });
 
-    await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 });
+    await screen.findByRole("heading", { name: "Payment approved", level: 1 });
 
     window.history.replaceState({}, "", "/checkout");
     window.dispatchEvent(new PopStateEvent("popstate"));
@@ -270,7 +270,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     window.history.replaceState({}, "", `/checkout/attempts/${attemptId}`);
     window.dispatchEvent(new PopStateEvent("popstate"));
     expect(
-      await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 })
+      await screen.findByRole("heading", { name: "Payment approved", level: 1 })
     ).toBeInTheDocument();
 
     const posts = recordedFetch().mock.calls.filter(([, options]) => options?.method === "POST");
@@ -300,7 +300,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     render(<Catalog />);
 
     expect(
-      await screen.findByRole("heading", { name: "Checking this journey...", level: 1 })
+      await screen.findByRole("heading", { name: "Checking your payment...", level: 1 })
     ).toBeInTheDocument();
 
     window.history.replaceState({}, "", "/checkout");
@@ -321,7 +321,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     window.dispatchEvent(new PopStateEvent("popstate"));
 
     expect(
-      await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 })
+      await screen.findByRole("heading", { name: "Payment approved", level: 1 })
     ).toBeInTheDocument();
     expect(orderCalls).toBe(2);
     expect(screen.queryByRole("heading", { name: "Order created", level: 1 })).not.toBeInTheDocument();
@@ -344,12 +344,12 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     const simulate = await screen.findByRole("button", { name: "Simulate payment" });
     await waitFor(() => expect(simulate).toBeDisabled());
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "A previous payment attempt reference is unresolved"
+      "A previous payment is not finished"
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
-    expect(screen.getByText(/does not cancel a request or delete a record/i)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Stop following" }));
+    expect(screen.getByText(/does not cancel the payment or delete anything/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
 
     await waitFor(() =>
       expect(window.sessionStorage.getItem("samska.latest-payment-attempt")).toBeNull()
@@ -386,7 +386,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
 
     expect(
       await screen.findByRole("heading", {
-        name: "We couldn't confirm a result for this reference.",
+        name: "We couldn't find a result for this payment.",
         level: 1
       })
     ).toBeInTheDocument();
@@ -397,7 +397,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     const simulate = screen.getByRole("button", { name: "Simulate payment" });
     expect(simulate).toBeDisabled();
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "A previous payment attempt reference is unresolved"
+      "A previous payment is not finished"
     );
     fireEvent.click(simulate);
     expect(
@@ -407,13 +407,13 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     fireEvent.click(screen.getByRole("button", { name: "View attempt" }));
     expect(
       await screen.findByRole("heading", {
-        name: "We couldn't confirm a result for this reference.",
+        name: "We couldn't find a result for this payment.",
         level: 1
       })
     ).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Stop following this reference" }));
-    fireEvent.click(screen.getByRole("button", { name: "Stop following" }));
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss this payment" }));
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
 
     await waitFor(() => expect(window.location.pathname).toBe("/checkout"));
     await waitFor(() =>
@@ -455,14 +455,14 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     fireEvent.click(await screen.findByRole("button", { name: "Simulate payment" }));
     expect(
       await screen.findByRole("heading", {
-        name: "Payment result is unconfirmed. Check this attempt before trying again.",
+        name: "We couldn't confirm the payment result. Check it before trying again.",
         level: 1
       })
     ).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole("button", { name: "Check this attempt" }));
-    fireEvent.click(screen.getByRole("button", { name: "Stop following this reference" }));
-    fireEvent.click(screen.getByRole("button", { name: "Stop following" }));
+    fireEvent.click(screen.getByRole("button", { name: "Check this payment" }));
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss this payment" }));
+    fireEvent.click(screen.getByRole("button", { name: "Dismiss" }));
 
     await waitFor(() => expect(window.location.pathname).toBe("/checkout"));
     expect(window.sessionStorage.getItem("samska.latest-payment-attempt")).toBeNull();
@@ -476,7 +476,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
       expect(screen.getByRole("button", { name: "Simulate payment" })).toBeEnabled()
     );
     expect(
-      screen.queryByRole("heading", { name: "Simulated payment approved", level: 1 })
+      screen.queryByRole("heading", { name: "Payment approved", level: 1 })
     ).not.toBeInTheDocument();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
@@ -519,7 +519,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     const simulate = await screen.findByRole("button", { name: "Simulate payment" });
     await waitFor(() => expect(simulate).toBeEnabled());
     fireEvent.click(simulate);
-    await screen.findByRole("heading", { name: "Checking this journey...", level: 1 });
+    await screen.findByRole("heading", { name: "Checking your payment...", level: 1 });
 
     window.history.replaceState({}, "", `/checkout/attempts/${otherAttemptId}`);
     window.dispatchEvent(new PopStateEvent("popstate"));
@@ -531,19 +531,19 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
 
     expect(
       await screen.findByRole("heading", {
-        name: "We couldn't confirm a result for this reference.",
+        name: "We couldn't find a result for this payment.",
         level: 1
       })
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole("heading", { name: "Simulated payment approved", level: 1 })
+      screen.queryByRole("heading", { name: "Payment approved", level: 1 })
     ).not.toBeInTheDocument();
 
     window.history.replaceState({}, "", `/checkout/attempts/${existingId}`);
     window.dispatchEvent(new PopStateEvent("popstate"));
 
     expect(
-      await screen.findByRole("heading", { name: "Simulated payment approved", level: 1 })
+      await screen.findByRole("heading", { name: "Payment approved", level: 1 })
     ).toBeInTheDocument();
     expect(existingLookups).toBe(2);
   });
@@ -572,7 +572,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     render(<Catalog />);
 
     expect(
-      await screen.findByRole("heading", { name: "Checking this journey...", level: 1 })
+      await screen.findByRole("heading", { name: "Checking your payment...", level: 1 })
     ).toBeInTheDocument();
 
     window.history.replaceState({}, "", "/checkout");
@@ -582,7 +582,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     window.history.replaceState({}, "", `/checkout/attempts/${attemptId}`);
     window.dispatchEvent(new PopStateEvent("popstate"));
     expect(
-      await screen.findByRole("heading", { name: "Checking this journey...", level: 1 })
+      await screen.findByRole("heading", { name: "Checking your payment...", level: 1 })
     ).toBeInTheDocument();
     await waitFor(() => expect(orderCalls).toBe(2));
 
@@ -592,7 +592,7 @@ describe("Attempt recovery independent of live Cart and Catalog", () => {
     });
 
     expect(
-      screen.getByRole("heading", { name: "Checking this journey...", level: 1 })
+      screen.getByRole("heading", { name: "Checking your payment...", level: 1 })
     ).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Order created", level: 1 })).not.toBeInTheDocument();
 
