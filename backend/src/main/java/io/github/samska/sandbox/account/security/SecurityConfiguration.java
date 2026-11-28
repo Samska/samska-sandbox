@@ -3,6 +3,7 @@ package io.github.samska.sandbox.account.security;
 import jakarta.servlet.DispatcherType;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -43,19 +44,17 @@ public class SecurityConfiguration {
         return new HttpSessionSecurityContextRepository();
     }
 
+    /**
+     * The only production filter chain. It is skipped solely when {@code samska.security.enforced=false},
+     * which the test source set answers with its own permissive chain; ProductionGuard refuses that
+     * value in a real run, so CSRF protection is never turned off by main code.
+     */
     @Bean
+    @ConditionalOnProperty(name = "samska.security.enforced", havingValue = "true", matchIfMissing = true)
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             SecurityContextRepository securityContextRepository,
-            @Value("${samska.security.enforced:true}") boolean enforced,
             @Value("${samska.security.secure-cookies:false}") boolean secureCookies) throws Exception {
-        if (!enforced) {
-            // Local tests of unrelated features only; the property is never set in a real run.
-            http.csrf(csrf -> csrf.disable())
-                    .authorizeHttpRequests(requests -> requests.anyRequest().permitAll());
-            return http.build();
-        }
-
         // A null attribute name loads the token eagerly, so every response carries the XSRF cookie
         // that the single-page application echoes in the X-XSRF-TOKEN header.
         var csrfHandler = new CsrfTokenRequestAttributeHandler();
