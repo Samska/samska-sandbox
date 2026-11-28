@@ -70,6 +70,10 @@ public class CartApplicationService {
         });
     }
 
+    public Cart clear() {
+        return cartStore.update(Cart::clear);
+    }
+
     /** Runs inside the Cart update, so a refusal stores nothing. */
     private void requireStock(Cart cart, ProductReference product) {
         var wanted = cart.snapshot().items().stream()

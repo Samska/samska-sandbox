@@ -797,6 +797,8 @@ export default function Catalog() {
 
       setOrderRecord(created);
       clearOrderOp(attemptId);
+      // The backend emptied the Cart when it stored the Order.
+      void refreshCart();
     } catch (caught) {
       if (!isCurrentLookup(token, attemptId)) {
         return;

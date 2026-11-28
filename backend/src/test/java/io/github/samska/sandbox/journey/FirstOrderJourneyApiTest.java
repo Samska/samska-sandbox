@@ -77,7 +77,9 @@ class FirstOrderJourneyApiTest extends OrderDatabaseTestSupport {
                 .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
         assertThat(replay).isEqualTo(createdOrder);
 
-        var laterRevision = updateQuantity(productId, 5);
+        mvc.perform(get("/api/cart")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.items").isEmpty());
+        var laterRevision = addToCart(productId, 5);
 
         mvc.perform(get("/api/orders/{orderId}", orderId)).andExpect(status().isOk())
                 .andExpect(jsonPath("$.cartRevision").value(reviewedRevision))

@@ -77,13 +77,16 @@ describe("Order creation from a confirmed approved payment", () => {
     const heading = await screen.findByRole("heading", { name: "Order created", level: 1 });
     await waitFor(() => expect(heading).toHaveFocus());
     expect(screen.getByText(/No real payment was made/)).toBeInTheDocument();
-    expect(screen.getByText(/was not cleared/)).toBeInTheDocument();
+    expect(screen.getByText(/Your Cart was emptied/)).toBeInTheDocument();
     expect(screen.getByText(/Order total: 25.00/)).toBeInTheDocument();
     expect(window.location.pathname).toBe(`/checkout/attempts/${approvedAttemptId}`);
 
     const posts = fetchMock.mock.calls.filter(([path, options]) => path === "/api/orders" && options?.method === "POST");
     expect(posts).toHaveLength(1);
     expect(JSON.parse(String(posts[0]?.[1]?.body))).toEqual({ paymentAttemptId: approvedAttemptId });
+    // The Cart is read again after the Order is stored, because the backend emptied it.
+    const paths = fetchMock.mock.calls.map(([path]) => path);
+    expect(paths.slice(paths.indexOf("/api/orders")).includes("/api/cart")).toBe(true);
 
     fireEvent.click(screen.getByRole("button", { name: "Back to Market" }));
     await screen.findByRole("heading", { name: "Products", level: 1 });

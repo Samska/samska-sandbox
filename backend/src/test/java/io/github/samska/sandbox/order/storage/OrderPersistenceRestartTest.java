@@ -59,9 +59,10 @@ class OrderPersistenceRestartTest {
             orderId = read(created, "$.orderId");
             assertOrder(created, orderId, firstProductId, secondProductId);
 
-            // Bump the revision so the second attempt is approved and deliberately left unordered.
-            assertThat(addToCart(base, firstProductId, 1)).isEqualTo(CART_REVISION + 1);
-            post(base, "/api/payment-attempts", attemptBody(UNORDERED_ATTEMPT, CART_REVISION + 1, "approve"), 201);
+            // Creating the Order emptied the Cart (one more revision); refill it so the second attempt
+            // is approved on a new revision and deliberately left unordered.
+            assertThat(addToCart(base, firstProductId, 1)).isEqualTo(CART_REVISION + 2);
+            post(base, "/api/payment-attempts", attemptBody(UNORDERED_ATTEMPT, CART_REVISION + 2, "approve"), 201);
         }
 
         try (var second = startApplication()) {
@@ -87,7 +88,7 @@ class OrderPersistenceRestartTest {
 
             var jdbc = second.getBean(JdbcTemplate.class);
             assertThat(jdbc.queryForObject("SELECT count(*) FROM orders", Long.class)).isEqualTo(2);
-            assertThat(jdbc.queryForObject("SELECT count(*) FROM order_items", Long.class)).isEqualTo(4);
+            assertThat(jdbc.queryForObject("SELECT count(*) FROM order_items", Long.class)).isEqualTo(3);
         }
     }
 

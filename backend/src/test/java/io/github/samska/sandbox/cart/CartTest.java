@@ -27,6 +27,20 @@ class CartTest {
     }
 
     @Test
+    void clearEmptiesTheCartAndAdvancesTheRevisionOnlyWhenItChangedSomething() {
+        var cart = new Cart();
+        cart.clear();
+        assertThat(cart.snapshot().revision()).isZero();
+
+        cart.addItem(PRODUCT, "Canvas Tote", new BigDecimal("12.50"), new Quantity(2));
+        cart.clear();
+
+        assertThat(cart.items()).isEmpty();
+        assertThat(cart.total()).isEqualByComparingTo("0");
+        assertThat(cart.snapshot().revision()).isEqualTo(2);
+    }
+
+    @Test
     void repeatedAdditionIncrementsExistingQuantityAndRetainsSnapshot() {
         var cart = new Cart();
 

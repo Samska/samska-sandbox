@@ -56,6 +56,14 @@ public final class Cart {
         revision++;
     }
 
+    public synchronized void clear() {
+        if (items.isEmpty()) {
+            return;
+        }
+        items.clear();
+        revision++;
+    }
+
     public synchronized List<CartItem> items() {
         return List.copyOf(items.values());
     }

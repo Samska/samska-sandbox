@@ -109,7 +109,7 @@ export default function PaymentResult({
         {isApproved && onCreateOrder && !onViewOrder ? (
           <div className="grid gap-3 rounded-sm border-[1.5px] border-ink px-4 py-4" aria-busy={orderPending}>
             <h2 className="text-lg text-ink">Create an Order</h2>
-            <p className="text-sm text-muted">This action records the frozen simulated payment items and total. It does not clear your live Cart.</p>
+            <p className="text-sm text-muted">This action records the frozen simulated payment items and total. Your Cart is emptied once the Order is created.</p>
             {orderPending ? <StatusMessage tone="pending">Checking Order...</StatusMessage> : null}
             {orderError ? <StatusMessage tone="error">{orderError}</StatusMessage> : null}
             {orderUnconfirmed && !orderRetryReady && onCheckOrder ? (
