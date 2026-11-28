@@ -74,7 +74,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-078-theme-switch.md](ss-078-theme-switch.md) | Layering a user theme override over the system preference, flash-free loading under a strict CSP, and failure-tolerant storage. |
 | [ss-079-image-build-in-ci.md](ss-079-image-build-in-ci.md) | Why deployment artifacts are built in CI, and the Maven wrapper's dependency on `unzip`. |
 | [ss-084-product-art.md](ss-084-product-art.md) | Theme-aware inline SVG, and a safe data migration in a seed. |
-| [ss-091-orders-catalog-number.md](ss-091-orders-catalog-number.md) | A customer-facing number beside a UUID key, and migrating a populated table. |
+| [ss-090-orders-catalog-number.md](ss-090-orders-catalog-number.md) | A customer-facing number beside a UUID key, and migrating a populated table. |
 | [ss-086-clear-cart-on-order.md](ss-086-clear-cart-on-order.md) | Side effects after a commit, idempotent replays, and changing a documented decision. |
 | [ss-088-self-hosted-fonts.md](ss-088-self-hosted-fonts.md) | Content-Security-Policy against third-party fonts, subsetting, and cache lifetimes. |
 | [ss-091-plain-copy.md](ss-091-plain-copy.md) | Error messages as interface, and stale messages as defects. |
