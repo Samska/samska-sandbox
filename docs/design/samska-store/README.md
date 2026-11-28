@@ -379,3 +379,12 @@ This approval/status update is mechanical; it does not restart or alter the revi
 Historical pre-merge instruction; completed by [Issue #100](https://github.com/Samska/samska-sandbox/issues/100) and [PR #101](https://github.com/Samska/samska-sandbox/pull/101).
 
 Owner visual approval and owner human engineering approval of the documentation are recorded. Scoped commit/push to `feat/ss-052-samska-store-design` is authorized. Native backup is not exported; it is optional and non-blocking for SS-052. Commit and push the approved documentation, then stop for a separate PR creation decision. Do not create another candidate, open a pull request, merge, close the Issue, delete, or clean up.
+
+## SS-082 — Illustrations for the sample Products
+
+Status: **Approved by the owner in the project thread (2026-11-27) and implemented.**
+
+- Issue: [SS-082 / #165](https://github.com/Samska/samska-sandbox/issues/165)
+- Why: the three photos on the sample Products did not look like the Bench identity, and three samples had no image.
+- Source of truth: [prototypes/product-art.html](prototypes/product-art.html): six original illustrations (tote, pour-over set, workbench, apron, camp mug, serving board) on Bench stages with the 25% grid and catalog number; ink linework and one signal color, so light and dark follow the theme tokens.
+- Implemented in `web/src/catalog/productArt.ts` (drawings keyed `art-*`) and `ProductMedia`; uploaded images still take precedence.

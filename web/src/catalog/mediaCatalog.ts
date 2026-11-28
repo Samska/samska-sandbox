@@ -1,4 +1,5 @@
 import type { ProductResponse } from "./catalogApi";
+import { productArt } from "./productArt";
 
 const mediaSourceByKey: Record<string, string> = {
   "canvas-market-tote": "/media/canvas-market-tote.jpg",
@@ -24,4 +25,9 @@ export function productMediaSource(
   }
 
   return curatedMediaSource(product.mediaKey);
+}
+
+/** True when the key names a curated image or a curated illustration. */
+export function hasCuratedMedia(mediaKey: string | null): boolean {
+  return curatedMediaSource(mediaKey) !== undefined || productArt(mediaKey) !== undefined;
 }
