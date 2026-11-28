@@ -6,7 +6,7 @@ import {
   type ProductResponse
 } from "../catalog/catalogApi";
 import ProductMedia from "../catalog/ProductMedia";
-import { curatedMediaSource } from "../catalog/mediaCatalog";
+import { hasCuratedMedia } from "../catalog/mediaCatalog";
 import { formatAmount } from "../formatAmount";
 import Button from "../ui/Button";
 import FormField from "../ui/FormField";
@@ -271,7 +271,7 @@ function imageStateLabel(product: ProductResponse): string {
     return "No image";
   }
 
-  return curatedMediaSource(product.mediaKey) !== undefined
+  return hasCuratedMedia(product.mediaKey)
     ? "Curated image"
     : "Monogram (media key has no local asset)";
 }

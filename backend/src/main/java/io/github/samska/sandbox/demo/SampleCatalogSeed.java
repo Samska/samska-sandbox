@@ -23,28 +23,29 @@ class SampleCatalogSeed implements ApplicationRunner {
 
     private static final Logger LOG = LoggerFactory.getLogger(SampleCatalogSeed.class);
 
-    private record Sample(String name, String description, String price, String mediaKey, int stock) {
+    private record Sample(String name, String description, String price, String mediaKey, String earlierMediaKey,
+            int stock) {
     }
 
     private static final List<Sample> SAMPLES = List.of(
             new Sample("Canvas Market Tote",
                     "Sturdy cotton canvas tote with reinforced handles, sized for a week of market shopping.",
-                    "29.90", "canvas-market-tote", 25),
+                    "29.90", "art-tote", "canvas-market-tote", 25),
             new Sample("Stoneware Pour-Over Set",
                     "Hand-glazed stoneware dripper and server for a slow, careful cup of coffee.",
-                    "64.00", "stoneware-pour-over-set", 25),
+                    "64.00", "art-pour-over", "stoneware-pour-over-set", 25),
             new Sample("Workshop Workbench",
                     "Solid beech workbench with a vise and tool shelf, built for a small home workshop.",
-                    "489.00", "workshop-workbench", 10),
+                    "489.00", "art-workbench", "workshop-workbench", 10),
             new Sample("Linen Apron",
                     "Washed linen apron with two deep pockets and an adjustable neck strap.",
-                    "34.50", null, 25),
+                    "34.50", "art-linen-apron", null, 25),
             new Sample("Enamel Camp Mug",
                     "Lightweight enamel mug with a rolled rim that stays cool to hold.",
-                    "12.00", null, 40),
+                    "12.00", "art-camp-mug", null, 40),
             new Sample("Walnut Serving Board",
                     "Oiled walnut board with a juice groove, large enough for a shared meal.",
-                    "58.00", null, 15));
+                    "58.00", "art-serving-board", null, 15));
 
     private final ProductApplicationService products;
     private final Inventory inventory;
@@ -61,7 +62,36 @@ class SampleCatalogSeed implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         if (enabled) {
             seedIfEmpty();
+            refreshIllustrations();
         }
+    }
+
+    /**
+     * Moves sample Products created by an earlier version to the current illustrations. A Product is touched only
+     * while it still has the sample's name, description and price and its earlier media key, so nothing the
+     * administrator changed is overwritten.
+     *
+     * @return the number of Products updated
+     */
+    int refreshIllustrations() {
+        var updated = 0;
+        for (var snapshot : products.listProducts()) {
+            var product = snapshot.product();
+            for (var sample : SAMPLES) {
+                if (product.name().equals(sample.name())
+                        && product.description().equals(sample.description())
+                        && product.price().compareTo(new BigDecimal(sample.price())) == 0
+                        && java.util.Objects.equals(product.mediaKey(), sample.earlierMediaKey())) {
+                    products.updateProduct(product.id(), product.name(), product.description(), product.price(),
+                            sample.mediaKey());
+                    updated++;
+                }
+            }
+        }
+        if (updated > 0) {
+            LOG.info("Moved {} sample Products to the current illustrations", updated);
+        }
+        return updated;
     }
 
     /** @return the number of Products created, zero when the catalog already has Products */

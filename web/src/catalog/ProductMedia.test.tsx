@@ -36,6 +36,35 @@ describe("ProductMedia", () => {
     expect(container.querySelector("img")).toHaveAttribute("src", "/media/canvas-market-tote.jpg");
   });
 
+  it("renders the curated illustration for an art key, in every variant, without an image", () => {
+    for (const variant of ["card", "detail", "thumbnail", "square"] as const) {
+      const { container, unmount } = render(
+        <ProductMedia product={{ ...product, mediaKey: "art-tote" }} variant={variant} />
+      );
+
+      expect(container.querySelector("img")).toBeNull();
+      expect(container.querySelector("svg")).not.toBeNull();
+      expect(container.querySelector("[data-product-art='art-tote']")).not.toBeNull();
+      unmount();
+    }
+  });
+
+  it("prefers uploaded media over an art key", () => {
+    const { container } = render(
+      <ProductMedia
+        product={{
+          ...product,
+          mediaKey: "art-tote",
+          uploadedMediaId: "22222222-2222-2222-2222-222222222222"
+        }}
+        variant="card"
+      />
+    );
+
+    expect(container.querySelector("img")).not.toBeNull();
+    expect(container.querySelector("svg")).toBeNull();
+  });
+
   it("renders the monogram fallback when no media is set", () => {
     const { container } = render(<ProductMedia product={product} variant="card" />);
 

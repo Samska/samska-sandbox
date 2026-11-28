@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ProductResponse } from "./catalogApi";
 import { productMediaSource } from "./mediaCatalog";
+import { productArt, type ProductArtTone } from "./productArt";
 
 const stageClassName = [
   "bg-media-teal",
@@ -8,6 +9,13 @@ const stageClassName = [
   "bg-media-rose",
   "bg-media-slate"
 ] as const;
+
+const toneClassName: Record<ProductArtTone, string> = {
+  teal: "bg-media-teal",
+  olive: "bg-media-olive",
+  rose: "bg-media-rose",
+  slate: "bg-media-slate"
+};
 
 const stageGridStyle = {
   backgroundImage:
@@ -66,6 +74,30 @@ export default function ProductMedia({
   }
 
   const showMarks = variant === "card" || variant === "detail";
+  const art = source === undefined ? productArt(product.mediaKey) : undefined;
+
+  if (art !== undefined) {
+    return (
+      <div
+        className={`relative overflow-hidden border-[1.5px] border-ink ${toneClassName[art.tone]} ${mediaVariantClassName[variant]}`}
+        style={showMarks ? stageGridStyle : undefined}
+        aria-hidden="true"
+        data-product-art={product.mediaKey ?? undefined}
+      >
+        {showMarks ? (
+          <span className="absolute left-3 top-3 z-10 rounded-[3px] border-[1.5px] border-ink bg-surface px-1.5 font-mono text-[0.7rem] text-ink">
+            No. {catalogNumber(product.id)}
+          </span>
+        ) : null}
+        <svg
+          viewBox="0 0 400 400"
+          className="absolute inset-0 h-full w-full"
+          focusable="false"
+          dangerouslySetInnerHTML={{ __html: art.markup }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div
