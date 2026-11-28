@@ -115,7 +115,7 @@ export default function App() {
       <footer className="border-t-2 border-ink bg-surface">
         <div className="mx-auto flex w-[min(100%-2.5rem,76rem)] flex-wrap items-center justify-between gap-2 py-6 text-sm text-muted">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.12em] text-ink">Samska Sandbox</p>
-          <p>A fictional storefront for engineering practice. Nothing here is real, and the public demo clears its data every day.</p>
+          <p>Samska Store · a personal storefront project</p>
         </div>
       </footer>
     </div>

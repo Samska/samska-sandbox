@@ -1,9 +1,9 @@
-# SS-094: Remove The Simulated Payment
+# SS-099: Remove The Simulated Payment
 
 - Status: Active
 - Work date: 2026-11-28
 - Last reviewed: 2026-11-28
-- Work item: [SS-094 (#189)](https://github.com/Samska/samska-sandbox/issues/189)
+- Work item: [SS-099 (#189)](https://github.com/Samska/samska-sandbox/issues/189)
 - Pull request: See the Issue
 - ADRs: [ADR 0021](../adr/0021-remove-the-simulated-payment.md)
 - Canonical documentation: [Architecture](../ARCHITECTURE.md)

@@ -1,6 +1,6 @@
 # ADR 0010: Adopt PostgreSQL Persistence for Payment Attempts
 
-- Status: Superseded by [ADR 0021](0021-remove-the-simulated-payment.md) (SS-094 removed the Payment module)
+- Status: Superseded by [ADR 0021](0021-remove-the-simulated-payment.md) (SS-099 removed the Payment module)
 - Date: 2026-11-27
 - Decision makers: Samska (human owner) with AI implementation support
 - Related: [SS-066 (#127)](https://github.com/Samska/samska-sandbox/issues/127), [ADR 0005](0005-adopt-payment-attempt-store-with-cart-revision.md), [ADR 0008](0008-adopt-postgresql-order-persistence.md), [ADR 0009](0009-adopt-postgresql-cart-persistence.md)

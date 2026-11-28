@@ -166,7 +166,7 @@ Uploaded images are runtime data: they are not committed to the repository, are 
 
 ## Placing An Order
 
-Checkout has one step: **Place order**. The browser sends a request ID and the Cart revision it showed; the backend captures an immutable, revision-checked snapshot of the current Cart, stores the Order and its items, takes the stock and empties the Cart in the same request. There is no payment and no demo outcome: every Order is approved directly, and nothing is charged. Repeating the same request ID returns the stored Order with `200` instead of `201`; a Cart that changed since the reviewed revision is refused with `409 cart-changed`; items that are no longer in stock are refused with `409 out-of-stock`. The simulated payment of SS-036 was removed in SS-094 ([ADR 0021](adr/0021-remove-the-simulated-payment.md)).
+Checkout has one step: **Place order**. The browser sends a request ID and the Cart revision it showed; the backend captures an immutable, revision-checked snapshot of the current Cart, stores the Order and its items, takes the stock and empties the Cart in the same request. There is no payment and no demo outcome: every Order is approved directly, and nothing is charged. Repeating the same request ID returns the stored Order with `200` instead of `201`; a Cart that changed since the reviewed revision is refused with `409 cart-changed`; items that are no longer in stock are refused with `409 out-of-stock`. The simulated payment of SS-036 was removed in SS-099 ([ADR 0021](adr/0021-remove-the-simulated-payment.md)).
 
 ## URLs and Ports
 

@@ -3,7 +3,7 @@
 - Status: Accepted; supersedes [ADR 0005](0005-adopt-payment-attempt-store-with-cart-revision.md), [ADR 0010](0010-adopt-postgresql-payment-attempt-persistence.md) and the reservation rule of [ADR 0015](0015-add-inventory-with-reservations.md), and supersedes in part [ADR 0006](0006-adopt-order-owned-in-memory-store.md) and [ADR 0007](0007-adopt-attempt-addressed-browser-recovery.md)
 - Date: 2026-11-28
 - Decision makers: Samska (human owner) with AI implementation support
-- Related: [SS-094 (#189)](https://github.com/Samska/samska-sandbox/issues/189), [ADR 0008](0008-adopt-postgresql-order-persistence.md), [Architecture](../ARCHITECTURE.md), [Security](../SECURITY.md)
+- Related: [SS-099 (#189)](https://github.com/Samska/samska-sandbox/issues/189), [ADR 0008](0008-adopt-postgresql-order-persistence.md), [Architecture](../ARCHITECTURE.md), [Security](../SECURITY.md)
 
 ## Context
 

@@ -79,7 +79,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-088-self-hosted-fonts.md](ss-088-self-hosted-fonts.md) | Content-Security-Policy against third-party fonts, subsetting, and cache lifetimes. |
 | [ss-095-remove-self-sign-up.md](ss-095-remove-self-sign-up.md) | Removing an attack surface instead of guarding it, and why roles outlive sign-up. |
 | [ss-091-plain-copy.md](ss-091-plain-copy.md) | Error messages as interface, and stale messages as defects. |
-| [ss-094-remove-payment-simulation.md](ss-094-remove-payment-simulation.md) | Removing a feature with its support code, and keeping the idempotency key. |
+| [ss-099-remove-payment-simulation.md](ss-099-remove-payment-simulation.md) | Removing a feature with its support code, and keeping the idempotency key. |
 | [ss-081-demo-sample-products.md](ss-081-demo-sample-products.md) | Idempotent seeding of demo data and why it must not overwrite existing data. |
 | [ss-080-web-dns-resolver.md](ss-080-web-dns-resolver.md) | Why the web image must use the platform's DNS resolver, and how it was verified. |
 | [ss-065-cart-persistence.md](ss-065-cart-persistence.md) | Transactional update contract for a mutable aggregate, row-lock serialization of a business revision, domain rules kept out of the store, and snapshot rows without a foreign key. |

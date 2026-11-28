@@ -67,7 +67,7 @@ validation, learning, and risk.
 | Product Storefront UX/UI | Implemented | Browse, detail, and feedback presentation refined with a small shared primitive layer and focus return; optional nullable Product `mediaKey` resolved to curated local assets with a monogram fallback; accessible Cart drawer with the quantity-summed item count; the Cart API contract is unchanged. |
 | Market Product-name search | Implemented | Case- and accent-insensitive substring filter on `Product.name` in the Market; term is held in `Catalog` while mounted, never written to the URL/history/storage/logs, and never sent to the API (`GET /api/products` is unchanged); Admin keeps its accent-sensitive filter by decision. |
 | Checkout | Implemented | An editable live view of the current authoritative Cart: quantity changes and item removal happen directly in Checkout using the existing Cart operations, server responses update the view, and no backend Checkout resource or identity exists; placing the order captures the immutable revision-checked snapshot. |
-| Order creation | Implemented | One "Place order" step from Checkout: the server reads the Cart at the reviewed revision, stores immutable copied lines and total with the Order in PostgreSQL, takes the stock in the same transaction, empties the Cart, and replays the same Order for the same request ID. The simulated payment (SS-036) was removed in SS-094; every Order is approved directly. |
+| Order creation | Implemented | One "Place order" step from Checkout: the server reads the Cart at the reviewed revision, stores immutable copied lines and total with the Order in PostgreSQL, takes the stock in the same transaction, empties the Cart, and replays the same Order for the same request ID. The simulated payment (SS-036) was removed in SS-099; every Order is approved directly. |
 | First Order journey | Implemented | Add to Cart, review in Checkout, place the order, and see the Order number; the Order then shows in the history and opens its tracking. |
 | Admin Catalog Management | Implemented | Compact management list at `/admin/products` with case-insensitive name search, thumbnails, Edit links, and delete confirmation; dedicated `/admin/products/new` and `/admin/products/{id}/edit` forms with staged image selection; Admin paths require an administrator sign-in. |
 | Product Media Upload | Implemented | One validated, re-encoded JPEG per Product stored with the Product in PostgreSQL under a bounded total size; uploaded media takes display precedence in Market cards and detail, with curated media and the monogram fallback retained; limits are enforced server-side and rejection changes nothing. |
@@ -172,7 +172,7 @@ PR #52. Checkout (SS-032) is implemented as an editable live view of the current
 Cart. Admin Catalog Management (SS-033) is complete and merged through PR #56.
 Product Media Upload (SS-034) is complete and merged through PR #58. Payment
 Simulator (SS-036) provided explicit simulated payment outcomes; it was removed
-by SS-094 and Checkout now places the Order in one step. Order creation (SS-037) is implemented and merged through PR #67; the
+by SS-099 and Checkout now places the Order in one step. Order creation (SS-037) is implemented and merged through PR #67; the
 owner observed the main browser flow, while API replay, uncertain-response
 recovery, and accessibility checks remain unobserved for SS-037 itself. The
 First Order journey (SS-039) is complete and merged through PR #70: `/checkout`
