@@ -73,6 +73,7 @@ Human engineering review remains required where the workflow calls for it. Engin
 | [ss-077-empty-state-design-fix.md](ss-077-empty-state-design-fix.md) | Prototype fidelity in the running app and one shared component for a repeated pattern. |
 | [ss-078-theme-switch.md](ss-078-theme-switch.md) | Layering a user theme override over the system preference, flash-free loading under a strict CSP, and failure-tolerant storage. |
 | [ss-079-image-build-in-ci.md](ss-079-image-build-in-ci.md) | Why deployment artifacts are built in CI, and the Maven wrapper's dependency on `unzip`. |
+| [ss-098-sample-catalog.md](ss-098-sample-catalog.md) | Idempotent seeding by natural key, and permanent example data. |
 | [ss-084-product-art.md](ss-084-product-art.md) | Theme-aware inline SVG, and a safe data migration in a seed. |
 | [ss-090-orders-catalog-number.md](ss-090-orders-catalog-number.md) | A customer-facing number beside a UUID key, and migrating a populated table. |
 | [ss-086-clear-cart-on-order.md](ss-086-clear-cart-on-order.md) | Side effects after a commit, idempotent replays, and changing a documented decision. |
