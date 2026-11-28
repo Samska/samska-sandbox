@@ -22,11 +22,7 @@ class DemoApiTest {
     }
 
     private static Client customer(EnforcedApplication app, String email) throws Exception {
-        var client = app.client();
-        assertThat(client.post("/api/auth/register",
-                "{\"email\":\"" + email + "\",\"displayName\":\"Synthetic\",\"password\":\"correct-horse\"}")
-                .status()).isEqualTo(201);
-        return client;
+        return app.customer(email);
     }
 
     @Test

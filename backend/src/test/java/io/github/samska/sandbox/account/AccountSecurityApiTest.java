@@ -29,15 +29,8 @@ class AccountSecurityApiTest {
         app.close();
     }
 
-    private static String credentials(String email, String name, String password) {
-        return "{\"email\":\"" + email + "\",\"displayName\":\"" + name + "\",\"password\":\"" + password + "\"}";
-    }
-
     private static Client customer(String email) throws Exception {
-        var client = app.client();
-        var reply = client.post("/api/auth/register", credentials(email, "Synthetic Person", "correct-horse"));
-        assertThat(reply.status()).as(reply.body()).isEqualTo(201);
-        return client;
+        return app.customer(email);
     }
 
     private static Client admin() throws Exception {
@@ -70,18 +63,29 @@ class AccountSecurityApiTest {
     }
 
     @Test
-    void registrationSignsTheAccountInAndNeverReturnsOrLogsThePassword() throws Exception {
-        var client = app.client();
-        var reply = client.post("/api/auth/register", credentials("Ana@Example.test", "Ana", "correct-horse"));
+    void thereIsNoSelfSignUp() throws Exception {
+        var body = "{\"email\":\"new@example.test\",\"displayName\":\"New\",\"password\":\"correct-horse\"}";
 
-        assertThat(reply.status()).isEqualTo(201);
+        assertThat(app.client().post("/api/auth/register", body).status()).isIn(401, 404);
+        assertThat(admin().post("/api/auth/register", body).status()).isEqualTo(404);
+        assertThat(app.context().getBean(JdbcTemplate.class)
+                .queryForObject("SELECT count(*) FROM accounts WHERE email = 'new@example.test'", Integer.class))
+                .isZero();
+    }
+
+    @Test
+    void signInNeverReturnsOrStoresThePasswordInThePlain() throws Exception {
+        customer("Ana@Example.test");
+        var client = app.client();
+        var reply = client.post("/api/auth/login", "{\"email\":\"ana@example.test\",\"password\":\"correct-horse\"}");
+
+        assertThat(reply.status()).isEqualTo(200);
         assertThat((String) JsonPath.read(reply.body(), "$.email")).isEqualTo("ana@example.test");
         assertThat((String) JsonPath.read(reply.body(), "$.role")).isEqualTo("CUSTOMER");
         assertThat(reply.body()).doesNotContain("correct-horse").doesNotContain("password");
 
         var me = client.get("/api/auth/me");
         assertThat(me.status()).isEqualTo(200);
-        assertThat((String) JsonPath.read(me.body(), "$.displayName")).isEqualTo("Ana");
 
         var stored = app.context().getBean(JdbcTemplate.class)
                 .queryForObject("SELECT password_hash FROM accounts WHERE email = 'ana@example.test'", String.class);
@@ -89,22 +93,6 @@ class AccountSecurityApiTest {
 
         var setCookie = String.join(";", reply.raw().headers().allValues("Set-Cookie"));
         assertThat(setCookie).contains("JSESSIONID").contains("HttpOnly");
-    }
-
-    @Test
-    void rejectsInvalidAndDuplicateRegistrations() throws Exception {
-        customer("duplicate@example.test");
-        var other = app.client();
-
-        assertThat(other.post("/api/auth/register",
-                credentials("DUPLICATE@example.test", "Again", "correct-horse")).status()).isEqualTo(409);
-        assertThat(other.post("/api/auth/register", credentials("not-an-email", "X", "correct-horse")).status())
-                .isEqualTo(400);
-        assertThat(other.post("/api/auth/register", credentials("short@example.test", "X", "short")).status())
-                .isEqualTo(400);
-        assertThat(other.post("/api/auth/register", credentials("noname@example.test", " ", "correct-horse")).status())
-                .isEqualTo(400);
-        assertThat(other.post("/api/auth/register", "{not json").status()).isEqualTo(400);
     }
 
     @Test

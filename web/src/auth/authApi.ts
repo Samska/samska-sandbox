@@ -7,7 +7,7 @@ export interface Account {
   role: "CUSTOMER" | "ADMIN";
 }
 
-export type AuthErrorKind = "invalid" | "duplicate" | "credentials" | "network" | "server";
+export type AuthErrorKind = "invalid" | "credentials" | "network" | "server";
 
 export class AuthApiError extends Error {
   readonly kind: AuthErrorKind;
@@ -26,10 +26,6 @@ export async function currentAccount(): Promise<Account | null> {
   }
 
   return readAccount(response, 200);
-}
-
-export async function register(email: string, displayName: string, password: string): Promise<Account> {
-  return readAccount(await call("/api/auth/register", { email, displayName, password }), 201);
 }
 
 export async function signIn(email: string, password: string): Promise<Account> {
@@ -73,7 +69,6 @@ async function readAccount(response: Response, expected: number): Promise<Accoun
 
 function kindFor(status: number): AuthErrorKind {
   if (status === 400) return "invalid";
-  if (status === 409) return "duplicate";
   if (status === 401) return "credentials";
   return "server";
 }
